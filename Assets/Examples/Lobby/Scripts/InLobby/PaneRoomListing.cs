@@ -1,9 +1,11 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
+using Prg.Scripts.Common.Unity;
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Examples.Lobby.Scripts.InLobby
@@ -13,6 +15,8 @@ namespace Examples.Lobby.Scripts.InLobby
     /// </summary>
     public class PaneRoomListing : MonoBehaviour
     {
+        [SerializeField] private Button characterButton;
+        [SerializeField] private UnitySceneName characterScene;
         [SerializeField] private Button templateButton;
         [SerializeField] private Transform buttonParent;
 
@@ -20,6 +24,10 @@ namespace Examples.Lobby.Scripts.InLobby
 
         private void Start()
         {
+            characterButton.onClick.AddListener(() =>
+            {
+                SceneManager.LoadScene(characterScene.sceneName);
+            });
             templateButton.onClick.AddListener(createRoomForMe);
         }
 
