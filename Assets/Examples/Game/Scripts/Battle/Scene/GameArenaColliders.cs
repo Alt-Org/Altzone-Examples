@@ -14,6 +14,7 @@ namespace Examples.Game.Scripts.Battle.Scene
         [Header("Settings"), SerializeField] private SpriteRenderer templateSprite;
         [SerializeField] private Transform colliderParent;
         [SerializeField] private float wallThickness;
+        [SerializeField] private PhysicsMaterial2D wallMaterial;
         [SerializeField, TagSelector] private string wallTopTag;
         [SerializeField, LayerSelector] private int wallTopLayer;
         [SerializeField, TagSelector] private string wallBottomTag;
@@ -35,10 +36,10 @@ namespace Examples.Game.Scripts.Battle.Scene
 
         private void makeWalls()
         {
-            wallTop = createWall("wallTop", colliderParent,  wallTopTag, wallTopLayer).GetComponent<BoxCollider2D>();
-            wallBottom = createWall("wallBottom", colliderParent, wallBottomTag, wallBottomLayer).GetComponent<BoxCollider2D>();
-            wallLeft = createWall("wallLeft", colliderParent, wallLeftTag, wallLeftLayer).GetComponent<BoxCollider2D>();
-            wallRight = createWall("wallRight", colliderParent, wallRightTag, wallRightLayer).GetComponent<BoxCollider2D>();
+            wallTop = createWall("wallTop", colliderParent,  wallTopTag, wallTopLayer, wallMaterial);
+            wallBottom = createWall("wallBottom", colliderParent, wallBottomTag, wallBottomLayer, wallMaterial);
+            wallLeft = createWall("wallLeft", colliderParent, wallLeftTag, wallLeftLayer, wallMaterial);
+            wallRight = createWall("wallRight", colliderParent, wallRightTag, wallRightLayer, wallMaterial);
 
             if (wallThickness == 0)
             {
@@ -62,7 +63,7 @@ namespace Examples.Game.Scripts.Battle.Scene
             wallRight.size = new Vector2(wallThickness, size.y);
         }
 
-        private static GameObject createWall(string name, Transform parent, string tag, int layer)
+        private static BoxCollider2D createWall(string name, Transform parent, string tag, int layer, PhysicsMaterial2D wallMaterial)
         {
             var wall = new GameObject(name) { isStatic = true };
             wall.transform.SetParent(parent);
@@ -72,8 +73,9 @@ namespace Examples.Game.Scripts.Battle.Scene
             }
             wall.layer = layer;
             wall.isStatic = true;
-            wall.AddComponent<BoxCollider2D>();
-            return wall;
+            var collider = wall.AddComponent<BoxCollider2D>();
+            collider.sharedMaterial = wallMaterial;
+            return collider;
         }
     }
 }
