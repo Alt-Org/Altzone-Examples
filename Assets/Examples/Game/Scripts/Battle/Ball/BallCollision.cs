@@ -44,6 +44,7 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void OnCollisionEnter2D(Collision2D other)
         {
+            Debug.Log($"OnCollisionEnter2D {other.gameObject.name}");
             if (!enabled)
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
@@ -57,6 +58,7 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            Debug.Log($"OnTriggerEnter2D {other.gameObject.name}");
             if (!enabled)
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.

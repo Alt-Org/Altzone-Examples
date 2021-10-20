@@ -40,6 +40,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         [Header("Live Data"), SerializeField] private int playerPos;
         [SerializeField] private int teamIndex;
+        //[SerializeField] private int currentMode;
         [SerializeField] private Collider2D[] colliders;
 
         int IPlayerActor.PlayerPos => playerPos;
@@ -126,17 +127,29 @@ namespace Examples.Game.Scripts.Battle.Player
 
         void IPlayerActor.setNormalMode()
         {
-            _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeNormal);
+            //if (currentMode != playModeNormal)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeNormal);
+            }
         }
 
         void IPlayerActor.setFrozenMode()
         {
-            _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeFrozen);
+            //if (currentMode != playModeFrozen)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeFrozen);
+            }
         }
 
         void IPlayerActor.setGhostedMode()
         {
-            _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeGhosted);
+            //if (currentMode != playModeGhosted)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeGhosted);
+            }
         }
 
         void IPlayerActor.headCollision()

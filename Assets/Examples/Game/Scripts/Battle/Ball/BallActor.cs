@@ -41,8 +41,11 @@ namespace Examples.Game.Scripts.Battle.Ball
         [SerializeField] private float networkLag;
 
         private Rigidbody2D _rigidbody;
-
         private PhotonView _photonView;
+
+        private bool isBallStarting;
+
+        private float ballGracePeriod;
         //--private Vector2 curVelocity;
 
         // Configurable settings
@@ -55,7 +58,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             _rigidbody = GetComponent<Rigidbody2D>();
             _photonView = PhotonView.Get(this);
             _rigidbody.isKinematic = !_photonView.IsMine;
-            _collider.enabled = _photonView.IsMine;
+            _collider.enabled = false;
 
             collisionToHead = collisionToHeadMask.value;
             collisionToWall = collisionToWallMask.value;
@@ -120,7 +123,10 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             onCurrentTeamChanged(teamIndex);
             _rigidbody.position = position;
-            Debug.Log($"teleportBall position={_rigidbody.position}");
+            _collider.enabled = false;
+            isBallStarting = true;
+            ballGracePeriod = Time.time + 1.0f;
+            Debug.Log($"teleportBall position={_rigidbody.position} and ball grace period starts");
         }
 
         void IBallControl.moveBall(Vector2 direction, float speed)
@@ -145,8 +151,8 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             ballCollision.enabled = true;
             _sprite.enabled = true;
-            _collider.enabled = true;
-            Debug.Log($"showBall position={_rigidbody.position}");
+            _collider.enabled = false;
+            Debug.Log($"showBall position={_rigidbody.position} and collider is disabled");
         }
 
         private void _hideBall()
@@ -192,6 +198,16 @@ namespace Examples.Game.Scripts.Battle.Ball
                 else
                 {
                     _rigidbody.position = Vector2.MoveTowards(curPos, networkPosition, Time.deltaTime);
+                }
+                return;
+            }
+            if (isBallStarting)
+            {
+                if (Time.time > ballGracePeriod)
+                {
+                    isBallStarting = false;
+                    _collider.enabled = true;
+                    Debug.Log($"ball grace period end and collider is enabled");
                 }
             }
         }
