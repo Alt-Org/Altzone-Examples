@@ -36,13 +36,13 @@ namespace Examples.Game.Scripts.Battle.Room
     }
 
     /// <summary>
-    /// Score manager for the room that synchronizes game score over network.
+    /// Optional score manager for the room that synchronizes game score over network.
     /// </summary>
     public class ScoreManager : MonoBehaviour
     {
         private const int msgSetTeamScore = PhotonEventDispatcher.eventCodeBase + 6;
 
-        public static ScoreManager Get()
+        private static ScoreManager Get()
         {
             if (_Instance == null)
             {
@@ -123,7 +123,8 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public static void addHeadScore(int teamIndex)
         {
-            if (PhotonNetwork.IsMasterClient)
+            var manager = Get();
+            if (PhotonNetwork.IsMasterClient && manager != null)
             {
                 Get()._addHeadScore(teamIndex);
             }
@@ -131,7 +132,8 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public static void addWallScore(GameObject gameObject)
         {
-            if (PhotonNetwork.IsMasterClient)
+            var manager = Get();
+            if (PhotonNetwork.IsMasterClient && manager != null)
             {
                 if (gameObject.CompareTag(UnityConstants.Tags.BotSide))
                 {

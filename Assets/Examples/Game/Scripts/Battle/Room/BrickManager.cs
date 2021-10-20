@@ -4,19 +4,14 @@ using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Room
 {
-    public interface IBrickManager
-    {
-        void deleteBrick(int brickId);
-    }
-
     /// <summary>
-    /// Manager for bricks.
+    /// Optional brick manager for the room that synchronizes brick state over network.
     /// </summary>
-    public class BrickManager : MonoBehaviour, IBrickManager
+    public class BrickManager : MonoBehaviour
     {
         private const int msgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 5;
 
-        public static BrickManager Get()
+        private static BrickManager Get()
         {
             if (_Instance == null)
             {
@@ -71,7 +66,7 @@ namespace Examples.Game.Scripts.Battle.Room
             }
         }
 
-        void IBrickManager.deleteBrick(int brickId)
+        private void _deleteBrick(int brickId)
         {
             Debug.Log($"deleteBrick id={brickId}");
             sendDeleteBrick(brickId);
@@ -79,9 +74,13 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public static void deleteBrick(GameObject gameObject)
         {
-            var manager = Get() as IBrickManager;
+            var manager = Get();
+            if (!manager)
+            {
+                return;
+            }
             var brickMarker = gameObject.GetComponent<BrickMarker>();
-            manager.deleteBrick(brickMarker.BrickId);
+            manager._deleteBrick(brickMarker.BrickId);
         }
     }
 }
