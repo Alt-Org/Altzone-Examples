@@ -18,7 +18,8 @@ namespace Editor.Prg.Util
                 return;
             }
             var selectedGuids = Selection.assetGUIDs;
-            var validExtensions = new[] { ".cs", ".prefab" };
+            // Keep extensions lowercase!
+            var validExtensions = new[] { ".cs", ".prefab", ".physicMaterial", ".physicsmaterial2d" };
             foreach (var guid in selectedGuids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
