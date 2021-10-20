@@ -14,7 +14,7 @@ namespace Examples.Game.Scripts.Battle.Room
     /// </summary>
     public class BrickManager : MonoBehaviour, IBrickManager
     {
-        private const int msgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 0;
+        private const int msgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 5;
 
         [SerializeField] private GameObject upperBricks;
         [SerializeField] private GameObject lowerBricks;
