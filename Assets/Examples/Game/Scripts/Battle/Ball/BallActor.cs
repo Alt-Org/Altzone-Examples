@@ -1,5 +1,6 @@
 ﻿using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.Player;
+using Examples.Game.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
@@ -86,6 +87,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             var colliderMask = 1 << otherGameObject.layer;
             if (collisionToBrick == (collisionToBrick | colliderMask))
             {
+                BrickManager.deleteBrick(other.gameObject);
                 return;
             }
             if (collisionToHead == (collisionToHead | colliderMask))
@@ -97,6 +99,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
             if (collisionToWall == (collisionToWall | colliderMask))
             {
+                ScoreManager.addWallScore(other.gameObject);
                 return;
             }
             Debug.Log($"onBallCollision UNHANDLED team={_curTeamIndex} other={other.gameObject.name}");

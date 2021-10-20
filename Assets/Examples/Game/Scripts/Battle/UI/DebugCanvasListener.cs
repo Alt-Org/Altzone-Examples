@@ -1,4 +1,5 @@
-﻿using Examples.Game.Scripts.Battle.Test;
+﻿using Examples.Game.Scripts.Battle.Room;
+using Examples.Game.Scripts.Battle.Test;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace Examples.Game.Scripts.Battle.UI
     /// </summary>
     public class DebugCanvasListener : MonoBehaviour
     {
-        private static readonly string[] teamName = { "Blue", "Red" };
+        private static readonly string[] teamName = { "Team-0", "Team-1" };
 
         public GameObject roomStartPanel;
         public Text titleText;
@@ -23,10 +24,9 @@ namespace Examples.Game.Scripts.Battle.UI
         {
             roomStartPanel.SetActive(false);
             scorePanel.SetActive(false);
-            // scorePanel might be get activated but nobody will update it!
             leftText.text = "";
             rightText.text = "";
-            this.Subscribe<GameManager.TeamScoreEvent>(OnTeamScoreEvent);
+            this.Subscribe<ScoreManager.TeamScoreEvent>(OnTeamScoreEvent);
             this.Subscribe<GameStartPlayingTest.CountdownEvent>(OnCountdownEvent);
         }
 
@@ -56,7 +56,7 @@ namespace Examples.Game.Scripts.Battle.UI
             }
         }
 
-        private void OnTeamScoreEvent(GameManager.TeamScoreEvent data)
+        private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
             Debug.Log($"OnTeamScoreEvent {data}");
             var score = data.score;

@@ -27,7 +27,7 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public override string ToString()
         {
-            return $"Brick #:{brickId} {gameObject.name}";
+            return $"Brick #{brickId} {gameObject.name}";
         }
     }
 }

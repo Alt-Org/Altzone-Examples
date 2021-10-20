@@ -1,6 +1,8 @@
 ﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
+using Prg.Scripts.Common.PubSub;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -156,6 +158,8 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             Debug.Log($"headCollision pos={playerPos} team={teamIndex}");
             ((IPlayerActor)this).setGhostedMode();
+            var oppositeTeam = ((IPlayerActor)this).OppositeTeam;
+            ScoreManager.addHeadScore(oppositeTeam);
         }
 
         void IPlayerActor.showShield()

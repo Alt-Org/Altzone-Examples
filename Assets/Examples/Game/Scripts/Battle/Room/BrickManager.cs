@@ -16,6 +16,17 @@ namespace Examples.Game.Scripts.Battle.Room
     {
         private const int msgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 5;
 
+        public static BrickManager Get()
+        {
+            if (_Instance == null)
+            {
+                _Instance = FindObjectOfType<BrickManager>();
+            }
+            return _Instance;
+        }
+
+        private static BrickManager _Instance;
+
         [SerializeField] private GameObject upperBricks;
         [SerializeField] private GameObject lowerBricks;
         [SerializeField] private int brickCount;
@@ -45,7 +56,6 @@ namespace Examples.Game.Scripts.Battle.Room
             {
                 bricks.Remove(brickId);
                 brickMarker.destroyBrick();
-                Debug.Log($"deleted Brick id={brickId} name={brickMarker.name}");
             }
         }
 
@@ -65,6 +75,13 @@ namespace Examples.Game.Scripts.Battle.Room
         {
             Debug.Log($"deleteBrick id={brickId}");
             sendDeleteBrick(brickId);
+        }
+
+        public static void deleteBrick(GameObject gameObject)
+        {
+            var manager = Get() as IBrickManager;
+            var brickMarker = gameObject.GetComponent<BrickMarker>();
+            manager.deleteBrick(brickMarker.BrickId);
         }
     }
 }

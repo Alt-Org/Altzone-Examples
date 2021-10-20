@@ -1,3 +1,4 @@
+using Examples.Game.Scripts.Battle.Room;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
