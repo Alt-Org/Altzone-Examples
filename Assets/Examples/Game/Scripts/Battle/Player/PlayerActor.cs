@@ -38,8 +38,8 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private GameObject localHighlight;
 
         [Header("Live Data"), SerializeField] private PlayerActivator activator;
-        [SerializeField] private bool _isLocalTeam;
         [SerializeField] private PlayerActor _teamMate;
+        [SerializeField] private bool _isLocalTeam;
 
         int IPlayerActor.PlayerPos => activator.playerPos;
         bool IPlayerActor.IsLocal => activator.isLocal;
@@ -74,8 +74,8 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             Debug.Log($"LateAwakePass1 name={name}");
             // Check out team status
-            _isLocalTeam = activator.checkLocalTeam();
-            _teamMate = activator.getTeamMate() as PlayerActor; // This is for Editor debugging, could be IPlayerActor OFC
+            _teamMate = activator.getTeamMate() as PlayerActor; // We want to have full PlayerActor here for convenience!
+            _isLocalTeam = activator.isLocal || _teamMate != null && _teamMate.activator.isLocal;
         }
 
         public void LateAwakePass2()

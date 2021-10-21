@@ -33,11 +33,6 @@ namespace Examples.Game.Scripts.Battle.Player
             isAwake = true; // Signal that we have configured ourself
         }
 
-        public bool checkLocalTeam()
-        {
-            return allPlayerActors.Any(x => x.TeamIndex == teamIndex && isLocal);
-        }
-
         public IPlayerActor getTeamMate()
         {
             return allPlayerActors.FirstOrDefault(x => x.TeamIndex == teamIndex && x.PlayerPos != playerPos);
