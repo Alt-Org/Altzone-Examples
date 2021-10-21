@@ -18,8 +18,6 @@ namespace Examples.Game.Scripts.Battle.Player
         void setNormalMode();
         void setFrozenMode();
         void setGhostedMode();
-        void showShield();
-        void hideShield();
         void headCollision();
         float CurrentSpeed { get; }
     }
@@ -33,7 +31,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private const int playModeFrozen = 1;
         private const int playModeGhosted = 2;
 
-        [Header("Settings"), SerializeField] private GameObject[] shields;
+        [Header("Settings"), SerializeField] private PlayerShield playerShield;
         [SerializeField] private GameObject realPlayer;
         [SerializeField] private GameObject frozenPlayer;
         [SerializeField] private GameObject ghostPlayer;
@@ -53,8 +51,6 @@ namespace Examples.Game.Scripts.Battle.Player
         float IPlayerActor.CurrentSpeed => _Speed;
 
         private float _Speed;
-        private int myShieldIndex;
-        private bool isShieldVisible;
         private IRestrictedPlayer restrictedPlayer;
         private PhotonView _photonView;
 
@@ -71,24 +67,21 @@ namespace Examples.Game.Scripts.Battle.Player
             transform.parent = sceneConfig.actorParent.transform;
             name = $"{(player.IsLocal ? "L" : "R")}{activator.playerPos}:{activator.teamIndex}:{player.NickName}";
 
-            myShieldIndex = activator.teamIndex;
-            shields[activator.oppositeTeamIndex].SetActive(false);
-
             setupPlayer(player);
         }
 
-        public void LateAwake() // Called after all players have been "activated"
+        public void LateAwakePass1() // Called after all players have been "activated"
         {
-            Debug.Log($"LateAwake name={name}");
+            Debug.Log($"LateAwakePass1 name={name}");
             // Check out team status
             _isLocalTeam = activator.checkLocalTeam();
-            _teamMate = activator.getTeamMate() as PlayerActor; // This is for Editor debugging, should be IPlayerActor OFC
-            // Start shields as they require that all players are ready.
-            var playerShield = GetComponentsInChildren<PlayerShield>(includeInactive: true);
-            if (playerShield.Length == 1)
-            {
-                playerShield[0].enabled = true;
-            }
+            _teamMate = activator.getTeamMate() as PlayerActor; // This is for Editor debugging, could be IPlayerActor OFC
+        }
+
+        public void LateAwakePass2()
+        {
+            // Enable shields as they require that all players are ready.
+            playerShield.enabled = true;
         }
 
         private void setupPlayer(Photon.Realtime.Player player)
@@ -172,27 +165,13 @@ namespace Examples.Game.Scripts.Battle.Player
             ScoreManager.addHeadScore(oppositeTeam);
         }
 
-        void IPlayerActor.showShield()
-        {
-            Debug.Log($"showShield name={name}");
-            isShieldVisible = true;
-            shields[myShieldIndex].SetActive(isShieldVisible);
-        }
-
-        void IPlayerActor.hideShield()
-        {
-            Debug.Log($"hideShield name={name}");
-            isShieldVisible = false;
-            shields[myShieldIndex].SetActive(isShieldVisible);
-        }
-
         private void _setNormalMode()
         {
             Debug.Log($"setNormalMode name={name}");
             realPlayer.SetActive(true);
             frozenPlayer.SetActive(false);
             ghostPlayer.SetActive(false);
-            shields[myShieldIndex].SetActive(isShieldVisible);
+            ((IPlayerShield)playerShield).showShield();
             restrictedPlayer.canMove = true;
         }
 
@@ -202,7 +181,7 @@ namespace Examples.Game.Scripts.Battle.Player
             realPlayer.SetActive(false);
             frozenPlayer.SetActive(true);
             ghostPlayer.SetActive(false);
-            shields[myShieldIndex].SetActive(false);
+            ((IPlayerShield)playerShield).hideShield();
             restrictedPlayer.canMove = false;
         }
 
@@ -212,7 +191,7 @@ namespace Examples.Game.Scripts.Battle.Player
             realPlayer.SetActive(false);
             frozenPlayer.SetActive(false);
             ghostPlayer.SetActive(true);
-            shields[myShieldIndex].SetActive(false);
+            ((IPlayerShield)playerShield).hideShield();
             restrictedPlayer.canMove = true;
         }
 

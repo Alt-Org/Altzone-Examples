@@ -4,13 +4,19 @@ using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
 {
+    public interface IPlayerShield
+    {
+        void showShield();
+        void hideShield();
+    }
+
     /// <summary>
     /// Controls player shield and synchronizes its state over network using <c>RPC</c>.
     /// </summary>
     /// <remarks>
     /// Shield can be visible or hidden and it can be "bent" when gets hit by the ball.
     /// </remarks>
-    public class PlayerShield : MonoBehaviour
+    public class PlayerShield : MonoBehaviour, IPlayerShield
     {
         [Header("Settings"), SerializeField] private GameObject upperShield;
         [SerializeField] private GameObject lowerShield;
@@ -23,6 +29,7 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private float sqrShieldDistance;
         [SerializeField] private float sqrDistance;
         [SerializeField] private bool isShieldVisible;
+        [SerializeField] private bool isShieldActive;
 
         [Header("Debug"), SerializeField] private bool isDebug;
 
@@ -31,14 +38,18 @@ namespace Examples.Game.Scripts.Battle.Player
             _photonView = PhotonView.Get(this);
             _transform = GetComponent<Transform>();
             sqrShieldDistance = RuntimeGameConfig.Get().variables.shieldDistance * 2f;
+            upperShield.SetActive(false);
+            lowerShield.SetActive(false);
+            isShieldVisible = false;
+            isShieldActive = false;
             enabled = false;
         }
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable allPlayerActors={PlayerActivator.allPlayerActors.Count}");
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
             currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
+            Debug.Log($"OnEnable {name} IsLocalTeam={playerActor.IsLocalTeam} currentShield={currentShield.name}");
             var teamMate = playerActor.TeamMate;
             if (teamMate == null)
             {
@@ -51,7 +62,7 @@ namespace Examples.Game.Scripts.Battle.Player
             }
             _otherTransform = ((PlayerActor)teamMate).transform;
             _otherPlayerShield = _otherTransform.GetComponent<PlayerShield>();
-            Debug.Log($"OnEnable teamMate={_otherTransform.gameObject.name} shield={currentShield.name}");
+            Debug.Log($"OnEnable {name} teamMate={_otherTransform.gameObject.name} shield={currentShield.name}");
         }
 
         private void OnDisable()
@@ -73,7 +84,10 @@ namespace Examples.Game.Scripts.Battle.Player
                 {
                     Debug.Log($"Show shield {currentShield.name}");
                     isShieldVisible = true;
-                    currentShield.SetActive(true);
+                    if (isShieldActive)
+                    {
+                        currentShield.SetActive(true);
+                    }
                 }
             }
             else
@@ -84,6 +98,24 @@ namespace Examples.Game.Scripts.Battle.Player
                     isShieldVisible = false;
                     currentShield.SetActive(false);
                 }
+            }
+        }
+
+        void IPlayerShield.showShield()
+        {
+            isShieldActive = true;
+            if (isShieldVisible)
+            {
+                currentShield.SetActive(true);
+            }
+        }
+
+        void IPlayerShield.hideShield()
+        {
+            isShieldActive = false;
+            if (isShieldVisible)
+            {
+                currentShield.SetActive(false);
             }
         }
     }

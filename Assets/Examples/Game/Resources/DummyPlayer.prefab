@@ -93,9 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b8604816253b44baca25645be62dde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shields:
-  - {fileID: 1730748534881358779}
-  - {fileID: 2203829940551802393}
+  playerShield: {fileID: 6530128325895131588}
   realPlayer: {fileID: 7415758767160422145}
   frozenPlayer: {fileID: 5803042723918779525}
   ghostPlayer: {fileID: 2240808866712253845}
@@ -125,6 +123,7 @@ MonoBehaviour:
   sqrShieldDistance: 0
   sqrDistance: 0
   isShieldVisible: 0
+  isShieldActive: 0
   isDebug: 0
 --- !u!1 &1730748534881358779
 GameObject:

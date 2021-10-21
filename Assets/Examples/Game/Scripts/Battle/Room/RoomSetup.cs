@@ -79,59 +79,64 @@ namespace Examples.Game.Scripts.Battle.Room
         {
             var playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
             playerActors = FindObjectsOfType<PlayerActor>().ToList();
+            var wait = new WaitForSeconds(0.1f);
+            // Wait for players so that everybody can know (find) each other if required!
             while (playerActors.Count != playerCount && PhotonNetwork.InRoom)
             {
-                if (!PhotonNetwork.InRoom)
-                {
-                    yield break;
-                }
                 Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={playerActors.Count} wait");
-                yield return null;
+                yield return wait;
                 playerActors = FindObjectsOfType<PlayerActor>().ToList();
             }
-            // Wait for players so that everybody can know (find) each other if required!
-            for (;;)
+            // All player have been instantiated in the scene, wait until they are in known state
+            for (;PhotonNetwork.InRoom;)
             {
-                if (!PhotonNetwork.InRoom)
-                {
-                    yield break;
-                }
-                var activeCount = activateActors(playerActors);
-                if (activeCount == playerCount)
+                if (checkPlayerActors(playerActors) == playerCount)
                 {
                     break;
                 }
                 yield return null;
             }
+            if (!PhotonNetwork.InRoom)
+            {
+                yield break;
+            }
             // Save current player actor list for easy access later!
             PlayerActivator.allPlayerActors.AddRange(playerActors);
             Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.allPlayerActors.Count} ready");
-            // Now we can activate all players safely!
+            // Now we can activate all players safely with two passes over them!
             foreach (var playerActor in playerActors)
             {
                 if (!PhotonNetwork.InRoom)
                 {
                     yield break;
                 }
-                playerActor.LateAwake();
+                playerActor.LateAwakePass1();
                 ((IPlayerActor)playerActor).setGhostedMode();
+            }
+            foreach (var playerActor in playerActors)
+            {
+                if (!PhotonNetwork.InRoom)
+                {
+                    yield break;
+                }
+                playerActor.LateAwakePass2();
             }
             continueToNextStage();
         }
 
-        private static int activateActors(List<PlayerActor> playerActors)
+        private static int checkPlayerActors(List<PlayerActor> playerActors)
         {
-            var countReady = 0;
+            var activeCount = 0;
             foreach (var playerActor in playerActors)
             {
                 var activator = playerActor.GetComponent<PlayerActivator>();
                 if (activator.isAwake)
                 {
-                    countReady += 1;
+                    activeCount += 1;
                 }
             }
-            Debug.Log($"activateActors countReady={countReady}");
-            return countReady;
+            Debug.Log($"checkPlayerActors activeCount={activeCount}");
+            return activeCount;
         }
     }
 }
