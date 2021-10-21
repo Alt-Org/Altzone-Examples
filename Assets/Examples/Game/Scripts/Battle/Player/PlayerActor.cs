@@ -4,6 +4,7 @@ using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
@@ -11,9 +12,12 @@ namespace Examples.Game.Scripts.Battle.Player
     public interface IPlayerActor
     {
         int PlayerPos { get; }
+        bool IsLocal { get; }
         int TeamMatePos { get; }
         int TeamIndex { get; }
+        bool IsLocalTeam { get; }
         int OppositeTeam { get; }
+        IPlayerActor TeamMate { get; }
         void setNormalMode();
         void setFrozenMode();
         void setGhostedMode();
@@ -42,13 +46,17 @@ namespace Examples.Game.Scripts.Battle.Player
 
         [Header("Live Data"), SerializeField] private int playerPos;
         [SerializeField] private int teamIndex;
+        [SerializeField] private bool isLocal;
         //[SerializeField] private int currentMode;
         [SerializeField] private Collider2D[] colliders;
 
         int IPlayerActor.PlayerPos => playerPos;
+        bool IPlayerActor.IsLocal => isLocal;
         int IPlayerActor.TeamMatePos => getTeamMatePos(playerPos);
         int IPlayerActor.TeamIndex => teamIndex;
+        bool IPlayerActor.IsLocalTeam => playerActors.Any(x => x.TeamIndex == teamIndex && x.IsLocal);
         int IPlayerActor.OppositeTeam => teamIndex == 0 ? 1 : 0;
+        IPlayerActor IPlayerActor.TeamMate => playerActors.FirstOrDefault(x => x.TeamIndex == teamIndex && x.PlayerPos != playerPos);
         float IPlayerActor.CurrentSpeed => _Speed;
 
         private float _Speed;
@@ -61,7 +69,9 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void Awake()
         {
-            var player = PhotonView.Get(this).Owner;
+            _photonView = PhotonView.Get(this);
+            isLocal = _photonView.IsMine;
+            var player = _photonView.Owner;
             PhotonBattle.getPlayerProperties(player, out playerPos, out teamIndex);
             var model = PhotonBattle.getPlayerCharacterModel(player);
             _Speed = model.Speed;
@@ -69,7 +79,6 @@ namespace Examples.Game.Scripts.Battle.Player
             myShieldIndex = teamIndex;
             shields[((IPlayerActor)this).OppositeTeam].SetActive(false);
             colliders = GetComponentsInChildren<Collider2D>(includeInactive: false);
-            _photonView = PhotonView.Get(this);
 
             // Re-parent and set name
             var sceneConfig = SceneConfig.Get();

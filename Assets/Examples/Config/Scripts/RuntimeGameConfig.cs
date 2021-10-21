@@ -53,6 +53,8 @@ namespace Examples.Config.Scripts
         public float playerSqrMinRotationDistance;
         public float playerSqrMaxRotationDistance;
 
+        [Header("Shield")] public float shieldDistance;
+
         public void CopyFrom(GameVariables other)
         {
             PropertyCopier<GameVariables, GameVariables>.CopyFields(other, this);

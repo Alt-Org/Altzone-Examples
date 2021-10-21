@@ -160,6 +160,7 @@ namespace Examples.Config.Scripts
                     writer.Write(variables.playerMoveSpeed);
                     writer.Write(variables.playerSqrMinRotationDistance);
                     writer.Write(variables.playerSqrMaxRotationDistance);
+                    writer.Write(variables.shieldDistance);
                     writer.Write(last);
                 }
                 var bytes = stream.ToArray();
@@ -190,6 +191,7 @@ namespace Examples.Config.Scripts
                     variables.playerMoveSpeed = reader.ReadSingle();
                     variables.playerSqrMinRotationDistance = reader.ReadSingle();
                     variables.playerSqrMaxRotationDistance = reader.ReadSingle();
+                    variables.shieldDistance = reader.ReadSingle();
                     reader.ReadByte(); // skip last
                 }
             }

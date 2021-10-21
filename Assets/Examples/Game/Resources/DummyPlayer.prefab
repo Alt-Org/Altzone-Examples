@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 626154037994138428}
   - component: {fileID: 2972943607577269493}
   - component: {fileID: 3604737390977094345}
+  - component: {fileID: 6530128325895131588}
   m_Layer: 0
   m_Name: DummyPlayer
   m_TagString: Player
@@ -82,7 +83,30 @@ MonoBehaviour:
   localHighlight: {fileID: 3553397774836255194}
   playerPos: 0
   teamIndex: 0
+  isLocal: 0
   colliders: []
+--- !u!114 &6530128325895131588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626154037994138417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fd0ee2f0ac54308837110fd62ab025e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upperShield: {fileID: 1730748534881358779}
+  lowerShield: {fileID: 2203829940551802393}
+  _photonView: {fileID: 0}
+  _transform: {fileID: 0}
+  _otherTransform: {fileID: 0}
+  currentShield: {fileID: 0}
+  sqrShieldDistance: 0
+  sqrDistance: 0
+  isShieldVisible: 0
+  isDebug: 0
 --- !u!1 &1730748534881358779
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,7 +117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1164476615258307641}
   m_Layer: 0
-  m_Name: ShieldTeam0
+  m_Name: UpperShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -124,7 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1565054470510749141}
   m_Layer: 0
-  m_Name: ShieldTeam1
+  m_Name: LowerShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -319,7 +343,7 @@ GameObject:
   - component: {fileID: 8867521107098597173}
   - component: {fileID: 2380884179259842108}
   m_Layer: 8
-  m_Name: Shield0
+  m_Name: ShieldUpper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -613,7 +637,7 @@ GameObject:
   - component: {fileID: 4787015711496208646}
   - component: {fileID: 6653913521430340255}
   m_Layer: 8
-  m_Name: Shield1
+  m_Name: ShieldLower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
