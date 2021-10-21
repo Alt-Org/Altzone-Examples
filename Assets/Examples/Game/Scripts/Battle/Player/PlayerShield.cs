@@ -7,6 +7,7 @@ namespace Examples.Game.Scripts.Battle.Player
     public interface IPlayerShield
     {
         void showShield();
+        void ghostShield();
         void hideShield();
     }
 
@@ -20,15 +21,19 @@ namespace Examples.Game.Scripts.Battle.Player
     {
         [Header("Settings"), SerializeField] private GameObject upperShield;
         [SerializeField] private GameObject lowerShield;
+        [SerializeField] private GameObject ghostedUpperShield;
+        [SerializeField] private GameObject ghostedLowerShield;
 
         [Header("Live Data"), SerializeField] protected PhotonView _photonView;
         [SerializeField] protected Transform _transform;
         [SerializeField] protected PlayerShield _otherPlayerShield;
         [SerializeField] protected Transform _otherTransform;
         [SerializeField] private GameObject currentShield;
+        [SerializeField] private GameObject currentGhostedShield;
         [SerializeField] private float sqrShieldDistance;
         [SerializeField] private float sqrDistance;
         [SerializeField] private bool isShieldVisible;
+        [SerializeField] private bool isShieldGhosted;
         [SerializeField] private bool isShieldActive;
 
         [Header("Debug"), SerializeField] private bool isDebug;
@@ -40,7 +45,10 @@ namespace Examples.Game.Scripts.Battle.Player
             sqrShieldDistance = RuntimeGameConfig.Get().variables.shieldDistance * 2f;
             upperShield.SetActive(false);
             lowerShield.SetActive(false);
+            ghostedUpperShield.SetActive(false);
+            ghostedLowerShield.SetActive(false);
             isShieldVisible = false;
+            isShieldGhosted = false;
             isShieldActive = false;
             enabled = false;
         }
@@ -48,7 +56,16 @@ namespace Examples.Game.Scripts.Battle.Player
         private void OnEnable()
         {
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
-            currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
+            if (playerActor.TeamIndex == 0)
+            {
+                currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
+                currentGhostedShield = playerActor.IsLocalTeam ? ghostedUpperShield : ghostedLowerShield;
+            }
+            else
+            {
+                currentShield = playerActor.IsLocalTeam ? lowerShield : upperShield;
+                currentGhostedShield = playerActor.IsLocalTeam ? ghostedLowerShield : ghostedUpperShield;
+            }
             Debug.Log($"OnEnable {name} IsLocalTeam={playerActor.IsLocalTeam} currentShield={currentShield.name}");
             var teamMate = playerActor.TeamMate;
             if (teamMate == null)
@@ -86,7 +103,16 @@ namespace Examples.Game.Scripts.Battle.Player
                     isShieldVisible = true;
                     if (isShieldActive)
                     {
-                        currentShield.SetActive(true);
+                        if (isShieldGhosted)
+                        {
+                            currentGhostedShield.SetActive(true);
+                            currentShield.SetActive(false);
+                        }
+                        else
+                        {
+                            currentShield.SetActive(true);
+                            currentGhostedShield.SetActive(false);
+                        }
                     }
                 }
             }
@@ -97,6 +123,7 @@ namespace Examples.Game.Scripts.Battle.Player
                     Debug.Log($"Hide shield {currentShield.name}");
                     isShieldVisible = false;
                     currentShield.SetActive(false);
+                    currentGhostedShield.SetActive(false);
                 }
             }
         }
@@ -104,18 +131,34 @@ namespace Examples.Game.Scripts.Battle.Player
         void IPlayerShield.showShield()
         {
             isShieldActive = true;
+            isShieldGhosted = false;
             if (isShieldVisible)
             {
                 currentShield.SetActive(true);
+                currentGhostedShield.SetActive(false);
             }
         }
 
-        void IPlayerShield.hideShield()
+        void IPlayerShield.ghostShield()
         {
-            isShieldActive = false;
+            isShieldActive = true;
+            isShieldGhosted = true;
             if (isShieldVisible)
             {
                 currentShield.SetActive(false);
+                currentGhostedShield.SetActive(true);
+            }
+        }
+
+        void IPlayerShield.hideShield() // This is a bit fuzzy semantics because visibility is controlled by distance to team mate
+        {
+            isShieldActive = false;
+            isShieldGhosted = false;
+            if (isShieldVisible)
+            {
+                isShieldVisible = false;
+                currentShield.SetActive(false);
+                currentGhostedShield.SetActive(false);
             }
         }
     }

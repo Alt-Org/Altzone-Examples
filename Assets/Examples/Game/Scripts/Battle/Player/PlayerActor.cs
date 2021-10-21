@@ -191,7 +191,7 @@ namespace Examples.Game.Scripts.Battle.Player
             realPlayer.SetActive(false);
             frozenPlayer.SetActive(false);
             ghostPlayer.SetActive(true);
-            ((IPlayerShield)playerShield).hideShield();
+            ((IPlayerShield)playerShield).ghostShield();
             restrictedPlayer.canMove = true;
         }
 
