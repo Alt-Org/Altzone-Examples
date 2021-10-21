@@ -90,6 +90,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void setupPlayer(Photon.Realtime.Player player)
         {
+            Debug.Log($"setupPlayer pos={playerPos} team={teamIndex} {player.GetDebugLabel()}");
             // Setup input system to move player around - PlayerMovement is required on both ends for RPC!
             var playerMovement = gameObject.AddComponent<PlayerMovement>();
             restrictedPlayer = playerMovement;
