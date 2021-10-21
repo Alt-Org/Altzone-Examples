@@ -99,8 +99,8 @@ MonoBehaviour:
   ghostPlayer: {fileID: 2240808866712253845}
   localHighlight: {fileID: 3553397774836255194}
   activator: {fileID: 0}
-  _isLocalTeam: 0
   _teamMate: {fileID: 0}
+  _isLocalTeam: 0
 --- !u!114 &6530128325895131588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,7 +359,7 @@ GameObject:
   m_Component:
   - component: {fileID: 426657933117336867}
   - component: {fileID: 8867521107098597173}
-  - component: {fileID: 2380884179259842108}
+  - component: {fileID: 3383781462162905069}
   m_Layer: 8
   m_Name: ShieldUpper
   m_TagString: Untagged
@@ -431,8 +431,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &2380884179259842108
-CircleCollider2D:
+--- !u!70 &3383781462162905069
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -440,13 +440,13 @@ CircleCollider2D:
   m_GameObject: {fileID: 5733253263040378484}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 94596ebae764187499988030f05d4f49, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1.2
+  m_Offset: {x: 0.00000019916158, y: 0.024129303}
+  m_Size: {x: 2.3828974, y: 2.3667176}
+  m_Direction: 1
 --- !u!1 &5803042723918779525
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +653,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7579439336419794009}
   - component: {fileID: 4787015711496208646}
-  - component: {fileID: 6653913521430340255}
+  - component: {fileID: 1822000863820008749}
   m_Layer: 8
   m_Name: ShieldLower
   m_TagString: Untagged
@@ -725,8 +725,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &6653913521430340255
-CircleCollider2D:
+--- !u!70 &1822000863820008749
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -734,10 +734,10 @@ CircleCollider2D:
   m_GameObject: {fileID: 8237476573868557261}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 94596ebae764187499988030f05d4f49, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1.2
+  m_Offset: {x: 0.00000019916158, y: 0.024129303}
+  m_Size: {x: 2.3828974, y: 2.3667176}
+  m_Direction: 1
