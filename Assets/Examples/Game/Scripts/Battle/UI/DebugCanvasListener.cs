@@ -61,7 +61,7 @@ namespace Examples.Game.Scripts.Battle.UI
             Debug.Log($"OnTeamScoreEvent {data}");
             var score = data.score;
             var text = score.teamIndex == 0 ? leftText : rightText;
-            text.text = $"<b>{teamName[score.teamIndex]}</b> head {score.headCollisionCount} wall {score.wallCollisionCount}";
+            text.text = $"<b>{teamName[score.teamIndex]}</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
         }
     }
 }
