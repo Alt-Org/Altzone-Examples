@@ -42,7 +42,7 @@ namespace Examples.Model.Scripts
         {
             var i = -1;
             labels[++i].text = $"<b>{character.Name}</b>";
-            labels[++i].text = $"MainDefence:\r\n{character.MainDefence}";
+            labels[++i].text = $"MainDefence:\r\n<b>{character.MainDefence}</b>";
             labels[++i].text = $"Speed:\r\n{character.Speed}";
             labels[++i].text = $"Resistance:\r\n{character.Resistance}";
             labels[++i].text = $"Attack:\r\n{character.Attack}";
