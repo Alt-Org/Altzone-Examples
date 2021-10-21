@@ -58,13 +58,13 @@ namespace Examples.Game.Scripts.Battle.Player
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
             if (playerActor.TeamIndex == 0)
             {
-                currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
-                currentGhostedShield = playerActor.IsLocalTeam ? ghostedUpperShield : ghostedLowerShield;
+                currentShield = upperShield;
+                currentGhostedShield = ghostedUpperShield;
             }
             else
             {
-                currentShield = playerActor.IsLocalTeam ? lowerShield : upperShield;
-                currentGhostedShield = playerActor.IsLocalTeam ? ghostedLowerShield : ghostedUpperShield;
+                currentShield = lowerShield;
+                currentGhostedShield = ghostedLowerShield;
             }
             Debug.Log($"OnEnable {name} IsLocalTeam={playerActor.IsLocalTeam} currentShield={currentShield.name}");
             var teamMate = playerActor.TeamMate;
