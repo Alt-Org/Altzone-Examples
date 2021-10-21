@@ -32,16 +32,16 @@
                 (int)Defence.Desensitisation, "Koulukiusaaja", Defence.Desensitisation, 3, 9, 6, 2));
             add("Vitsiniekka", new CharacterModel(
                 (int)Defence.Deflection, "Vitsiniekka", Defence.Deflection, 9, 2, 4, 5));
-            add("Hissukkasihteeri", new CharacterModel(
-                (int)Defence.Introjection, "Hissukkasihteeri", Defence.Introjection, 5, 5, 5, 5));
+            add("Pappi", new CharacterModel(
+                (int)Defence.Introjection, "Pappi", Defence.Introjection, 5, 5, 5, 5));
             add("Taiteilija", new CharacterModel(
                 (int)Defence.Projection, "Taiteilija", Defence.Projection, 2, 2, 8, 8));
             add("Hodariläski", new CharacterModel(
                 (int)Defence.Retroflection, "Hodariläski", Defence.Retroflection, 3, 6, 2, 9));
             add("Älykkö", new CharacterModel(
                 (int)Defence.Egotism, "Älykkö", Defence.Egotism, 6, 2, 6, 6));
-            add("Unikeko", new CharacterModel(
-                (int)Defence.Confluence, "Unikeko", Defence.Confluence, 6, 7, 1, 6));
+            add("Tytöt", new CharacterModel(
+                (int)Defence.Confluence, "Tytöt", Defence.Confluence, 6, 7, 1, 6));
         }
 
         private static void add(string name, AbstractModel model)
