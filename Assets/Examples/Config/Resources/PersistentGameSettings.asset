@@ -25,6 +25,7 @@ MonoBehaviour:
     playerMoveSpeed: 5
     playerSqrMinRotationDistance: 5
     playerSqrMaxRotationDistance: 5
+    shieldDistance: 5
   prefabs:
     playerForDes: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
       type: 3}

@@ -1,7 +1,5 @@
 using Examples.Config.Scripts;
 using Photon.Pun;
-using System;
-using System.Collections;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
@@ -19,6 +17,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         [Header("Live Data"), SerializeField] protected PhotonView _photonView;
         [SerializeField] protected Transform _transform;
+        [SerializeField] protected PlayerShield _otherPlayerShield;
         [SerializeField] protected Transform _otherTransform;
         [SerializeField] private GameObject currentShield;
         [SerializeField] private float sqrShieldDistance;
@@ -32,11 +31,12 @@ namespace Examples.Game.Scripts.Battle.Player
             _photonView = PhotonView.Get(this);
             _transform = GetComponent<Transform>();
             sqrShieldDistance = RuntimeGameConfig.Get().variables.shieldDistance * 2f;
+            enabled = false;
         }
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable allPlayerActors={PlayerActor.allPlayerActors.Count}");
+            Debug.Log($"OnEnable allPlayerActors={PlayerActivator.allPlayerActors.Count}");
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
             currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
             var teamMate = playerActor.TeamMate;
@@ -50,7 +50,18 @@ namespace Examples.Game.Scripts.Battle.Player
                 return;
             }
             _otherTransform = ((PlayerActor)teamMate).transform;
+            _otherPlayerShield = _otherTransform.GetComponent<PlayerShield>();
             Debug.Log($"OnEnable teamMate={_otherTransform.gameObject.name} shield={currentShield.name}");
+        }
+
+        private void OnDisable()
+        {
+            Debug.Log($"OnDisable name={name}");
+            if (_otherPlayerShield != null)
+            {
+                // Must disable our team mate - for now
+                _otherPlayerShield.enabled = false;
+            }
         }
 
         private void Update()

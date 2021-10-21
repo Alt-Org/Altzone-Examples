@@ -51,7 +51,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private void onSetActiveTeam(object data)
         {
             var activeTeam = (int)data;
-            foreach (var playerActor in PlayerActor.allPlayerActors)
+            foreach (var playerActor in PlayerActivator.allPlayerActors)
             {
                 if (playerActor.TeamIndex == activeTeam)
                 {

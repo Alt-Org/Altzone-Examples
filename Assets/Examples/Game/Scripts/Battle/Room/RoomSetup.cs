@@ -25,7 +25,6 @@ namespace Examples.Game.Scripts.Battle.Room
         private void Awake()
         {
             Debug.Log($"Awake: {PhotonNetwork.NetworkClientState}");
-            PlayerActor.allPlayerActors = new List<IPlayerActor>(); // Create global static player actor list.
             prepareCurrentStage();
         }
 
@@ -82,22 +81,57 @@ namespace Examples.Game.Scripts.Battle.Room
             playerActors = FindObjectsOfType<PlayerActor>().ToList();
             while (playerActors.Count != playerCount && PhotonNetwork.InRoom)
             {
+                if (!PhotonNetwork.InRoom)
+                {
+                    yield break;
+                }
                 Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={playerActors.Count} wait");
                 yield return null;
                 playerActors = FindObjectsOfType<PlayerActor>().ToList();
             }
-            if (!PhotonNetwork.InRoom)
+            // Wait for players so that everybody can know (find) each other if required!
+            for (;;)
             {
-                yield break;
+                if (!PhotonNetwork.InRoom)
+                {
+                    yield break;
+                }
+                var activeCount = activateActors(playerActors);
+                if (activeCount == playerCount)
+                {
+                    break;
+                }
+                yield return null;
             }
+            // Save current player actor list for easy access later!
+            PlayerActivator.allPlayerActors.AddRange(playerActors);
+            Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.allPlayerActors.Count} ready");
+            // Now we can activate all players safely!
             foreach (var playerActor in playerActors)
             {
+                if (!PhotonNetwork.InRoom)
+                {
+                    yield break;
+                }
+                playerActor.LateAwake();
                 ((IPlayerActor)playerActor).setGhostedMode();
             }
-            // Save current player actor list for our convenience!
-            PlayerActor.allPlayerActors.AddRange(playerActors.OrderBy(x => x.sortKey).Cast<IPlayerActor>());
-            Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActor.allPlayerActors.Count} ready");
             continueToNextStage();
+        }
+
+        private static int activateActors(List<PlayerActor> playerActors)
+        {
+            var countReady = 0;
+            foreach (var playerActor in playerActors)
+            {
+                var activator = playerActor.GetComponent<PlayerActivator>();
+                if (activator.isAwake)
+                {
+                    countReady += 1;
+                }
+            }
+            Debug.Log($"activateActors countReady={countReady}");
+            return countReady;
         }
     }
 }

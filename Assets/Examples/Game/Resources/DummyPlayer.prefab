@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 626154037994138428}
   - component: {fileID: 2972943607577269493}
+  - component: {fileID: 8984222216227667538}
   - component: {fileID: 3604737390977094345}
   - component: {fileID: 6530128325895131588}
   m_Layer: 0
@@ -62,6 +63,24 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &8984222216227667538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626154037994138417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3af4852ec47f46e9bebd7b5b026cf52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPos: 0
+  teamIndex: 0
+  isLocal: 0
+  oppositeTeamIndex: 0
+  teamMatePos: 0
+  isAwake: 0
 --- !u!114 &3604737390977094345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,10 +100,9 @@ MonoBehaviour:
   frozenPlayer: {fileID: 5803042723918779525}
   ghostPlayer: {fileID: 2240808866712253845}
   localHighlight: {fileID: 3553397774836255194}
-  playerPos: 0
-  teamIndex: 0
-  isLocal: 0
-  colliders: []
+  activator: {fileID: 0}
+  _isLocalTeam: 0
+  _teamMate: {fileID: 0}
 --- !u!114 &6530128325895131588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,6 +119,7 @@ MonoBehaviour:
   lowerShield: {fileID: 2203829940551802393}
   _photonView: {fileID: 0}
   _transform: {fileID: 0}
+  _otherPlayerShield: {fileID: 0}
   _otherTransform: {fileID: 0}
   currentShield: {fileID: 0}
   sqrShieldDistance: 0
