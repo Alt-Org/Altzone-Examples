@@ -82,8 +82,12 @@ namespace Editor
 
             var indexHtml = Path.Combine(OUTPUT_WEBGL, "index.html");
             var curName = Application.productName;
-            var newName = $"{Application.productName} built {DateTime.Now:u}";
-            patchIndexHtml(indexHtml, curName, newName);
+            var title = $"{Application.productName} built {DateTime.Now:u}";
+            var gitTagCompliantLabel =
+                title.Substring(0, title.Length - 4) // remove seconds
+                .Replace(" ", "_")
+                .Replace(":", ".");
+            patchIndexHtml(indexHtml, curName, gitTagCompliantLabel);
 
             const string scriptName = "m_BuildScript_PostProcess.bat";
             File.WriteAllText(scriptName, MyCmdLineScripts.WebGLPostProcessScript);
