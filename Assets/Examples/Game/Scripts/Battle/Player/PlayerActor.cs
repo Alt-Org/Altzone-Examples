@@ -32,7 +32,7 @@ namespace Examples.Game.Scripts.Battle.Player
     /// </summary>
     public class PlayerActor : MonoBehaviour, IPlayerActor
     {
-        public static List<IPlayerActor> playerActors;
+        public static List<IPlayerActor> allPlayerActors;
 
         private const int playModeNormal = 0;
         private const int playModeFrozen = 1;
@@ -54,9 +54,9 @@ namespace Examples.Game.Scripts.Battle.Player
         bool IPlayerActor.IsLocal => isLocal;
         int IPlayerActor.TeamMatePos => getTeamMatePos(playerPos);
         int IPlayerActor.TeamIndex => teamIndex;
-        bool IPlayerActor.IsLocalTeam => playerActors.Any(x => x.TeamIndex == teamIndex && x.IsLocal);
+        bool IPlayerActor.IsLocalTeam => allPlayerActors.Any(x => x.TeamIndex == teamIndex && x.IsLocal);
         int IPlayerActor.OppositeTeam => teamIndex == 0 ? 1 : 0;
-        IPlayerActor IPlayerActor.TeamMate => playerActors.FirstOrDefault(x => x.TeamIndex == teamIndex && x.PlayerPos != playerPos);
+        IPlayerActor IPlayerActor.TeamMate => allPlayerActors.FirstOrDefault(x => x.TeamIndex == teamIndex && x.PlayerPos != playerPos);
         float IPlayerActor.CurrentSpeed => _Speed;
 
         private float _Speed;

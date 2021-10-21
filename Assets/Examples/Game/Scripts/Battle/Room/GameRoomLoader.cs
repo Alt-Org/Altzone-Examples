@@ -61,8 +61,11 @@ namespace Examples.Game.Scripts.Battle.Room
         private void continueToNextStage()
         {
             enabled = false;
-            // Mark room "closed"
-            PhotonLobby.closeRoom(keepVisible: true);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // Mark room "closed"
+                PhotonLobby.closeRoom(keepVisible: true);
+            }
             // Enable game objects when this room stage is ready to play
             Array.ForEach(objectsToManage, x => x.SetActive(true));
         }

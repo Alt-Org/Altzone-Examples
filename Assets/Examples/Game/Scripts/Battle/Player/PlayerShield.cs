@@ -36,6 +36,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void OnEnable()
         {
+            Debug.Log($"OnEnable allPlayerActors={PlayerActor.allPlayerActors}");
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
             currentShield = playerActor.IsLocalTeam ? upperShield : lowerShield;
             var teamMate = playerActor.TeamMate;

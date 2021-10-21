@@ -41,7 +41,7 @@ namespace Examples.Game.Scripts.Battle.Test
             // HACK to set players on the game after ball has been started!
             var ball = FindObjectOfType<BallActor>() as IBallControl;
             var ballSideTeam = ball.currentTeamIndex;
-            foreach (var playerActor in PlayerActor.playerActors)
+            foreach (var playerActor in PlayerActor.allPlayerActors)
             {
                 if (playerActor.TeamIndex == ballSideTeam)
                 {
