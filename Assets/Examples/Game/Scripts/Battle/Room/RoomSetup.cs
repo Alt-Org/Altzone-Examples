@@ -78,6 +78,7 @@ namespace Examples.Game.Scripts.Battle.Room
         private IEnumerator setupAllPlayers()
         {
             var playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+            PlayerActor.playerActors = new List<IPlayerActor>(); // Create global static player actor list.
             playerActors = FindObjectsOfType<PlayerActor>().ToList();
             while (playerActors.Count != playerCount && PhotonNetwork.InRoom)
             {
@@ -93,9 +94,9 @@ namespace Examples.Game.Scripts.Battle.Room
             {
                 ((IPlayerActor)playerActor).setGhostedMode();
             }
-            Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={playerActors.Count} ready");
             // Save current player actor list for our convenience!
-            PlayerActor.playerActors = playerActors.OrderBy(x => x.sortKey).Cast<IPlayerActor>().ToList();
+            PlayerActor.playerActors.AddRange(playerActors.OrderBy(x => x.sortKey).Cast<IPlayerActor>());
+            Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={PlayerActor.playerActors.Count} ready");
             continueToNextStage();
         }
     }
