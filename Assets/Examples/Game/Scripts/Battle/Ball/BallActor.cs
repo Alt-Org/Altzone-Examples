@@ -47,7 +47,6 @@ namespace Examples.Game.Scripts.Battle.Ball
         private bool isBallStarting;
 
         private float ballGracePeriod;
-        //--private Vector2 curVelocity;
 
         // Configurable settings
         private GameVariables variables;
@@ -136,7 +135,6 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             targetSpeed = speed;
             _rigidbody.velocity = direction.normalized * speed;
-            //--curVelocity = _rigidbody.velocity;
             Debug.Log($"moveBall position={_rigidbody.position} velocity={_rigidbody.velocity} speed={targetSpeed}");
         }
 
@@ -165,7 +163,6 @@ namespace Examples.Game.Scripts.Battle.Ball
             _collider.enabled = false;
             targetSpeed = 0;
             _rigidbody.velocity = Vector2.zero;
-            //--curVelocity = _rigidbody.velocity;
             Debug.Log($"hideBall position={_rigidbody.position}");
         }
 
@@ -180,7 +177,6 @@ namespace Examples.Game.Scripts.Battle.Ball
             {
                 networkPosition = (Vector2)stream.ReceiveNext();
                 _rigidbody.velocity = (Vector2)stream.ReceiveNext();
-                //--curVelocity = _rigidbody.velocity;
 
                 networkLag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
                 networkPosition += _rigidbody.velocity * networkLag;
@@ -223,11 +219,6 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
             if (targetSpeed > 0)
             {
-                //--if (curVelocity != _rigidbody.velocity)
-                //--{
-                //--    Debug.Log($"__> curVelocity {curVelocity} != {_rigidbody.velocity} _rigidbody.velocity");
-                //--    curVelocity = _rigidbody.velocity;
-                //--}
                 keepConstantVelocity(Time.fixedDeltaTime);
             }
         }
@@ -243,9 +234,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
             if (targetVelocity != _rigidbody.velocity)
             {
-                //--Debug.Log($"keepConstantVelocity position={_rigidbody.position} velocity={targetVelocity}");
                 _rigidbody.velocity = Vector2.Lerp(_velocity, targetVelocity, deltaTime * variables.ballLerpSmoothingFactor);
-                //--curVelocity = _rigidbody.velocity;
             }
         }
 
@@ -254,8 +243,6 @@ namespace Examples.Game.Scripts.Battle.Ball
             transform.position = Vector3.zero;
             var direction = forTeam == 0 ? Vector2.up : Vector2.down;
             _rigidbody.velocity = direction * targetSpeed;
-            //--curVelocity = _rigidbody.velocity;
-            //--Debug.Log($"randomReset position={_rigidbody.position} velocity={_rigidbody.velocity} speed={targetSpeed}");
         }
 
         [PunRPC]
