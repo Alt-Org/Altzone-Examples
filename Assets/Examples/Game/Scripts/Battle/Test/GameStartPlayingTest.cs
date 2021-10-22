@@ -90,7 +90,7 @@ namespace Examples.Game.Scripts.Battle.Test
             BallSlingShot.startTheBall();
         }
 
-        public class CountdownEvent
+        internal class CountdownEvent
         {
             public readonly int maxCountdownValue;
             public readonly int curCountdownValue;

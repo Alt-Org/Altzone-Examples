@@ -74,10 +74,9 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void onCurrentTeamChanged(int newTeamIndex)
         {
-            var oldTemIndex = _curTeamIndex;
+            Debug.Log($"onCurrentTeamChanged ({_curTeamIndex}) <- ({newTeamIndex})");
             _curTeamIndex = newTeamIndex;
-            Debug.Log($"onCurrentTeamChanged ({oldTemIndex}) <- ({newTeamIndex})");
-            this.Publish(new ActiveTeamEvent(oldTemIndex, newTeamIndex));
+            this.Publish(new ActiveTeamEvent(newTeamIndex));
         }
 
         private void onBallCollision(Collision2D other)
@@ -258,20 +257,18 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
         }
 
-        public class ActiveTeamEvent
+        internal class ActiveTeamEvent
         {
-            public readonly int oldTeamIndex;
             public readonly int newTeamIndex;
 
-            public ActiveTeamEvent(int oldTeamIndex, int newTeamIndex)
+            public ActiveTeamEvent(int newTeamIndex)
             {
-                this.oldTeamIndex = oldTeamIndex;
                 this.newTeamIndex = newTeamIndex;
             }
 
             public override string ToString()
             {
-                return $"old: {oldTeamIndex}, new: {newTeamIndex}";
+                return $"team: {newTeamIndex}";
             }
         }
     }

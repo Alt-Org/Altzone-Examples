@@ -146,7 +146,7 @@ namespace Examples.Game.Scripts.Battle.Room
             }
         }
 
-        public class TeamScoreEvent
+        internal class TeamScoreEvent
         {
             public readonly TeamScore score;
 
