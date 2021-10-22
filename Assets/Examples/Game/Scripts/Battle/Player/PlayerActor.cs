@@ -33,6 +33,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private const int playModeGhosted = 2;
 
         [Header("Settings"), SerializeField] private PlayerShield playerShield;
+        [SerializeField] private GameObject playerRotation;
         [SerializeField] private GameObject realPlayer;
         [SerializeField] private GameObject frozenPlayer;
         [SerializeField] private GameObject ghostPlayer;
@@ -98,6 +99,11 @@ namespace Examples.Game.Scripts.Battle.Player
             name = $"{(player.IsLocal ? "L" : "R")}{activator.playerPos}:{activator.teamIndex}:{player.NickName}";
 
             setupPlayer(player);
+            if (sceneConfig.isCameraRotated)
+            {
+                // Rotate player to align with camera orientation
+                playerRotation.transform.rotation = Quaternion.Euler(0f, 0f, 180f); // Upside down
+            }
         }
 
         public void LateAwakePass1() // Called after all players have been "activated"
