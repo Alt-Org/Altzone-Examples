@@ -1,5 +1,7 @@
-﻿using Examples.Game.Scripts.Battle.Room;
+﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Test;
+using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +13,7 @@ namespace Examples.Game.Scripts.Battle.UI
     /// </summary>
     public class DebugCanvasListener : MonoBehaviour
     {
-        private static readonly string[] teamName = { "Team-0", "Team-1" };
+        private static readonly string[] teamName = { "Home", "Visitor" };
 
         public GameObject roomStartPanel;
         public Text titleText;
@@ -19,6 +21,7 @@ namespace Examples.Game.Scripts.Battle.UI
         public GameObject scorePanel;
         public Text leftText;
         public Text rightText;
+        public int homeTeamIndex;
 
         private void OnEnable()
         {
@@ -26,6 +29,7 @@ namespace Examples.Game.Scripts.Battle.UI
             scorePanel.SetActive(false);
             leftText.text = "";
             rightText.text = "";
+            homeTeamIndex = 0;
             this.Subscribe<ScoreManager.TeamScoreEvent>(OnTeamScoreEvent);
             this.Subscribe<GameStartPlayingTest.CountdownEvent>(OnCountdownEvent);
         }
@@ -51,17 +55,34 @@ namespace Examples.Game.Scripts.Battle.UI
                 this.executeAsCoroutine(new WaitForSeconds(0.67f), () =>
                 {
                     roomStartPanel.SetActive(false);
-                    scorePanel.SetActive(true);
+                    activateScores();
                 });
             }
+        }
+
+        private void activateScores()
+        {
+            var player = PhotonNetwork.LocalPlayer;
+            PhotonBattle.getPlayerProperties(player, out _, out var teamIndex);
+            var features = RuntimeGameConfig.Get().features;
+            if (features.isLocalPLayerOnTeamBlue)
+            {
+                if (teamIndex == 1)
+                {
+                    homeTeamIndex = 1;
+                    // c# swap via deconstruction
+                    (leftText, rightText) = (rightText, leftText);
+                }
+            }
+            scorePanel.SetActive(true);
         }
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
             Debug.Log($"OnTeamScoreEvent {data}");
             var score = data.score;
-            var text = score.teamIndex == 0 ? leftText : rightText;
-            text.text = $"<b>{teamName[score.teamIndex]}</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
+            var text = score.teamIndex == homeTeamIndex ? leftText : rightText;
+            text.text = $"<b>{teamName[score.teamIndex]}({score.teamIndex})</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
         }
     }
 }
