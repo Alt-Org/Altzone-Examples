@@ -100,6 +100,7 @@ namespace Examples.Game.Scripts.Battle.Room
                 yield break;
             }
             // Save current player actor list for easy access later!
+            PlayerActivator.allPlayerActors.Clear();
             PlayerActivator.allPlayerActors.AddRange(playerActors);
             Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.allPlayerActors.Count} ready");
             // Now we can activate all players safely with two passes over them!
