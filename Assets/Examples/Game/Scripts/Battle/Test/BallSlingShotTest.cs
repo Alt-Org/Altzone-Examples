@@ -1,4 +1,5 @@
 using Examples.Game.Scripts.Battle.Ball;
+using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.SlingShot;
 using Photon.Pun;
@@ -23,34 +24,8 @@ namespace Examples.Game.Scripts.Battle.Test
         {
             if (Input.GetKeyDown(controlKey))
             {
-                startTheBall();
+                BallSlingShot.startTheBall();
                 gameObject.SetActive(false);
-            }
-        }
-
-        public static void startTheBall()
-        {
-            // Get slingshot with longest distance and start it.
-            var ballSlingShot = FindObjectsOfType<BallSlingShot>()
-                .Cast<IBallSlingShot>()
-                .OrderByDescending(x => x.currentDistance)
-                .FirstOrDefault();
-
-            ballSlingShot?.startBall();
-
-            // HACK to set players on the game after ball has been started!
-            var ball = FindObjectOfType<BallActor>() as IBallControl;
-            var ballSideTeam = ball.currentTeamIndex;
-            foreach (var playerActor in PlayerActivator.allPlayerActors)
-            {
-                if (playerActor.TeamIndex == ballSideTeam)
-                {
-                    playerActor.setFrozenMode();
-                }
-                else
-                {
-                    playerActor.setNormalMode();
-                }
             }
         }
     }

@@ -1,4 +1,5 @@
 using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.SlingShot;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
@@ -86,7 +87,7 @@ namespace Examples.Game.Scripts.Battle.Test
             Debug.Log("*");
             Debug.Log($"* startRoom={Time.time:0.00}");
             Debug.Log("*");
-            BallSlingShotTest.startTheBall();
+            BallSlingShot.startTheBall();
         }
 
         public class CountdownEvent

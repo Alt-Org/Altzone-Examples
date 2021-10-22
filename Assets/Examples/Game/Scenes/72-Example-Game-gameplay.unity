@@ -1214,7 +1214,6 @@ GameObject:
   - component: {fileID: 582860940}
   - component: {fileID: 582860941}
   - component: {fileID: 582860939}
-  - component: {fileID: 582860943}
   m_Layer: 0
   m_Name: DebugScripts
   m_TagString: Untagged
@@ -1265,19 +1264,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Visible: 0
   controlKey: 283
---- !u!114 &582860943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 582860938}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d19b43492d84f9a9d5a72fa7ef1d9f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controlKey: 284
 --- !u!1 &622445136
 GameObject:
   m_ObjectHideFlags: 0

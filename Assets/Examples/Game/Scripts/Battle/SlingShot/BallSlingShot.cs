@@ -1,4 +1,6 @@
-﻿using Examples.Game.Scripts.Battle.Ball;
+﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Ball;
+using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
@@ -9,15 +11,6 @@ using UnityEngine;
 namespace Examples.Game.Scripts.Battle.SlingShot
 {
     /// <summary>
-    /// Interface to start the ball aka put the ball into play by sling shot.
-    /// </summary>
-    public interface IBallSlingShot
-    {
-        void startBall();
-        float currentDistance { get; }
-    }
-
-    /// <summary>
     ///  Puts the ball on the game using "sling shot" method between two team mates in position A and B.
     /// </summary>
     /// <remarks>
@@ -27,9 +20,6 @@ namespace Examples.Game.Scripts.Battle.SlingShot
     public class BallSlingShot : MonoBehaviourPunCallbacks, IBallSlingShot
     {
         private const int msgHideSlingShot = PhotonEventDispatcher.eventCodeBase + 2;
-
-        private const float minDistance = 3f;
-        private const float maxDistance = 9f;
 
         [Header("Settings"), SerializeField] private int teamIndex;
         [SerializeField] private SpriteRenderer spriteA;
@@ -123,7 +113,8 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
             position = a;
             direction = b - a;
-            _currentDistance = Mathf.Clamp(direction.magnitude, minDistance, maxDistance);
+            var variables = RuntimeGameConfig.Get().variables;
+            _currentDistance = Mathf.Clamp(direction.magnitude, variables.minSlingShotDistance, variables.maxSlingShotDistance);
             direction = direction.normalized;
         }
 
@@ -132,6 +123,32 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             ballControl.teleportBall(position, teamIndex);
             ballControl.showBall();
             ballControl.moveBall(direction, speed);
+        }
+
+        public static void startTheBall()
+        {
+            // Get slingshot with longest distance and start it.
+            var ballSlingShot = FindObjectsOfType<BallSlingShot>()
+                .Cast<IBallSlingShot>()
+                .OrderByDescending(x => x.currentDistance)
+                .FirstOrDefault();
+
+            ballSlingShot?.startBall();
+
+            // HACK to set players on the game after ball has been started!
+            var ball = FindObjectOfType<BallActor>() as IBallControl;
+            var ballSideTeam = ball.currentTeamIndex;
+            foreach (var playerActor in PlayerActivator.allPlayerActors)
+            {
+                if (playerActor.TeamIndex == ballSideTeam)
+                {
+                    playerActor.setFrozenMode();
+                }
+                else
+                {
+                    playerActor.setNormalMode();
+                }
+            }
         }
     }
 }

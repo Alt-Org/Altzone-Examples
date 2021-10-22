@@ -23,6 +23,8 @@ MonoBehaviour:
     ballMoveSpeed: 7
     ballLerpSmoothingFactor: 4
     ballTeleportDistance: 1
+    minSlingShotDistance: 3
+    maxSlingShotDistance: 9
     playerMoveSpeed: 5
     playerSqrMinRotationDistance: 5
     playerSqrMaxRotationDistance: 5

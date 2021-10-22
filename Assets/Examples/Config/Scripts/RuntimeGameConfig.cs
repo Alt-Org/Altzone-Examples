@@ -53,6 +53,8 @@ namespace Examples.Config.Scripts
         [Header("Ball")] public float ballMoveSpeed;
         public float ballLerpSmoothingFactor;
         public float ballTeleportDistance;
+        public float minSlingShotDistance;
+        public float maxSlingShotDistance;
 
         [Header("Player")] public float playerMoveSpeed;
         public float playerSqrMinRotationDistance;
