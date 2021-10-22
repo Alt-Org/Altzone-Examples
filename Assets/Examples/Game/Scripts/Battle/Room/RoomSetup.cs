@@ -59,9 +59,7 @@ namespace Examples.Game.Scripts.Battle.Room
                 if (teamIndex == 1)
                 {
                     // Rotate game camera for upper team
-                    var _camera = sceneConfig._camera;
-                    var cameraTransform = _camera.transform;
-                    cameraTransform.rotation = Quaternion.Euler(0f, 0f, 180f); // Upside down
+                    sceneConfig.rotateGameCamera(upsideDown: true);
                 }
             }
             if (features.isLocalPLayerOnTeamBlue)
