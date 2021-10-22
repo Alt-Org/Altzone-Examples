@@ -50,7 +50,7 @@ namespace Examples.Game.Scripts.Battle.Player
             get
             {
                 if (!_isValidTeam) throw new UnityException("team has not been setup yet");
-                return _isLocalTeam;
+                return _isHomeTeam;
             }
         }
 
@@ -91,9 +91,9 @@ namespace Examples.Game.Scripts.Battle.Player
             }
         }
 
-        public void LateAwakePass1() // Called after all players have been "activated"
+        public void LateAwakePass1() // Called after all players have been "awaken"
         {
-            Debug.Log($"LateAwakePass1 name={name}");
+            Debug.Log($"LateAwakePass1 name={name} players={PlayerActivator.allPlayerActors.Count}");
             // Set our team status
             _isValidTeam = true;
             _teamMate = PlayerActivator.allPlayerActors
