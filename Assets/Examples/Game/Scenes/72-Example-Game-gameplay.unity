@@ -390,6 +390,7 @@ MonoBehaviour:
   scorePanel: {fileID: 622445136}
   leftText: {fileID: 294850089}
   rightText: {fileID: 4661980}
+  homeTeamIndex: 0
 --- !u!4 &94137884
 Transform:
   m_ObjectHideFlags: 0
@@ -1385,7 +1386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 6780388524306496468}
   actorParent: {fileID: 1374902844}
-  ballParent: {fileID: 0}
+  _gameArena: {fileID: 666866954}
   playerStartPos:
   - {fileID: 14502046}
   - {fileID: 1073276108}

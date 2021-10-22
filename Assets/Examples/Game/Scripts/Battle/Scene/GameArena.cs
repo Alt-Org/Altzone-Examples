@@ -1,3 +1,4 @@
+using Examples.Game.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.Unity;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Examples.Game.Scripts.Battle.Scene
     /// <remarks>
     /// Wall collider parent, "wall" thickness, tag and layer are configurable.
     /// </remarks>
-    public class GameArenaColliders : MonoBehaviour
+    public class GameArena : MonoBehaviour, IGameArena
     {
         [Header("Settings"), SerializeField] private SpriteRenderer templateSprite;
         [SerializeField] private Transform colliderParent;
@@ -29,12 +30,7 @@ namespace Examples.Game.Scripts.Battle.Scene
         [SerializeField] private BoxCollider2D wallLeft;
         [SerializeField] private BoxCollider2D wallRight;
 
-        private void Awake()
-        {
-            makeWalls();
-        }
-
-        private void makeWalls()
+        void IGameArena.makeWalls()
         {
             wallTop = createWall("wallTop", colliderParent,  wallTopTag, wallTopLayer, wallMaterial);
             wallBottom = createWall("wallBottom", colliderParent, wallBottomTag, wallBottomLayer, wallMaterial);

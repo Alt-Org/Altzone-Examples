@@ -1,3 +1,4 @@
+using Examples.Game.Scripts.Battle.interfaces;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Scene
@@ -20,9 +21,11 @@ namespace Examples.Game.Scripts.Battle.Scene
         public GameObject actorParent;
 
         /// <summary>
-        /// Parent <c>GameObject</c> for the ball and its related components.
+        /// Game arena
         /// </summary>
-        public GameObject ballParent;
+        public IGameArena gameArena => _gameArena;
+
+        [SerializeField] private GameArena _gameArena;
 
         /// <summary>
         /// Player start (instantiation) positions on game arena.

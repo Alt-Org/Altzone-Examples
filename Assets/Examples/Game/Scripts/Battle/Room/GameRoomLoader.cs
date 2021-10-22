@@ -1,4 +1,5 @@
 using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Scene;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -66,6 +67,9 @@ namespace Examples.Game.Scripts.Battle.Room
                 // Mark room "closed"
                 PhotonLobby.closeRoom(keepVisible: true);
             }
+            // Create walls
+            var gameArena = SceneConfig.Get().gameArena;
+            gameArena.makeWalls();
             // Enable game objects when this room stage is ready to play
             Array.ForEach(objectsToManage, x => x.SetActive(true));
         }
