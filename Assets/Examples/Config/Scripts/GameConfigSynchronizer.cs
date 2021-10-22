@@ -112,6 +112,7 @@ namespace Examples.Config.Scripts
                     writer.Write(features.isLocalPLayerOnTeamBlue);
                     writer.Write(features.isSPawnMiniBall);
                     writer.Write(features.isActivateTeamWithBall);
+                    writer.Write(features.isSinglePlayerShieldOn);
                     writer.Write(last);
                 }
                 var bytes = stream.ToArray();
@@ -139,6 +140,7 @@ namespace Examples.Config.Scripts
                     features.isLocalPLayerOnTeamBlue = reader.ReadBoolean();
                     features.isSPawnMiniBall = reader.ReadBoolean();
                     features.isActivateTeamWithBall = reader.ReadBoolean();
+                    features.isSinglePlayerShieldOn = reader.ReadBoolean();
                     reader.ReadByte(); // skip last
                 }
             }

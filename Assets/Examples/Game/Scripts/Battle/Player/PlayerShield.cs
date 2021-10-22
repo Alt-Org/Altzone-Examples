@@ -36,8 +36,6 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private bool isShieldGhosted;
         [SerializeField] private bool isShieldActive;
 
-        [Header("Debug"), SerializeField] private bool isDebug;
-
         private void Awake()
         {
             _photonView = PhotonView.Get(this);
@@ -70,9 +68,12 @@ namespace Examples.Game.Scripts.Battle.Player
             var teamMate = playerActor.TeamMate;
             if (teamMate == null)
             {
-                if (isDebug && _otherTransform != null)
+                var features = RuntimeGameConfig.Get().features;
+                if (features.isSinglePlayerShieldOn)
                 {
-                    return; // _otherTransform has been set in Editor!
+                    _otherTransform = _transform; // measure distance to ourself: shield will be always on!
+                    Debug.Log($"OnEnable {name} shield is always ON");
+                    return;
                 }
                 enabled = false;
                 return;

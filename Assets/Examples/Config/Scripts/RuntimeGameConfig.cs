@@ -31,6 +31,11 @@ namespace Examples.Config.Scripts
         /// </summary>
         public bool isActivateTeamWithBall;
 
+        /// <summary>
+        /// Is shield always on when team has only one player (for testing).
+        /// </summary>
+        public bool isSinglePlayerShieldOn;
+
         public void CopyFrom(GameFeatures other)
         {
             PropertyCopier<GameFeatures, GameFeatures>.CopyFields(other, this);
