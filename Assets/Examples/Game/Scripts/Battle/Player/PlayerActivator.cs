@@ -12,6 +12,7 @@ namespace Examples.Game.Scripts.Battle.Player
     public class PlayerActivator : MonoBehaviour
     {
         public static readonly List<IPlayerActor> allPlayerActors = new List<IPlayerActor>();
+        public static int homeTeamIndex;
 
         [Header("Live Data")] public int playerPos;
         public int teamIndex;
@@ -26,6 +27,11 @@ namespace Examples.Game.Scripts.Battle.Player
             var player = _photonView.Owner;
             PhotonBattle.getPlayerProperties(player, out playerPos, out teamIndex);
             isLocal = _photonView.IsMine;
+            if (isLocal && player.IsMasterClient)
+            {
+                homeTeamIndex = teamIndex;
+                Debug.Log($"homeTeamIndex={homeTeamIndex} pos={playerPos}");
+            }
             oppositeTeamIndex = getOppositeTeamIndex(teamIndex);
             teamMatePos = getTeamMatePos(playerPos);
             Debug.Log($"Awake {player.NickName} pos={playerPos} team={teamIndex}");

@@ -181,8 +181,10 @@ MonoBehaviour:
   ghostPlayer: {fileID: 2240808866712253845}
   localHighlight: {fileID: 3553397774836255194}
   activator: {fileID: 0}
+  _isValidTeam: 0
   _teamMate: {fileID: 0}
   _isLocalTeam: 0
+  _isHomeTeam: 0
 --- !u!114 &6530128325895131588
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 ﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Test;
 using Photon.Pun;
@@ -55,34 +56,20 @@ namespace Examples.Game.Scripts.Battle.UI
                 this.executeAsCoroutine(new WaitForSeconds(0.67f), () =>
                 {
                     roomStartPanel.SetActive(false);
-                    activateScores();
+                    homeTeamIndex = PlayerActivator.homeTeamIndex;
+                    scorePanel.SetActive(true);
                 });
             }
-        }
-
-        private void activateScores()
-        {
-            var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.getPlayerProperties(player, out _, out var teamIndex);
-            var features = RuntimeGameConfig.Get().features;
-            if (features.isLocalPLayerOnTeamBlue)
-            {
-                if (teamIndex == 1)
-                {
-                    homeTeamIndex = 1;
-                    // c# swap via deconstruction
-                    (leftText, rightText) = (rightText, leftText);
-                }
-            }
-            scorePanel.SetActive(true);
         }
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
             Debug.Log($"OnTeamScoreEvent {data}");
             var score = data.score;
-            var text = score.teamIndex == homeTeamIndex ? leftText : rightText;
-            text.text = $"<b>{teamName[score.teamIndex]}({score.teamIndex})</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
+            var isHomeTeam = score.teamIndex == homeTeamIndex;
+            var teamNameIndex = isHomeTeam ? 0 : 1;
+            var text = isHomeTeam ? leftText : rightText;
+            text.text = $"<b>{teamName[teamNameIndex]}({score.teamIndex})</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
         }
     }
 }

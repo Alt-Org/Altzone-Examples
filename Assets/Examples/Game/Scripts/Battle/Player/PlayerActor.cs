@@ -13,6 +13,7 @@ namespace Examples.Game.Scripts.Battle.Player
         int TeamMatePos { get; }
         int TeamIndex { get; }
         bool IsLocalTeam { get; }
+        bool IsHomeTeam { get; }
         int OppositeTeam { get; }
         IPlayerActor TeamMate { get; }
         void setNormalMode();
@@ -38,16 +39,44 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private GameObject localHighlight;
 
         [Header("Live Data"), SerializeField] private PlayerActivator activator;
+        [SerializeField] private bool _isValidTeam;
         [SerializeField] private PlayerActor _teamMate;
         [SerializeField] private bool _isLocalTeam;
+        [SerializeField] private bool _isHomeTeam;
 
         int IPlayerActor.PlayerPos => activator.playerPos;
         bool IPlayerActor.IsLocal => activator.isLocal;
         int IPlayerActor.TeamMatePos => activator.teamMatePos;
         int IPlayerActor.TeamIndex => activator.teamIndex;
         int IPlayerActor.OppositeTeam => activator.oppositeTeamIndex;
-        bool IPlayerActor.IsLocalTeam => _isLocalTeam;
-        IPlayerActor IPlayerActor.TeamMate => _teamMate;
+
+        bool IPlayerActor.IsLocalTeam
+        {
+            get
+            {
+                if (!_isValidTeam) throw new UnityException("team has not been setup yet");
+                return _isLocalTeam;
+            }
+        }
+
+        bool IPlayerActor.IsHomeTeam
+        {
+            get
+            {
+                if (!_isValidTeam) throw new UnityException("team has not been setup yet");
+                return _isLocalTeam;
+            }
+        }
+
+        IPlayerActor IPlayerActor.TeamMate
+        {
+            get
+            {
+                if (!_isValidTeam) throw new UnityException("team has not been setup yet");
+                return _teamMate;
+            }
+        }
+
         float IPlayerActor.CurrentSpeed => _Speed;
 
         private float _Speed;
@@ -57,6 +86,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private void Awake()
         {
             activator = GetComponent<PlayerActivator>();
+            _isValidTeam = false;
             _photonView = PhotonView.Get(this);
             var player = _photonView.Owner;
             var model = PhotonBattle.getPlayerCharacterModel(player);
@@ -73,9 +103,11 @@ namespace Examples.Game.Scripts.Battle.Player
         public void LateAwakePass1() // Called after all players have been "activated"
         {
             Debug.Log($"LateAwakePass1 name={name}");
-            // Check out team status
+            // Set our team status
+            _isValidTeam = true;
             _teamMate = activator.getTeamMate() as PlayerActor; // We want to have full PlayerActor here for convenience!
             _isLocalTeam = activator.isLocal || _teamMate != null && _teamMate.activator.isLocal;
+            _isHomeTeam = activator.teamIndex == PlayerActivator.homeTeamIndex;
         }
 
         public void LateAwakePass2()
