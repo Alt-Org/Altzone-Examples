@@ -1,4 +1,5 @@
 ﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Room;
 using Photon.Pun;
@@ -8,22 +9,21 @@ using UnityEngine;
 namespace Examples.Game.Scripts.Battle.Ball
 {
     /// <summary>
-    /// Interface for external ball control, for example for <c>Game Manager</c> to use.
-    /// </summary>
-    public interface IBallControl
-    {
-        int currentTeamIndex { get; }
-        void teleportBall(Vector2 position, int teamIndex); // We need to know onto which team side we are landing!
-        void moveBall(Vector2 direction, float speed);
-        void showBall();
-        void hideBall();
-    }
-
-    /// <summary>
     /// Simple ball with <c>Rigidbody2D</c> that synchronizes its movement across network using <c>PhotonView</c> and <c>RPC</c>.
     /// </summary>
     public class BallActor : MonoBehaviour, IPunObservable, IBallControl
     {
+        public static IBallControl Get()
+        {
+            if (_Instance == null)
+            {
+                _Instance = FindObjectOfType<BallActor>();
+            }
+            return _Instance;
+        }
+
+        private static IBallControl _Instance;
+
         [Header("Settings"), SerializeField] private SpriteRenderer _sprite;
         [SerializeField] private Collider2D _collider;
 

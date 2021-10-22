@@ -26,8 +26,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private SpriteRenderer spriteB;
         [SerializeField] private LineRenderer line;
 
-        [Header("Live Data"), SerializeField] private BallActor ballActor;
-        [SerializeField] private Transform followA;
+        [Header("Live Data"), SerializeField] private Transform followA;
         [SerializeField] private Transform followB;
         [SerializeField] private Vector3 a;
         [SerializeField] private Vector3 b;
@@ -36,6 +35,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private Vector2 direction;
         [SerializeField] private float _currentDistance;
 
+        private IBallControl ballControl;
         private PhotonEventDispatcher photonEventDispatcher;
 
         private void Awake()
@@ -70,8 +70,8 @@ namespace Examples.Game.Scripts.Battle.SlingShot
                 return;
             }
             // Hide ball immediately
-            ballActor = FindObjectOfType<BallActor>();
-            ((IBallControl)ballActor).hideBall();
+            ballControl = BallActor.Get();
+            ballControl.hideBall();
 
             followA = ((PlayerActor)playerActors[0]).transform;
             if (playerActors.Count == 2)
@@ -95,7 +95,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         void IBallSlingShot.startBall()
         {
-            startTheBall(ballActor, position, teamIndex, direction, _currentDistance); // Ball takes care of its own network synchronization
+            startTheBall(ballControl, position, teamIndex, direction, _currentDistance); // Ball takes care of its own network synchronization
             sendHideSlingShot();
         }
 
@@ -136,7 +136,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             ballSlingShot?.startBall();
 
             // HACK to set players on the game after ball has been started!
-            var ball = FindObjectOfType<BallActor>() as IBallControl;
+            var ball = BallActor.Get();
             var ballSideTeam = ball.currentTeamIndex;
             foreach (var playerActor in PlayerActivator.allPlayerActors)
             {
