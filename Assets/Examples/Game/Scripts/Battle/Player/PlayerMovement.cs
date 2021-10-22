@@ -1,3 +1,4 @@
+using Examples.Game.Scripts.Battle.interfaces;
 using Photon.Pun;
 using UnityEngine;
 

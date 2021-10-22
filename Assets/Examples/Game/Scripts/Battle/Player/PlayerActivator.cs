@@ -1,13 +1,13 @@
 using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.interfaces;
 using Photon.Pun;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
 {
     /// <summary>
-    /// Synchronize local player(s) activation before "everything else" in the room.
+    /// Helper to collect essential player data before all players can be enabled for the game play.
     /// </summary>
     public class PlayerActivator : MonoBehaviour
     {
@@ -37,11 +37,6 @@ namespace Examples.Game.Scripts.Battle.Player
             Debug.Log($"Awake {player.NickName} pos={playerPos} team={teamIndex}");
 
             isAwake = true; // Signal that we have configured ourself
-        }
-
-        public IPlayerActor getTeamMate()
-        {
-            return allPlayerActors.FirstOrDefault(x => x.TeamIndex == teamIndex && x.PlayerPos != playerPos);
         }
 
         private static int getOppositeTeamIndex(int teamIndex)

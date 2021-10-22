@@ -1,28 +1,13 @@
 ﻿using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
+using System.Linq;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
 {
-    public interface IPlayerActor
-    {
-        int PlayerPos { get; }
-        bool IsLocal { get; }
-        int TeamMatePos { get; }
-        int TeamIndex { get; }
-        bool IsLocalTeam { get; }
-        bool IsHomeTeam { get; }
-        int OppositeTeam { get; }
-        IPlayerActor TeamMate { get; }
-        void setNormalMode();
-        void setFrozenMode();
-        void setGhostedMode();
-        void headCollision();
-        float CurrentSpeed { get; }
-    }
-
     /// <summary>
     /// Player base class for common player data.
     /// </summary>
@@ -111,7 +96,8 @@ namespace Examples.Game.Scripts.Battle.Player
             Debug.Log($"LateAwakePass1 name={name}");
             // Set our team status
             _isValidTeam = true;
-            _teamMate = activator.getTeamMate() as PlayerActor; // We want to have full PlayerActor here for convenience!
+            _teamMate = PlayerActivator.allPlayerActors
+                .FirstOrDefault(x => x.TeamIndex == activator.teamIndex && x.PlayerPos != activator.playerPos) as PlayerActor;
             _isLocalTeam = activator.isLocal || _teamMate != null && _teamMate.activator.isLocal;
             _isHomeTeam = activator.teamIndex == PlayerActivator.homeTeamIndex;
         }
