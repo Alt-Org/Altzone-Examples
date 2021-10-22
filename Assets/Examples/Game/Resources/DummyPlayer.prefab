@@ -209,7 +209,6 @@ MonoBehaviour:
   isShieldVisible: 0
   isShieldGhosted: 0
   isShieldActive: 0
-  isDebug: 0
 --- !u!1 &787628663945926928
 GameObject:
   m_ObjectHideFlags: 0
