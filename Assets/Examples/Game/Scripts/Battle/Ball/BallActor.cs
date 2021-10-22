@@ -72,6 +72,11 @@ namespace Examples.Game.Scripts.Battle.Ball
             ((IBallCollisionSource)ballCollision).onCollision2D = onBallCollision;
         }
 
+        private void OnDestroy()
+        {
+            _Instance = null;
+        }
+
         private void onCurrentTeamChanged(int newTeamIndex)
         {
             Debug.Log($"onCurrentTeamChanged ({_curTeamIndex}) <- ({newTeamIndex})");

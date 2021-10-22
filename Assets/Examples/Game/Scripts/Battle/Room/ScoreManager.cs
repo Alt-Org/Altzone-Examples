@@ -53,7 +53,6 @@ namespace Examples.Game.Scripts.Battle.Room
 
         private static ScoreManager _Instance;
 
-
         [SerializeField] private TeamScore[] scores;
 
         private PhotonEventDispatcher photonEventDispatcher;
@@ -67,6 +66,11 @@ namespace Examples.Game.Scripts.Battle.Room
             };
             photonEventDispatcher = PhotonEventDispatcher.Get();
             photonEventDispatcher.registerEventListener(msgSetTeamScore, data => { onSetTeamScore(data.CustomData); });
+        }
+
+        private void OnDestroy()
+        {
+            _Instance = null;
         }
 
         private void OnEnable()

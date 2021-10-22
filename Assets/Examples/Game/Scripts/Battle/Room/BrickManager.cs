@@ -39,6 +39,11 @@ namespace Examples.Game.Scripts.Battle.Room
             photonEventDispatcher.registerEventListener(msgDeleteBrick, data => { onDeleteBrick(data.CustomData); });
         }
 
+        private void OnDestroy()
+        {
+            _Instance = null;
+        }
+
         private void sendDeleteBrick(int brickId)
         {
             photonEventDispatcher.RaiseEvent(msgDeleteBrick, brickId);

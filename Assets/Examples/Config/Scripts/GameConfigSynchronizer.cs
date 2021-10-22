@@ -71,6 +71,11 @@ namespace Examples.Config.Scripts
             photonEventDispatcher.registerEventListener(msgSynchronize, data => onSynchronize(data.CustomData));
         }
 
+        private void OnDestroy()
+        {
+            _Instance = null;
+        }
+
         private static void onSynchronize(object data)
         {
             if (data is byte[] bytes)

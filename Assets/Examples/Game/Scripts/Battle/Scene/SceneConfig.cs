@@ -67,6 +67,11 @@ namespace Examples.Game.Scripts.Battle.Scene
 
         private static SceneConfig _Instance;
 
+        private void OnDestroy()
+        {
+            _Instance = null;
+        }
+
         public Rect getPlayArea(int playerPos)
         {
             // For convenience player start positions are kept under corresponding play area as child objects.

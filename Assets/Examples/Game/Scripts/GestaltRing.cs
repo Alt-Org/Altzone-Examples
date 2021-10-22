@@ -55,11 +55,11 @@ namespace Examples.Game.Scripts
                 byte payload;
                 if (value == Defence.None)
                 {
-                    payload = (byte) nextDefence[(int) curDefence];
+                    payload = (byte)nextDefence[(int)curDefence];
                 }
                 else
                 {
-                    payload = (byte) value;
+                    payload = (byte)value;
                 }
                 Debug.Log($"set Defence {(byte)curDefence} <- {payload}");
                 photonEventDispatcher.RaiseEvent(photonEventCode, payload);
@@ -77,11 +77,11 @@ namespace Examples.Game.Scripts
         private void Start()
         {
             // Start with some random Defence so that we have a valid state.
-            curDefence = nextDefence[Random.Range(1, (int) Defence.Confluence)];
+            curDefence = nextDefence[Random.Range(1, (int)Defence.Confluence)];
             photonEventDispatcher = PhotonEventDispatcher.Get();
             photonEventDispatcher.registerEventListener(photonEventCode, data =>
             {
-                var newDefence = (Defence) Enum.ToObject(typeof(Defence), data.CustomData);
+                var newDefence = (Defence)Enum.ToObject(typeof(Defence), data.CustomData);
                 Debug.Log($"set Defence {curDefence} <- {newDefence}");
                 curDefence = newDefence;
                 this.Publish(new DefenceEvent(curDefence));
@@ -100,10 +100,7 @@ namespace Examples.Game.Scripts
 
         private void OnDestroy()
         {
-            if (_Instance == this)
-            {
-                _Instance = null;
-            }
+            _Instance = null;
         }
 
         private static void onDefenceEvent(DefenceEvent data)
