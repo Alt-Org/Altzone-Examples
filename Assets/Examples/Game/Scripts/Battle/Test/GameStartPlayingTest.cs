@@ -60,7 +60,6 @@ namespace Examples.Game.Scripts.Battle.Test
         {
             secondsRemaining = (int)payload;
             this.Publish(new CountdownEvent(variables.roomStartDelay, secondsRemaining));
-            Debug.Log($"secondsRemaining={secondsRemaining}");
             if (secondsRemaining <= 0)
             {
                 startRoom();
