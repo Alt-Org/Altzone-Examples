@@ -27,8 +27,9 @@ namespace Examples.Game.Scripts.Battle.Player
             var player = _photonView.Owner;
             PhotonBattle.getPlayerProperties(player, out playerPos, out teamIndex);
             isLocal = _photonView.IsMine;
-            if (isLocal && player.IsMasterClient)
+            if (player.IsMasterClient)
             {
+                // The player who created this room is in "home team"!
                 homeTeamIndex = teamIndex;
                 Debug.Log($"homeTeamIndex={homeTeamIndex} pos={playerPos}");
             }
