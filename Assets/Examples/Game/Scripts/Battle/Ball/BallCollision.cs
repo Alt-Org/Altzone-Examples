@@ -29,7 +29,6 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void OnCollisionEnter2D(Collision2D other)
         {
-            Debug.Log($"OnCollisionEnter2D {other.gameObject.name}");
             if (!enabled)
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
@@ -38,12 +37,12 @@ namespace Examples.Game.Scripts.Battle.Ball
             {
                 return; // Ignore colliders without a specific layer(s)!
             }
+            Debug.Log($"OnCollisionEnter2D {other.gameObject.name}");
             ((IBallCollisionSource)this).onCollision2D?.Invoke(other);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log($"OnTriggerEnter2D {other.gameObject.name}");
             if (!enabled)
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
@@ -52,12 +51,15 @@ namespace Examples.Game.Scripts.Battle.Ball
             {
                 isUpper = true;
                 checkBallAndTeam();
+                return;
             }
-            else if (other.Equals(lowerTeam))
+            if (other.Equals(lowerTeam))
             {
                 isLower = true;
                 checkBallAndTeam();
+                return;
             }
+            Debug.Log($"OnTriggerEnter2D UNHANDLED {other.gameObject.name}");
         }
 
         private void OnTriggerExit2D(Collider2D other)
