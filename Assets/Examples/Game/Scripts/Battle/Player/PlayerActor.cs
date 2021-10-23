@@ -95,16 +95,16 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             Debug.Log($"LateAwakePass1 name={name} players={PlayerActivator.allPlayerActors.Count}");
             // Set our team status
-            _isValidTeam = true;
             _teamMate = PlayerActivator.allPlayerActors
                 .FirstOrDefault(x => x.TeamIndex == activator.teamIndex && x.PlayerPos != activator.playerPos) as PlayerActor;
             _isLocalTeam = activator.isLocal || _teamMate != null && _teamMate.activator.isLocal;
             _isHomeTeam = activator.teamIndex == PlayerActivator.homeTeamIndex;
+            _isValidTeam = true;
         }
 
         public void LateAwakePass2()
         {
-            // Enable shields as they require that all players are ready.
+            // Enable shields as they require that all players are valid and ready.
             playerShield.enabled = true;
         }
 

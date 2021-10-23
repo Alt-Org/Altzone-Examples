@@ -99,6 +99,7 @@ namespace Examples.Game.Scripts.Battle.Room
             {
                 yield break;
             }
+            // TODO: this need more work to make it better and easier to understand
             // Save current player actor list for easy access later!
             PlayerActivator.allPlayerActors.Clear();
             PlayerActivator.allPlayerActors.AddRange(playerActors);

@@ -65,7 +65,7 @@ namespace Examples.Game.Scripts.Battle.Player
                 currentShield = lowerShield;
                 currentGhostedShield = ghostedLowerShield;
             }
-            Debug.Log($"OnEnable {name} IsLocalTeam={playerActor.IsLocalTeam} currentShield={currentShield.name}");
+            Debug.Log($"OnEnable {name} currentShield={currentShield.name}");
             var teamMate = playerActor.TeamMate;
             if (teamMate == null)
             {
