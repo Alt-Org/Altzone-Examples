@@ -34,6 +34,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [Header("Debug"), SerializeField] private Vector2 position;
         [SerializeField] private Vector2 direction;
         [SerializeField] private float _currentDistance;
+        [SerializeField] private float _attackForce;
 
         private IBallControl ballControl;
         private PhotonEventDispatcher photonEventDispatcher;
@@ -58,14 +59,14 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         public override void OnEnable()
         {
             base.OnEnable();
+            // Get all team players ordered by their position so we can align the sling properly from A to B
             var playerActors = FindObjectsOfType<PlayerActor>()
-                .Cast<IPlayerActor>()
-                .Where(x => x.TeamIndex == teamIndex)
-                .OrderBy(x => x.PlayerPos)
+                .Where(x => ((IPlayerActor)x).TeamIndex == teamIndex)
+                .OrderBy(x => ((IPlayerActor)x).PlayerPos)
                 .ToList();
-            Debug.Log($"OnEnable team={teamIndex} playerActors={playerActors.Count}");
             if (playerActors.Count == 0)
             {
+                Debug.Log($"OnEnable team={teamIndex} playerActors={playerActors.Count}");
                 gameObject.SetActive(false); // No players for our team!
                 return;
             }
@@ -73,18 +74,28 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             ballControl = BallActor.Get();
             ballControl.hideBall();
 
-            followA = ((PlayerActor)playerActors[0]).transform;
+            followA = playerActors[0].transform;
+            _attackForce = getAttackForce(playerActors[0]);
             if (playerActors.Count == 2)
             {
-                followB = ((PlayerActor)playerActors[1]).transform;
+                followB = playerActors[1].transform;
+                _attackForce += getAttackForce(playerActors[1]);
             }
             else
             {
-                var teamMatePos = playerActors[0].TeamMatePos;
+                var teamMatePos = ((IPlayerActor)playerActors[0]).TeamMatePos;
                 followB = SceneConfig.Get().playerStartPos[teamMatePos]; // Never moves
             }
+            Debug.Log($"OnEnable team={teamIndex} playerActors={playerActors.Count} attackForce={_attackForce}");
             // LineRenderer should be configured ok in Editor - we just move both "ends" on the fly!
             line.positionCount = 2;
+        }
+
+        private static float getAttackForce(Component playerActor)
+        {
+            var player = PhotonView.Get(playerActor).Owner;
+            var model = PhotonBattle.getPlayerCharacterModel(player);
+            return model.Attack;
         }
 
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
@@ -95,11 +106,14 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         void IBallSlingShot.startBall()
         {
+            Debug.Log($"startBall team={teamIndex} distance={_currentDistance} attackForce={_attackForce}");
             startTheBall(ballControl, position, teamIndex, direction, _currentDistance); // Ball takes care of its own network synchronization
             sendHideSlingShot();
         }
 
         float IBallSlingShot.currentDistance => _currentDistance;
+
+        float IBallSlingShot.attackForce => _attackForce;
 
         private void Update()
         {
@@ -127,13 +141,13 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         public static void startTheBall()
         {
-            // Get slingshot with longest distance and start it.
+            // Get slingshot with largest attack force and start it - LINQ First can throw an exception if list is empty.
             var ballSlingShot = FindObjectsOfType<BallSlingShot>()
                 .Cast<IBallSlingShot>()
-                .OrderByDescending(x => x.currentDistance)
-                .FirstOrDefault();
+                .OrderByDescending(x => x.currentDistance * x.attackForce)
+                .First();
 
-            ballSlingShot?.startBall();
+            ballSlingShot.startBall();
 
             // HACK to set players on the game after ball has been started!
             var ball = BallActor.Get();
