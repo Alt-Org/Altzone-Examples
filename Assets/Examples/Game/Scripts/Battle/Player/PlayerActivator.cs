@@ -13,6 +13,7 @@ namespace Examples.Game.Scripts.Battle.Player
     {
         public static readonly List<IPlayerActor> allPlayerActors = new List<IPlayerActor>();
         public static int homeTeamIndex;
+        public static int localTeamIndex;
 
         [Header("Live Data")] public int playerPos;
         public int teamIndex;
@@ -32,6 +33,11 @@ namespace Examples.Game.Scripts.Battle.Player
                 // The player who created this room is in "home team"!
                 homeTeamIndex = teamIndex;
                 Debug.Log($"homeTeamIndex={homeTeamIndex} pos={playerPos}");
+            }
+            if (isLocal)
+            {
+                Debug.Log($"localTeamIndex={localTeamIndex} pos={playerPos}");
+                localTeamIndex = teamIndex;
             }
             oppositeTeamIndex = getOppositeTeamIndex(teamIndex);
             teamMatePos = getTeamMatePos(playerPos);

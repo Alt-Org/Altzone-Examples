@@ -14,7 +14,10 @@ namespace Examples.Game.Scripts.Battle.UI
     /// </summary>
     public class DebugCanvasListener : MonoBehaviour
     {
-        private static readonly string[] teamName = { "Home", "Visitor" };
+        private const string teamNameHome = "Home";
+        private const string teamNameVisitor = "Visitor";
+        private const string scoreFormatLocal = "<b>{0}({1})</b> h={2} w={3}";
+        private const string scoreFormatVisitor = "{0}({1}) h={2} w={3}";
 
         public GameObject roomStartPanel;
         public Text titleText;
@@ -22,7 +25,6 @@ namespace Examples.Game.Scripts.Battle.UI
         public GameObject scorePanel;
         public Text leftText;
         public Text rightText;
-        public int homeTeamIndex;
 
         private void OnEnable()
         {
@@ -30,7 +32,6 @@ namespace Examples.Game.Scripts.Battle.UI
             scorePanel.SetActive(false);
             leftText.text = "";
             rightText.text = "";
-            homeTeamIndex = 0;
             this.Subscribe<ScoreManager.TeamScoreEvent>(OnTeamScoreEvent);
             this.Subscribe<GameStartPlayingTest.CountdownEvent>(OnCountdownEvent);
         }
@@ -56,7 +57,6 @@ namespace Examples.Game.Scripts.Battle.UI
                 this.executeAsCoroutine(new WaitForSeconds(0.67f), () =>
                 {
                     roomStartPanel.SetActive(false);
-                    homeTeamIndex = PlayerActivator.homeTeamIndex;
                     scorePanel.SetActive(true);
                 });
             }
@@ -64,12 +64,14 @@ namespace Examples.Game.Scripts.Battle.UI
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
-            Debug.Log($"OnTeamScoreEvent {data}");
+            Debug.Log($"OnTeamScoreEvent {data} homeTeamIndex={PlayerActivator.homeTeamIndex}");
             var score = data.score;
-            var isHomeTeam = score.teamIndex == homeTeamIndex;
-            var teamNameIndex = isHomeTeam ? 0 : 1;
+            var isHomeTeam = score.teamIndex == PlayerActivator.homeTeamIndex;
+            var teamName = isHomeTeam ? teamNameHome : teamNameVisitor;
             var text = isHomeTeam ? leftText : rightText;
-            text.text = $"<b>{teamName[teamNameIndex]}({score.teamIndex})</b> h={score.headCollisionCount} w={score.wallCollisionCount}";
+            var isLocalTeam = score.teamIndex == PlayerActivator.localTeamIndex;
+            var format = isLocalTeam ? scoreFormatLocal : scoreFormatVisitor;
+            text.text = string.Format(format, teamName, score.teamIndex, score.headCollisionCount, score.wallCollisionCount);
         }
     }
 }
