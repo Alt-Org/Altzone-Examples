@@ -21,10 +21,10 @@ namespace Examples.Game.Scripts.Battle.UI
 
         public GameObject roomStartPanel;
         public Text titleText;
-        public Text countdownText;
         public GameObject scorePanel;
         public Text leftText;
         public Text rightText;
+        public CountdownText countdown;
 
         private void OnEnable()
         {
@@ -51,7 +51,7 @@ namespace Examples.Game.Scripts.Battle.UI
                 roomStartPanel.SetActive(true);
                 titleText.text = "Wait for game start:";
             }
-            countdownText.text = data.curCountdownValue.ToString("N0");
+            countdown.setCountdownValue(data.curCountdownValue);
             if (data.curCountdownValue <= 0)
             {
                 this.executeAsCoroutine(new WaitForSeconds(0.67f), () =>
