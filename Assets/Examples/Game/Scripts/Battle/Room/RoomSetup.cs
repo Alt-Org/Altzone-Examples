@@ -68,9 +68,10 @@ namespace Examples.Game.Scripts.Battle.Room
             }
             if (features.isLocalPLayerOnTeamBlue)
             {
-                if (teamIndex == 1)
+                sceneConfig.rotateBackground(upsideDown: true);
+                if (teamIndex == 1 && sceneConfig.upperTeamSprite.enabled && sceneConfig.lowerTeamSprite.enabled)
                 {
-                    // c# swap via deconstruction
+                    // c# swap via deconstruction - these might not be visible in final game
                     (sceneConfig.upperTeamSprite.color, sceneConfig.lowerTeamSprite.color) =
                         (sceneConfig.lowerTeamSprite.color, sceneConfig.upperTeamSprite.color);
                 }
@@ -90,7 +91,7 @@ namespace Examples.Game.Scripts.Battle.Room
                 playerActors = FindObjectsOfType<PlayerActor>().ToList();
             }
             // All player have been instantiated in the scene, wait until they are in known state
-            for (;PhotonNetwork.InRoom;)
+            for (; PhotonNetwork.InRoom;)
             {
                 if (checkPlayerActors(playerActors) == playerCount)
                 {

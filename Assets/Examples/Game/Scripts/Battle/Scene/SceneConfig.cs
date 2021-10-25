@@ -11,6 +11,11 @@ namespace Examples.Game.Scripts.Battle.Scene
         public Camera _camera;
 
         /// <summary>
+        /// Background for the game.
+        /// </summary>
+        public GameObject gameBackground;
+
+        /// <summary>
         /// Is game camera rotated upside down (180 degrees)?
         /// </summary>
         public bool isCameraRotated { get; private set; }
@@ -80,6 +85,14 @@ namespace Examples.Game.Scripts.Battle.Scene
             var center = playAreaTransform.position;
             var bounds = playAreaTransform.GetComponent<Collider2D>().bounds;
             return calculateRectFrom(center, bounds);
+        }
+
+        public void rotateBackground(bool upsideDown)
+        {
+            var rotation = upsideDown
+                ? Quaternion.Euler(0f, 0f, 180f) // Upside down
+                : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
+            gameBackground.transform.rotation = rotation;
         }
 
         public void rotateGameCamera(bool upsideDown)

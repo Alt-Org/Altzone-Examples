@@ -1469,6 +1469,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _camera: {fileID: 6780388524306496468}
+  gameBackground: {fileID: 801765301}
   actorParent: {fileID: 1374902844}
   _gameArena: {fileID: 666866954}
   playerStartPos:
@@ -1893,7 +1894,7 @@ GameObject:
   - component: {fileID: 801765302}
   - component: {fileID: 801765303}
   m_Layer: 0
-  m_Name: ArenaTemplate
+  m_Name: gameBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3016,6 +3017,7 @@ MonoBehaviour:
   ballCollision: {fileID: 0}
   networkPosition: {x: 0, y: 0}
   networkLag: 0
+  collidersDisabledTime: 0
 --- !u!58 &1491261278
 CircleCollider2D:
   m_ObjectHideFlags: 0
