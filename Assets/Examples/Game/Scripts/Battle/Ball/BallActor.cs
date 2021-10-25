@@ -13,8 +13,6 @@ namespace Examples.Game.Scripts.Battle.Ball
     /// </summary>
     public class BallActor : MonoBehaviour, IPunObservable, IBallControl
     {
-        private const float collidersDisabledTime = 0.3f; // Ball colliders will be disabled after ball is started to avoid player over the ball!
-
         public static IBallControl Get()
         {
             if (_Instance == null)
@@ -46,6 +44,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         private Rigidbody2D _rigidbody;
         private PhotonView _photonView;
 
+        public float collidersDisabledTime; // Ball colliders will be disabled after ball is started to avoid player over the ball!
         private bool isBallStarting;
 
         private float ballGracePeriod;
@@ -131,10 +130,18 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             onCurrentTeamChanged(teamIndex);
             _rigidbody.position = position;
-            _collider.enabled = false;
-            isBallStarting = true;
-            ballGracePeriod = Time.time + collidersDisabledTime;
-            Debug.Log($"teleportBall position={_rigidbody.position} and ball grace period starts");
+            if (collidersDisabledTime > 0f)
+            {
+                isBallStarting = true;
+                _collider.enabled = false;
+                ballGracePeriod = Time.time + collidersDisabledTime;
+            }
+            else
+            {
+                isBallStarting = false;
+                _collider.enabled = true;
+                ballGracePeriod = 0f;
+            }
         }
 
         void IBallControl.moveBall(Vector2 direction, float speed)
@@ -158,8 +165,15 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             ballCollision.enabled = true;
             _sprite.enabled = true;
-            _collider.enabled = false;
-            Debug.Log($"showBall position={_rigidbody.position} and collider is disabled");
+            if (isBallStarting)
+            {
+                _collider.enabled = false;
+            }
+            else
+            {
+                _collider.enabled = true;
+            }
+            Debug.Log($"showBall position={_rigidbody.position} and isBallStarting={isBallStarting}");
         }
 
         private void _hideBall()
