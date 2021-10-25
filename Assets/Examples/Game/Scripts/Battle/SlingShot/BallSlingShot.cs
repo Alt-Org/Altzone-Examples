@@ -14,8 +14,9 @@ namespace Examples.Game.Scripts.Battle.SlingShot
     ///  Puts the ball on the game using "sling shot" method between two team mates in position A and B.
     /// </summary>
     /// <remarks>
-    /// Position A is end point of aiming and position B is start point of aiming.<br />
-    /// Vector A-B provides direction and relative speed (increase or decrease) to the ball when it is started to the game.
+    /// Position A is start point of aiming and position B is end point of aiming.<br />
+    /// Vector B-A provides direction and relative speed (increase or decrease) to the ball when it is started to the game.<br />
+    /// Ball is started from point B.
     /// </remarks>
     public class BallSlingShot : MonoBehaviourPunCallbacks, IBallSlingShot
     {
@@ -31,17 +32,22 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private Vector3 a;
         [SerializeField] private Vector3 b;
 
-        [Header("Debug"), SerializeField] private Vector2 position;
-        [SerializeField] private Vector2 direction;
-        [SerializeField] private float _currentDistance;
+        [Header("Debug"), SerializeField] private Vector2 startPosition;
+        [SerializeField] private Vector2 deltaVector;
+        [SerializeField] private float _sqrMagnitude;
         [SerializeField] private float _attackForce;
 
         private IBallControl ballControl;
+        private float sqrMinSlingShotDistance;
+        private float sqrMaxSlingShotDistance;
         private PhotonEventDispatcher photonEventDispatcher;
 
         private void Awake()
         {
             Debug.Log("Awake");
+            var variables = RuntimeGameConfig.Get().variables;
+            sqrMinSlingShotDistance = variables.minSlingShotDistance * variables.minSlingShotDistance;
+            sqrMaxSlingShotDistance = variables.maxSlingShotDistance * variables.maxSlingShotDistance;
             photonEventDispatcher = PhotonEventDispatcher.Get();
             photonEventDispatcher.registerEventListener(msgHideSlingShot, data => { onHideSlingShot(); });
         }
@@ -106,12 +112,14 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         void IBallSlingShot.startBall()
         {
-            Debug.Log($"startBall team={teamIndex} distance={_currentDistance} attackForce={_attackForce}");
-            startTheBall(ballControl, position, teamIndex, direction, _currentDistance); // Ball takes care of its own network synchronization
+            Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
+            var direction = deltaVector.normalized;
+            var speed = deltaVector.magnitude;
+            startTheBall(ballControl, startPosition, teamIndex, direction, speed); // Ball takes care of its own network synchronization
             sendHideSlingShot();
         }
 
-        float IBallSlingShot.currentDistance => _currentDistance;
+        float IBallSlingShot.sqrMagnitude => _sqrMagnitude;
 
         float IBallSlingShot.attackForce => _attackForce;
 
@@ -125,11 +133,9 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             line.SetPosition(0, a);
             line.SetPosition(1, b);
 
-            position = a;
-            direction = b - a;
-            var variables = RuntimeGameConfig.Get().variables;
-            _currentDistance = Mathf.Clamp(direction.magnitude, variables.minSlingShotDistance, variables.maxSlingShotDistance);
-            direction = direction.normalized;
+            startPosition = b;
+            deltaVector = b-a;
+            _sqrMagnitude = Mathf.Clamp(deltaVector.sqrMagnitude, sqrMinSlingShotDistance, sqrMaxSlingShotDistance);
         }
 
         private static void startTheBall(IBallControl ballControl, Vector2 position, int teamIndex, Vector2 direction, float speed)
@@ -144,7 +150,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             // Get slingshot with largest attack force and start it - LINQ First can throw an exception if list is empty.
             var ballSlingShot = FindObjectsOfType<BallSlingShot>()
                 .Cast<IBallSlingShot>()
-                .OrderByDescending(x => x.currentDistance * x.attackForce)
+                .OrderByDescending(x => x.sqrMagnitude * x.attackForce)
                 .First();
 
             ballSlingShot.startBall();

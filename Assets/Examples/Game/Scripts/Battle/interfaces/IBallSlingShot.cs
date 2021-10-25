@@ -11,9 +11,9 @@ namespace Examples.Game.Scripts.Battle.interfaces
         void startBall();
 
         /// <summary>
-        /// Current distance between sling head and tail positions.
+        /// Current squared length between sling head and tail positions.
         /// </summary>
-        float currentDistance { get; }
+        float sqrMagnitude { get; }
 
         /// <summary>
         /// Attack force of current players "holding" the sling.
