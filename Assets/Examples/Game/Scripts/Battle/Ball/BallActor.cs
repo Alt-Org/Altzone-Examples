@@ -13,6 +13,8 @@ namespace Examples.Game.Scripts.Battle.Ball
     /// </summary>
     public class BallActor : MonoBehaviour, IPunObservable, IBallControl
     {
+        private const float collidersDisabledTime = 0.3f; // Ball colliders will be disabled after ball is started to avoid player over the ball!
+
         public static IBallControl Get()
         {
             if (_Instance == null)
@@ -131,7 +133,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             _rigidbody.position = position;
             _collider.enabled = false;
             isBallStarting = true;
-            ballGracePeriod = Time.time + 1.0f;
+            ballGracePeriod = Time.time + collidersDisabledTime;
             Debug.Log($"teleportBall position={_rigidbody.position} and ball grace period starts");
         }
 
