@@ -1,4 +1,5 @@
 ﻿using Examples.Config.Scripts;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
@@ -23,6 +24,12 @@ namespace Examples.Lobby.Scripts
         {
             if (PhotonWrapper.InLobby)
             {
+                var playerData = RuntimeGameConfig.Get().playerDataCache;
+                if (PhotonNetwork.NickName != playerData.PlayerName)
+                {
+                    // Fix player name if it has been changed
+                    PhotonNetwork.NickName = playerData.PlayerName;
+                }
                 inLobby.SetActive(true);
                 enabled = false;
                 return;
