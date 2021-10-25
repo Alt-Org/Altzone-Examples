@@ -191,7 +191,7 @@ namespace Prg.Scripts.Common.Photon
             // - original 10 times per second is way too slow to keep moving objects synchronized properly without glitches!
             PhotonNetwork.SerializationRate = 30;
             Debug.Log(
-                $"ConnectUsingSettings {PhotonNetwork.NetworkClientState} scene={SceneManager.GetActiveScene().name}" +
+                $"ConnectUsingSettings {PhotonNetwork.NetworkClientState} scene={SceneManager.GetActiveScene().name} player={playerName}" +
                 $" {(appSettings != null ? appSettings.ToStringFull() : "")}");
             PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
             PhotonNetwork.NickName = playerName;
