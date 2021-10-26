@@ -30,8 +30,6 @@ namespace Examples.Game.Scripts.Battle.Ball
         private static IBallControl _Instance;
 
         [Header("Settings"), SerializeField] private SpriteRenderer _sprite;
-        [SerializeField] private Color normalColor;
-        [SerializeField] private Color ghostColor;
         [SerializeField] private Collider2D _collider;
 
         [SerializeField] private LayerMask collisionToHeadMask;
@@ -51,6 +49,7 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private Rigidbody2D _rigidbody;
         private PhotonView _photonView;
+        private IBallColor ballColor;
 
         public float collidersDisabledTime; // Ball colliders will be disabled after ball is started to avoid player over the ball!
         private bool isBallStarting;
@@ -80,6 +79,8 @@ namespace Examples.Game.Scripts.Battle.Ball
             ((IBallCollisionSource)ballCollision).onCurrentTeamChanged = onCurrentTeamChanged;
             ((IBallCollisionSource)ballCollision).onCollision2D = onBallCollision;
             ballHeadShot = GetComponent<BallHeadShot>(); // Disables itself automatically
+            ballColor = GetComponent<BallColor>();
+            ballColor.initialize(); // Must initialize ball color explicitly to avoid script execution order problems
         }
 
         private void OnDestroy()
@@ -185,7 +186,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         private void _showBall()
         {
             ballCollision.enabled = true;
-            _sprite.color = normalColor;
+            ballColor.setNormalMode();
             _sprite.enabled = true;
             if (isBallStarting)
             {
@@ -211,7 +212,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         private void _ghostBall()
         {
             ballCollision.enabled = false;
-            _sprite.color = ghostColor;
+            ballColor.setGhostedMode();
             _sprite.enabled = true;
             _collider.enabled = false;
             targetSpeed = 0;

@@ -1,4 +1,5 @@
 using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.interfaces;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
@@ -6,47 +7,63 @@ using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Ball
 {
-    public class BallColor : MonoBehaviour
+    public class BallColor : MonoBehaviour, IBallColor
     {
         private const int msgSetBallColor = PhotonEventDispatcher.eventCodeBase + 4;
 
         private const int neutralColorIndex = 0;
         private const int upperTeamColorIndex = 1;
         private const int lowerTeamColorIndex = 2;
+        private const int ghostedColorIndex = 3;
 
         [Header("Settings"), SerializeField] private SpriteRenderer _sprite;
-        [SerializeField] private Color neutralColor;
+        [SerializeField] private Color normalColor;
         [SerializeField] private Color upperTeamColor;
         [SerializeField] private Color lowerTeamColor;
+        [SerializeField] private Color ghostColor;
+
+        [Header("Live Data"), SerializeField] private bool isNormalMode;
+        [SerializeField] private int currentColorIndex;
 
         private PhotonEventDispatcher photonEventDispatcher;
 
         private void Awake()
         {
+            // HACK: stupid way to initialize us if/because BallActor is awaken before us :-(
             Debug.Log("Awake");
-            photonEventDispatcher = PhotonEventDispatcher.Get();
-            photonEventDispatcher.registerEventListener(msgSetBallColor, data => { onSetBallColor(data.CustomData); });
+            ((IBallColor)this).initialize();
         }
 
-        private void sendSetBallColor(int colorIndex)
+        private void sendSetBallColor(int colorIndex, bool normalMode)
         {
-            photonEventDispatcher.RaiseEvent(msgSetBallColor, colorIndex);
+            var payload = new[] { (byte)colorIndex, (byte)(normalMode ? 1 : 0) };
+            photonEventDispatcher.RaiseEvent(msgSetBallColor, payload);
         }
 
         private void onSetBallColor(object data)
         {
-            var colorIndex = (int)data;
-            switch (colorIndex)
+            byte[] payload = (byte[])data;
+            currentColorIndex = payload[0];
+            isNormalMode = payload[1] == 1;
+            if (!isNormalMode)
+            {
+                _sprite.color = ghostColor;
+                return;
+            }
+            switch (currentColorIndex)
             {
                 case lowerTeamColorIndex:
                     _sprite.color = lowerTeamColor;
-                    break;
+                    return;
                 case upperTeamColorIndex:
                     _sprite.color = upperTeamColor;
-                    break;
+                    return;
+                case ghostedColorIndex:
+                    _sprite.color = ghostColor;
+                    return;
                 default:
-                    _sprite.color = neutralColor;
-                    break;
+                    _sprite.color = normalColor;
+                    return;
             }
         }
 
@@ -67,19 +84,44 @@ namespace Examples.Game.Scripts.Battle.Ball
             this.Unsubscribe();
         }
 
+        void IBallColor.initialize()
+        {
+            if (photonEventDispatcher == null)
+            {
+                photonEventDispatcher = PhotonEventDispatcher.Get();
+                photonEventDispatcher.registerEventListener(msgSetBallColor, data => { onSetBallColor(data.CustomData); });
+                isNormalMode = true;
+                currentColorIndex = 0;
+            }
+        }
+
+        void IBallColor.setNormalMode()
+        {
+            isNormalMode = true;
+            sendSetBallColor(currentColorIndex, isNormalMode);
+        }
+
+        void IBallColor.setGhostedMode()
+        {
+            isNormalMode = false;
+            sendSetBallColor(currentColorIndex, isNormalMode);
+        }
+
         private void onActiveTeamEvent(BallActor.ActiveTeamEvent data)
         {
             switch (data.newTeamIndex)
             {
                 case 0:
-                    sendSetBallColor(lowerTeamColorIndex);
-                    break;
+                    sendSetBallColor(lowerTeamColorIndex, isNormalMode);
+                    return;
                 case 1:
-                    sendSetBallColor(upperTeamColorIndex);
-                    break;
+                    sendSetBallColor(upperTeamColorIndex, isNormalMode);
+                    return;
+                case -1:
+                    sendSetBallColor(neutralColorIndex, isNormalMode);
+                    return;
                 default:
-                    sendSetBallColor(neutralColorIndex);
-                    break;
+                    throw new UnityException($"unknown team index: {data.newTeamIndex}");
             }
         }
     }
