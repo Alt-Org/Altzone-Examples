@@ -15,8 +15,6 @@ namespace Examples.Lobby.Scripts.InLobby
     /// </summary>
     public class PaneRoomListing : MonoBehaviour
     {
-        [SerializeField] private Button characterButton;
-        [SerializeField] private UnitySceneName characterScene;
         [SerializeField] private Button templateButton;
         [SerializeField] private Transform buttonParent;
 
@@ -24,10 +22,6 @@ namespace Examples.Lobby.Scripts.InLobby
 
         private void Start()
         {
-            characterButton.onClick.AddListener(() =>
-            {
-                SceneManager.LoadScene(characterScene.sceneName);
-            });
             templateButton.onClick.AddListener(createRoomForMe);
         }
 

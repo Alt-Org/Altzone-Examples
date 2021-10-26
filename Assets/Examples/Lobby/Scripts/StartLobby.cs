@@ -12,12 +12,16 @@ namespace Examples.Lobby.Scripts
     {
         [SerializeField] private GameObject inLobby;
         [SerializeField] private GameObject inRoom;
+        [SerializeField] private GameObject inChooseModel;
 
+        private static StartLobby instance;
         private void Start()
         {
+            instance = this;
             PhotonLobby.OfflineMode = false;
             inLobby.SetActive(false);
             inRoom.SetActive(false);
+            inChooseModel.SetActive(false);
         }
 
         private void Update()
@@ -49,6 +53,21 @@ namespace Examples.Lobby.Scripts
                 var playerData = RuntimeGameConfig.Get().playerDataCache;
                 PhotonLobby.connect(playerData.PlayerName);
             }
+        }
+
+        public void showLobby()
+        {
+            Debug.Log("showLobby");
+            inLobby.SetActive(true);
+            inRoom.SetActive(false);
+            inChooseModel.SetActive(false);
+        }
+
+        public static void showChooseModel()
+        {
+            instance.inLobby.SetActive(false);
+            instance.inRoom.SetActive(false);
+            instance.inChooseModel.SetActive(true);
         }
     }
 }
