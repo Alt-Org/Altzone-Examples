@@ -27,11 +27,6 @@ namespace Examples.Config.Scripts
         public bool isSPawnMiniBall;
 
         /// <summary>
-        /// Enable or disable team (player) movement depending on ball position on game area, is it on our side or others side.
-        /// </summary>
-        public bool isActivateTeamWithBall;
-
-        /// <summary>
         /// Is shield always on when team has only one player (for testing).
         /// </summary>
         public bool isSinglePlayerShieldOn;

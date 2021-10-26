@@ -116,7 +116,6 @@ namespace Examples.Config.Scripts
                     writer.Write(features.isRotateGameCamera);
                     writer.Write(features.isLocalPLayerOnTeamBlue);
                     writer.Write(features.isSPawnMiniBall);
-                    writer.Write(features.isActivateTeamWithBall);
                     writer.Write(features.isSinglePlayerShieldOn);
                     writer.Write(last);
                 }
@@ -144,7 +143,6 @@ namespace Examples.Config.Scripts
                     features.isRotateGameCamera = reader.ReadBoolean();
                     features.isLocalPLayerOnTeamBlue = reader.ReadBoolean();
                     features.isSPawnMiniBall = reader.ReadBoolean();
-                    features.isActivateTeamWithBall = reader.ReadBoolean();
                     features.isSinglePlayerShieldOn = reader.ReadBoolean();
                     reader.ReadByte(); // skip last
                 }
