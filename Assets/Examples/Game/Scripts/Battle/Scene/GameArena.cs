@@ -29,10 +29,13 @@ namespace Examples.Game.Scripts.Battle.Scene
         [SerializeField] private BoxCollider2D wallBottom;
         [SerializeField] private BoxCollider2D wallLeft;
         [SerializeField] private BoxCollider2D wallRight;
+        [SerializeField] private Rect _outerArea;
+
+        Rect IGameArena.outerArea => _outerArea;
 
         void IGameArena.makeWalls()
         {
-            wallTop = createWall("wallTop", colliderParent,  wallTopTag, wallTopLayer, wallMaterial);
+            wallTop = createWall("wallTop", colliderParent, wallTopTag, wallTopLayer, wallMaterial);
             wallBottom = createWall("wallBottom", colliderParent, wallBottomTag, wallBottomLayer, wallMaterial);
             wallLeft = createWall("wallLeft", colliderParent, wallLeftTag, wallLeftLayer, wallMaterial);
             wallRight = createWall("wallRight", colliderParent, wallRightTag, wallRightLayer, wallMaterial);
@@ -57,6 +60,9 @@ namespace Examples.Game.Scripts.Battle.Scene
 
             wallRight.offset = new Vector2(width + wallAdjustment, 0f);
             wallRight.size = new Vector2(wallThickness, size.y);
+
+            var originalArea = calculateRectFrom(templateSprite.transform.position, templateSprite.bounds);
+            _outerArea = inflate(originalArea, wallThickness, wallThickness, wallThickness, wallThickness);
         }
 
         private static BoxCollider2D createWall(string name, Transform parent, string tag, int layer, PhysicsMaterial2D wallMaterial)
@@ -73,5 +79,28 @@ namespace Examples.Game.Scripts.Battle.Scene
             collider.sharedMaterial = wallMaterial;
             return collider;
         }
+
+        private static Rect calculateRectFrom(Vector3 center, Bounds bounds)
+        {
+            var extents = bounds.extents;
+            var size = bounds.size;
+            var x = center.x - extents.x;
+            var y = center.y - extents.y;
+            var width = size.x;
+            var height = size.y;
+            return new Rect(x, y, width, height);
+        }
+
+        private static Rect inflate(Rect a, float left, float top, float right, float bottom)
+        {
+            return new Rect
+            {
+                xMin = a.xMin - left,
+                yMin = a.yMin - top,
+                xMax = a.xMax + right,
+                yMax = a.yMax + bottom
+            };
+        }
+
     }
 }

@@ -81,6 +81,10 @@ namespace Examples.Game.Scripts.Battle.Ball
             ballHeadShot = GetComponent<BallHeadShot>(); // Disables itself automatically
             ballColor = GetComponent<BallColor>();
             ballColor.initialize(); // Must initialize ball color explicitly to avoid script execution order problems
+            if (PhotonNetwork.IsMasterClient)
+            {
+                gameObject.AddComponent<BallWatchdog>();
+            }
         }
 
         private void OnDestroy()
