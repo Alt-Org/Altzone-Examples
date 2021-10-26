@@ -2,6 +2,7 @@
 using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Room;
+using Examples.Game.Scripts.Battle.SlingShot;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
@@ -13,6 +14,10 @@ namespace Examples.Game.Scripts.Battle.Ball
     /// </summary>
     public class BallActor : MonoBehaviour, IPunObservable, IBallControl
     {
+        private const int visibilityModeNormal = 0;
+        private const int visibilityModeHidden = 1;
+        private const int visibilityModeGhosted = 2;
+
         public static IBallControl Get()
         {
             if (_Instance == null)
@@ -25,6 +30,8 @@ namespace Examples.Game.Scripts.Battle.Ball
         private static IBallControl _Instance;
 
         [Header("Settings"), SerializeField] private SpriteRenderer _sprite;
+        [SerializeField] private Color normalColor;
+        [SerializeField] private Color ghostColor;
         [SerializeField] private Collider2D _collider;
 
         [SerializeField] private LayerMask collisionToHeadMask;
@@ -37,6 +44,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         [Header("Live Data"), SerializeField] private int _curTeamIndex;
         [SerializeField] private float targetSpeed;
         [SerializeField] private BallCollision ballCollision;
+        [SerializeField] private BallHeadShot ballHeadShot;
 
         [Header("Photon"), SerializeField] private Vector2 networkPosition;
         [SerializeField] private float networkLag;
@@ -71,6 +79,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             ballCollision.enabled = false;
             ((IBallCollisionSource)ballCollision).onCurrentTeamChanged = onCurrentTeamChanged;
             ((IBallCollisionSource)ballCollision).onCollision2D = onBallCollision;
+            ballHeadShot = GetComponent<BallHeadShot>(); // Disables itself automatically
         }
 
         private void OnDestroy()
@@ -94,16 +103,16 @@ namespace Examples.Game.Scripts.Battle.Ball
                 BrickManager.deleteBrick(other.gameObject);
                 return;
             }
+            if (collisionToWall == (collisionToWall | colliderMask))
+            {
+                ScoreManager.addWallScore(other.gameObject);
+                return;
+            }
             if (collisionToHead == (collisionToHead | colliderMask))
             {
                 // Contract: player is one level up from head collider
                 var playerActor = otherGameObject.GetComponentInParent<PlayerActor>() as IPlayerActor;
-                playerActor.headCollision();
-                return;
-            }
-            if (collisionToWall == (collisionToWall | colliderMask))
-            {
-                ScoreManager.addWallScore(other.gameObject);
+                playerActor.headCollision(this);
                 return;
             }
             Debug.Log($"onBallCollision UNHANDLED team={_curTeamIndex} other={other.gameObject.name}");
@@ -153,17 +162,30 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         void IBallControl.showBall()
         {
-            _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, true);
+            _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, visibilityModeNormal);
         }
 
         void IBallControl.hideBall()
         {
-            _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, false);
+            _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, visibilityModeHidden);
+        }
+
+        void IBallControl.ghostBall()
+        {
+            _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, visibilityModeGhosted);
+        }
+
+        void IBallControl.restartBallFor(IPlayerActor player)
+        {
+            Debug.Log($"restartBallFor playerPos={player.PlayerPos}");
+            // Let ball headshot script do actual work to start ball again.
+            ballHeadShot.restartBall(this, player);
         }
 
         private void _showBall()
         {
             ballCollision.enabled = true;
+            _sprite.color = normalColor;
             _sprite.enabled = true;
             if (isBallStarting)
             {
@@ -184,6 +206,17 @@ namespace Examples.Game.Scripts.Battle.Ball
             targetSpeed = 0;
             _rigidbody.velocity = Vector2.zero;
             Debug.Log($"hideBall position={_rigidbody.position}");
+        }
+
+        private void _ghostBall()
+        {
+            ballCollision.enabled = false;
+            _sprite.color = ghostColor;
+            _sprite.enabled = true;
+            _collider.enabled = false;
+            targetSpeed = 0;
+            _rigidbody.velocity = Vector2.zero;
+            Debug.Log($"ghostBall position={_rigidbody.position}");
         }
 
         void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -266,15 +299,21 @@ namespace Examples.Game.Scripts.Battle.Ball
         }
 
         [PunRPC]
-        private void setBallVisibilityRpc(bool isVisible)
+        private void setBallVisibilityRpc(int visibilityMode)
         {
-            if (isVisible)
+            switch (visibilityMode)
             {
-                _showBall();
-            }
-            else
-            {
-                _hideBall();
+             case visibilityModeNormal:
+                 _showBall();
+                 return;
+             case visibilityModeHidden:
+                 _hideBall();
+                 return;
+             case visibilityModeGhosted:
+                 _ghostBall();
+                 return;
+             default:
+                 throw new UnityException($"unknown visibility mode: {visibilityMode}");
             }
         }
 

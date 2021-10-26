@@ -12,5 +12,7 @@ namespace Examples.Game.Scripts.Battle.interfaces
         void moveBall(Vector2 direction, float speed);
         void showBall();
         void hideBall();
+        void ghostBall();
+        void restartBallFor(IPlayerActor player);
     }
 }

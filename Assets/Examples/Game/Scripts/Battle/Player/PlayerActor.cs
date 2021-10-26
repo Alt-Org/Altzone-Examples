@@ -181,12 +181,12 @@ namespace Examples.Game.Scripts.Battle.Player
             }
         }
 
-        void IPlayerActor.headCollision()
+        void IPlayerActor.headCollision(IBallControl ballControl)
         {
             Debug.Log($"headCollision name={name}");
-            ((IPlayerActor)this).setGhostedMode();
             var oppositeTeam = ((IPlayerActor)this).OppositeTeam;
             ScoreManager.addHeadScore(oppositeTeam);
+            ballControl.restartBallFor(this);
         }
 
         private void _setNormalMode()

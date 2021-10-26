@@ -16,8 +16,7 @@ MonoBehaviour:
     isRotateGameCamera: 1
     isLocalPLayerOnTeamBlue: 1
     isSPawnMiniBall: 0
-    isActivateTeamWithBall: 1
-    isSinglePlayerShieldOn: 1
+    isSinglePlayerShieldOn: 0
   variables:
     roomStartDelay: 3
     ballMoveSpeed: 7
