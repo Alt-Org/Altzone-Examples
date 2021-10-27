@@ -43,14 +43,14 @@ namespace Examples.Config.Scripts
     [Serializable]
     public class GameVariables
     {
-        [Header("Battle")] public int roomStartDelay;
+        [Header("Battle"), Min(1)] public int roomStartDelay;
 
         [Header("Ball")] public float ballMoveSpeed;
         public float ballLerpSmoothingFactor;
         public float ballTeleportDistance;
         public float minSlingShotDistance;
         public float maxSlingShotDistance;
-        public int ballRestartDelay;
+        [Min(1)] public int ballRestartDelay;
 
         [Header("Player")] public float playerMoveSpeed;
         public float playerSqrMinRotationDistance;
@@ -134,7 +134,7 @@ namespace Examples.Config.Scripts
         }
 
         public CharacterModel CharacterModel => Models.GetById<CharacterModel>(_characterModelId) ??
-                                                new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0,0,0,0);
+                                                new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
 
         /// <summary>
         /// Unique string to identify this player across devices and systems.
