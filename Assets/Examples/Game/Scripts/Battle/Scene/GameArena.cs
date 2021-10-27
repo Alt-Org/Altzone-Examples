@@ -62,7 +62,7 @@ namespace Examples.Game.Scripts.Battle.Scene
             wallRight.size = new Vector2(wallThickness, size.y);
 
             var originalArea = calculateRectFrom(templateSprite.transform.position, templateSprite.bounds);
-            _outerArea = inflate(originalArea, wallThickness, wallThickness, wallThickness, wallThickness);
+            _outerArea = originalArea.inflate(wallThickness, wallThickness, wallThickness, wallThickness);
         }
 
         private static BoxCollider2D createWall(string name, Transform parent, string tag, int layer, PhysicsMaterial2D wallMaterial)
@@ -90,17 +90,5 @@ namespace Examples.Game.Scripts.Battle.Scene
             var height = size.y;
             return new Rect(x, y, width, height);
         }
-
-        private static Rect inflate(Rect a, float left, float top, float right, float bottom)
-        {
-            return new Rect
-            {
-                xMin = a.xMin - left,
-                yMin = a.yMin - top,
-                xMax = a.xMax + right,
-                yMax = a.yMax + bottom
-            };
-        }
-
     }
 }
