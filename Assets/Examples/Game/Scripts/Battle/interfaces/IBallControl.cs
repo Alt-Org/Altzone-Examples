@@ -13,6 +13,6 @@ namespace Examples.Game.Scripts.Battle.interfaces
         void showBall();
         void hideBall();
         void ghostBall();
-        void restartBallFor(IPlayerActor player);
+        void catchABallFor(IPlayerActor player);
     }
 }

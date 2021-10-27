@@ -1,8 +1,8 @@
 using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.interfaces;
+using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
-using System;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.SlingShot
@@ -13,7 +13,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
     /// <remarks>
     /// Team mate in position A is the player whose head was hit - the "take a catch" player.
     /// </remarks>
-    public class BallHeadShot : MonoBehaviourPunCallbacks
+    public class BallHeadShot : MonoBehaviourPunCallbacks, ICatchABall
     {
         [Header("Settings"), SerializeField] private float gapToBall;
         [SerializeField] private LineRenderer line;
@@ -36,7 +36,6 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             enabled = false;
         }
 
-
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
             // When any player leaves, the game is over!
@@ -55,7 +54,12 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
             if (Time.time > ballStartTime)
             {
-                startBall();
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    startBall();
+                }
+                line.gameObject.SetActive(false);
+                enabled = false;
             }
         }
 
@@ -66,16 +70,15 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             var direction = delta.normalized;
             var speed = Mathf.Clamp(Mathf.Abs(delta.magnitude), variables.minSlingShotDistance, variables.maxSlingShotDistance);
             startTheBall(ballControl, ballTransform.position, teamIndex, direction, speed);
-            line.gameObject.SetActive(false);
-            enabled = false;
         }
 
-        public void restartBall(IBallControl ball, IPlayerActor playerA)
+        public void catchABall(IBallControl ball, int playerPos)
         {
-            Debug.Log($"restartBall");
+            Debug.Log($"restartBall playerPos={playerPos}");
             ballControl = ball;
             ballTransform = ((Component)ballControl).transform;
 
+            var playerA = PlayerActivator.allPlayerActors.Find(x => x.PlayerPos == playerPos);
             playerA.setGhostedMode();
             teamIndex = playerA.TeamIndex;
             followA = ((Component)playerA).transform;

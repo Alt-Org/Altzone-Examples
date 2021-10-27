@@ -42,7 +42,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         [Header("Live Data"), SerializeField] private int _curTeamIndex;
         [SerializeField] private float targetSpeed;
         [SerializeField] private BallCollision ballCollision;
-        [SerializeField] private BallHeadShot ballHeadShot;
+        [SerializeField] private ICatchABall ballHeadShot;
 
         [Header("Photon"), SerializeField] private Vector2 networkPosition;
         [SerializeField] private float networkLag;
@@ -164,11 +164,9 @@ namespace Examples.Game.Scripts.Battle.Ball
             _photonView.RPC(nameof(setBallVisibilityRpc), RpcTarget.All, visibilityModeGhosted);
         }
 
-        void IBallControl.restartBallFor(IPlayerActor player)
+        void IBallControl.catchABallFor(IPlayerActor player)
         {
-            Debug.Log($"restartBallFor playerPos={player.PlayerPos}");
-            // Let ball headshot script do actual work to start ball again.
-            ballHeadShot.restartBall(this, player);
+            _photonView.RPC(nameof(catchABallRpc), RpcTarget.All, player.PlayerPos);
         }
 
         private void _showBall()
@@ -198,6 +196,12 @@ namespace Examples.Game.Scripts.Battle.Ball
             _sprite.enabled = true;
             _collider.enabled = false;
             Debug.Log($"ghostBall position={_rigidbody.position}");
+        }
+
+        private void _catchABall(int playerPos)
+        {
+            Debug.Log($"restartBall playerPos={playerPos}");
+            ballHeadShot.catchABall(this, playerPos);
         }
 
         void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -286,6 +290,12 @@ namespace Examples.Game.Scripts.Battle.Ball
                 default:
                     throw new UnityException($"unknown visibility mode: {visibilityMode}");
             }
+        }
+
+        [PunRPC]
+        private void catchABallRpc(int playerPos)
+        {
+            _catchABall(playerPos);
         }
 
         internal class ActiveTeamEvent

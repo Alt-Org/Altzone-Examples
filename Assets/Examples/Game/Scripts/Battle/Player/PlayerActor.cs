@@ -198,7 +198,7 @@ namespace Examples.Game.Scripts.Battle.Player
             Debug.Log($"headCollision name={name} mode={_playMode}");
             var oppositeTeam = ((IPlayerActor)this).OppositeTeam;
             ScoreManager.addHeadScore(oppositeTeam);
-            ballControl.restartBallFor(this);
+            ballControl.catchABallFor(this);
         }
 
         private void _setNormalMode()
