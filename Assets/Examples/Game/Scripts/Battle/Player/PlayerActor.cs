@@ -23,6 +23,7 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private GameObject frozenPlayer;
         [SerializeField] private GameObject ghostPlayer;
         [SerializeField] private GameObject localHighlight;
+        [SerializeField,Tooltip("Shrink play area to restrict player movement")] private Vector2 playerDimensions;
 
         [Header("Live Data"), SerializeField] private PlayerActivator activator;
         [SerializeField] private bool _isValidTeam;
@@ -128,7 +129,8 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             var sceneConfig = SceneConfig.Get();
             var playArea = sceneConfig.getPlayArea(activator.playerPos);
-            restrictedPlayer.setPlayArea(playArea);
+            var restrictedArea = playArea.inflate(-playerDimensions); // deflate play area!
+            restrictedPlayer.setPlayArea(restrictedArea);
 
             var playerInput = gameObject.AddComponent<PlayerInput>();
             playerInput.Camera = sceneConfig._camera;
