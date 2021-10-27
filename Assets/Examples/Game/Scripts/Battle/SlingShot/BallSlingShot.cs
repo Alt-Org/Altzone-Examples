@@ -77,8 +77,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             }
             // Hide ball immediately
             ballControl = BallActor.Get();
-            ballControl.hideBall();
-
+            if (PhotonNetwork.IsMasterClient)
+            {
+                ballControl.hideBall();
+            }
             followA = playerActors[0].transform;
             _attackForce = getAttackForce(playerActors[0]);
             if (playerActors.Count == 2)
@@ -133,7 +135,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             line.SetPosition(0, a);
             line.SetPosition(1, b);
 
-            deltaVector = b-a;
+            deltaVector = b - a;
             _sqrMagnitude = Mathf.Clamp(deltaVector.sqrMagnitude, sqrMinSlingShotDistance, sqrMaxSlingShotDistance);
         }
 
@@ -146,6 +148,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         public static void startTheBall()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
             // Get slingshot with largest attack force and start it - LINQ First can throw an exception if list is empty.
             var ballSlingShot = FindObjectsOfType<BallSlingShot>()
                 .Cast<IBallSlingShot>()
