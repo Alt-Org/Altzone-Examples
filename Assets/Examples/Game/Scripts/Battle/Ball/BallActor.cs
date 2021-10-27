@@ -51,11 +51,6 @@ namespace Examples.Game.Scripts.Battle.Ball
         private PhotonView _photonView;
         private IBallColor ballColor;
 
-        public float collidersDisabledTime; // Ball colliders will be disabled after ball is started to avoid player over the ball!
-        private bool isBallStarting;
-
-        private float ballGracePeriod;
-
         // Configurable settings
         private GameVariables variables;
 
@@ -144,18 +139,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             onCurrentTeamChanged(teamIndex);
             _rigidbody.position = position;
-            if (collidersDisabledTime > 0f)
-            {
-                isBallStarting = true;
-                _collider.enabled = false;
-                ballGracePeriod = Time.time + collidersDisabledTime;
-            }
-            else
-            {
-                isBallStarting = false;
-                _collider.enabled = true;
-                ballGracePeriod = 0f;
-            }
+            _collider.enabled = true;
         }
 
         void IBallControl.moveBall(Vector2 direction, float speed)
@@ -189,18 +173,11 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void _showBall()
         {
-            ballCollision.enabled = true;
             ballColor.setNormalMode();
+            ballCollision.enabled = true;
             _sprite.enabled = true;
-            if (isBallStarting)
-            {
-                _collider.enabled = false;
-            }
-            else
-            {
-                _collider.enabled = true;
-            }
-            Debug.Log($"showBall position={_rigidbody.position} and isBallStarting={isBallStarting}");
+            _collider.enabled = true;
+            Debug.Log($"showBall position={_rigidbody.position}");
         }
 
         private void _hideBall()
@@ -208,6 +185,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             ballCollision.enabled = false;
             _sprite.enabled = false;
             _collider.enabled = false;
+            // Stop it
             targetSpeed = 0;
             _rigidbody.velocity = Vector2.zero;
             Debug.Log($"hideBall position={_rigidbody.position}");
@@ -215,12 +193,10 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void _ghostBall()
         {
-            ballCollision.enabled = false;
             ballColor.setGhostedMode();
+            ballCollision.enabled = false;
             _sprite.enabled = true;
             _collider.enabled = false;
-            targetSpeed = 0;
-            _rigidbody.velocity = Vector2.zero;
             Debug.Log($"ghostBall position={_rigidbody.position}");
         }
 
@@ -255,16 +231,6 @@ namespace Examples.Game.Scripts.Battle.Ball
                 else
                 {
                     _rigidbody.position = Vector2.MoveTowards(curPos, networkPosition, Time.deltaTime);
-                }
-                return;
-            }
-            if (isBallStarting)
-            {
-                if (Time.time > ballGracePeriod)
-                {
-                    isBallStarting = false;
-                    _collider.enabled = true;
-                    Debug.Log($"ball grace period end and collider is enabled");
                 }
             }
         }
@@ -308,17 +274,17 @@ namespace Examples.Game.Scripts.Battle.Ball
         {
             switch (visibilityMode)
             {
-             case visibilityModeNormal:
-                 _showBall();
-                 return;
-             case visibilityModeHidden:
-                 _hideBall();
-                 return;
-             case visibilityModeGhosted:
-                 _ghostBall();
-                 return;
-             default:
-                 throw new UnityException($"unknown visibility mode: {visibilityMode}");
+                case visibilityModeNormal:
+                    _showBall();
+                    return;
+                case visibilityModeHidden:
+                    _hideBall();
+                    return;
+                case visibilityModeGhosted:
+                    _ghostBall();
+                    return;
+                default:
+                    throw new UnityException($"unknown visibility mode: {visibilityMode}");
             }
         }
 
