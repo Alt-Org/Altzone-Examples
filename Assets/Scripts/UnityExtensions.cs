@@ -72,6 +72,31 @@ public static class UnityExtensions
 
     #endregion
 
+    #region Rect
+
+    public static Rect inflate(this Rect rect, Vector2 size)
+    {
+        return new Rect
+        {
+            xMin = rect.xMin - size.x,
+            yMin = rect.yMin - size.y,
+            xMax = rect.xMax + size.x,
+            yMax = rect.yMax + size.y
+        };
+    }
+    public static Rect inflate(this Rect rect, float left, float top, float right, float bottom)
+    {
+        return new Rect
+        {
+            xMin = rect.xMin - left,
+            yMin = rect.yMin - top,
+            xMax = rect.xMax + right,
+            yMax = rect.yMax + bottom
+        };
+    }
+
+    #endregion
+
     #region Debugging
 
     public static string GetFullPath(this Transform transform)
