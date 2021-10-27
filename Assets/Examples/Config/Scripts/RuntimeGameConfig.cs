@@ -50,6 +50,7 @@ namespace Examples.Config.Scripts
         public float ballTeleportDistance;
         public float minSlingShotDistance;
         public float maxSlingShotDistance;
+        public int ballRestartDelay;
 
         [Header("Player")] public float playerMoveSpeed;
         public float playerSqrMinRotationDistance;

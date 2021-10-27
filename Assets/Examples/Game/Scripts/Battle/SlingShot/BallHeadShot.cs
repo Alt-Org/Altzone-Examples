@@ -95,7 +95,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             deltaBall = (ballTransform.position - followA.position) * (1f + gapToBall);
             distanceBall = Mathf.Abs(deltaBall.magnitude);
 
-            ballStartTime = Time.time + RuntimeGameConfig.Get().variables.roomStartDelay;
+            ballStartTime = Time.time + RuntimeGameConfig.Get().variables.ballRestartDelay;
 
             line.gameObject.SetActive(true);
             enabled = true;

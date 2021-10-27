@@ -164,6 +164,7 @@ namespace Examples.Config.Scripts
                     writer.Write(variables.ballTeleportDistance);
                     writer.Write(variables.minSlingShotDistance);
                     writer.Write(variables.maxSlingShotDistance);
+                    writer.Write(variables.ballRestartDelay);
                     writer.Write(variables.playerMoveSpeed);
                     writer.Write(variables.playerSqrMinRotationDistance);
                     writer.Write(variables.playerSqrMaxRotationDistance);
@@ -197,6 +198,7 @@ namespace Examples.Config.Scripts
                     variables.ballTeleportDistance = reader.ReadSingle();
                     variables.minSlingShotDistance = reader.ReadSingle();
                     variables.maxSlingShotDistance = reader.ReadSingle();
+                    variables.ballRestartDelay = reader.ReadInt32();
                     variables.playerMoveSpeed = reader.ReadSingle();
                     variables.playerSqrMinRotationDistance = reader.ReadSingle();
                     variables.playerSqrMaxRotationDistance = reader.ReadSingle();
