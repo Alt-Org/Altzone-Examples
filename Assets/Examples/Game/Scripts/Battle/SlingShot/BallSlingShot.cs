@@ -152,22 +152,20 @@ namespace Examples.Game.Scripts.Battle.SlingShot
                 .OrderByDescending(x => x.sqrMagnitude * x.attackForce)
                 .First();
 
-            ballSlingShot.startBall();
-
-            // HACK to set players on the game after ball has been started!
-            var ball = BallActor.Get();
-            var ballSideTeam = ball.currentTeamIndex;
+            // Set player state on the game before ball has been started!
+            var teamIndex = ((BallSlingShot)ballSlingShot).teamIndex;
             foreach (var playerActor in PlayerActivator.allPlayerActors)
             {
-                if (playerActor.TeamIndex == ballSideTeam)
+                if (playerActor.TeamIndex == teamIndex)
                 {
-                    playerActor.setFrozenMode();
+                    playerActor.setSpecialMode(); // If we were frozen ball gets stuck inside us :-(
                 }
                 else
                 {
                     playerActor.setNormalMode();
                 }
             }
+            ballSlingShot.startBall();
         }
     }
 }
