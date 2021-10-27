@@ -27,11 +27,6 @@ namespace Examples.Config.Scripts
         public bool isSPawnMiniBall;
 
         /// <summary>
-        /// Enable or disable team (player) movement depending on ball position on game area, is it on our side or others side.
-        /// </summary>
-        public bool isActivateTeamWithBall;
-
-        /// <summary>
         /// Is shield always on when team has only one player (for testing).
         /// </summary>
         public bool isSinglePlayerShieldOn;
@@ -48,13 +43,14 @@ namespace Examples.Config.Scripts
     [Serializable]
     public class GameVariables
     {
-        [Header("Battle")] public int roomStartDelay;
+        [Header("Battle"), Min(1)] public int roomStartDelay;
 
         [Header("Ball")] public float ballMoveSpeed;
         public float ballLerpSmoothingFactor;
         public float ballTeleportDistance;
         public float minSlingShotDistance;
         public float maxSlingShotDistance;
+        [Min(1)] public int ballRestartDelay;
 
         [Header("Player")] public float playerMoveSpeed;
         public float playerSqrMinRotationDistance;
@@ -138,7 +134,7 @@ namespace Examples.Config.Scripts
         }
 
         public CharacterModel CharacterModel => Models.GetById<CharacterModel>(_characterModelId) ??
-                                                new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0,0,0,0);
+                                                new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
 
         /// <summary>
         /// Unique string to identify this player across devices and systems.

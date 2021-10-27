@@ -9,10 +9,12 @@ namespace Examples.Lobby.Scripts.InLobby
     {
         [SerializeField] private Text titleText;
         [SerializeField] private Text lobbyText;
+        [SerializeField] private Button characterButton;
 
         private void Start()
         {
             titleText.text = $"Welcome to {Application.productName} {PhotonLobby.gameVersion}";
+            characterButton.onClick.AddListener(StartLobby.showChooseModel);
         }
 
         private void Update()

@@ -16,6 +16,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private const int playModeNormal = 0;
         private const int playModeFrozen = 1;
         private const int playModeGhosted = 2;
+        private const int playModeSpecial = 3;
 
         [Header("Settings"), SerializeField] private PlayerShield playerShield;
         [SerializeField] private GameObject playerRotation;
@@ -23,12 +24,14 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private GameObject frozenPlayer;
         [SerializeField] private GameObject ghostPlayer;
         [SerializeField] private GameObject localHighlight;
+        [SerializeField,Tooltip("Shrink play area to restrict player movement")] private Vector2 playerDimensions;
 
         [Header("Live Data"), SerializeField] private PlayerActivator activator;
         [SerializeField] private bool _isValidTeam;
         [SerializeField] private PlayerActor _teamMate;
         [SerializeField] private bool _isLocalTeam;
         [SerializeField] private bool _isHomeTeam;
+        [SerializeField] private int _playMode;
 
         int IPlayerActor.PlayerPos => activator.playerPos;
         bool IPlayerActor.IsLocal => activator.isLocal;
@@ -128,7 +131,8 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             var sceneConfig = SceneConfig.Get();
             var playArea = sceneConfig.getPlayArea(activator.playerPos);
-            restrictedPlayer.setPlayArea(playArea);
+            var restrictedArea = playArea.inflate(-playerDimensions); // deflate play area!
+            restrictedPlayer.setPlayArea(restrictedArea);
 
             var playerInput = gameObject.AddComponent<PlayerInput>();
             playerInput.Camera = sceneConfig._camera;
@@ -149,12 +153,12 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable name={name}");
+            Debug.Log($"OnEnable name={name} mode={_playMode}");
         }
 
         private void OnDisable()
         {
-            Debug.Log($"OnDisable name={name}");
+            Debug.Log($"OnDisable name={name} mode={_playMode}");
         }
 
         void IPlayerActor.setNormalMode()
@@ -181,17 +185,25 @@ namespace Examples.Game.Scripts.Battle.Player
             }
         }
 
-        void IPlayerActor.headCollision()
+        void IPlayerActor.setSpecialMode()
         {
-            Debug.Log($"headCollision name={name}");
-            ((IPlayerActor)this).setGhostedMode();
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeSpecial);
+            }
+        }
+
+        void IPlayerActor.headCollision(IBallControl ballControl)
+        {
+            Debug.Log($"headCollision name={name} mode={_playMode}");
             var oppositeTeam = ((IPlayerActor)this).OppositeTeam;
             ScoreManager.addHeadScore(oppositeTeam);
+            ballControl.catchABallFor(this);
         }
 
         private void _setNormalMode()
         {
-            Debug.Log($"setNormalMode name={name}");
+            Debug.Log($"setNormalMode name={name} mode={_playMode}");
             realPlayer.SetActive(true);
             frozenPlayer.SetActive(false);
             ghostPlayer.SetActive(false);
@@ -201,7 +213,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void _setFrozenMode()
         {
-            Debug.Log($"setFrozenMode name={name}");
+            Debug.Log($"setFrozenMode name={name} mode={_playMode}");
             realPlayer.SetActive(false);
             frozenPlayer.SetActive(true);
             ghostPlayer.SetActive(false);
@@ -211,7 +223,18 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void _setGhostedMode()
         {
-            Debug.Log($"setGhostedMode name={name}");
+            Debug.Log($"setGhostedMode name={name} mode={_playMode}");
+            realPlayer.SetActive(false);
+            frozenPlayer.SetActive(false);
+            ghostPlayer.SetActive(true);
+            ((IPlayerShield)playerShield).ghostShield();
+            restrictedPlayer.canMove = true;
+        }
+
+        private void _setSpecialMode()
+        {
+            // This looks and behaves like ghosted mode but could look something else?
+            Debug.Log($"setSpecialMode name={name} mode={_playMode}");
             realPlayer.SetActive(false);
             frozenPlayer.SetActive(false);
             ghostPlayer.SetActive(true);
@@ -222,6 +245,16 @@ namespace Examples.Game.Scripts.Battle.Player
         [PunRPC]
         private void setPlayerPlayModeRpc(int playMode)
         {
+            if (_playMode == playModeSpecial && playMode == playModeFrozen)
+            {
+                // During ball start we will be set frozen but we can not allow do that
+                // because ball might be "inside" us and that is impossible!
+                // Special mode is cleared when ball goes to other team's side
+                Debug.Log($"setPlayerPlayModeRpc name={name} mode={_playMode} <- {playMode} INTERCEPT");
+                _setSpecialMode();
+                return;
+            }
+            _playMode = playMode;
             switch (playMode)
             {
                 case playModeNormal:
@@ -232,6 +265,9 @@ namespace Examples.Game.Scripts.Battle.Player
                     return;
                 case playModeGhosted:
                     _setGhostedMode();
+                    return;
+                case playModeSpecial:
+                    _setSpecialMode();
                     return;
                 default:
                     throw new UnityException($"unknown play mode: {playMode}");

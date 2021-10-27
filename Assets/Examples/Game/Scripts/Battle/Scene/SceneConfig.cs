@@ -38,6 +38,14 @@ namespace Examples.Game.Scripts.Battle.Scene
         public Transform[] playerStartPos = new Transform[4];
 
         /// <summary>
+        /// Anchor positions for ball start if there is only one player.
+        /// </summary>
+        /// <remarks>
+        /// Required for testing!
+        /// </remarks>
+        public Transform[] ballAnchors = new Transform[2];
+
+        /// <summary>
         /// Ball needs to know where it travels and collides, this is area for upper team activity.
         /// </summary>
         public Collider2D upperTeamCollider;
@@ -48,12 +56,12 @@ namespace Examples.Game.Scripts.Battle.Scene
         public Collider2D lowerTeamCollider;
 
         /// <summary>
-        /// Ball needs to know where it travels and collides, this is area for upper team activity.
+        /// Optional sprite for upper team play area.
         /// </summary>
         public SpriteRenderer upperTeamSprite;
 
         /// <summary>
-        /// Ball needs to know where it travels and collides, this is area for lower team activity.
+        /// Optional sprite for lower team play area.
         /// </summary>
         public SpriteRenderer lowerTeamSprite;
 

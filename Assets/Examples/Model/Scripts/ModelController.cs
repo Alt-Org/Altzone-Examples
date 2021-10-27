@@ -11,7 +11,6 @@ namespace Examples.Model.Scripts
     /// </summary>
     public class ModelController : MonoBehaviour
     {
-        [SerializeField] private ModelManager manager;
         [SerializeField] private ModelView view;
 
         [SerializeField] private int currentCharacterId;
@@ -25,17 +24,18 @@ namespace Examples.Model.Scripts
             view.hideCharacter();
             view.continueButton.onClick.AddListener(() =>
             {
+                Debug.Log("continueButton");
                 // Save player settings if changed before continuing!
                 if (view.playerName.text != player.PlayerName ||
                     currentCharacterId != player.CharacterModelId)
                 {
+                    Debug.Log("player.BatchSave");
                     player.BatchSave(() =>
                     {
                         player.PlayerName = view.playerName.text;
                         player.CharacterModelId = currentCharacterId;
                     });
                 }
-                manager.Continue();
             });
             currentCharacterId = player.CharacterModelId;
             var characters = Models.GetAll<CharacterModel>();

@@ -177,11 +177,13 @@ MonoBehaviour:
   frozenPlayer: {fileID: 5803042723918779525}
   ghostPlayer: {fileID: 2240808866712253845}
   localHighlight: {fileID: 3553397774836255194}
+  playerDimensions: {x: 0, y: 0.8}
   activator: {fileID: 0}
   _isValidTeam: 0
   _teamMate: {fileID: 0}
   _isLocalTeam: 0
   _isHomeTeam: 0
+  _playMode: 0
 --- !u!114 &6530128325895131588
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -32,8 +32,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private Vector3 a;
         [SerializeField] private Vector3 b;
 
-        [Header("Debug"), SerializeField] private Vector2 startPosition;
-        [SerializeField] private Vector2 deltaVector;
+        [Header("Debug"), SerializeField] private Vector2 deltaVector;
         [SerializeField] private float _sqrMagnitude;
         [SerializeField] private float _attackForce;
 
@@ -78,8 +77,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             }
             // Hide ball immediately
             ballControl = BallActor.Get();
-            ballControl.hideBall();
-
+            if (PhotonNetwork.IsMasterClient)
+            {
+                ballControl.hideBall();
+            }
             followA = playerActors[0].transform;
             _attackForce = getAttackForce(playerActors[0]);
             if (playerActors.Count == 2)
@@ -113,9 +114,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         void IBallSlingShot.startBall()
         {
             Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
+            var startPosition = b;
             var direction = deltaVector.normalized;
             var speed = deltaVector.magnitude;
-            startTheBall(ballControl, startPosition, teamIndex, direction, speed); // Ball takes care of its own network synchronization
+            startTheBall(ballControl, startPosition, teamIndex, direction, speed);
             sendHideSlingShot();
         }
 
@@ -133,8 +135,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             line.SetPosition(0, a);
             line.SetPosition(1, b);
 
-            startPosition = b;
-            deltaVector = b-a;
+            deltaVector = b - a;
             _sqrMagnitude = Mathf.Clamp(deltaVector.sqrMagnitude, sqrMinSlingShotDistance, sqrMaxSlingShotDistance);
         }
 
@@ -147,28 +148,30 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         public static void startTheBall()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
             // Get slingshot with largest attack force and start it - LINQ First can throw an exception if list is empty.
             var ballSlingShot = FindObjectsOfType<BallSlingShot>()
                 .Cast<IBallSlingShot>()
                 .OrderByDescending(x => x.sqrMagnitude * x.attackForce)
                 .First();
 
-            ballSlingShot.startBall();
-
-            // HACK to set players on the game after ball has been started!
-            var ball = BallActor.Get();
-            var ballSideTeam = ball.currentTeamIndex;
+            // Set player state on the game before ball has been started!
+            var teamIndex = ((BallSlingShot)ballSlingShot).teamIndex;
             foreach (var playerActor in PlayerActivator.allPlayerActors)
             {
-                if (playerActor.TeamIndex == ballSideTeam)
+                if (playerActor.TeamIndex == teamIndex)
                 {
-                    playerActor.setFrozenMode();
+                    playerActor.setSpecialMode(); // If we were frozen ball gets stuck inside us :-(
                 }
                 else
                 {
                     playerActor.setNormalMode();
                 }
             }
+            ballSlingShot.startBall();
         }
     }
 }

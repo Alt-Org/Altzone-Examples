@@ -13,7 +13,8 @@ namespace Examples.Game.Scripts.Battle.interfaces
         void setNormalMode();
         void setFrozenMode();
         void setGhostedMode();
-        void headCollision();
+        void setSpecialMode();
+        void headCollision(IBallControl ballControl);
         float CurrentSpeed { get; }
     }
 }

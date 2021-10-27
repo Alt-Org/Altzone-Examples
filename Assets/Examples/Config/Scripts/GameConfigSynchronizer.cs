@@ -116,7 +116,6 @@ namespace Examples.Config.Scripts
                     writer.Write(features.isRotateGameCamera);
                     writer.Write(features.isLocalPLayerOnTeamBlue);
                     writer.Write(features.isSPawnMiniBall);
-                    writer.Write(features.isActivateTeamWithBall);
                     writer.Write(features.isSinglePlayerShieldOn);
                     writer.Write(last);
                 }
@@ -144,7 +143,6 @@ namespace Examples.Config.Scripts
                     features.isRotateGameCamera = reader.ReadBoolean();
                     features.isLocalPLayerOnTeamBlue = reader.ReadBoolean();
                     features.isSPawnMiniBall = reader.ReadBoolean();
-                    features.isActivateTeamWithBall = reader.ReadBoolean();
                     features.isSinglePlayerShieldOn = reader.ReadBoolean();
                     reader.ReadByte(); // skip last
                 }
@@ -166,6 +164,7 @@ namespace Examples.Config.Scripts
                     writer.Write(variables.ballTeleportDistance);
                     writer.Write(variables.minSlingShotDistance);
                     writer.Write(variables.maxSlingShotDistance);
+                    writer.Write(variables.ballRestartDelay);
                     writer.Write(variables.playerMoveSpeed);
                     writer.Write(variables.playerSqrMinRotationDistance);
                     writer.Write(variables.playerSqrMaxRotationDistance);
@@ -199,6 +198,7 @@ namespace Examples.Config.Scripts
                     variables.ballTeleportDistance = reader.ReadSingle();
                     variables.minSlingShotDistance = reader.ReadSingle();
                     variables.maxSlingShotDistance = reader.ReadSingle();
+                    variables.ballRestartDelay = reader.ReadInt32();
                     variables.playerMoveSpeed = reader.ReadSingle();
                     variables.playerSqrMinRotationDistance = reader.ReadSingle();
                     variables.playerSqrMaxRotationDistance = reader.ReadSingle();

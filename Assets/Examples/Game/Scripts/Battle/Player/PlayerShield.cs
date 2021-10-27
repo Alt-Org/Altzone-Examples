@@ -101,7 +101,6 @@ namespace Examples.Game.Scripts.Battle.Player
             {
                 if (!isShieldVisible)
                 {
-                    Debug.Log($"Show shield {currentShield.name}");
                     isShieldVisible = true;
                     if (isShieldActive)
                     {
@@ -122,7 +121,6 @@ namespace Examples.Game.Scripts.Battle.Player
             {
                 if (isShieldVisible)
                 {
-                    Debug.Log($"Hide shield {currentShield.name}");
                     isShieldVisible = false;
                     currentShield.SetActive(false);
                     currentGhostedShield.SetActive(false);
