@@ -32,8 +32,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private Vector3 a;
         [SerializeField] private Vector3 b;
 
-        [Header("Debug"), SerializeField] private Vector2 startPosition;
-        [SerializeField] private Vector2 deltaVector;
+        [Header("Debug"), SerializeField] private Vector2 deltaVector;
         [SerializeField] private float _sqrMagnitude;
         [SerializeField] private float _attackForce;
 
@@ -113,9 +112,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         void IBallSlingShot.startBall()
         {
             Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
+            var startPosition = b;
             var direction = deltaVector.normalized;
             var speed = deltaVector.magnitude;
-            startTheBall(ballControl, startPosition, teamIndex, direction, speed); // Ball takes care of its own network synchronization
+            startTheBall(ballControl, startPosition, teamIndex, direction, speed);
             sendHideSlingShot();
         }
 
@@ -133,7 +133,6 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             line.SetPosition(0, a);
             line.SetPosition(1, b);
 
-            startPosition = b;
             deltaVector = b-a;
             _sqrMagnitude = Mathf.Clamp(deltaVector.sqrMagnitude, sqrMinSlingShotDistance, sqrMaxSlingShotDistance);
         }
