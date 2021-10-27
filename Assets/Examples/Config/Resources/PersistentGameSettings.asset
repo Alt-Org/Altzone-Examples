@@ -30,17 +30,17 @@ MonoBehaviour:
     playerSqrMaxRotationDistance: 5
     shieldDistance: 5
   prefabs:
-    playerForDes: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForDes: {fileID: 626154037994138417, guid: 15cab2234cc49ef448d4e8057a198fa3,
       type: 3}
-    playerForDef: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForDef: {fileID: 626154037994138417, guid: 7140c4913f4d2f54794ae10968276765,
       type: 3}
-    playerForInt: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForInt: {fileID: 626154037994138417, guid: 71ee33dd865c5b24594d268bdf1bc893,
       type: 3}
-    playerForPro: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForPro: {fileID: 626154037994138417, guid: cfdb81e4dbce5874ab9aa0d8320c839f,
       type: 3}
-    playerForRet: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForRet: {fileID: 626154037994138417, guid: 17700df4bd8607349857edd708f9b5cd,
       type: 3}
-    playerForEgo: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForEgo: {fileID: 626154037994138417, guid: d7ddcaa9bb81d554a98d7e948838b85d,
       type: 3}
-    playerForCon: {fileID: 626154037994138417, guid: 39ec2ef1312f7794bb694114c27a5699,
+    playerForCon: {fileID: 626154037994138417, guid: aaf10c03909866b40acadf3d84cab765,
       type: 3}
