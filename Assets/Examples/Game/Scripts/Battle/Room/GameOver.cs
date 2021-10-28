@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using Examples.Config.Scripts;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using System;
@@ -37,7 +38,7 @@ namespace Examples.Game.Scripts.Battle.Room
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
             Debug.Log($"OnPlayerLeftRoom {otherPlayer.GetDebugLabel()}");
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient && PhotonBattle.isRealPlayer(otherPlayer))
             {
                 gotoMainMenu();
                 enabled = false;

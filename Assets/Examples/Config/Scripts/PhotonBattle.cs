@@ -10,6 +10,11 @@ namespace Examples.Config.Scripts
         public const string playerPositionKey = "pp";
         public const string playerMainSkillKey = "mk";
 
+        public static bool isRealPlayer(Player player)
+        {
+            var playerPos = player.GetCustomProperty(playerPositionKey, -1);
+            return playerPos >= 0 && playerPos <= 3;
+        }
         public static void getPlayerProperties(Player player, out int playerPos, out int teamIndex)
         {
             playerPos = player.GetCustomProperty(playerPositionKey, -1);

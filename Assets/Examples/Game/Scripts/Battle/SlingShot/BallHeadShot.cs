@@ -15,6 +15,8 @@ namespace Examples.Game.Scripts.Battle.SlingShot
     /// </remarks>
     public class BallHeadShot : MonoBehaviourPunCallbacks, ICatchABall
     {
+        private const int notPhotonOwner = -2; // -1 is reserved magic number in Photon!
+
         [Header("Settings"), SerializeField] private float gapToBall;
         [SerializeField] private LineRenderer line;
 
@@ -28,18 +30,36 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         [Header("Debug"), SerializeField] private Vector3 deltaBall;
         [SerializeField] private float distanceBall;
+        [SerializeField] private int followAOwnerId;
+        [SerializeField] private int followBOwnerId;
 
         private IBallControl ballControl;
 
         private void Awake()
         {
+            resetMe();
             enabled = false;
+        }
+
+        private void resetMe()
+        {
+            followAOwnerId = notPhotonOwner;
+            followBOwnerId = notPhotonOwner;
+            line.gameObject.SetActive(false);
         }
 
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
-            // When any player leaves, the game is over!
-            gameObject.SetActive(false);
+            if (!PhotonBattle.isRealPlayer(otherPlayer))
+            {
+                return; // Ignore non players
+            }
+            var otherOwnerId = otherPlayer.ActorNumber;
+            if (followAOwnerId == otherOwnerId || followBOwnerId == otherOwnerId)
+            {
+                resetMe();
+                enabled = false;
+            }
         }
 
         private void Update()
@@ -58,7 +78,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
                 {
                     startBall();
                 }
-                line.gameObject.SetActive(false);
+                resetMe();
                 enabled = false;
             }
         }
@@ -82,15 +102,18 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             playerA.setGhostedMode();
             teamIndex = playerA.TeamIndex;
             followA = ((Component)playerA).transform;
+            followAOwnerId = PhotonView.Get(followA).Owner.ActorNumber;
             var teamMate = playerA.TeamMate;
             if (teamMate != null)
             {
                 teamMate.setGhostedMode();
                 followB = ((Component)teamMate).transform;
+                followBOwnerId = PhotonView.Get(followB).Owner.ActorNumber;
             }
             else
             {
                 followB = SceneConfig.Get().ballAnchors[teamIndex];
+                followBOwnerId = notPhotonOwner;
             }
             ballControl.ghostBall();
             ballControl.moveBall(Vector2.zero, 0f);

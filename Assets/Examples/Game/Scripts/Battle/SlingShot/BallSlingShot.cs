@@ -108,7 +108,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
             // When any player leaves, the game is over!
-            gameObject.SetActive(false);
+            if (PhotonBattle.isRealPlayer(otherPlayer))
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         void IBallSlingShot.startBall()
