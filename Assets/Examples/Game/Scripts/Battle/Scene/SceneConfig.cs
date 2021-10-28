@@ -3,8 +3,19 @@ using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Scene
 {
+    /// <summary>
+    /// General scene setup that was hard to organize in a better way.
+    /// </summary>
     public class SceneConfig : MonoBehaviour
     {
+        /// <summary>
+        /// Startup object for the room.
+        /// </summary>
+        /// <remarks>
+        /// This is used to keep <c>script execution order</c> under our control.
+        /// </remarks>
+        public GameObject roomStartup;
+
         /// <summary>
         /// Camera for this scene.
         /// </summary>
@@ -79,6 +90,11 @@ namespace Examples.Game.Scripts.Battle.Scene
         }
 
         private static SceneConfig _Instance;
+
+        private void Awake()
+        {
+            roomStartup.SetActive(true);
+        }
 
         private void OnDestroy()
         {
