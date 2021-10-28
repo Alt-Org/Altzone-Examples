@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
@@ -15,6 +16,13 @@ namespace Examples.Lobby.Scripts
         {
             if (PhotonWrapper.InRoom)
             {
+                var room = PhotonNetwork.CurrentRoom;
+                var player = PhotonNetwork.LocalPlayer;
+                if (!room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "", out var uniquePlayerName))
+                {
+                    // Make player name unique within this room if it was not!
+                    PhotonNetwork.NickName = uniquePlayerName;
+                }
                 inLobby.SetActive(false);
                 inRoom.SetActive(true);
                 enabled = false;
