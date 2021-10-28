@@ -1,4 +1,5 @@
-﻿using Examples.Model.Scripts.Model;
+﻿using Examples.Config.Scripts;
+using Examples.Model.Scripts.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ namespace Examples.Model.Scripts
 
         [SerializeField] private Transform leftPane;
         [SerializeField] private Transform rightPane;
+        [SerializeField] private GameObject[] prefabs;
+        [SerializeField] private GameObject curPrefab;
 
         private Button[] buttons;
         private Text[] labels;
@@ -47,6 +50,14 @@ namespace Examples.Model.Scripts
             labels[++i].text = $"Resistance:\r\n{character.Resistance}";
             labels[++i].text = $"Attack:\r\n{character.Attack}";
             labels[++i].text = $"Defence:\r\n{character.Defence}";
+            setCharacterPrefab(character);
+        }
+
+        private void setCharacterPrefab(CharacterModel character)
+        {
+            curPrefab.SetActive(false);
+            curPrefab = prefabs[character.Id];
+            curPrefab.SetActive(true);
         }
     }
 }
