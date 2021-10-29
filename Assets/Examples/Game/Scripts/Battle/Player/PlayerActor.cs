@@ -79,7 +79,8 @@ namespace Examples.Game.Scripts.Battle.Player
             _photonView = PhotonView.Get(this);
             var player = _photonView.Owner;
             var model = PhotonBattle.getPlayerCharacterModel(player);
-            _Speed = model.Speed;
+            var multiplier = RuntimeGameConfig.Get().variables.playerMoveSpeedMultiplier;
+            _Speed = model.Speed * multiplier;
 
             // Re-parent and set name
             var sceneConfig = SceneConfig.Get();

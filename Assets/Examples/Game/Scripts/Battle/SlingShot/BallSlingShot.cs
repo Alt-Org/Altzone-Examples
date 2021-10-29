@@ -119,7 +119,8 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
             var startPosition = b;
             var direction = deltaVector.normalized;
-            var speed = deltaVector.magnitude;
+            var multiplier = RuntimeGameConfig.Get().variables.ballMoveSpeedMultiplier;
+            var speed = deltaVector.magnitude * multiplier;
             startTheBall(ballControl, startPosition, teamIndex, direction, speed);
             sendHideSlingShot();
         }

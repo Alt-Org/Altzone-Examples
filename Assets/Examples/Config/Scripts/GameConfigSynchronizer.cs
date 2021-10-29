@@ -159,16 +159,16 @@ namespace Examples.Config.Scripts
                 {
                     writer.Write(first);
                     writer.Write(variables.roomStartDelay);
-                    writer.Write(variables.ballMoveSpeed);
+                    writer.Write(variables.ballMoveSpeedMultiplier);
                     writer.Write(variables.ballLerpSmoothingFactor);
                     writer.Write(variables.ballTeleportDistance);
                     writer.Write(variables.minSlingShotDistance);
                     writer.Write(variables.maxSlingShotDistance);
                     writer.Write(variables.ballRestartDelay);
-                    writer.Write(variables.playerMoveSpeed);
+                    writer.Write(variables.playerMoveSpeedMultiplier);
                     writer.Write(variables.playerSqrMinRotationDistance);
                     writer.Write(variables.playerSqrMaxRotationDistance);
-                    writer.Write(variables.shieldDistance);
+                    writer.Write(variables.shieldDistanceMultiplier);
                     writer.Write(last);
                 }
                 var bytes = stream.ToArray();
@@ -193,16 +193,16 @@ namespace Examples.Config.Scripts
                 {
                     reader.ReadByte(); // skip first
                     variables.roomStartDelay = reader.ReadInt32();
-                    variables.ballMoveSpeed = reader.ReadSingle();
+                    variables.ballMoveSpeedMultiplier = reader.ReadSingle();
                     variables.ballLerpSmoothingFactor = reader.ReadSingle();
                     variables.ballTeleportDistance = reader.ReadSingle();
                     variables.minSlingShotDistance = reader.ReadSingle();
                     variables.maxSlingShotDistance = reader.ReadSingle();
                     variables.ballRestartDelay = reader.ReadInt32();
-                    variables.playerMoveSpeed = reader.ReadSingle();
+                    variables.playerMoveSpeedMultiplier = reader.ReadSingle();
                     variables.playerSqrMinRotationDistance = reader.ReadSingle();
                     variables.playerSqrMaxRotationDistance = reader.ReadSingle();
-                    variables.shieldDistance = reader.ReadSingle();
+                    variables.shieldDistanceMultiplier = reader.ReadSingle();
                     reader.ReadByte(); // skip last
                 }
             }

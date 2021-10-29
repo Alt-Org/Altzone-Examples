@@ -19,16 +19,16 @@ MonoBehaviour:
     isSinglePlayerShieldOn: 1
   variables:
     roomStartDelay: 3
-    ballMoveSpeed: 7
+    ballMoveSpeedMultiplier: 1
     ballLerpSmoothingFactor: 4
     ballTeleportDistance: 1
     minSlingShotDistance: 3
     maxSlingShotDistance: 9
     ballRestartDelay: 3
-    playerMoveSpeed: 5
+    playerMoveSpeedMultiplier: 1
     playerSqrMinRotationDistance: 5
     playerSqrMaxRotationDistance: 5
-    shieldDistance: 5
+    shieldDistanceMultiplier: 1
   prefabs:
     playerForDes: {fileID: 626154037994138417, guid: 15cab2234cc49ef448d4e8057a198fa3,
       type: 3}

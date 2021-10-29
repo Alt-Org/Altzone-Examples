@@ -88,7 +88,9 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             var variables = RuntimeGameConfig.Get().variables;
             var delta = a - b;
             var direction = delta.normalized;
-            var speed = Mathf.Clamp(Mathf.Abs(delta.magnitude), variables.minSlingShotDistance, variables.maxSlingShotDistance);
+            var clampedSpeed = Mathf.Clamp(Mathf.Abs(delta.magnitude), variables.minSlingShotDistance, variables.maxSlingShotDistance);
+            var multiplier = RuntimeGameConfig.Get().variables.ballMoveSpeedMultiplier;
+            var speed = clampedSpeed * multiplier;
             startTheBall(ballControl, ballTransform.position, teamIndex, direction, speed);
         }
 

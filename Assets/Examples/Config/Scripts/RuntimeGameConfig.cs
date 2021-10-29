@@ -45,18 +45,18 @@ namespace Examples.Config.Scripts
     {
         [Header("Battle"), Min(1)] public int roomStartDelay;
 
-        [Header("Ball")] public float ballMoveSpeed;
+        [Header("Ball")] public float ballMoveSpeedMultiplier;
         public float ballLerpSmoothingFactor;
         public float ballTeleportDistance;
         public float minSlingShotDistance;
         public float maxSlingShotDistance;
         [Min(1)] public int ballRestartDelay;
 
-        [Header("Player")] public float playerMoveSpeed;
+        [Header("Player")] public float playerMoveSpeedMultiplier;
         public float playerSqrMinRotationDistance;
         public float playerSqrMaxRotationDistance;
 
-        [Header("Shield")] public float shieldDistance;
+        [Header("Shield")] public float shieldDistanceMultiplier;
 
         public void CopyFrom(GameVariables other)
         {
