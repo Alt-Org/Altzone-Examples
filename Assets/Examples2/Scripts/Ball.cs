@@ -83,6 +83,12 @@ namespace Examples2.Scripts
                 teamEnter(otherGameObject);
                 return;
             }
+            if (brickMaskValue == (brickMaskValue | colliderMask))
+            {
+                bounce(other);
+                brick(otherGameObject);
+                return;
+            }
             Debug.Log($"UNHANDLED hit {other.name} layer {layer}");
         }
 
@@ -148,6 +154,12 @@ namespace Examples2.Scripts
             reflect(currentVelocity, direction.normalized);
             frameCount = Time.frameCount;
             Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity} frame {frameCount} overlappingCount {overlappingCount}");
+        }
+
+        private void brick(GameObject brick)
+        {
+            Debug.Log($"Destroy {brick.name}");
+            Destroy(brick);
         }
 
         private void teamEnter(GameObject teamArea)
