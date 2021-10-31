@@ -16,7 +16,7 @@ namespace Examples2.Scripts
         public LayerMask brickMask;
         public LayerMask wallMask;
 
-        [Header("Tags"), TagSelector] public string readTeamTag;
+        [Header("Tags"), TagSelector] public string redTeamTag;
         [TagSelector] public string blueTeamTag;
     }
 
@@ -24,8 +24,10 @@ namespace Examples2.Scripts
     {
         [SerializeField] private BallSettings settings;
 
+        [Header("Live Data"), SerializeField] private bool isRedTeamActive;
+        [SerializeField] private bool isBlueTeamActive;
+
         private Rigidbody2D _rigidbody;
-        private Vector2 currentVelocity;
 
         private int bounceMaskValue;
         private int teamAreaMaskValue;
@@ -48,13 +50,12 @@ namespace Examples2.Scripts
             _rigidbody.velocity = settings.initialVelocity;
         }
 
-        private void Update()
-        {
-            currentVelocity = _rigidbody.velocity;
-        }
-
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (!enabled)
+            {
+                return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
+            }
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
             if (layer == 0)
@@ -65,20 +66,92 @@ namespace Examples2.Scripts
             var colliderMask = 1 << layer;
             if (bounceMaskValue == (bounceMaskValue | colliderMask))
             {
-                var position = _rigidbody.position;
-                var closestPoint = other.ClosestPoint(position);
-                var direction = closestPoint - position;
-                bounceFrom(direction.normalized);
+                bounce(other);
+                return;
+            }
+            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            {
+                teamEnter(otherGameObject);
                 return;
             }
             Debug.Log($"UNHANDLED hit {other.name} layer {layer}");
         }
 
-        private void bounceFrom(Vector2 collisionNormal)
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (!enabled)
+            {
+                return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
+            }
+            var otherGameObject = other.gameObject;
+            var layer = otherGameObject.layer;
+            if (layer == 0)
+            {
+                return;
+            }
+            var colliderMask = 1 << layer;
+            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            {
+                teamExit(otherGameObject);
+            }
+        }
+
+        private void bounce(Collider2D other)
+        {
+            var currentVelocity = _rigidbody.velocity;
+            var position = _rigidbody.position;
+            var closestPoint = other.ClosestPoint(position);
+            var direction = closestPoint - position;
+            reflect(currentVelocity, direction.normalized);
+            Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity}");
+        }
+
+        private void teamEnter(GameObject teamArea)
+        {
+            if (teamArea.CompareTag(settings.redTeamTag))
+            {
+                if (!isRedTeamActive)
+                {
+                    Debug.Log("isRedTeamActive <- false");
+                }
+                isRedTeamActive = false;
+                return;
+            }
+            if (teamArea.CompareTag(settings.blueTeamTag))
+            {
+                if (!isBlueTeamActive)
+                {
+                    Debug.Log("isBlueTeamActive <- false");
+                }
+                isBlueTeamActive = false;
+            }
+        }
+
+        private void teamExit(GameObject teamArea)
+        {
+            if (teamArea.CompareTag(settings.redTeamTag))
+            {
+                if (isRedTeamActive)
+                {
+                    Debug.Log("isRedTeamActive <- true");
+                }
+                isRedTeamActive = true;
+                return;
+            }
+            if (teamArea.CompareTag(settings.blueTeamTag))
+            {
+                if (isBlueTeamActive)
+                {
+                    Debug.Log("isBlueTeamActive <- true");
+                }
+                isBlueTeamActive = true;
+            }
+        }
+
+        private void reflect(Vector2 currentVelocity, Vector2 collisionNormal)
         {
             var speed = currentVelocity.magnitude;
             var direction = Vector2.Reflect(currentVelocity.normalized, collisionNormal);
-            Debug.Log($"bounce @ {_rigidbody.position} dir {direction}");
             _rigidbody.velocity = direction * Mathf.Max(speed, settings.minVelocity);
         }
     }

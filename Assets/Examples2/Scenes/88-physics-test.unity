@@ -1190,8 +1190,10 @@ MonoBehaviour:
     wallMask:
       serializedVersion: 2
       m_Bits: 2048
-    readTeamTag: TopSide
+    redTeamTag: TopSide
     blueTeamTag: BotSide
+  isRedTeamActive: 0
+  isBlueTeamActive: 0
 --- !u!58 &1491261278
 CircleCollider2D:
   m_ObjectHideFlags: 0
