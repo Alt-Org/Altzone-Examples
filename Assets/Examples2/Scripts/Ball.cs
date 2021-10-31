@@ -27,7 +27,12 @@ namespace Examples2.Scripts
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log($"hit {other.name}");
+            if (other.gameObject.layer == 0)
+            {
+                Debug.Log($"ignore {other.name} layer {other.gameObject.layer}");
+                return;
+            }
+            Debug.Log($"hit {other.name} layer {other.gameObject.layer}");
             var position = _rigidbody.position;
             var closestPoint = other.ClosestPoint(position);
             var direction = closestPoint - position;

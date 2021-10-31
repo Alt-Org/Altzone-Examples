@@ -131,12 +131,12 @@ GameObject:
   m_Component:
   - component: {fileID: 6255823}
   - component: {fileID: 6255824}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &6255823
 Transform:
@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 141990475}
   - component: {fileID: 141990477}
   - component: {fileID: 141990476}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: RightDiamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,8 +244,8 @@ Transform:
   m_Father: {fileID: 1750488678}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
---- !u!61 &141990476
-BoxCollider2D:
+--- !u!60 &141990476
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -267,9 +267,12 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.59999996, y: 0.59999996}
+      - {x: -0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: 0.59999996}
 --- !u!212 &141990477
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -363,8 +366,8 @@ GameObject:
   - component: {fileID: 497427343}
   - component: {fileID: 497427345}
   - component: {fileID: 497427344}
-  m_Layer: 0
-  m_Name: BotDiamond
+  m_Layer: 11
+  m_Name: BottomDiamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -384,8 +387,8 @@ Transform:
   m_Father: {fileID: 781129962}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
---- !u!61 &497427344
-BoxCollider2D:
+--- !u!60 &497427344
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -407,9 +410,12 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.59999996, y: 0.59999996}
+      - {x: -0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: 0.59999996}
 --- !u!212 &497427345
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -470,7 +476,6 @@ GameObject:
   m_Component:
   - component: {fileID: 506844927}
   - component: {fileID: 506844929}
-  - component: {fileID: 506844928}
   m_Layer: 0
   m_Name: RedDiamond
   m_TagString: Untagged
@@ -492,32 +497,6 @@ Transform:
   m_Father: {fileID: 141990475}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
---- !u!61 &506844928
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 506844926}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.2, y: 1.2}
-    newSize: {x: 1.2, y: 1.2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
 --- !u!212 &506844929
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -623,7 +602,6 @@ GameObject:
   m_Component:
   - component: {fileID: 708616387}
   - component: {fileID: 708616389}
-  - component: {fileID: 708616388}
   m_Layer: 0
   m_Name: RedDiamond
   m_TagString: Untagged
@@ -645,32 +623,6 @@ Transform:
   m_Father: {fileID: 1038443106}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
---- !u!61 &708616388
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 708616386}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.2, y: 1.2}
-    newSize: {x: 1.2, y: 1.2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
 --- !u!212 &708616389
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -735,7 +687,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &781129962
 Transform:
@@ -768,7 +720,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &801765302
 Transform:
@@ -845,7 +797,7 @@ GameObject:
   - component: {fileID: 1038443106}
   - component: {fileID: 1038443108}
   - component: {fileID: 1038443107}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: LeftDiamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -867,8 +819,8 @@ Transform:
   m_Father: {fileID: 1750488678}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
---- !u!61 &1038443107
-BoxCollider2D:
+--- !u!60 &1038443107
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -890,9 +842,12 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.59999996, y: 0.59999996}
+      - {x: -0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: 0.59999996}
 --- !u!212 &1038443108
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -953,12 +908,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1127112133}
   - component: {fileID: 1127112134}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: TopWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &1127112133
 Transform:
@@ -1127,7 +1082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40eee0b2b06fed040ad3f14b5b37890f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: {x: 3, y: 4}
+  initialVelocity: {x: 4, y: 3}
   minVelocity: 3
 --- !u!58 &1491261278
 CircleCollider2D:
@@ -1176,12 +1131,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1582723513}
   - component: {fileID: 1582723512}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: RightWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!61 &1582723512
 BoxCollider2D:
@@ -1266,15 +1221,15 @@ GameObject:
   - component: {fileID: 1756588911}
   - component: {fileID: 1756588910}
   - component: {fileID: 1756588909}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: TopDiamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!61 &1756588909
-BoxCollider2D:
+--- !u!60 &1756588909
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1296,9 +1251,12 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.2, y: 1.2}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.59999996, y: 0.59999996}
+      - {x: -0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: -0.59999996}
+      - {x: 0.59999996, y: 0.59999996}
 --- !u!212 &1756588910
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1373,12 +1331,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1885154250}
   - component: {fileID: 1885154251}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: BottomWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &1885154250
 Transform:
@@ -1434,7 +1392,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &2122656219
 Transform:
