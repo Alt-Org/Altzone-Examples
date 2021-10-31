@@ -28,6 +28,8 @@ namespace Examples2.Scripts
         [SerializeField] private bool isBlueTeamActive;
 
         private Rigidbody2D _rigidbody;
+        public Collider2D _collider;
+        public ContactFilter2D contactFilter;
 
         private int bounceMaskValue;
         private int teamAreaMaskValue;
@@ -43,6 +45,13 @@ namespace Examples2.Scripts
             brickMaskValue = settings.brickMask.value;
             wallMaskValue = settings.wallMask.value;
             _rigidbody = GetComponent<Rigidbody2D>();
+            _collider = GetComponent<Collider2D>();
+            contactFilter = new ContactFilter2D
+            {
+                useTriggers = true,
+                useLayerMask = true,
+                layerMask = settings.wallMask,
+            };
         }
 
         private void OnEnable()
@@ -97,16 +106,40 @@ namespace Examples2.Scripts
         }
 
         public int frameCount;
+        public int overlappingCount;
+        public Collider2D[] overlappingColliders = new Collider2D[4];
+        public bool hasIgnoreCollider;
+        public Collider2D ignoreCollider;
+
         private void bounce(Collider2D other)
         {
-            if (frameCount == Time.frameCount)
+            overlappingCount = _rigidbody.OverlapCollider(contactFilter, overlappingColliders);
+            if (overlappingCount > 1)
             {
-                if (other.name.EndsWith("Diamond"))
+                for (int i = 0; i < overlappingColliders.Length; i++)
                 {
-                    Debug.Log($"SKIP bounce {other.name} {_rigidbody.velocity} frame {frameCount}");
-                    return;
+                    if (i < overlappingCount)
+                    {
+                        var oCollider = overlappingColliders[i];
+                        Debug.Log($"overlapping {i} {oCollider.name}");
+                        if (oCollider.name.EndsWith("Diamond"))
+                        {
+                            ignoreCollider = oCollider;
+                            hasIgnoreCollider = true;
+                        }
+                    }
+                    else
+                    {
+                        overlappingColliders[i] = null;
+                    }
                 }
-                Debug.LogWarning($"bounce {other.name} {_rigidbody.velocity} frame {frameCount}");
+            }
+            if (hasIgnoreCollider && other.Equals(ignoreCollider))
+            {
+                Debug.Log($"SKIP bounce {other.name} {_rigidbody.velocity} frame {frameCount} overlappingCount {overlappingCount}");
+                hasIgnoreCollider = false;
+                ignoreCollider = null;
+                return;
             }
             var currentVelocity = _rigidbody.velocity;
             var position = _rigidbody.position;
@@ -114,7 +147,7 @@ namespace Examples2.Scripts
             var direction = closestPoint - position;
             reflect(currentVelocity, direction.normalized);
             frameCount = Time.frameCount;
-            Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity} frame {frameCount}");
+            Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity} frame {frameCount} overlappingCount {overlappingCount}");
         }
 
         private void teamEnter(GameObject teamArea)
