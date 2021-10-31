@@ -96,14 +96,25 @@ namespace Examples2.Scripts
             }
         }
 
+        public int frameCount;
         private void bounce(Collider2D other)
         {
+            if (frameCount == Time.frameCount)
+            {
+                if (other.name.EndsWith("Diamond"))
+                {
+                    Debug.Log($"SKIP bounce {other.name} {_rigidbody.velocity} frame {frameCount}");
+                    return;
+                }
+                Debug.LogWarning($"bounce {other.name} {_rigidbody.velocity} frame {frameCount}");
+            }
             var currentVelocity = _rigidbody.velocity;
             var position = _rigidbody.position;
             var closestPoint = other.ClosestPoint(position);
             var direction = closestPoint - position;
             reflect(currentVelocity, direction.normalized);
-            Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity}");
+            frameCount = Time.frameCount;
+            Debug.Log($"bounce {other.name} @ {position} dir {currentVelocity} <- {_rigidbody.velocity} frame {frameCount}");
         }
 
         private void teamEnter(GameObject teamArea)
