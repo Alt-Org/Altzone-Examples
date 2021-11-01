@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Examples2.Scripts
+namespace Examples2.Scripts.Test
 {
     [Serializable]
     internal class BallSettings
@@ -28,13 +28,29 @@ namespace Examples2.Scripts
         [SerializeField] private bool isBlueTeamActive;
 
         private Rigidbody2D _rigidbody;
-        public ContactFilter2D contactFilter;
 
         private int bounceMaskValue;
         private int teamAreaMaskValue;
         private int headMaskValue;
         private int brickMaskValue;
         private int wallMaskValue;
+
+        [Header("Time.timeScale")] public float timeScale;
+
+        [Header("Collider Debug")] public int ignoredCount;
+        public Collider2D[] ignoredColliders = new Collider2D[4];
+        public ContactFilter2D contactFilter;
+        private int overlappingCount;
+        private readonly Collider2D[] overlappingColliders = new Collider2D[4];
+        private readonly float[] overlappingDistance = new float[4];
+
+        // Diamond hack
+        private GameObject TopDiamond;
+        private GameObject BottomDiamond;
+        private GameObject UpperStoneWall;
+        private GameObject LowerStoneWall;
+        [Header("Diamond Debug")] public int UpperStoneWallCount;
+        public int LowerStoneWallCount;
 
         private void Awake()
         {
@@ -51,11 +67,30 @@ namespace Examples2.Scripts
                 useLayerMask = true,
                 layerMask = settings.wallMask.value + settings.brickMask.value, // Implicitly converts an integer to a LayerMask
             };
+            TopDiamond = GameObject.Find(nameof(TopDiamond));
+            BottomDiamond = GameObject.Find(nameof(BottomDiamond));
+            UpperStoneWall = GameObject.Find(nameof(UpperStoneWall));
+            LowerStoneWall = GameObject.Find(nameof(LowerStoneWall));
+            UpperStoneWallCount = UpperStoneWall.transform.childCount;
+            LowerStoneWallCount = LowerStoneWall.transform.childCount;
+            if (UpperStoneWallCount > 0)
+            {
+                TopDiamond.SetActive(false);
+            }
+            if (LowerStoneWallCount > 0)
+            {
+                BottomDiamond.SetActive(false);
+            }
         }
 
         private void OnEnable()
         {
             _rigidbody.velocity = settings.initialVelocity;
+            if (timeScale > 1f)
+            {
+                Time.timeScale = timeScale;
+                Debug.Log($"SET Time.timeScale {Time.timeScale:F3}");
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -149,6 +184,12 @@ namespace Examples2.Scripts
             }
         }
 
+        private void addIgnoredCollider(Collider2D other)
+        {
+            ignoredColliders[ignoredCount] = other;
+            ignoredCount += 1;
+        }
+
         private bool removeIgnoredCollider(Collider2D other)
         {
             for (var i = 0; i < ignoredCount; ++i)
@@ -163,7 +204,7 @@ namespace Examples2.Scripts
                         return true;
                     }
                     // Move items down by one
-                    Array.Copy(ignoredColliders, i+1, ignoredColliders, i, ignoredColliders.Length - 2);
+                    Array.Copy(ignoredColliders, i + 1, ignoredColliders, i, ignoredColliders.Length - 2);
                     ignoredColliders[ignoredCount] = null;
                     ignoredCount -= 1;
                     return true;
@@ -172,19 +213,18 @@ namespace Examples2.Scripts
             return false;
         }
 
-        [Header("Debug")]
-        public int ignoredCount;
-        public Collider2D[] ignoredColliders = new Collider2D[4];
-
-        public int overlappingCount;
-        public Collider2D[] overlappingColliders = new Collider2D[4];
-        public float[] overlappingDistance = new float[4];
-
         private void bounce(Collider2D other)
         {
             if (ignoredCount > 0)
             {
-                return;
+                for (var i = 0; i < ignoredCount; ++i)
+                {
+                    if (ignoredColliders[i].Equals(other))
+                    {
+                        Debug.Log($"SKIP ignore {other.name} frame {Time.frameCount} ignored {ignoredCount}");
+                        return;
+                    }
+                }
             }
             overlappingCount = _rigidbody.OverlapCollider(contactFilter, overlappingColliders);
             if (overlappingCount < 2)
@@ -233,8 +273,7 @@ namespace Examples2.Scripts
             ignoredCount = 0;
             for (var i = 0; i < overlappingCount; i++)
             {
-                ignoredColliders[ignoredCount] = overlappingColliders[i];
-                ignoredCount += 1;
+                addIgnoredCollider(overlappingColliders[i]);
             }
             // Do the bounce
             var nearestCollider = overlappingColliders[nearest];
@@ -243,12 +282,36 @@ namespace Examples2.Scripts
 
         private void brick(GameObject brick)
         {
-            Debug.Log($"Destroy {brick.name}");
+            Debug.Log($"Destroy {brick.name} brick count {UpperStoneWallCount + LowerStoneWallCount}");
             Destroy(brick);
             if (ignoredCount > 0)
             {
                 var brickCollider = brick.GetComponent<Collider2D>();
                 removeIgnoredCollider(brickCollider);
+            }
+            // Diamond hack
+            brick.transform.SetParent(null);
+            if (UpperStoneWallCount > 0)
+            {
+                UpperStoneWallCount = UpperStoneWall.transform.childCount;
+                if (UpperStoneWallCount == 0)
+                {
+                    TopDiamond.SetActive(true);
+                    Debug.Log($"SetActive {TopDiamond.name}");
+                    var diamondCollider = TopDiamond.GetComponent<Collider2D>();
+                    addIgnoredCollider(diamondCollider);
+                }
+            }
+            if (LowerStoneWallCount > 0)
+            {
+                LowerStoneWallCount = LowerStoneWall.transform.childCount;
+                if (LowerStoneWallCount == 0)
+                {
+                    BottomDiamond.SetActive(true);
+                    Debug.Log($"SetActive {BottomDiamond.name}");
+                    var diamondCollider = BottomDiamond.GetComponent<Collider2D>();
+                    addIgnoredCollider(diamondCollider);
+                }
             }
         }
 

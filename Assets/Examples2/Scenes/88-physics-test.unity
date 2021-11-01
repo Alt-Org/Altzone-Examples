@@ -6733,7 +6733,6 @@ MonoBehaviour:
     blueTeamTag: BotSide
   isRedTeamActive: 0
   isBlueTeamActive: 0
-  _collider: {fileID: 0}
   contactFilter:
     useTriggers: 0
     useLayerMask: 0
@@ -6748,15 +6747,26 @@ MonoBehaviour:
     maxDepth: 0
     minNormalAngle: 0
     maxNormalAngle: 0
-  frameCount: 0
+  timeScale: 2
+  ignoredCount: 0
+  ignoredColliders:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   overlappingCount: 0
   overlappingColliders:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  hasIgnoreCollider: 0
-  ignoreCollider: {fileID: 0}
+  overlappingDistance:
+  - 0
+  - 0
+  - 0
+  - 0
+  UpperStoneWallCount: 0
+  LowerStoneWallCount: 0
 --- !u!58 &1491261278
 CircleCollider2D:
   m_ObjectHideFlags: 0
