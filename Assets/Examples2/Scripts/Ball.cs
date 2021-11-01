@@ -28,7 +28,6 @@ namespace Examples2.Scripts
         [SerializeField] private bool isBlueTeamActive;
 
         private Rigidbody2D _rigidbody;
-        public Collider2D _collider;
         public ContactFilter2D contactFilter;
 
         private int bounceMaskValue;
@@ -45,7 +44,7 @@ namespace Examples2.Scripts
             brickMaskValue = settings.brickMask.value;
             wallMaskValue = settings.wallMask.value;
             _rigidbody = GetComponent<Rigidbody2D>();
-            _collider = GetComponent<Collider2D>();
+            // We need to track these colliders while ball bounces
             contactFilter = new ContactFilter2D
             {
                 useTriggers = true,
@@ -98,6 +97,16 @@ namespace Examples2.Scripts
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
             }
+            if (ignoredCount > 0)
+            {
+                for (var i = 0; i < ignoredCount; ++i)
+                {
+                    if (ignoredColliders[i].Equals(other))
+                    {
+                        return;
+                    }
+                }
+            }
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
             if (layer == 0)
@@ -110,7 +119,7 @@ namespace Examples2.Scripts
                 return;
             }
 
-            Debug.Log($"STOP on STAY hit {other.name}");
+            Debug.Log($"STOP @ {_rigidbody.position} on STAY hit {other.name} frame {Time.frameCount}");
             _rigidbody.velocity = Vector2.zero;
         }
 
@@ -119,6 +128,13 @@ namespace Examples2.Scripts
             if (!enabled)
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
+            }
+            if (ignoredCount > 0)
+            {
+                if (removeIgnoredCollider(other))
+                {
+                    return;
+                }
             }
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
@@ -133,12 +149,43 @@ namespace Examples2.Scripts
             }
         }
 
-        public int frameCount;
+        private bool removeIgnoredCollider(Collider2D other)
+        {
+            for (var i = 0; i < ignoredCount; ++i)
+            {
+                if (ignoredColliders[i].Equals(other))
+                {
+                    Debug.Log($"REMOVE ignore {other.name} frame {Time.frameCount} ignored {ignoredCount}");
+                    if (ignoredCount == 1)
+                    {
+                        ignoredColliders[i] = null;
+                        ignoredCount = 0;
+                        return true;
+                    }
+                    // Move items down by one
+                    Array.Copy(ignoredColliders, i+1, ignoredColliders, i, ignoredColliders.Length - 2);
+                    ignoredColliders[ignoredCount] = null;
+                    ignoredCount -= 1;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Header("Debug")]
+        public int ignoredCount;
+        public Collider2D[] ignoredColliders = new Collider2D[4];
+
         public int overlappingCount;
         public Collider2D[] overlappingColliders = new Collider2D[4];
+        public float[] overlappingDistance = new float[4];
 
         private void bounce(Collider2D other)
         {
+            if (ignoredCount > 0)
+            {
+                return;
+            }
             overlappingCount = _rigidbody.OverlapCollider(contactFilter, overlappingColliders);
             if (overlappingCount < 2)
             {
@@ -147,17 +194,20 @@ namespace Examples2.Scripts
             }
             // Count wall colliders and print print all colliders
             var wallColliderCount = 0;
-            for (int i = 0; i < overlappingColliders.Length; i++)
+            var position = _rigidbody.position;
+            for (var i = 0; i < overlappingColliders.Length; i++)
             {
                 if (i < overlappingCount)
                 {
-                    var oCollider = overlappingColliders[i];
-                    if (oCollider.name.EndsWith("Wall"))
+                    var overlappingCollider = overlappingColliders[i];
+                    var closest = overlappingCollider.ClosestPoint(_rigidbody.position);
+                    overlappingDistance[i] = (closest - position).sqrMagnitude;
+                    if (overlappingCollider.name.EndsWith("Wall"))
                     {
                         wallColliderCount += 1;
                     }
                     Debug.Log(
-                        $"overlapping {other.name} {i}/{overlappingCount} {oCollider.name} closest {oCollider.ClosestPoint(_rigidbody.position)}");
+                        $"overlapping {other.name} {i}/{overlappingCount} {overlappingCollider.name} pos {closest} dist {Mathf.Sqrt(overlappingDistance[i]):F3}");
                 }
                 else
                 {
@@ -166,36 +216,40 @@ namespace Examples2.Scripts
             }
             if (wallColliderCount == overlappingCount)
             {
-                // Let colliders run normally
+                // Let wall colliders run normally
                 bounceAndReflect(other);
                 return;
             }
-            // Special handling for diamonds - for now
-            for (int i = 0; i < overlappingColliders.Length; i++)
+            // Collide with nearest only
+            var nearest = 0;
+            for (var i = 1; i < overlappingCount; i++)
             {
-                if (i < overlappingCount)
+                if (overlappingDistance[i] < overlappingDistance[nearest])
                 {
-                    var oCollider = overlappingColliders[i];
-                    if (!oCollider.name.EndsWith("Diamond"))
-                    {
-                        bounceAndReflect(oCollider); // We accept walls and bricks here!
-                    }
-                    else
-                    {
-                        Debug.Log($"SKIP bounce {oCollider.name} {_rigidbody.velocity} frame {frameCount} ol-count {overlappingCount}");
-                    }
-                }
-                else
-                {
-                    overlappingColliders[i] = null;
+                    nearest = i;
                 }
             }
+            // Add everything to ignored colliders so that ball can move out while bouncing
+            ignoredCount = 0;
+            for (var i = 0; i < overlappingCount; i++)
+            {
+                ignoredColliders[ignoredCount] = overlappingColliders[i];
+                ignoredCount += 1;
+            }
+            // Do the bounce
+            var nearestCollider = overlappingColliders[nearest];
+            bounceAndReflect(nearestCollider);
         }
 
         private void brick(GameObject brick)
         {
             Debug.Log($"Destroy {brick.name}");
             Destroy(brick);
+            if (ignoredCount > 0)
+            {
+                var brickCollider = brick.GetComponent<Collider2D>();
+                removeIgnoredCollider(brickCollider);
+            }
         }
 
         private void teamEnter(GameObject teamArea)
@@ -247,9 +301,8 @@ namespace Examples2.Scripts
             var closestPoint = other.ClosestPoint(position);
             var direction = closestPoint - position;
             reflect(currentVelocity, direction.normalized);
-            frameCount = Time.frameCount;
             Debug.Log(
-                $"bounce {other.name} @ {position} closest {closestPoint} dir {currentVelocity} <- {_rigidbody.velocity} frame {frameCount} ol-count {overlappingCount}");
+                $"bounce {other.name} @ {position} closest {closestPoint} dir {currentVelocity} <- {_rigidbody.velocity} frame {Time.frameCount} ol-count {overlappingCount}");
         }
 
         private void reflect(Vector2 currentVelocity, Vector2 collisionNormal)
