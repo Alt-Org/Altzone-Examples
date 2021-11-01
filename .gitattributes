@@ -14,6 +14,9 @@ https://github.com/git-lfs/git-lfs/wiki/Tutorial#migrating-existing-repository-d
 *.prefab linguist-generated
 *.unity linguist-generated
 #
+# JetUML state diagrams
+*.state.jet linguist-generated
+#
 # 3D models
 *.3dm filter=lfs diff=lfs merge=lfs -text
 *.3ds filter=lfs diff=lfs merge=lfs -text
