@@ -73,6 +73,7 @@ namespace Examples2.Scripts.Battle.Ball
         private void onBrickCollision(GameObject other)
         {
             Debug.Log($"onBrickCollision {other.name}");
+            Destroy(other);
         }
 
         private void onWallCollision(GameObject other)
