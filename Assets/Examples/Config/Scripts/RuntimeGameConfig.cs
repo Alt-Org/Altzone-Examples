@@ -263,10 +263,10 @@ namespace Examples.Config.Scripts
             public PlayerDataCacheLocal()
             {
                 _playerName = PlayerPrefs.GetString(PlayerNameKey, string.Empty);
-                if (string.IsNullOrWhiteSpace(PlayerName))
+                if (string.IsNullOrWhiteSpace(_playerName))
                 {
                     _playerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
-                    PlayerPrefs.SetString(PlayerNameKey, PlayerName);
+                    PlayerPrefs.SetString(PlayerNameKey, _playerName);
                 }
                 _characterModelId = PlayerPrefs.GetInt(CharacterModelIdKey, -1);
                 _playerHandle = PlayerPrefs.GetString(PlayerHandleKey, string.Empty);
