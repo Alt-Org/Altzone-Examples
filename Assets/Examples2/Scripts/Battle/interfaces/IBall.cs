@@ -10,14 +10,14 @@ namespace Examples2.Scripts.Battle.interfaces
         Blue,
     }
 
-    internal enum BallColor
+    internal enum BallColor : byte
     {
-        NoTeam,
-        RedTeam,
-        BlueTeam,
-        Ghosted,
-        Hidden,
-        Placeholder
+        Placeholder = 0,
+        NoTeam = 1,
+        RedTeam = 2,
+        BlueTeam = 3,
+        Ghosted = 4,
+        Hidden = 5,
     }
 
     internal interface IBall

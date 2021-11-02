@@ -72,14 +72,14 @@ namespace Examples2.Scripts.Battle.Ball
             }
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.isKinematic = !_photonView.IsMine;
-            stateObjects = new[]
+            stateObjects = new[] // This is indexed by BallColor!
             {
+                settings.colorPlaceholder,
                 settings.colorNoTeam,
                 settings.colorRedTeam,
                 settings.colorBlueTeam,
                 settings.colorGhosted,
                 settings.colorHidden,
-                settings.colorPlaceholder
             };
             teamAreaMaskValue = settings.teamAreaMask.value;
             headMaskValue = settings.headMask.value;
@@ -253,7 +253,15 @@ namespace Examples2.Scripts.Battle.Ball
 
         void IBall.setColor(BallColor ballColor)
         {
-            Debug.Log($"setColor {state.ballColor} <- {ballColor}");
+            if (_photonView.IsMine)
+            {
+                _photonView.RPC(nameof(setBallColorRpc), RpcTarget.All, (byte)ballColor);
+            }
+        }
+
+        private void _setBallColorLocal(BallColor ballColor)
+        {
+            //Debug.Log($"setColor {state.ballColor} <- {ballColor}");
             stateObjects[(int)state.ballColor].SetActive(false);
             state.ballColor = ballColor;
             stateObjects[(int)state.ballColor].SetActive(true);
@@ -297,6 +305,16 @@ namespace Examples2.Scripts.Battle.Ball
         {
             get => _onExitTeamArea;
             set => _onExitTeamArea = value;
+        }
+
+        #endregion
+
+        #region Photon RPC
+
+        [PunRPC]
+        private void setBallColorRpc(byte ballColor)
+        {
+            _setBallColorLocal((BallColor)ballColor);
         }
 
         #endregion

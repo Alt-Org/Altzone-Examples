@@ -4650,7 +4650,7 @@ GameObject:
   - component: {fileID: 1002994371}
   - component: {fileID: 1002994372}
   m_Layer: 9
-  m_Name: Ball (3) BlueActive
+  m_Name: Ball (3) BlueTeam
   m_TagString: Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6920,7 +6920,7 @@ GameObject:
   - component: {fileID: 1407378976}
   - component: {fileID: 1407378977}
   m_Layer: 9
-  m_Name: Ball (2) RedActive
+  m_Name: Ball (2) RedTeam
   m_TagString: Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7946,6 +7946,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee4863c094d4f829a3148a2c6d0b303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state:
+    isBallMoving: 0
+    isRedTeamActive: 0
+    isBlueTeamActive: 0
   ballVelocity: {x: 6, y: 6}
   ballPosition: {x: 0, y: 0}
   startBallMoving: 1
@@ -7970,9 +7974,6 @@ MonoBehaviour:
     colorGhosted: {fileID: 1799714950}
     colorHidden: {fileID: 25514626}
     colorPlaceholder: {fileID: 528197331}
-    bounceMask:
-      serializedVersion: 2
-      m_Bits: 2048
     teamAreaMask:
       serializedVersion: 2
       m_Bits: 8192
@@ -7991,7 +7992,7 @@ MonoBehaviour:
     redTeamTag: RedTeam
     blueTeamTag: BlueTeam
   state:
-    ballColor: 5
+    ballColor: 0
     isMoving: 0
   networkPosition: {x: 0, y: 0}
   networkLag: 0

@@ -13,13 +13,14 @@ namespace Examples2.Scripts.Battle.Ball
         [Serializable]
         internal class State
         {
+            public bool isBallMoving;
             public bool isRedTeamActive;
             public bool isBlueTeamActive;
         }
 
         [SerializeField] private State state;
 
-        public Vector2 ballVelocity;
+        [Header("Debug Only")] public Vector2 ballVelocity;
         public Vector2 ballPosition;
         public bool startBallMoving;
         public bool stopBallMoving;
@@ -58,6 +59,7 @@ namespace Examples2.Scripts.Battle.Ball
             if (startBallMoving)
             {
                 startBallMoving = false;
+                state.isBallMoving = true;
                 ball.setColor(BallColor.NoTeam);
                 ball.startMoving(ballPosition, ballVelocity);
                 return;
@@ -65,6 +67,7 @@ namespace Examples2.Scripts.Battle.Ball
             if (stopBallMoving)
             {
                 stopBallMoving = false;
+                state.isBallMoving = false;
                 ball.stopMoving();
             }
         }
@@ -94,22 +97,7 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void onEnterTeamArea(GameObject other)
         {
-            switch (other.tag)
-            {
-                case UnityConstants.Tags.RedTeam:
-                    state.isRedTeamActive = false;
-                    setBallColor(ball, state);
-                    return;
-                case UnityConstants.Tags.BlueTeam:
-                    state.isBlueTeamActive = false;
-                    setBallColor(ball, state);
-                    return;
-            }
-            Debug.Log($"UNHANDLED onEnterTeamArea {other.name} {other.tag}");
-        }
-
-        private void onExitTeamArea(GameObject other)
-        {
+            //Debug.Log($"onEnterTeamArea {other.name} {other.tag}");
             switch (other.tag)
             {
                 case UnityConstants.Tags.RedTeam:
@@ -118,6 +106,23 @@ namespace Examples2.Scripts.Battle.Ball
                     return;
                 case UnityConstants.Tags.BlueTeam:
                     state.isBlueTeamActive = true;
+                    setBallColor(ball, state);
+                    return;
+            }
+            Debug.Log($"UNHANDLED onEnterTeamArea {other.name} {other.tag}");
+        }
+
+        private void onExitTeamArea(GameObject other)
+        {
+            //Debug.Log($"onExitTeamArea {other.name} {other.tag}");
+            switch (other.tag)
+            {
+                case UnityConstants.Tags.RedTeam:
+                    state.isRedTeamActive = false;
+                    setBallColor(ball, state);
+                    return;
+                case UnityConstants.Tags.BlueTeam:
+                    state.isBlueTeamActive = false;
                     setBallColor(ball, state);
                     return;
             }
