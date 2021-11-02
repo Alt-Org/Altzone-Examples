@@ -1,7 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
-using System;
 using System.Collections;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -64,7 +63,7 @@ namespace Examples2.Scripts.Battle.Room
         private static IEnumerator activateObjects(GameObject[] objectsToActivate)
         {
             // Enable game objects one per frame in array sequence
-            for (int i = 0; i < objectsToActivate.LongLength; i++)
+            for (var i = 0; i < objectsToActivate.LongLength; i++)
             {
                 yield return null;
                 objectsToActivate[i].SetActive(true);
@@ -91,7 +90,7 @@ namespace Examples2.Scripts.Battle.Room
             PhotonBattle.setDebugPlayerPos(PhotonNetwork.LocalPlayer, debugPlayerPos);
         }
 
-        public override void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             var player = PhotonNetwork.LocalPlayer;
             Debug.Log($"Start game for: {player.GetDebugLabel()}");
