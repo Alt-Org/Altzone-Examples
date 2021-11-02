@@ -1,5 +1,6 @@
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 
@@ -16,6 +17,10 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void Awake()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                enabled = false;
+            }
             ball = Context.getBall;
         }
 

@@ -42,7 +42,13 @@ namespace Examples2.Scripts.Battle.Ball
         private void Awake()
         {
             _photonView = PhotonView.Get(this);
+            if (!_photonView.ObservedComponents.Contains(this))
+            {
+                // If not set in Editor
+                _photonView.ObservedComponents.Add(this);
+            }
             _rigidbody = GetComponent<Rigidbody2D>();
+            _rigidbody.isKinematic = !_photonView.IsMine;
             stateObjects = new[]
             {
                 settings.colorNoTeam,
