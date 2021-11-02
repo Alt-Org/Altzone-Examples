@@ -5,10 +5,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Examples2.Scripts.Battle.Ball
+namespace Examples2.Scripts.Test
 {
 
-    internal class BallController : MonoBehaviour
+    internal class BallControllerTest : MonoBehaviour
     {
         [Serializable]
         internal class State

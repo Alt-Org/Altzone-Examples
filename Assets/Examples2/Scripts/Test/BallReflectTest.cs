@@ -20,7 +20,7 @@ namespace Examples2.Scripts.Test
         [TagSelector] public string blueTeamTag;
     }
 
-    internal class Ball : MonoBehaviour
+    internal class BallReflectTest : MonoBehaviour
     {
         [SerializeField] private BallSettings settings;
 
