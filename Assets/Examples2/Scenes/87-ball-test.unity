@@ -897,7 +897,7 @@ GameObject:
   - component: {fileID: 136760891}
   m_Layer: 13
   m_Name: BlueTeam
-  m_TagString: BotSide
+  m_TagString: BlueTeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -5382,7 +5382,7 @@ GameObject:
   - component: {fileID: 1127112134}
   m_Layer: 11
   m_Name: TopWall
-  m_TagString: TopSide
+  m_TagString: RedTeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -7970,6 +7970,26 @@ MonoBehaviour:
     colorGhosted: {fileID: 1799714950}
     colorHidden: {fileID: 25514626}
     colorPlaceholder: {fileID: 528197331}
+    bounceMask:
+      serializedVersion: 2
+      m_Bits: 2048
+    teamAreaMask:
+      serializedVersion: 2
+      m_Bits: 8192
+    headMask:
+      serializedVersion: 2
+      m_Bits: 1024
+    shieldMask:
+      serializedVersion: 2
+      m_Bits: 256
+    brickMask:
+      serializedVersion: 2
+      m_Bits: 16384
+    wallMask:
+      serializedVersion: 2
+      m_Bits: 2048
+    redTeamTag: RedTeam
+    blueTeamTag: BlueTeam
   state:
     ballColor: 5
     isMoving: 0
@@ -8694,7 +8714,7 @@ GameObject:
   - component: {fileID: 1885154251}
   m_Layer: 11
   m_Name: BottomWall
-  m_TagString: BotSide
+  m_TagString: BlueTeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -8893,7 +8913,7 @@ GameObject:
   - component: {fileID: 1955689418}
   m_Layer: 13
   m_Name: RedTeam
-  m_TagString: TopSide
+  m_TagString: RedTeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

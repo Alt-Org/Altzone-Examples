@@ -22,6 +22,9 @@ namespace Examples2.Scripts.Battle.Ball
                 enabled = false;
             }
             ball = Context.getBall;
+            var ballCollision = ball.ballCollision;
+            ballCollision.onEnterTeamArea = onTeamEnter;
+            ballCollision.onExitTeamArea = onTeamExit;
         }
 
         private IEnumerator Start()
@@ -49,6 +52,15 @@ namespace Examples2.Scripts.Battle.Ball
                 stopBallMoving = false;
                 ball.stopMoving();
             }
+        }
+
+        private void onTeamEnter(TeamColor teamColor)
+        {
+            Debug.Log($"onTeamEnter {teamColor}");
+        }
+        private void onTeamExit(TeamColor teamColor)
+        {
+            Debug.Log($"onTeamExit {teamColor}");
         }
     }
 }

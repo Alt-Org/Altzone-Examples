@@ -19,6 +19,8 @@ TagManager:
   - Pelaaja-4
   - TopSide
   - BotSide
+  - RedTeam
+  - BlueTeam
   layers:
   - Default
   - TransparentFX

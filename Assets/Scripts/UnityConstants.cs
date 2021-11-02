@@ -29,6 +29,8 @@ namespace UnityConstants
         public const string Pelaaja_4 = "Pelaaja-4";
         public const string TopSide = "TopSide";
         public const string BotSide = "BotSide";
+        public const string RedTeam = "RedTeam";
+        public const string BlueTeam = "BlueTeam";
     }
 
     /// <summary>
@@ -60,7 +62,6 @@ namespace UnityConstants
         public const int Player = 12;
         public const int Arena = 13;
         public const int Brick = 14;
-        public const int SideSeperator = 15;
 
         // Bitmask of layer
         public const int TransparentFXMask = 1 << 1;
@@ -74,7 +75,6 @@ namespace UnityConstants
         public const int PlayerMask = 1 << 12;
         public const int ArenaMask = 1 << 13;
         public const int BrickMask = 1 << 14;
-        public const int SideSeperatorMask = 1 << 15;
     }
 
 }

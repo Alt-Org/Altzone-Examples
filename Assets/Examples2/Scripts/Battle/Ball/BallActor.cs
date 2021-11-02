@@ -1,5 +1,6 @@
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
+using Prg.Scripts.Common.Unity;
 using System;
 using UnityEngine;
 
@@ -15,6 +16,15 @@ namespace Examples2.Scripts.Battle.Ball
         public GameObject colorGhosted;
         public GameObject colorHidden;
         public GameObject colorPlaceholder;
+
+        [Header("Layers")] public LayerMask teamAreaMask;
+        public LayerMask headMask;
+        public LayerMask shieldMask;
+        public LayerMask brickMask;
+        public LayerMask wallMask;
+
+        [Header("Tags"), TagSelector] public string redTeamTag;
+        [TagSelector] public string blueTeamTag;
     }
 
     [Serializable]
@@ -24,7 +34,7 @@ namespace Examples2.Scripts.Battle.Ball
         public bool isMoving;
     }
 
-    internal class BallActor : MonoBehaviour, IPunObservable, IBall
+    internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
     {
         private const float ballTeleportDistance = 1f;
 
@@ -38,6 +48,19 @@ namespace Examples2.Scripts.Battle.Ball
         private Rigidbody2D _rigidbody;
 
         private GameObject[] stateObjects;
+
+        private int teamAreaMaskValue;
+        private int headMaskValue;
+        private int shieldMaskValue;
+        private int brickMaskValue;
+        private int wallMaskValue;
+
+        private Action<GameObject> _onHeadCollision;
+        private Action<GameObject> _onShieldCollision;
+        private Action<GameObject> _onBrickCollision;
+        private Action<GameObject> _onWallCollision;
+        private Action<TeamColor> _onEnterTeamArea;
+        private Action<TeamColor> _onExitTeamArea;
 
         private void Awake()
         {
@@ -58,6 +81,11 @@ namespace Examples2.Scripts.Battle.Ball
                 settings.colorHidden,
                 settings.colorPlaceholder
             };
+            teamAreaMaskValue = settings.teamAreaMask.value;
+            headMaskValue = settings.headMask.value;
+            shieldMaskValue = settings.shieldMask.value;
+            brickMaskValue = settings.brickMask.value;
+            wallMaskValue = settings.wallMask.value;
         }
 
         private void OnEnable()
@@ -112,10 +140,16 @@ namespace Examples2.Scripts.Battle.Ball
             var layer = otherGameObject.layer;
             if (layer == 0)
             {
-                Debug.Log($"IGNORE trigger collision {otherGameObject.name} layer {otherGameObject.layer}");
+                Debug.Log($"IGNORE trigger_enter {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            Debug.Log($"UNHANDLED trigger collision {otherGameObject.name} layer {otherGameObject.layer}");
+            var colliderMask = 1 << layer;
+            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            {
+                checkTeamArea(otherGameObject, settings, _onEnterTeamArea);
+                return;
+            }
+            Debug.Log($"UNHANDLED trigger_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -128,10 +162,24 @@ namespace Examples2.Scripts.Battle.Ball
             var layer = otherGameObject.layer;
             if (layer == 0)
             {
-                Debug.Log($"IGNORE trigger exit {otherGameObject.name} layer {otherGameObject.layer}");
+                Debug.Log($"IGNORE trigger_exit {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            Debug.Log($"UNHANDLED trigger exit {otherGameObject.name} layer {otherGameObject.layer}");
+            var colliderMask = 1 << layer;
+            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            {
+                checkTeamArea(otherGameObject, settings, _onExitTeamArea);
+                return;
+            }
+            Debug.Log($"UNHANDLED trigger_exit {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
+        }
+
+        private static void checkTeamArea(GameObject gameObject, BallSettings settings, Action<TeamColor> action)
+        {
+            var teamColor = gameObject.CompareTag(settings.blueTeamTag) ? TeamColor.Blue
+                : gameObject.CompareTag(settings.redTeamTag) ? TeamColor.Red
+                : TeamColor.None;
+            action.Invoke(teamColor);
         }
 
         private void OnCollisionEnter2D(Collision2D other)
@@ -144,13 +192,44 @@ namespace Examples2.Scripts.Battle.Ball
             var layer = otherGameObject.layer;
             if (layer == 0)
             {
-                Debug.Log($"IGNORE collision {otherGameObject.name} layer {otherGameObject.layer}");
+                Debug.Log($"IGNORE collision_enter {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            Debug.Log($"UNHANDLED collision {otherGameObject.name} layer {otherGameObject.layer}");
+            var colliderMask = 1 << layer;
+            if (callbackEvent(headMaskValue, colliderMask, otherGameObject, _onHeadCollision))
+            {
+                return;
+            }
+            if (callbackEvent(shieldMaskValue, colliderMask, otherGameObject, _onShieldCollision))
+            {
+                return;
+            }
+            if (callbackEvent(brickMaskValue, colliderMask, otherGameObject, _onBrickCollision))
+            {
+                return;
+            }
+            if (callbackEvent(wallMaskValue, colliderMask, otherGameObject, _onWallCollision))
+            {
+                return;
+            }
+            Debug.Log($"UNHANDLED collision_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
+        }
+
+        private static bool callbackEvent(int maskValue, int colliderMask, GameObject gameObject, Action<GameObject> callback)
+        {
+            if (maskValue == (maskValue | colliderMask))
+            {
+                callback?.Invoke(gameObject);
+                return true;
+            }
+            return false;
         }
 
         #endregion
+
+        #region IBall
+
+        IBallCollision IBall.ballCollision => this;
 
         void IBall.stopMoving()
         {
@@ -176,5 +255,47 @@ namespace Examples2.Scripts.Battle.Ball
             state.ballColor = ballColor;
             stateObjects[(int)state.ballColor].SetActive(true);
         }
+
+        #endregion
+
+        #region IBallCollision
+
+        Action<GameObject> IBallCollision.onHeadCollision
+        {
+            get => _onHeadCollision;
+            set => _onHeadCollision = value;
+        }
+
+        Action<GameObject> IBallCollision.onShieldCollision
+        {
+            get => _onShieldCollision;
+            set => _onShieldCollision = value;
+        }
+
+        Action<GameObject> IBallCollision.onWallCollision
+        {
+            get => _onWallCollision;
+            set => _onWallCollision = value;
+        }
+
+        Action<GameObject> IBallCollision.onBrickCollision
+        {
+            get => _onBrickCollision;
+            set => _onBrickCollision = value;
+        }
+
+        Action<TeamColor> IBallCollision.onEnterTeamArea
+        {
+            get => _onEnterTeamArea;
+            set => _onEnterTeamArea = value;
+        }
+
+        Action<TeamColor> IBallCollision.onExitTeamArea
+        {
+            get => _onExitTeamArea;
+            set => _onExitTeamArea = value;
+        }
+
+        #endregion
     }
 }
