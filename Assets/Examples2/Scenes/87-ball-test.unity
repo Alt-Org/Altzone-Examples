@@ -7036,7 +7036,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1491261275
 Transform:
   m_ObjectHideFlags: 0
@@ -7839,10 +7839,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee4863c094d4f829a3148a2c6d0b303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetVelocity: {x: 2, y: 2}
-  isMoving: 1
-  networkPosition: {x: 0, y: 0}
-  networkLag: 0
+  ballVelocity: {x: 6, y: 6}
+  ballPosition: {x: 0, y: 0}
+  startBallMoving: 1
+  stopBallMoving: 0
 --- !u!114 &1685972415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7866,6 +7866,10 @@ MonoBehaviour:
   state:
     ballColor: 5
     isMoving: 0
+  targetVelocity: {x: 0, y: 0}
+  isMoving: 0
+  networkPosition: {x: 0, y: 0}
+  networkLag: 0
 --- !u!114 &1685972416
 MonoBehaviour:
   m_ObjectHideFlags: 0
