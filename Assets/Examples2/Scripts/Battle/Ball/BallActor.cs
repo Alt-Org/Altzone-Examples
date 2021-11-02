@@ -59,8 +59,8 @@ namespace Examples2.Scripts.Battle.Ball
         private Action<GameObject> _onShieldCollision;
         private Action<GameObject> _onBrickCollision;
         private Action<GameObject> _onWallCollision;
-        private Action<TeamColor> _onEnterTeamArea;
-        private Action<TeamColor> _onExitTeamArea;
+        private Action<GameObject> _onEnterTeamArea;
+        private Action<GameObject> _onExitTeamArea;
 
         private void Awake()
         {
@@ -143,11 +143,13 @@ namespace Examples2.Scripts.Battle.Ball
                 Debug.Log($"IGNORE trigger_enter {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            var colliderMask = 1 << layer;
-            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
             {
-                checkTeamArea(otherGameObject, settings, _onEnterTeamArea);
-                return;
+                var colliderMask = 1 << layer;
+                if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onEnterTeamArea))
+                {
+                    return;
+                }
             }
             Debug.Log($"UNHANDLED trigger_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
         }
@@ -165,21 +167,15 @@ namespace Examples2.Scripts.Battle.Ball
                 Debug.Log($"IGNORE trigger_exit {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            var colliderMask = 1 << layer;
-            if (teamAreaMaskValue == (teamAreaMaskValue | colliderMask))
+            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
             {
-                checkTeamArea(otherGameObject, settings, _onExitTeamArea);
-                return;
+                var colliderMask = 1 << layer;
+                if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onExitTeamArea))
+                {
+                    return;
+                }
             }
             Debug.Log($"UNHANDLED trigger_exit {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
-        }
-
-        private static void checkTeamArea(GameObject gameObject, BallSettings settings, Action<TeamColor> action)
-        {
-            var teamColor = gameObject.CompareTag(settings.blueTeamTag) ? TeamColor.Blue
-                : gameObject.CompareTag(settings.redTeamTag) ? TeamColor.Red
-                : TeamColor.None;
-            action.Invoke(teamColor);
         }
 
         private void OnCollisionEnter2D(Collision2D other)
@@ -208,9 +204,16 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 return;
             }
-            if (callbackEvent(wallMaskValue, colliderMask, otherGameObject, _onWallCollision))
+            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
             {
-                return;
+                if (callbackEvent(wallMaskValue, colliderMask, otherGameObject, _onWallCollision))
+                {
+                    return;
+                }
+            }
+            if (wallMaskValue == (wallMaskValue | colliderMask))
+            {
+                return; // Ignore walls without tags
             }
             Debug.Log($"UNHANDLED collision_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
         }
@@ -284,13 +287,13 @@ namespace Examples2.Scripts.Battle.Ball
             set => _onBrickCollision = value;
         }
 
-        Action<TeamColor> IBallCollision.onEnterTeamArea
+        Action<GameObject> IBallCollision.onEnterTeamArea
         {
             get => _onEnterTeamArea;
             set => _onEnterTeamArea = value;
         }
 
-        Action<TeamColor> IBallCollision.onExitTeamArea
+        Action<GameObject> IBallCollision.onExitTeamArea
         {
             get => _onExitTeamArea;
             set => _onExitTeamArea = value;

@@ -34,7 +34,7 @@ namespace Examples2.Scripts.Battle.interfaces
         Action<GameObject> onShieldCollision { get; set; }
         Action<GameObject> onBrickCollision { get; set; }
         Action<GameObject> onWallCollision { get; set; }
-        Action<TeamColor> onEnterTeamArea { get; set; }
-        Action<TeamColor> onExitTeamArea { get; set; }
+        Action<GameObject> onEnterTeamArea { get; set; }
+        Action<GameObject> onExitTeamArea { get; set; }
     }
 }

@@ -23,8 +23,12 @@ namespace Examples2.Scripts.Battle.Ball
             }
             ball = Context.getBall;
             var ballCollision = ball.ballCollision;
-            ballCollision.onEnterTeamArea = onTeamEnter;
-            ballCollision.onExitTeamArea = onTeamExit;
+            ballCollision.onHeadCollision = onHeadCollision;
+            ballCollision.onShieldCollision = onShieldCollision;
+            ballCollision.onBrickCollision = onBrickCollision;
+            ballCollision.onWallCollision = onWallCollision;
+            ballCollision.onEnterTeamArea = onEnterTeamArea;
+            ballCollision.onExitTeamArea = onExitTeamArea;
         }
 
         private IEnumerator Start()
@@ -54,13 +58,38 @@ namespace Examples2.Scripts.Battle.Ball
             }
         }
 
-        private void onTeamEnter(TeamColor teamColor)
+        #region IBallCollision callback events
+
+        private void onHeadCollision(GameObject other)
         {
-            Debug.Log($"onTeamEnter {teamColor}");
+            Debug.Log($"onHeadCollision {other.name}");
         }
-        private void onTeamExit(TeamColor teamColor)
+
+        private void onShieldCollision(GameObject other)
         {
-            Debug.Log($"onTeamExit {teamColor}");
+            Debug.Log($"onShieldCollision {other.name}");
         }
+
+        private void onBrickCollision(GameObject other)
+        {
+            Debug.Log($"onBrickCollision {other.name}");
+        }
+
+        private void onWallCollision(GameObject other)
+        {
+            Debug.Log($"onWallCollision {other.name} {other.tag}");
+        }
+
+        private void onEnterTeamArea(GameObject other)
+        {
+            Debug.Log($"onEnterTeamArea {other.tag}");
+        }
+
+        private void onExitTeamArea(GameObject other)
+        {
+            Debug.Log($"onExitTeamArea {other.tag}");
+        }
+
+        #endregion
     }
 }
