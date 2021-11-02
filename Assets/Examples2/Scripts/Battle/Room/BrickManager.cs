@@ -29,6 +29,8 @@ namespace Examples2.Scripts.Battle.Room
             photonEventDispatcher.registerEventListener(msgDeleteBrick, data => { onDeleteBrick(data.CustomData); });
         }
 
+        #region Photon Events
+
         private void onDeleteBrick(object data)
         {
             var payload = (byte[])data;
@@ -48,6 +50,10 @@ namespace Examples2.Scripts.Battle.Room
             photonEventDispatcher.RaiseEvent(msgDeleteBrick, payload);
         }
 
+        #endregion
+
+        #region Brick Management
+
         private static void createBrickMarkersFor(Transform parentTransform, Dictionary<int, IdMarker> bricks)
         {
             var childCount = parentTransform.childCount;
@@ -66,5 +72,7 @@ namespace Examples2.Scripts.Battle.Room
             Assert.IsTrue(gameObject.activeSelf, "GameObject is not active for destroy");
             gameObject.SetActive(false);
         }
+
+        #endregion
     }
 }

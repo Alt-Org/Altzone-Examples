@@ -122,7 +122,6 @@ namespace Examples2.Scripts.Battle.Ball
                 _rigidbody.position = isTeleport
                     ? networkPosition
                     : Vector2.MoveTowards(position, networkPosition, Time.deltaTime);
-                return;
             }
         }
 
@@ -259,6 +258,12 @@ namespace Examples2.Scripts.Battle.Ball
             }
         }
 
+        [PunRPC]
+        private void setBallColorRpc(byte ballColor)
+        {
+            _setBallColorLocal((BallColor)ballColor);
+        }
+
         private void _setBallColorLocal(BallColor ballColor)
         {
             //Debug.Log($"setColor {state.ballColor} <- {ballColor}");
@@ -305,16 +310,6 @@ namespace Examples2.Scripts.Battle.Ball
         {
             get => _onExitTeamArea;
             set => _onExitTeamArea = value;
-        }
-
-        #endregion
-
-        #region Photon RPC
-
-        [PunRPC]
-        private void setBallColorRpc(byte ballColor)
-        {
-            _setBallColorLocal((BallColor)ballColor);
         }
 
         #endregion
