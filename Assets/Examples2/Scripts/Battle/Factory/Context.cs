@@ -1,5 +1,6 @@
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Room;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Factory
@@ -13,5 +14,7 @@ namespace Examples2.Scripts.Battle.Factory
     internal static class Context
     {
         internal static IBall getBall => Object.FindObjectOfType<BallActor>();
+
+        internal static IBrickManager getBrickManager => Object.FindObjectOfType<BrickManager>();
     }
 }

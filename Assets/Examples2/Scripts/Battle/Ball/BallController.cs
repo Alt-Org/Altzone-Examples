@@ -26,6 +26,7 @@ namespace Examples2.Scripts.Battle.Ball
         public bool stopBallMoving;
 
         private IBall ball;
+        private IBrickManager brickManager;
 
         private void Awake()
         {
@@ -34,6 +35,7 @@ namespace Examples2.Scripts.Battle.Ball
                 enabled = false;
             }
             ball = Context.getBall;
+            brickManager = Context.getBrickManager;
             var ballCollision = ball.ballCollision;
             ballCollision.onHeadCollision = onHeadCollision;
             ballCollision.onShieldCollision = onShieldCollision;
@@ -86,8 +88,8 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void onBrickCollision(GameObject other)
         {
-            Debug.Log($"onBrickCollision {other.name}");
-            Destroy(other);
+            //Debug.Log($"onBrickCollision {other.name}");
+            brickManager.deleteBrick(other);
         }
 
         private void onWallCollision(GameObject other)
