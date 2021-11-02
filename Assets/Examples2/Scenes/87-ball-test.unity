@@ -7993,13 +7993,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state:
-    isBallMoving: 0
     isRedTeamActive: 0
     isBlueTeamActive: 0
   ballVelocity: {x: 6, y: 6}
-  ballPosition: {x: 0, y: 0}
   startBallMoving: 1
   stopBallMoving: 0
+  hideBall: 0
+  showBall: 0
 --- !u!114 &1685972415
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,7 +13,6 @@ namespace Examples2.Scripts.Test
         [Serializable]
         internal class State
         {
-            public bool isBallMoving;
             public bool isRedTeamActive;
             public bool isBlueTeamActive;
         }
@@ -21,9 +20,10 @@ namespace Examples2.Scripts.Test
         [SerializeField] private State state;
 
         [Header("Debug Only")] public Vector2 ballVelocity;
-        public Vector2 ballPosition;
         public bool startBallMoving;
         public bool stopBallMoving;
+        public bool hideBall;
+        public bool showBall;
 
         private IBall ball;
         private IBrickManager brickManager;
@@ -54,6 +54,9 @@ namespace Examples2.Scripts.Test
                 yield return new WaitForSeconds(1f);
                 startBallMoving = true;
             }
+            stopBallMoving = false;
+            hideBall = false;
+            showBall = false;
         }
 
         private void Update()
@@ -61,16 +64,28 @@ namespace Examples2.Scripts.Test
             if (startBallMoving)
             {
                 startBallMoving = false;
-                state.isBallMoving = true;
                 ball.setColor(BallColor.NoTeam);
-                ball.startMoving(ballPosition, ballVelocity);
+                var position = GetComponent<Rigidbody2D>().position;
+                ball.startMoving(position, ballVelocity);
                 return;
             }
             if (stopBallMoving)
             {
                 stopBallMoving = false;
-                state.isBallMoving = false;
                 ball.stopMoving();
+                ball.setColor(BallColor.Ghosted);
+            }
+            if (showBall)
+            {
+                showBall = false;
+                ball.setColor(BallColor.Ghosted);
+                return;
+            }
+            if (hideBall)
+            {
+                hideBall = false;
+                ball.stopMoving();
+                ball.setColor(BallColor.Hidden);
             }
         }
 
