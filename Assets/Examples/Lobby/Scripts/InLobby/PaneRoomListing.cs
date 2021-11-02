@@ -123,7 +123,6 @@ namespace Examples.Lobby.Scripts.InLobby
 
         private void update(Button button, RoomInfo room)
         {
-            var text = button.GetComponentInChildren<Text>();
             var roomText = $"{room.Name}";
             if (roomText.Length > 21)
             {
@@ -139,6 +138,7 @@ namespace Examples.Lobby.Scripts.InLobby
                 roomText += $" ({room.PlayerCount} playing)";
                 roomText = $"<color=brown>{roomText}</color>";
             }
+            var text = button.GetComponentInChildren<Text>();
             Debug.Log($"update '{text.text}' -> '{roomText}'");
             text.text = roomText;
             button.onClick.RemoveAllListeners();

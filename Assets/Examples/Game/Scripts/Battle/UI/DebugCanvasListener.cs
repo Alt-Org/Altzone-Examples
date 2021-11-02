@@ -16,7 +16,7 @@ namespace Examples.Game.Scripts.Battle.UI
     {
         private const string teamNameHome = "Home";
         private const string teamNameVisitor = "Visitor";
-        private const string scoreFormatLocal = "<b>{0}({1})</b> h={2} w={3}";
+        private const string scoreFormatLocal = "<color=yellow>{0}({1})</color> h={2} w={3}";
         private const string scoreFormatVisitor = "{0}({1}) h={2} w={3}";
 
         public GameObject roomStartPanel;

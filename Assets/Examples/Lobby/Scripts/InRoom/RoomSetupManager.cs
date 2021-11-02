@@ -213,9 +213,7 @@ namespace Examples.Lobby.Scripts.InRoom
             selectable.interactable = interactable;
             if (!string.IsNullOrEmpty(caption))
             {
-                selectable.GetComponentInChildren<Text>().text = interactable
-                    ? caption
-                    : $"<b>|{caption}|</b>";
+                selectable.GetComponentInChildren<Text>().text = caption;
             }
         }
 

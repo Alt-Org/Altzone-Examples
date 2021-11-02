@@ -87,14 +87,14 @@ namespace Examples.Lobby.Scripts.InRoom
         private static void update(Text line, Player player)
         {
             var text = line.GetComponent<Text>();
-            var nickName = player.IsLocal ? $"<b>{player.NickName}</b>" : player.NickName;
+            var nickName = player.IsLocal ? $"<color=blue>{player.NickName}</color>" : player.NickName;
             var pos = player.GetCustomProperty(playerPositionKey, playerIsGuest);
             var skill = Mathf.Clamp(player.GetCustomProperty(playerMainSkillKey, 0), 0, skillNames.Length - 1);
             var skillName = skillNames[skill];
             var status = $" pos={pos} skill={skillName}";
             if (player.IsMasterClient)
             {
-                status += " [M]";
+                status += " <color=yellow>[M]</color>";
             }
             var playerText = $"{nickName} {status}";
             Debug.Log($"update '{text.text}' -> '{playerText}'");

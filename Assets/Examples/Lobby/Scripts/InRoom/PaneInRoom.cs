@@ -43,7 +43,7 @@ namespace Examples.Lobby.Scripts.InRoom
         /// </summary>
         private void Update()
         {
-            title.text = PhotonNetwork.InRoom ? PhotonNetwork.CurrentRoom.Name : "<color=red><b>Not in room</b></color>";
+            title.text = PhotonNetwork.InRoom ? PhotonNetwork.CurrentRoom.Name : "<color=red>Not in room</color>";
         }
     }
 }
