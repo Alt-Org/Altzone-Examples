@@ -1,7 +1,8 @@
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
-using Prg.Scripts.Common.Unity;
 using System;
+using TMPro;
+using UnityConstants;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Ball
@@ -37,6 +38,7 @@ namespace Examples2.Scripts.Battle.Ball
     internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
     {
         private const float ballTeleportDistance = 1f;
+        private const float checkVelocityDelay = 0.5f;
 
         [SerializeField] private BallSettings settings;
         [SerializeField] private BallState state;
@@ -44,8 +46,14 @@ namespace Examples2.Scripts.Battle.Ball
         [Header("Photon"), SerializeField] private Vector2 networkPosition;
         [SerializeField] private float networkLag;
 
+        [Header("Debug"), SerializeField] private TMP_Text ballInfo;
+
         private PhotonView _photonView;
         private Rigidbody2D _rigidbody;
+
+        [SerializeField] private float currentSpeed;
+        private bool isCheckVelocityTime;
+        private float checkVelocityTime;
 
         private GameObject[] stateObjects;
 
@@ -127,7 +135,24 @@ namespace Examples2.Scripts.Battle.Ball
                 _rigidbody.position = isTeleport
                     ? networkPosition
                     : Vector2.MoveTowards(position, networkPosition, Time.deltaTime);
+                return;
             }
+            if (isCheckVelocityTime && checkVelocityTime > Time.time)
+            {
+                isCheckVelocityTime = false;
+                if (!Mathf.Approximately(currentSpeed, _rigidbody.velocity.magnitude))
+                {
+                    Debug.Log("fix velocity");
+                    keepConstantVelocity();
+                }
+            }
+            // Just for testing - this is expensive call!
+            ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
+        }
+
+        private void keepConstantVelocity()
+        {
+            _rigidbody.velocity = _rigidbody.velocity.normalized * currentSpeed;
         }
 
         #endregion
@@ -147,7 +172,7 @@ namespace Examples2.Scripts.Battle.Ball
                 Debug.Log($"IGNORE trigger_enter {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
+            if (!otherGameObject.CompareTag(Tags.Untagged))
             {
                 var colliderMask = 1 << layer;
                 if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onEnterTeamArea))
@@ -171,7 +196,7 @@ namespace Examples2.Scripts.Battle.Ball
                 Debug.Log($"IGNORE trigger_exit {otherGameObject.name} layer {otherGameObject.layer}");
                 return;
             }
-            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
+            if (!otherGameObject.CompareTag(Tags.Untagged))
             {
                 var colliderMask = 1 << layer;
                 if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onExitTeamArea))
@@ -188,6 +213,8 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
             }
+            isCheckVelocityTime = true;
+            checkVelocityTime = Time.time + checkVelocityDelay;
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
             if (layer == 0)
@@ -210,9 +237,9 @@ namespace Examples2.Scripts.Battle.Ball
             }
             if (isCallbackEvent(wallMaskValue, colliderMask))
             {
-                if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
+                if (!otherGameObject.CompareTag(Tags.Untagged))
                 {
-                    _onWallCollision?.Invoke(gameObject);
+                    _onWallCollision?.Invoke(otherGameObject);
                 }
                 return;
             }
@@ -244,7 +271,11 @@ namespace Examples2.Scripts.Battle.Ball
         {
             Debug.Log($"stopMoving {state.isMoving} <- {false}");
             state.isMoving = false;
-            settings.ballCollider.SetActive(false);
+            if (_photonView.IsMine)
+            {
+                settings.ballCollider.SetActive(false);
+            }
+            currentSpeed = 0f;
             _rigidbody.velocity = Vector2.zero;
         }
 
@@ -252,10 +283,14 @@ namespace Examples2.Scripts.Battle.Ball
         {
             Debug.Log($"startMoving {state.isMoving} <- {true} position {position} velocity {velocity}");
             state.isMoving = true;
-            settings.ballCollider.SetActive(true);
+            if (_photonView.IsMine)
+            {
+                settings.ballCollider.SetActive(true);
+            }
             _rigidbody.position = position;
             var speed = Mathf.Clamp(Mathf.Abs(velocity.magnitude), settings.minBallSpeed, settings.maxBallSpeed);
             _rigidbody.velocity = velocity.normalized * speed;
+            currentSpeed = _rigidbody.velocity.magnitude;
         }
 
         void IBall.setColor(BallColor ballColor)

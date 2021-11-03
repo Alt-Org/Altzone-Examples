@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -19,6 +20,12 @@ namespace Examples2.Scripts.Battle.Room
         private void Awake()
         {
             Debug.Log($"Awake: {PhotonNetwork.NetworkClientState}");
+            if (objectsToActivate.Any(x => x.activeSelf))
+            {
+                Debug.LogError("objectsToActivate has active items, disable them and retry");
+                enabled = false;
+                return;
+            }
             if (PhotonNetwork.InRoom)
             {
                 continueToNextStage();
