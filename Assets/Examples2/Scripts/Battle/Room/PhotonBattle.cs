@@ -50,7 +50,7 @@ namespace Examples2.Scripts.Battle.Room
                 { playerPositionKey, playerPos },
                 //{ playerMainSkillKey, (int)Defence.Deflection }
             });
-            Debug.LogWarning($"setDebugPlayerProps {player.GetDebugLabel()}");
+            Debug.Log($"setDebugPlayerProps {player.GetDebugLabel()}");
         }
     }
 }
