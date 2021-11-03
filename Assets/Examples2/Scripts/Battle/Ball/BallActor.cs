@@ -23,8 +23,8 @@ namespace Examples2.Scripts.Battle.Ball
         public LayerMask brickMask;
         public LayerMask wallMask;
 
-        [Header("Tags"), TagSelector] public string redTeamTag;
-        [TagSelector] public string blueTeamTag;
+        [Header("Ball Constraints")] public float minBallSpeed;
+        public float maxBallSpeed;
     }
 
     [Serializable]
@@ -90,7 +90,12 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnEnable()
         {
-            _rigidbody.velocity = Vector2.zero;
+            if (_photonView.IsMine)
+            {
+                var ball = (IBall)this;
+                ball.stopMoving();
+                ball.setColor(BallColor.Hidden);
+            }
         }
 
         #region Movement
@@ -203,18 +208,20 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 return;
             }
-            if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
+            if (isCallbackEvent(wallMaskValue, colliderMask))
             {
-                if (callbackEvent(wallMaskValue, colliderMask, otherGameObject, _onWallCollision))
+                if (!otherGameObject.CompareTag(UnityConstants.Tags.Untagged))
                 {
-                    return;
+                    _onWallCollision?.Invoke(gameObject);
                 }
-            }
-            if (wallMaskValue == (wallMaskValue | colliderMask))
-            {
-                return; // Ignore walls without tags
+                return;
             }
             Debug.Log($"UNHANDLED collision_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
+        }
+
+        private static bool isCallbackEvent(int maskValue, int colliderMask)
+        {
+            return maskValue == (maskValue | colliderMask);
         }
 
         private static bool callbackEvent(int maskValue, int colliderMask, GameObject gameObject, Action<GameObject> callback)
@@ -247,7 +254,8 @@ namespace Examples2.Scripts.Battle.Ball
             state.isMoving = true;
             settings.ballCollider.SetActive(true);
             _rigidbody.position = position;
-            _rigidbody.velocity = velocity;
+            var speed = Mathf.Clamp(Mathf.Abs(velocity.magnitude), settings.minBallSpeed, settings.maxBallSpeed);
+            _rigidbody.velocity = velocity.normalized * speed;
         }
 
         void IBall.setColor(BallColor ballColor)

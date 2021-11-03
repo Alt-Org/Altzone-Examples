@@ -7995,11 +7995,12 @@ MonoBehaviour:
   state:
     isRedTeamActive: 0
     isBlueTeamActive: 0
-  ballVelocity: {x: 18, y: 32}
+  ballVelocity: {x: 5, y: 5}
   startBallMoving: 1
   stopBallMoving: 0
   hideBall: 0
   showBall: 0
+  ghostBall: 0
 --- !u!114 &1685972415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8035,8 +8036,8 @@ MonoBehaviour:
     wallMask:
       serializedVersion: 2
       m_Bits: 2048
-    redTeamTag: RedTeam
-    blueTeamTag: BlueTeam
+    minBallSpeed: 2
+    maxBallSpeed: 10
   state:
     ballColor: 0
     isMoving: 0

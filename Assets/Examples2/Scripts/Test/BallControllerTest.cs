@@ -24,6 +24,7 @@ namespace Examples2.Scripts.Test
         public bool stopBallMoving;
         public bool hideBall;
         public bool showBall;
+        public bool ghostBall;
 
         private IBall ball;
         private IBrickManager brickManager;
@@ -57,6 +58,7 @@ namespace Examples2.Scripts.Test
             stopBallMoving = false;
             hideBall = false;
             showBall = false;
+            ghostBall = false;
         }
 
         private void Update()
@@ -75,17 +77,23 @@ namespace Examples2.Scripts.Test
                 ball.stopMoving();
                 ball.setColor(BallColor.Ghosted);
             }
-            if (showBall)
-            {
-                showBall = false;
-                ball.setColor(BallColor.Ghosted);
-                return;
-            }
             if (hideBall)
             {
                 hideBall = false;
                 ball.stopMoving();
                 ball.setColor(BallColor.Hidden);
+                return;
+            }
+            if (showBall)
+            {
+                showBall = false;
+                ball.setColor(BallColor.NoTeam);
+                return;
+            }
+            if (ghostBall)
+            {
+                ghostBall = false;
+                ball.setColor(BallColor.Ghosted);
             }
         }
 
