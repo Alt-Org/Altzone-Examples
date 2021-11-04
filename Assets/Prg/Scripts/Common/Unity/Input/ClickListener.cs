@@ -5,11 +5,11 @@ namespace Prg.Scripts.Common.Unity.Input
 {
     public class ClickListener : MonoBehaviour
     {
-        [Header("Settings")] [SerializeField] private Camera _camera;
+        [Header("Settings"),SerializeField]  private Camera _camera;
         [SerializeField] private string clickableTagName;
         [SerializeField] private LayerMask clickableLayers;
 
-        [Header("Debug")] [SerializeField] private int layerMask;
+        [Header("Debug"),SerializeField]  private int layerMask;
 
         private void OnEnable()
         {

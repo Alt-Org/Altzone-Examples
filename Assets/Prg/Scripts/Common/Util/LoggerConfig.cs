@@ -46,10 +46,10 @@ namespace Prg.Scripts.Common.Util
             {
                 return;
             }
-            Debug.logLineAllowedFilter += (method) =>
+            Debug.logLineAllowedFilter += method =>
             {
                 // For anonymous types we try its parent type.
-                var isAnonymous = (method.ReflectedType?.Name.StartsWith("<"));
+                var isAnonymous = method.ReflectedType?.Name.StartsWith("<");
                 var type = isAnonymous.HasValue && isAnonymous.Value
                     ? method.ReflectedType?.DeclaringType
                     : method.ReflectedType;
@@ -126,7 +126,6 @@ namespace Prg.Scripts.Common.Util
                     var isLogged = true;
                     if (line.EndsWith("=1"))
                     {
-                        isLogged = true;
                         line = line.Substring(0, line.Length - 2);
                     }
                     else if (line.EndsWith("=0"))

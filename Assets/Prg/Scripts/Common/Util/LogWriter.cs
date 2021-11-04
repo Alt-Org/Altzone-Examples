@@ -117,10 +117,7 @@ namespace Prg.Scripts.Common.Util
 
         private void Flush()
         {
-            if (_file != null)
-            {
-                _file.Flush();
-            }
+            _file?.Flush();
         }
 
         private static void WriteLog(string message)
@@ -129,7 +126,7 @@ namespace Prg.Scripts.Common.Util
         }
 
         private static string _prevLogString = "";
-        private static int _prevLogLineCount = 0;
+        private static int _prevLogLineCount;
 
         /* Threaded callback for listening Unity logging */
 

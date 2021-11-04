@@ -28,13 +28,13 @@ namespace Prg.Scripts.Common.Photon
         static PhotonListener()
         {
             // https://doc-api.photonengine.com/en/pun/v2/class_photon_1_1_realtime_1_1_game_property_key.html
-            photonPlayerPropNames = new Dictionary<string, string>()
+            photonPlayerPropNames = new Dictionary<string, string>
             {
                 { ActorProperties.PlayerName.ToString(), nameof(ActorProperties.PlayerName) },
                 { ActorProperties.IsInactive.ToString(), nameof(ActorProperties.IsInactive) },
                 { ActorProperties.UserId.ToString(), nameof(ActorProperties.UserId) },
             };
-            photonRoomPropNames = new Dictionary<string, string>()
+            photonRoomPropNames = new Dictionary<string, string>
             {
                 { GamePropertyKey.MaxPlayers.ToString(), nameof(GamePropertyKey.MaxPlayers) },
                 { GamePropertyKey.IsVisible.ToString(), nameof(GamePropertyKey.IsVisible) },
@@ -124,7 +124,7 @@ namespace Prg.Scripts.Common.Photon
             Debug.Log($"{c}> {PhotonNetwork.NetworkClientState} {deltaTime} {message}");
         }
 
-        private static string HashtableToString(Hashtable props, Dictionary<string, string> keyMapping)
+        private static string HashtableToString(Hashtable props, IReadOnlyDictionary<string, string> keyMapping)
         {
             var builder = new StringBuilder("{");
             foreach (var prop in props)

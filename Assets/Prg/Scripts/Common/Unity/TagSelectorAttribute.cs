@@ -10,6 +10,6 @@ namespace Prg.Scripts.Common.Unity
     /// </remarks>
     public class TagSelectorAttribute : PropertyAttribute
     {
-        public bool UseDefaultTagFieldDrawer = false;
+        public static bool UseDefaultTagFieldDrawer = false;
     }
 }

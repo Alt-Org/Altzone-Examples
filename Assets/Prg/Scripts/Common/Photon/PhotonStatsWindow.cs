@@ -87,7 +87,7 @@ namespace Prg.Scripts.Common.Photon
                 var room = PhotonNetwork.CurrentRoom;
                 var props = room.CustomProperties;
                 var keys = props.Keys.ToList();
-                keys.Sort((a, b) => String.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
+                keys.Sort((a, b) => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
                 foreach (var key in keys)
                 {
                     var propValue = props[key].ToString();
@@ -102,7 +102,7 @@ namespace Prg.Scripts.Common.Photon
                     if (props.Count > 0)
                     {
                         keys = props.Keys.ToList();
-                        keys.Sort((a, b) => String.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
+                        keys.Sort((a, b) => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
                         foreach (var key in keys)
                         {
                             var propValue = props[key].ToString();

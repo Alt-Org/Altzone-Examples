@@ -5,7 +5,7 @@ namespace Prg.Scripts.Common.Unity.Input
 {
     public class TouchHandler : BaseHandler
     {
-        [Header("Debug")] [SerializeField] private int touchCount;
+        [Header("Debug"),SerializeField]  private int touchCount;
         [SerializeField] private Vector3 firstPanPosition;
         [SerializeField] private Vector3 lastPanPosition;
         [SerializeField] private int panFingerId;

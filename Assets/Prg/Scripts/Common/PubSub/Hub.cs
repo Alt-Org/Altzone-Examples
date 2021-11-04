@@ -26,7 +26,7 @@ namespace Prg.Scripts.Common.PubSub
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        public void Publish<T>(T data = default(T))
+        public void Publish<T>(T data = default)
         {
             Publish(this, data);
         }
@@ -128,7 +128,7 @@ namespace Prg.Scripts.Common.PubSub
         /// <param name="handler"></param>
         public void Unsubscribe<T>(Action<T> handler)
         {
-            Unsubscribe<T>(this, handler);
+            Unsubscribe(this, handler);
         }
 
         public void Unsubscribe<T>(object sender, Action<T> handler = null)
@@ -137,7 +137,7 @@ namespace Prg.Scripts.Common.PubSub
             {
                 var query = handlers
                     .Where(a => !a.Sender.IsAlive ||
-                                (a.Sender.Target.Equals(sender) && a.Type == typeof(T)));
+                                a.Sender.Target.Equals(sender) && a.Type == typeof(T));
 
                 if (handler != null)
                 {

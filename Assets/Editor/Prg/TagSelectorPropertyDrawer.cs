@@ -21,7 +21,7 @@ namespace Editor.Prg
             }
             EditorGUI.BeginProperty(position, label, property);
             {
-                if (attribute is TagSelectorAttribute selectorAttribute && selectorAttribute.UseDefaultTagFieldDrawer)
+                if (attribute is TagSelectorAttribute && TagSelectorAttribute.UseDefaultTagFieldDrawer)
                 {
                     property.stringValue = EditorGUI.TagField(position, label, property.stringValue);
                 }

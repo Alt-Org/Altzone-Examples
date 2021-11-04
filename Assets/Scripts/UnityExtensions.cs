@@ -11,7 +11,7 @@ public static class UnityExtensions
 
     public static T GetOrAddComponent<T>(this GameObject parent) where T : Component
     {
-        T component = parent.GetComponent<T>();
+        var component = parent.GetComponent<T>();
         if (component == null)
         {
             component = parent.AddComponent<T>();
@@ -101,20 +101,12 @@ public static class UnityExtensions
 
     public static string GetFullPath(this Transform transform)
     {
-        if (transform == null)
-        {
-            return "";
-        }
-        return GetFullPath(transform.gameObject);
+        return transform == null ? "" : GetFullPath(transform.gameObject);
     }
 
     public static string GetFullPath(this Component component)
     {
-        if (component == null)
-        {
-            return "";
-        }
-        return GetFullPath(component.gameObject);
+        return component == null ? "" : GetFullPath(component.gameObject);
     }
 
     public static string GetFullPath(this GameObject gameObject)
@@ -123,7 +115,7 @@ public static class UnityExtensions
         {
             return "";
         }
-        StringBuilder path = new StringBuilder("\\").Append(gameObject.name);
+        var path = new StringBuilder("\\").Append(gameObject.name);
         while (gameObject.transform.parent != null)
         {
             gameObject = gameObject.transform.parent.gameObject;

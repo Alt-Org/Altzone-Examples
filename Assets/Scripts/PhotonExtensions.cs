@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -10,14 +11,14 @@ public static class PhotonExtensions
 {
     #region Room
 
-    public static IOrderedEnumerable<Player> GetPlayersByActorNumber(this Room room)
+    public static IEnumerable<Player> GetPlayersByActorNumber(this Room room)
     {
-        return room.Players.Values.OrderBy((x) => x.ActorNumber);
+        return room.Players.Values.OrderBy(x => x.ActorNumber);
     }
 
-    public static IOrderedEnumerable<Player> GetPlayersByNickName(this Room room)
+    public static IEnumerable<Player> GetPlayersByNickName(this Room room)
     {
-        return room.Players.Values.OrderBy((x) => x.NickName);
+        return room.Players.Values.OrderBy(x => x.NickName);
     }
 
     public static bool GetUniquePlayerNameForRoom(this Room room, Player player, string playerName, string separator, out string uniquePlayerName)
