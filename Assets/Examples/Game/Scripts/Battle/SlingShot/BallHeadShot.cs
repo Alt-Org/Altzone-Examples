@@ -100,7 +100,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             ballControl = ball;
             ballTransform = ((Component)ballControl).transform;
 
-            var playerA = PlayerActivator.allPlayerActors.Find(x => x.PlayerPos == playerPos);
+            var playerA = PlayerActivator.AllPlayerActors.Find(x => x.PlayerPos == playerPos);
             playerA.setGhostedMode();
             teamIndex = playerA.TeamIndex;
             followA = ((Component)playerA).transform;

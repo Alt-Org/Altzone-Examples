@@ -14,13 +14,13 @@ namespace Examples.Game.Scripts.Battle.Room
     [Serializable]
     public class TeamScore
     {
-        public int teamIndex;
-        public int headCollisionCount;
-        public int wallCollisionCount;
+        public int _teamIndex;
+        public int _headCollisionCount;
+        public int _wallCollisionCount;
 
         public byte[] ToBytes()
         {
-            return new[] { (byte)teamIndex, (byte)headCollisionCount, (byte)wallCollisionCount };
+            return new[] { (byte)_teamIndex, (byte)_headCollisionCount, (byte)_wallCollisionCount };
         }
 
         public static void FromBytes(object data, out int teamIndex, out int headCollisionCount, out int wallCollisionCount)
@@ -33,7 +33,7 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public override string ToString()
         {
-            return $"team: {teamIndex}, headCollision: {headCollisionCount}, wallCollision: {wallCollisionCount}";
+            return $"team: {_teamIndex}, headCollision: {_headCollisionCount}, wallCollision: {_wallCollisionCount}";
         }
     }
 
@@ -42,46 +42,46 @@ namespace Examples.Game.Scripts.Battle.Room
     /// </summary>
     public class ScoreManager : MonoBehaviour
     {
-        private const int msgSetTeamScore = PhotonEventDispatcher.eventCodeBase + 6;
+        private const int MsgSetTeamScore = PhotonEventDispatcher.eventCodeBase + 6;
 
         private static ScoreManager Get()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = FindObjectOfType<ScoreManager>();
+                _instance = FindObjectOfType<ScoreManager>();
             }
-            return _Instance;
+            return _instance;
         }
 
-        private static ScoreManager _Instance;
+        private static ScoreManager _instance;
 
-        [SerializeField] private TeamScore[] scores;
+        [SerializeField] private TeamScore[] _scores;
 
-        private PhotonEventDispatcher photonEventDispatcher;
+        private PhotonEventDispatcher _photonEventDispatcher;
 
         private void Awake()
         {
-            scores = new[]
+            _scores = new[]
             {
-                new TeamScore { teamIndex = 0 },
-                new TeamScore { teamIndex = 1 },
+                new TeamScore { _teamIndex = 0 },
+                new TeamScore { _teamIndex = 1 },
             };
-            photonEventDispatcher = PhotonEventDispatcher.Get();
-            photonEventDispatcher.registerEventListener(msgSetTeamScore, data => { onSetTeamScore(data.CustomData); });
+            _photonEventDispatcher = PhotonEventDispatcher.Get();
+            _photonEventDispatcher.registerEventListener(MsgSetTeamScore, data => { ONSetTeamScore(data.CustomData); });
         }
 
         private void OnDestroy()
         {
-            _Instance = null;
+            _instance = null;
         }
 
         private void OnEnable()
         {
-            this.Subscribe<TeamScoreEvent>(onTeamScoreEvent);
+            this.Subscribe<TeamScoreEvent>(ONTeamScoreEvent);
             // Set initial state for scores
             SendTeamNames();
-            this.Publish(new TeamScoreEvent(scores[0]));
-            this.Publish(new TeamScoreEvent(scores[1]));
+            this.Publish(new TeamScoreEvent(_scores[0]));
+            this.Publish(new TeamScoreEvent(_scores[1]));
         }
 
         private void OnDisable()
@@ -94,7 +94,7 @@ namespace Examples.Game.Scripts.Battle.Room
             var room = PhotonNetwork.CurrentRoom;
             string teamRedName;
             string teamBlueName;
-            if (PlayerActivator.homeTeamIndex == 0)
+            if (PlayerActivator.HomeTeamIndex == 0)
             {
                 teamRedName = room.GetCustomProperty<string>(PhotonBattle.TeamRedKey);
                 teamBlueName = room.GetCustomProperty<string>(PhotonBattle.TeamBlueKey);
@@ -107,46 +107,46 @@ namespace Examples.Game.Scripts.Battle.Room
             this.Publish(new TeamNameEvent(teamRedName, teamBlueName));
         }
 
-        private void sendSetTeamScore(TeamScore score)
+        private void SendSetTeamScore(TeamScore score)
         {
-            photonEventDispatcher.RaiseEvent(msgSetTeamScore, score.ToBytes());
+            _photonEventDispatcher.RaiseEvent(MsgSetTeamScore, score.ToBytes());
         }
 
-        private void onSetTeamScore(object data)
+        private void ONSetTeamScore(object data)
         {
-            TeamScore.FromBytes(data, out var _teamIndex, out var _headCollisionCount, out var _wallCollisionCount);
-            var score = scores[_teamIndex];
+            TeamScore.FromBytes(data, out var teamIndex, out var headCollisionCount, out var wallCollisionCount);
+            var score = _scores[teamIndex];
             // Update and publish new score
-            score.headCollisionCount = _headCollisionCount;
-            score.wallCollisionCount = _wallCollisionCount;
+            score._headCollisionCount = headCollisionCount;
+            score._wallCollisionCount = wallCollisionCount;
             this.Publish(new TeamScoreEvent(score));
         }
 
-        private void onTeamScoreEvent(TeamScoreEvent data)
+        private void ONTeamScoreEvent(TeamScoreEvent data)
         {
-            var scoreNew = data.score;
-            var score = scores[scoreNew.teamIndex];
-            score.headCollisionCount = scoreNew.headCollisionCount;
-            score.wallCollisionCount = scoreNew.wallCollisionCount;
+            var scoreNew = data.Score;
+            var score = _scores[scoreNew._teamIndex];
+            score._headCollisionCount = scoreNew._headCollisionCount;
+            score._wallCollisionCount = scoreNew._wallCollisionCount;
         }
 
         private void _addHeadScore(int teamIndex)
         {
-            var score = scores[teamIndex];
-            score.headCollisionCount += 1;
+            var score = _scores[teamIndex];
+            score._headCollisionCount += 1;
             // Send updated score to everybody
-            sendSetTeamScore(score);
+            SendSetTeamScore(score);
         }
 
         private void _addWallScore(int teamIndex)
         {
-            var score = scores[teamIndex];
-            score.wallCollisionCount += 1;
+            var score = _scores[teamIndex];
+            score._wallCollisionCount += 1;
             // Send updated score to everybody
-            sendSetTeamScore(score);
+            SendSetTeamScore(score);
         }
 
-        public static void addHeadScore(int teamIndex)
+        public static void AddHeadScore(int teamIndex)
         {
             var manager = Get();
             if (PhotonNetwork.IsMasterClient && manager != null)
@@ -155,7 +155,7 @@ namespace Examples.Game.Scripts.Battle.Room
             }
         }
 
-        public static void addWallScore(GameObject gameObject)
+        public static void AddWallScore(GameObject gameObject)
         {
             var manager = Get();
             if (PhotonNetwork.IsMasterClient && manager != null)
@@ -185,16 +185,16 @@ namespace Examples.Game.Scripts.Battle.Room
 
         internal class TeamScoreEvent
         {
-            public readonly TeamScore score;
+            public readonly TeamScore Score;
 
             public TeamScoreEvent(TeamScore score)
             {
-                this.score = score;
+                this.Score = score;
             }
 
             public override string ToString()
             {
-                return $"{nameof(score)}: {score}";
+                return $"{nameof(Score)}: {Score}";
             }
         }
     }

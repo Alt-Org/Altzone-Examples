@@ -1,8 +1,6 @@
-﻿using Examples.Config.Scripts;
-using Examples.Game.Scripts.Battle.Player;
+﻿using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Test;
-using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +12,8 @@ namespace Examples.Game.Scripts.Battle.UI
     /// </summary>
     public class DebugCanvasListener : MonoBehaviour
     {
-        private const string scoreFormatLocal = "<color={4}>{0}({1})</color> h={2} w={3}";
-        private const string scoreFormatVisitor = "<color={4}>{0}({1})</color> h={2} w={3}";
+        private const string ScoreFormatLocal = "<color={4}>{0}({1})</color> h={2} w={3}";
+        private const string ScoreFormatVisitor = "<color={4}>{0}({1})</color> h={2} w={3}";
 
         public GameObject roomStartPanel;
         public Text titleText;
@@ -70,7 +68,7 @@ namespace Examples.Game.Scripts.Battle.UI
         {
             _teamNameVisitor = data.TeamRedName;
             _teamNameHome = data.TeamBlueName;
-            if (PlayerActivator.homeTeamIndex == 0)
+            if (PlayerActivator.HomeTeamIndex == 0)
             {
                 _teamColorHome = "yellow";
                 _teamColorVisitor = "white";
@@ -84,15 +82,15 @@ namespace Examples.Game.Scripts.Battle.UI
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
-            Debug.Log($"OnTeamScoreEvent {data} homeTeamIndex={PlayerActivator.homeTeamIndex}");
-            var score = data.score;
-            var isHomeTeam = score.teamIndex == PlayerActivator.homeTeamIndex;
+            Debug.Log($"OnTeamScoreEvent {data} homeTeamIndex={PlayerActivator.HomeTeamIndex}");
+            var score = data.Score;
+            var isHomeTeam = score._teamIndex == PlayerActivator.HomeTeamIndex;
             var teamName = isHomeTeam ? _teamNameHome : _teamNameVisitor;
             var teamColor = isHomeTeam ? _teamColorHome : _teamColorVisitor;
             var text = isHomeTeam ? leftText : rightText;
-            var isLocalTeam = score.teamIndex == PlayerActivator.localTeamIndex;
-            var format = isLocalTeam ? scoreFormatLocal : scoreFormatVisitor;
-            text.text = string.Format(format, teamName, score.teamIndex, score.headCollisionCount, score.wallCollisionCount, teamColor);
+            var isLocalTeam = score._teamIndex == PlayerActivator.LocalTeamIndex;
+            var format = isLocalTeam ? ScoreFormatLocal : ScoreFormatVisitor;
+            text.text = string.Format(format, teamName, score._teamIndex, score._headCollisionCount, score._wallCollisionCount, teamColor);
         }
     }
 }

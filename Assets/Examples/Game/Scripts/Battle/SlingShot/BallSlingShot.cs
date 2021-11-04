@@ -164,7 +164,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
             // Set player state on the game before ball has been started!
             var teamIndex = ((BallSlingShot)ballSlingShot).teamIndex;
-            foreach (var playerActor in PlayerActivator.allPlayerActors)
+            foreach (var playerActor in PlayerActivator.AllPlayerActors)
             {
                 if (playerActor.TeamIndex == teamIndex)
                 {

@@ -1,5 +1,4 @@
 using Examples.Config.Scripts;
-using Examples.Model.Scripts.Model;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;

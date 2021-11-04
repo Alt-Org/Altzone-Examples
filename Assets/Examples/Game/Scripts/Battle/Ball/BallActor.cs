@@ -105,7 +105,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
             if (collisionToWall == (collisionToWall | colliderMask))
             {
-                ScoreManager.addWallScore(other.gameObject);
+                ScoreManager.AddWallScore(other.gameObject);
                 return;
             }
             if (collisionToHead == (collisionToHead | colliderMask))

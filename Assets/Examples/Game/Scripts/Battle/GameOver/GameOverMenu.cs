@@ -31,8 +31,8 @@ namespace Examples.Game.Scripts.Battle.GameOver
         {
             scores = new[]
             {
-                new TeamScore { teamIndex = 0 },
-                new TeamScore { teamIndex = 1 },
+                new TeamScore { _teamIndex = 0 },
+                new TeamScore { _teamIndex = 1 },
             };
             if (!PhotonNetwork.InRoom)
             {
@@ -41,15 +41,15 @@ namespace Examples.Game.Scripts.Battle.GameOver
             var room = PhotonNetwork.CurrentRoom;
             foreach (var score in scores)
             {
-                var key = $"T{score.teamIndex}";
+                var key = $"T{score._teamIndex}";
                 var value = room.GetCustomProperty(key, -1);
                 if (value > 0)
                 {
-                    score.wallCollisionCount = value;
+                    score._wallCollisionCount = value;
                 }
             }
-            team0.text = scores[0].wallCollisionCount > 0 ? $"Team {scores[0].teamIndex}\r\n{scores[0].wallCollisionCount}" : "No\r\nscore";
-            team1.text = scores[1].wallCollisionCount > 0 ? $"Team {scores[1].teamIndex}\r\n{scores[1].wallCollisionCount}" : "No\r\nscore";
+            team0.text = scores[0]._wallCollisionCount > 0 ? $"Team {scores[0]._teamIndex}\r\n{scores[0]._wallCollisionCount}" : "No\r\nscore";
+            team1.text = scores[1]._wallCollisionCount > 0 ? $"Team {scores[1]._teamIndex}\r\n{scores[1]._wallCollisionCount}" : "No\r\nscore";
             PhotonLobby.leaveRoom();
         }
 

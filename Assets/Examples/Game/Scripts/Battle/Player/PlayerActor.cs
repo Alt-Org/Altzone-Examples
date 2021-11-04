@@ -33,11 +33,11 @@ namespace Examples.Game.Scripts.Battle.Player
         [SerializeField] private bool _isHomeTeam;
         [SerializeField] private int _playMode;
 
-        int IPlayerActor.PlayerPos => activator.playerPos;
-        bool IPlayerActor.IsLocal => activator.isLocal;
-        int IPlayerActor.TeamMatePos => activator.teamMatePos;
-        int IPlayerActor.TeamIndex => activator.teamIndex;
-        int IPlayerActor.OppositeTeam => activator.oppositeTeamIndex;
+        int IPlayerActor.PlayerPos => activator._playerPos;
+        bool IPlayerActor.IsLocal => activator._isLocal;
+        int IPlayerActor.TeamMatePos => activator._teamMatePos;
+        int IPlayerActor.TeamIndex => activator._teamIndex;
+        int IPlayerActor.OppositeTeam => activator._oppositeTeamIndex;
 
         bool IPlayerActor.IsLocalTeam
         {
@@ -85,7 +85,7 @@ namespace Examples.Game.Scripts.Battle.Player
             // Re-parent and set name
             var sceneConfig = SceneConfig.Get();
             transform.parent = sceneConfig.actorParent.transform;
-            name = $"{(player.IsLocal ? "L" : "R")}{activator.playerPos}:{activator.teamIndex}:{player.NickName}";
+            name = $"{(player.IsLocal ? "L" : "R")}{activator._playerPos}:{activator._teamIndex}:{player.NickName}";
 
             setupPlayer(player);
             if (sceneConfig.isCameraRotated)
@@ -97,12 +97,12 @@ namespace Examples.Game.Scripts.Battle.Player
 
         public void LateAwakePass1() // Called after all players have been "awaken"
         {
-            Debug.Log($"LateAwakePass1 name={name} players={PlayerActivator.allPlayerActors.Count}");
+            Debug.Log($"LateAwakePass1 name={name} players={PlayerActivator.AllPlayerActors.Count}");
             // Set our team status
-            _teamMate = PlayerActivator.allPlayerActors
-                .FirstOrDefault(x => x.TeamIndex == activator.teamIndex && x.PlayerPos != activator.playerPos) as PlayerActor;
-            _isLocalTeam = activator.isLocal || _teamMate != null && _teamMate.activator.isLocal;
-            _isHomeTeam = activator.teamIndex == PlayerActivator.homeTeamIndex;
+            _teamMate = PlayerActivator.AllPlayerActors
+                .FirstOrDefault(x => x.TeamIndex == activator._teamIndex && x.PlayerPos != activator._playerPos) as PlayerActor;
+            _isLocalTeam = activator._isLocal || _teamMate != null && _teamMate.activator._isLocal;
+            _isHomeTeam = activator._teamIndex == PlayerActivator.HomeTeamIndex;
             _isValidTeam = true;
         }
 
@@ -131,7 +131,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private void setupLocalPlayer(IMovablePlayer movablePlayer)
         {
             var sceneConfig = SceneConfig.Get();
-            var playArea = sceneConfig.getPlayArea(activator.playerPos);
+            var playArea = sceneConfig.getPlayArea(activator._playerPos);
             var restrictedArea = playArea.Inflate(-playerDimensions); // deflate play area!
             restrictedPlayer.setPlayArea(restrictedArea);
 
@@ -198,7 +198,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             Debug.Log($"headCollision name={name} mode={_playMode}");
             var oppositeTeam = ((IPlayerActor)this).OppositeTeam;
-            ScoreManager.addHeadScore(oppositeTeam);
+            ScoreManager.AddHeadScore(oppositeTeam);
             ballControl.catchABallFor(this);
         }
 

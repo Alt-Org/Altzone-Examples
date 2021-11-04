@@ -11,47 +11,47 @@ namespace Examples.Game.Scripts.Battle.Player
     /// </summary>
     public class PlayerActivator : MonoBehaviour
     {
-        public static readonly List<IPlayerActor> allPlayerActors = new List<IPlayerActor>();
-        public static int homeTeamIndex;
-        public static int localTeamIndex;
+        public static readonly List<IPlayerActor> AllPlayerActors = new List<IPlayerActor>();
+        public static int HomeTeamIndex;
+        public static int LocalTeamIndex;
 
-        [Header("Live Data")] public int playerPos;
-        public int teamIndex;
-        public bool isLocal;
-        public int oppositeTeamIndex;
-        public int teamMatePos;
-        public bool isAwake;
+        [Header("Live Data")] public int _playerPos;
+        public int _teamIndex;
+        public bool _isLocal;
+        public int _oppositeTeamIndex;
+        public int _teamMatePos;
+        public bool _isAwake;
 
         private void Awake()
         {
-            var _photonView = PhotonView.Get(this);
-            var player = _photonView.Owner;
-            PhotonBattle.getPlayerProperties(player, out playerPos, out teamIndex);
-            isLocal = _photonView.IsMine;
+            var photonView = PhotonView.Get(this);
+            var player = photonView.Owner;
+            PhotonBattle.getPlayerProperties(player, out _playerPos, out _teamIndex);
+            _isLocal = photonView.IsMine;
             if (player.IsMasterClient)
             {
                 // The player who created this room is in "home team"!
-                homeTeamIndex = teamIndex;
-                Debug.Log($"homeTeamIndex={homeTeamIndex} pos={playerPos}");
+                HomeTeamIndex = _teamIndex;
+                Debug.Log($"homeTeamIndex={HomeTeamIndex} pos={_playerPos}");
             }
-            if (isLocal)
+            if (_isLocal)
             {
-                Debug.Log($"localTeamIndex={localTeamIndex} pos={playerPos}");
-                localTeamIndex = teamIndex;
+                Debug.Log($"localTeamIndex={LocalTeamIndex} pos={_playerPos}");
+                LocalTeamIndex = _teamIndex;
             }
-            oppositeTeamIndex = getOppositeTeamIndex(teamIndex);
-            teamMatePos = getTeamMatePos(playerPos);
-            Debug.Log($"Awake {player.NickName} pos={playerPos} team={teamIndex}");
+            _oppositeTeamIndex = GETOppositeTeamIndex(_teamIndex);
+            _teamMatePos = GETTeamMatePos(_playerPos);
+            Debug.Log($"Awake {player.NickName} pos={_playerPos} team={_teamIndex}");
 
-            isAwake = true; // Signal that we have configured ourself
+            _isAwake = true; // Signal that we have configured ourself
         }
 
-        private static int getOppositeTeamIndex(int teamIndex)
+        private static int GETOppositeTeamIndex(int teamIndex)
         {
             return teamIndex == 0 ? 1 : 0;
         }
 
-        private static int getTeamMatePos(int playerPos)
+        private static int GETTeamMatePos(int playerPos)
         {
             switch (playerPos)
             {

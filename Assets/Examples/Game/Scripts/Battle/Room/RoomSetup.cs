@@ -26,9 +26,9 @@ namespace Examples.Game.Scripts.Battle.Room
         private void Awake()
         {
             Debug.Log($"Awake: {PhotonNetwork.NetworkClientState}");
-            PlayerActivator.allPlayerActors.Clear();
-            PlayerActivator.homeTeamIndex = -1;
-            PlayerActivator.localTeamIndex = -1;
+            PlayerActivator.AllPlayerActors.Clear();
+            PlayerActivator.HomeTeamIndex = -1;
+            PlayerActivator.LocalTeamIndex = -1;
             prepareCurrentStage();
         }
 
@@ -107,8 +107,8 @@ namespace Examples.Game.Scripts.Battle.Room
             }
             // TODO: this need more work to make it better and easier to understand
             // Save current player actor list for easy access later!
-            PlayerActivator.allPlayerActors.AddRange(playerActors);
-            Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.allPlayerActors.Count} ready");
+            PlayerActivator.AllPlayerActors.AddRange(playerActors);
+            Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.AllPlayerActors.Count} ready");
             // Now we can activate all players safely with two passes over them!
             foreach (var playerActor in playerActors)
             {
@@ -136,7 +136,7 @@ namespace Examples.Game.Scripts.Battle.Room
             foreach (var playerActor in playerActors)
             {
                 var activator = playerActor.GetComponent<PlayerActivator>();
-                if (activator.isAwake)
+                if (activator._isAwake)
                 {
                     activeCount += 1;
                 }
