@@ -1,6 +1,7 @@
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
 using System;
+using System.Collections;
 using TMPro;
 using UnityConstants;
 using UnityEngine;
@@ -10,29 +11,28 @@ namespace Examples2.Scripts.Battle.Ball
     [Serializable]
     internal class BallSettings
     {
-        [Header("Ball Setup")] public GameObject ballCollider;
-        public GameObject colorNoTeam;
-        public GameObject colorRedTeam;
-        public GameObject colorBlueTeam;
-        public GameObject colorGhosted;
-        public GameObject colorHidden;
-        public GameObject colorPlaceholder;
+        [Header("Ball Setup")] public GameObject _ballCollider;
+        public GameObject _colorNoTeam;
+        public GameObject _colorRedTeam;
+        public GameObject _colorBlueTeam;
+        public GameObject _colorGhosted;
+        public GameObject _colorHidden;
 
-        [Header("Layers")] public LayerMask teamAreaMask;
-        public LayerMask headMask;
-        public LayerMask shieldMask;
-        public LayerMask brickMask;
-        public LayerMask wallMask;
+        [Header("Layers")] public LayerMask _teamAreaMask;
+        public LayerMask _headMask;
+        public LayerMask _shieldMask;
+        public LayerMask _brickMask;
+        public LayerMask _wallMask;
 
-        [Header("Ball Constraints")] public float minBallSpeed;
-        public float maxBallSpeed;
+        [Header("Ball Constraints")] public float _minBallSpeed;
+        public float _maxBallSpeed;
     }
 
     [Serializable]
     internal class BallState
     {
-        public BallColor ballColor;
-        public bool isMoving;
+        public BallColor _ballColor;
+        public bool _isMoving;
     }
 
     internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
@@ -40,18 +40,19 @@ namespace Examples2.Scripts.Battle.Ball
         private const float BallTeleportDistance = 1f;
         private const float CheckVelocityDelay = 0.5f;
 
-        [SerializeField] private BallSettings settings;
-        [SerializeField] private BallState state;
+        [SerializeField] private BallSettings _settings;
+        [SerializeField] private BallState _state;
 
-        [Header("Photon"), SerializeField] private Vector2 networkPosition;
-        [SerializeField] private float networkLag;
+        [Header("Photon"), SerializeField] private Vector2 _networkPosition;
+        [SerializeField] private float _networkLag;
 
-        [Header("Debug"), SerializeField] private TMP_Text ballInfo;
+        [Header("Debug"), SerializeField] private TMP_Text _ballInfo;
+        private GameObject _ballInfoParent;
 
         private PhotonView _photonView;
         private Rigidbody2D _rigidbody;
 
-        [SerializeField] private float currentSpeed;
+        [SerializeField] private float _currentSpeed;
         private bool _isCheckVelocityTime;
         private float _checkVelocityTime;
 
@@ -72,6 +73,7 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void Awake()
         {
+            Debug.Log($"Awake");
             _photonView = PhotonView.Get(this);
             if (!_photonView.ObservedComponents.Contains(this))
             {
@@ -82,28 +84,29 @@ namespace Examples2.Scripts.Battle.Ball
             _rigidbody.isKinematic = !_photonView.IsMine;
             _stateObjects = new[] // This is indexed by BallColor!
             {
-                settings.colorPlaceholder,
-                settings.colorNoTeam,
-                settings.colorRedTeam,
-                settings.colorBlueTeam,
-                settings.colorGhosted,
-                settings.colorHidden
+                _settings._colorNoTeam,
+                _settings._colorRedTeam,
+                _settings._colorBlueTeam,
+                _settings._colorGhosted,
+                _settings._colorHidden
             };
-            _teamAreaMaskValue = settings.teamAreaMask.value;
-            _headMaskValue = settings.headMask.value;
-            _shieldMaskValue = settings.shieldMask.value;
-            _brickMaskValue = settings.brickMask.value;
-            _wallMaskValue = settings.wallMask.value;
+            _teamAreaMaskValue = _settings._teamAreaMask.value;
+            _headMaskValue = _settings._headMask.value;
+            _shieldMaskValue = _settings._shieldMask.value;
+            _brickMaskValue = _settings._brickMask.value;
+            _wallMaskValue = _settings._wallMask.value;
+            _ballInfoParent = _ballInfo.gameObject;
+            // We wait until networking etc has been established and all game clients are ready, then somebody should enable us.
+            // - remote clients can continue as there will be no network traffic yet!
+            if (_photonView.IsMine)
+            {
+                enabled = false;
+            }
         }
 
         private void OnEnable()
         {
-            if (_photonView.IsMine)
-            {
-                var ball = (IBall)this;
-                ball.StopMoving();
-                ball.SetColor(BallColor.Hidden);
-            }
+            Debug.Log($"OnEnable IsMine {_photonView.IsMine}");
         }
 
         #region Movement
@@ -117,11 +120,14 @@ namespace Examples2.Scripts.Battle.Ball
             }
             else
             {
-                networkPosition = (Vector2)stream.ReceiveNext();
+                _networkPosition = (Vector2)stream.ReceiveNext();
                 _rigidbody.velocity = (Vector2)stream.ReceiveNext();
 
-                networkLag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-                networkPosition += _rigidbody.velocity * networkLag;
+                _networkLag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+                _networkPosition += _rigidbody.velocity * _networkLag;
+
+                // Just for testing - this is expensive call!
+                _ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
             }
         }
 
@@ -130,29 +136,29 @@ namespace Examples2.Scripts.Battle.Ball
             if (!_photonView.IsMine)
             {
                 var position = _rigidbody.position;
-                var isTeleport = Mathf.Abs(position.x - networkPosition.x) > BallTeleportDistance ||
-                                 Mathf.Abs(position.y - networkPosition.y) > BallTeleportDistance;
+                var isTeleport = Mathf.Abs(position.x - _networkPosition.x) > BallTeleportDistance ||
+                                 Mathf.Abs(position.y - _networkPosition.y) > BallTeleportDistance;
                 _rigidbody.position = isTeleport
-                    ? networkPosition
-                    : Vector2.MoveTowards(position, networkPosition, Time.deltaTime);
+                    ? _networkPosition
+                    : Vector2.MoveTowards(position, _networkPosition, Time.deltaTime);
                 return;
             }
             if (_isCheckVelocityTime && _checkVelocityTime > Time.time)
             {
                 _isCheckVelocityTime = false;
-                if (!Mathf.Approximately(currentSpeed, _rigidbody.velocity.magnitude))
+                if (!Mathf.Approximately(_currentSpeed, _rigidbody.velocity.magnitude))
                 {
                     Debug.Log("fix velocity");
                     KeepConstantVelocity();
                 }
             }
             // Just for testing - this is expensive call!
-            ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
+            _ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
         }
 
         private void KeepConstantVelocity()
         {
-            _rigidbody.velocity = _rigidbody.velocity.normalized * currentSpeed;
+            _rigidbody.velocity = _rigidbody.velocity.normalized * _currentSpeed;
         }
 
         #endregion
@@ -269,28 +275,34 @@ namespace Examples2.Scripts.Battle.Ball
 
         void IBall.StopMoving()
         {
-            Debug.Log($"stopMoving {state.isMoving} <- {false}");
-            state.isMoving = false;
+            Debug.Log($"stopMoving {_state._isMoving} <- {false}");
+            _state._isMoving = false;
             if (_photonView.IsMine)
             {
-                settings.ballCollider.SetActive(false);
+                _settings._ballCollider.SetActive(false);
             }
-            currentSpeed = 0f;
+            _currentSpeed = 0f;
             _rigidbody.velocity = Vector2.zero;
         }
 
         void IBall.StartMoving(Vector2 position, Vector2 velocity)
         {
-            Debug.Log($"startMoving {state.isMoving} <- {true} position {position} velocity {velocity}");
-            state.isMoving = true;
             if (_photonView.IsMine)
             {
-                settings.ballCollider.SetActive(true);
+                // Hackish way to enable us
+                enabled = true;
             }
-            _rigidbody.position = position;
-            var speed = Mathf.Clamp(Mathf.Abs(velocity.magnitude), settings.minBallSpeed, settings.maxBallSpeed);
-            _rigidbody.velocity = velocity.normalized * speed;
-            currentSpeed = _rigidbody.velocity.magnitude;
+            Debug.Log($"startMoving {_state._isMoving} <- {true} position {position} velocity {velocity}");
+            _state._isMoving = true;
+            if (_photonView.IsMine)
+            {
+                _settings._ballCollider.SetActive(true);
+
+                _rigidbody.position = position;
+                var speed = Mathf.Clamp(Mathf.Abs(velocity.magnitude), _settings._minBallSpeed, _settings._maxBallSpeed);
+                _rigidbody.velocity = velocity.normalized * speed;
+                _currentSpeed = _rigidbody.velocity.magnitude;
+            }
         }
 
         void IBall.SetColor(BallColor ballColor)
@@ -310,9 +322,10 @@ namespace Examples2.Scripts.Battle.Ball
         private void _setBallColorLocal(BallColor ballColor)
         {
             //Debug.Log($"setColor {state.ballColor} <- {ballColor}");
-            _stateObjects[(int)state.ballColor].SetActive(false);
-            state.ballColor = ballColor;
-            _stateObjects[(int)state.ballColor].SetActive(true);
+            _stateObjects[(int)_state._ballColor].SetActive(false);
+            _state._ballColor = ballColor;
+            _stateObjects[(int)_state._ballColor].SetActive(true);
+            _ballInfoParent.SetActive(ballColor != BallColor.Hidden);
         }
 
         #endregion

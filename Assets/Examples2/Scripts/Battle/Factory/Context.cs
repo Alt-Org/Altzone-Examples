@@ -13,8 +13,8 @@ namespace Examples2.Scripts.Battle.Factory
     /// </remarks>
     internal static class Context
     {
-        internal static IBall GETBall => Object.FindObjectOfType<BallActor>();
+        internal static IBall GetBall => Object.FindObjectOfType<BallActor>();
 
-        internal static IBrickManager GETBrickManager => Object.FindObjectOfType<BrickManager>();
+        internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
     }
 }

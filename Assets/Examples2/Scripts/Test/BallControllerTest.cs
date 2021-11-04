@@ -1,8 +1,9 @@
+using System;
+using System.Collections;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
-using System;
-using System.Collections;
+using UnityConstants;
 using UnityEngine;
 
 namespace Examples2.Scripts.Test
@@ -12,18 +13,18 @@ namespace Examples2.Scripts.Test
         [Serializable]
         internal class State
         {
-            public bool isRedTeamActive;
-            public bool isBlueTeamActive;
+            public bool _isRedTeamActive;
+            public bool _isBlueTeamActive;
         }
 
-        [SerializeField] private State state;
+        [SerializeField] private State _state;
 
-        [Header("Debug Only")] public Vector2 ballVelocity;
-        public bool startBallMoving;
-        public bool stopBallMoving;
-        public bool hideBall;
-        public bool showBall;
-        public bool ghostBall;
+        [Header("Debug Only")] public Vector2 _ballVelocity;
+        public bool _startBallMoving;
+        public bool _stopBallMoving;
+        public bool _hideBall;
+        public bool _showBall;
+        public bool _ghostBall;
 
         private IBall _ball;
         private IBrickManager _brickManager;
@@ -34,8 +35,8 @@ namespace Examples2.Scripts.Test
             {
                 enabled = false;
             }
-            _ball = Context.GETBall;
-            _brickManager = Context.GETBrickManager;
+            _ball = Context.GetBall;
+            _brickManager = Context.GetBrickManager;
             var ballCollision = _ball.BallCollision;
             ballCollision.OnHeadCollision = OnHeadCollision;
             ballCollision.OnShieldCollision = OnShieldCollision;
@@ -47,51 +48,51 @@ namespace Examples2.Scripts.Test
 
         private IEnumerator Start()
         {
-            _ball.SetColor(BallColor.Hidden);
-            if (startBallMoving)
+            if (_startBallMoving)
             {
-                startBallMoving = false;
+                _startBallMoving = false;
+                // Networking takes some time to establish ready state
                 yield return new WaitForSeconds(1f);
-                startBallMoving = true;
+                _startBallMoving = true;
             }
-            stopBallMoving = false;
-            hideBall = false;
-            showBall = false;
-            ghostBall = false;
+            _stopBallMoving = false;
+            _hideBall = false;
+            _showBall = false;
+            _ghostBall = false;
         }
 
         private void Update()
         {
-            if (startBallMoving)
+            if (_startBallMoving)
             {
-                startBallMoving = false;
+                _startBallMoving = false;
                 _ball.SetColor(BallColor.NoTeam);
                 var position = GetComponent<Rigidbody2D>().position;
-                _ball.StartMoving(position, ballVelocity);
+                _ball.StartMoving(position, _ballVelocity);
                 return;
             }
-            if (stopBallMoving)
+            if (_stopBallMoving)
             {
-                stopBallMoving = false;
+                _stopBallMoving = false;
                 _ball.StopMoving();
                 _ball.SetColor(BallColor.Ghosted);
             }
-            if (hideBall)
+            if (_hideBall)
             {
-                hideBall = false;
+                _hideBall = false;
                 _ball.StopMoving();
                 _ball.SetColor(BallColor.Hidden);
                 return;
             }
-            if (showBall)
+            if (_showBall)
             {
-                showBall = false;
+                _showBall = false;
                 _ball.SetColor(BallColor.NoTeam);
                 return;
             }
-            if (ghostBall)
+            if (_ghostBall)
             {
-                ghostBall = false;
+                _ghostBall = false;
                 _ball.SetColor(BallColor.Ghosted);
             }
         }
@@ -124,13 +125,13 @@ namespace Examples2.Scripts.Test
             //Debug.Log($"onEnterTeamArea {other.name} {other.tag}");
             switch (other.tag)
             {
-                case UnityConstants.Tags.RedTeam:
-                    state.isRedTeamActive = true;
-                    SetBallColor(_ball, state);
+                case Tags.RedTeam:
+                    _state._isRedTeamActive = true;
+                    SetBallColor(_ball, _state);
                     return;
-                case UnityConstants.Tags.BlueTeam:
-                    state.isBlueTeamActive = true;
-                    SetBallColor(_ball, state);
+                case Tags.BlueTeam:
+                    _state._isBlueTeamActive = true;
+                    SetBallColor(_ball, _state);
                     return;
             }
             Debug.Log($"UNHANDLED onEnterTeamArea {other.name} {other.tag}");
@@ -141,13 +142,13 @@ namespace Examples2.Scripts.Test
             //Debug.Log($"onExitTeamArea {other.name} {other.tag}");
             switch (other.tag)
             {
-                case UnityConstants.Tags.RedTeam:
-                    state.isRedTeamActive = false;
-                    SetBallColor(_ball, state);
+                case Tags.RedTeam:
+                    _state._isRedTeamActive = false;
+                    SetBallColor(_ball, _state);
                     return;
-                case UnityConstants.Tags.BlueTeam:
-                    state.isBlueTeamActive = false;
-                    SetBallColor(_ball, state);
+                case Tags.BlueTeam:
+                    _state._isBlueTeamActive = false;
+                    SetBallColor(_ball, _state);
                     return;
             }
             Debug.Log($"UNHANDLED onExitTeamArea {other.name} {other.tag}");
@@ -157,12 +158,12 @@ namespace Examples2.Scripts.Test
 
         private static void SetBallColor(IBall ball, State state)
         {
-            if (state.isRedTeamActive && !state.isBlueTeamActive)
+            if (state._isRedTeamActive && !state._isBlueTeamActive)
             {
                 ball.SetColor(BallColor.RedTeam);
                 return;
             }
-            if (state.isBlueTeamActive && !state.isRedTeamActive)
+            if (state._isBlueTeamActive && !state._isRedTeamActive)
             {
                 ball.SetColor(BallColor.BlueTeam);
                 return;

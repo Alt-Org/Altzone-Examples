@@ -207,7 +207,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &25514628
 SpriteRenderer:
@@ -2535,7 +2535,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &528197332
 Transform:
   m_ObjectHideFlags: 0
@@ -2548,7 +2548,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &528197333
 SpriteRenderer:
@@ -3158,7 +3158,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &707748695
 SpriteRenderer:
@@ -4668,7 +4668,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1002994372
 SpriteRenderer:
@@ -6939,7 +6939,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1407378977
 SpriteRenderer:
@@ -7146,7 +7146,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1463858628
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7156,9 +7156,9 @@ RectTransform:
   m_GameObject: {fileID: 1463858627}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1491261275}
+  m_Father: {fileID: 1685972413}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -7331,10 +7331,9 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
-  m_Children:
-  - {fileID: 1463858628}
+  m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &1491261278
 CircleCollider2D:
@@ -8147,6 +8146,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1463858628}
   - {fileID: 1491261275}
   - {fileID: 707748694}
   - {fileID: 1407378976}
@@ -8169,15 +8169,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee4863c094d4f829a3148a2c6d0b303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state:
-    isRedTeamActive: 0
-    isBlueTeamActive: 0
-  ballVelocity: {x: 5, y: 5}
-  startBallMoving: 1
-  stopBallMoving: 0
-  hideBall: 0
-  showBall: 0
-  ghostBall: 0
+  _state:
+    _isRedTeamActive: 0
+    _isBlueTeamActive: 0
+  _ballVelocity: {x: 5, y: 5}
+  _startBallMoving: 1
+  _stopBallMoving: 0
+  _hideBall: 0
+  _showBall: 0
+  _ghostBall: 0
 --- !u!114 &1685972415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8190,37 +8190,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ae2482754fb4d4380e7c4c6dbd7f4dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings:
-    ballCollider: {fileID: 1491261274}
-    colorNoTeam: {fileID: 707748693}
-    colorRedTeam: {fileID: 1407378975}
-    colorBlueTeam: {fileID: 1002994370}
-    colorGhosted: {fileID: 1799714950}
-    colorHidden: {fileID: 25514626}
-    colorPlaceholder: {fileID: 528197331}
-    teamAreaMask:
+  _settings:
+    _ballCollider: {fileID: 1491261274}
+    _colorNoTeam: {fileID: 707748693}
+    _colorRedTeam: {fileID: 1407378975}
+    _colorBlueTeam: {fileID: 1002994370}
+    _colorGhosted: {fileID: 1799714950}
+    _colorHidden: {fileID: 25514626}
+    _teamAreaMask:
       serializedVersion: 2
       m_Bits: 8192
-    headMask:
+    _headMask:
       serializedVersion: 2
       m_Bits: 1024
-    shieldMask:
+    _shieldMask:
       serializedVersion: 2
       m_Bits: 256
-    brickMask:
+    _brickMask:
       serializedVersion: 2
       m_Bits: 16384
-    wallMask:
+    _wallMask:
       serializedVersion: 2
       m_Bits: 2048
-    minBallSpeed: 2
-    maxBallSpeed: 10
-  state:
-    ballColor: 0
-    isMoving: 0
-  networkPosition: {x: 0, y: 0}
-  networkLag: 0
-  ballInfo: {fileID: 1463858629}
+    _minBallSpeed: 2
+    _maxBallSpeed: 20
+  _state:
+    _ballColor: 0
+    _isMoving: 0
+  _networkPosition: {x: 0, y: 0}
+  _networkLag: 0
+  _ballInfo: {fileID: 1463858629}
+  _currentSpeed: 0
 --- !u!114 &1685972416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8576,7 +8576,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1685972413}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1799714952
 SpriteRenderer:
