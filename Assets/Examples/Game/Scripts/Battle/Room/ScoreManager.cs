@@ -2,6 +2,8 @@ using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using System;
+using Examples.Config.Scripts;
+using Examples.Game.Scripts.Battle.Player;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Room
@@ -77,6 +79,7 @@ namespace Examples.Game.Scripts.Battle.Room
         {
             this.Subscribe<TeamScoreEvent>(onTeamScoreEvent);
             // Set initial state for scores
+            SendTeamNames();
             this.Publish(new TeamScoreEvent(scores[0]));
             this.Publish(new TeamScoreEvent(scores[1]));
         }
@@ -84,6 +87,24 @@ namespace Examples.Game.Scripts.Battle.Room
         private void OnDisable()
         {
             this.Unsubscribe();
+        }
+
+        private void SendTeamNames()
+        {
+            var room = PhotonNetwork.CurrentRoom;
+            string teamRedName;
+            string teamBlueName;
+            if (PlayerActivator.homeTeamIndex == 0)
+            {
+                teamRedName = room.GetCustomProperty<string>(PhotonBattle.TeamRedKey);
+                teamBlueName = room.GetCustomProperty<string>(PhotonBattle.TeamBlueKey);
+            }
+            else
+            {
+                teamRedName = room.GetCustomProperty<string>(PhotonBattle.TeamBlueKey);
+                teamBlueName = room.GetCustomProperty<string>(PhotonBattle.TeamRedKey);
+            }
+            this.Publish(new TeamNameEvent(teamRedName, teamBlueName));
         }
 
         private void sendSetTeamScore(TeamScore score)
@@ -147,6 +168,18 @@ namespace Examples.Game.Scripts.Battle.Room
                 {
                     Get()._addWallScore(1);
                 }
+            }
+        }
+
+        internal class TeamNameEvent
+        {
+            public readonly string TeamRedName;
+            public readonly string TeamBlueName;
+
+            public TeamNameEvent(string teamRedName, string teamBlueName)
+            {
+                TeamRedName = teamRedName;
+                TeamBlueName = teamBlueName;
             }
         }
 
