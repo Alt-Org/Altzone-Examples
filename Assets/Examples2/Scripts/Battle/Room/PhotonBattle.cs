@@ -13,10 +13,10 @@ namespace Examples2.Scripts.Battle.Room
     internal static class PhotonBattle
     {
         private const string PlayerNameKey = "PlayerData.PlayerName";
-        private const string playerPositionKey = "pp";
-        private const string playerMainSkillKey = "mk";
+        private const string PlayerPositionKey = "pp";
+        private const string PlayerMainSkillKey = "mk";
 
-        public static string getLocalPlayerName()
+        public static string GetLocalPlayerName()
         {
             if (PhotonNetwork.InRoom)
             {
@@ -31,23 +31,23 @@ namespace Examples2.Scripts.Battle.Room
             return playerName;
         }
 
-        public static bool isRealPlayer(Player player)
+        public static bool IsRealPlayer(Player player)
         {
-            var playerPos = player.GetCustomProperty(playerPositionKey, -1);
+            var playerPos = player.GetCustomProperty(PlayerPositionKey, -1);
             return playerPos >= 0 && playerPos <= 3;
         }
 
-        public static int getPlayerPos(Player player)
+        public static int GetPlayerPos(Player player)
         {
-            return player.GetCustomProperty(playerPositionKey, -1);
+            return player.GetCustomProperty(PlayerPositionKey, -1);
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void setDebugPlayerPos(Player player, int playerPos)
+        public static void SetDebugPlayerPos(Player player, int playerPos)
         {
             player.SetCustomProperties(new Hashtable
             {
-                { playerPositionKey, playerPos },
+                { PlayerPositionKey, playerPos }
                 //{ playerMainSkillKey, (int)Defence.Deflection }
             });
             Debug.Log($"setDebugPlayerProps {player.GetDebugLabel()}");

@@ -7,24 +7,19 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     public class IdMarker : MonoBehaviour
     {
-        private static int idCounter;
+        private static int _idCounter;
 
-        [SerializeField] private int _id;
+        [SerializeField] private int id;
 
         public int Id
         {
-            get => _id;
-            set => _id = value;
+            get => id;
+            set => id = value;
         }
 
         private void Awake()
         {
-            _id = ++idCounter;
-        }
-
-        public override string ToString()
-        {
-            return $"{gameObject.name}#{_id}";
+            id = ++_idCounter;
         }
     }
 }

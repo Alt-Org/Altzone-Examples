@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Test
 {
-
     internal class BallControllerTest : MonoBehaviour
     {
         [Serializable]
@@ -26,8 +25,8 @@ namespace Examples2.Scripts.Test
         public bool showBall;
         public bool ghostBall;
 
-        private IBall ball;
-        private IBrickManager brickManager;
+        private IBall _ball;
+        private IBrickManager _brickManager;
 
         private void Awake()
         {
@@ -35,20 +34,20 @@ namespace Examples2.Scripts.Test
             {
                 enabled = false;
             }
-            ball = Context.getBall;
-            brickManager = Context.getBrickManager;
-            var ballCollision = ball.ballCollision;
-            ballCollision.onHeadCollision = onHeadCollision;
-            ballCollision.onShieldCollision = onShieldCollision;
-            ballCollision.onBrickCollision = onBrickCollision;
-            ballCollision.onWallCollision = onWallCollision;
-            ballCollision.onEnterTeamArea = onEnterTeamArea;
-            ballCollision.onExitTeamArea = onExitTeamArea;
+            _ball = Context.GETBall;
+            _brickManager = Context.GETBrickManager;
+            var ballCollision = _ball.BallCollision;
+            ballCollision.OnHeadCollision = OnHeadCollision;
+            ballCollision.OnShieldCollision = OnShieldCollision;
+            ballCollision.OnBrickCollision = OnBrickCollision;
+            ballCollision.OnWallCollision = OnWallCollision;
+            ballCollision.OnEnterTeamArea = OnEnterTeamArea;
+            ballCollision.OnExitTeamArea = OnExitTeamArea;
         }
 
         private IEnumerator Start()
         {
-            ball.setColor(BallColor.Hidden);
+            _ball.SetColor(BallColor.Hidden);
             if (startBallMoving)
             {
                 startBallMoving = false;
@@ -66,89 +65,89 @@ namespace Examples2.Scripts.Test
             if (startBallMoving)
             {
                 startBallMoving = false;
-                ball.setColor(BallColor.NoTeam);
+                _ball.SetColor(BallColor.NoTeam);
                 var position = GetComponent<Rigidbody2D>().position;
-                ball.startMoving(position, ballVelocity);
+                _ball.StartMoving(position, ballVelocity);
                 return;
             }
             if (stopBallMoving)
             {
                 stopBallMoving = false;
-                ball.stopMoving();
-                ball.setColor(BallColor.Ghosted);
+                _ball.StopMoving();
+                _ball.SetColor(BallColor.Ghosted);
             }
             if (hideBall)
             {
                 hideBall = false;
-                ball.stopMoving();
-                ball.setColor(BallColor.Hidden);
+                _ball.StopMoving();
+                _ball.SetColor(BallColor.Hidden);
                 return;
             }
             if (showBall)
             {
                 showBall = false;
-                ball.setColor(BallColor.NoTeam);
+                _ball.SetColor(BallColor.NoTeam);
                 return;
             }
             if (ghostBall)
             {
                 ghostBall = false;
-                ball.setColor(BallColor.Ghosted);
+                _ball.SetColor(BallColor.Ghosted);
             }
         }
 
         #region IBallCollision callback events
 
-        private void onHeadCollision(GameObject other)
+        private void OnHeadCollision(GameObject other)
         {
             Debug.Log($"onHeadCollision {other.name}");
         }
 
-        private void onShieldCollision(GameObject other)
+        private void OnShieldCollision(GameObject other)
         {
             Debug.Log($"onShieldCollision {other.name}");
         }
 
-        private void onBrickCollision(GameObject other)
+        private void OnBrickCollision(GameObject other)
         {
             //Debug.Log($"onBrickCollision {other.name}");
-            brickManager.deleteBrick(other);
+            _brickManager.DeleteBrick(other);
         }
 
-        private void onWallCollision(GameObject other)
+        private void OnWallCollision(GameObject other)
         {
             Debug.Log($"onWallCollision {other.name} {other.tag}");
         }
 
-        private void onEnterTeamArea(GameObject other)
+        private void OnEnterTeamArea(GameObject other)
         {
             //Debug.Log($"onEnterTeamArea {other.name} {other.tag}");
             switch (other.tag)
             {
                 case UnityConstants.Tags.RedTeam:
                     state.isRedTeamActive = true;
-                    setBallColor(ball, state);
+                    SetBallColor(_ball, state);
                     return;
                 case UnityConstants.Tags.BlueTeam:
                     state.isBlueTeamActive = true;
-                    setBallColor(ball, state);
+                    SetBallColor(_ball, state);
                     return;
             }
             Debug.Log($"UNHANDLED onEnterTeamArea {other.name} {other.tag}");
         }
 
-        private void onExitTeamArea(GameObject other)
+        private void OnExitTeamArea(GameObject other)
         {
             //Debug.Log($"onExitTeamArea {other.name} {other.tag}");
             switch (other.tag)
             {
                 case UnityConstants.Tags.RedTeam:
                     state.isRedTeamActive = false;
-                    setBallColor(ball, state);
+                    SetBallColor(_ball, state);
                     return;
                 case UnityConstants.Tags.BlueTeam:
                     state.isBlueTeamActive = false;
-                    setBallColor(ball, state);
+                    SetBallColor(_ball, state);
                     return;
             }
             Debug.Log($"UNHANDLED onExitTeamArea {other.name} {other.tag}");
@@ -156,19 +155,19 @@ namespace Examples2.Scripts.Test
 
         #endregion
 
-        private static void setBallColor(IBall ball, State state)
+        private static void SetBallColor(IBall ball, State state)
         {
             if (state.isRedTeamActive && !state.isBlueTeamActive)
             {
-                ball.setColor(BallColor.RedTeam);
+                ball.SetColor(BallColor.RedTeam);
                 return;
             }
             if (state.isBlueTeamActive && !state.isRedTeamActive)
             {
-                ball.setColor(BallColor.BlueTeam);
+                ball.SetColor(BallColor.BlueTeam);
                 return;
             }
-            ball.setColor(BallColor.NoTeam);
+            ball.SetColor(BallColor.NoTeam);
         }
     }
 }

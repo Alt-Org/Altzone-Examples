@@ -37,8 +37,8 @@ namespace Examples2.Scripts.Battle.Ball
 
     internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
     {
-        private const float ballTeleportDistance = 1f;
-        private const float checkVelocityDelay = 0.5f;
+        private const float BallTeleportDistance = 1f;
+        private const float CheckVelocityDelay = 0.5f;
 
         [SerializeField] private BallSettings settings;
         [SerializeField] private BallState state;
@@ -52,16 +52,16 @@ namespace Examples2.Scripts.Battle.Ball
         private Rigidbody2D _rigidbody;
 
         [SerializeField] private float currentSpeed;
-        private bool isCheckVelocityTime;
-        private float checkVelocityTime;
+        private bool _isCheckVelocityTime;
+        private float _checkVelocityTime;
 
-        private GameObject[] stateObjects;
+        private GameObject[] _stateObjects;
 
-        private int teamAreaMaskValue;
-        private int headMaskValue;
-        private int shieldMaskValue;
-        private int brickMaskValue;
-        private int wallMaskValue;
+        private int _teamAreaMaskValue;
+        private int _headMaskValue;
+        private int _shieldMaskValue;
+        private int _brickMaskValue;
+        private int _wallMaskValue;
 
         private Action<GameObject> _onHeadCollision;
         private Action<GameObject> _onShieldCollision;
@@ -80,20 +80,20 @@ namespace Examples2.Scripts.Battle.Ball
             }
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.isKinematic = !_photonView.IsMine;
-            stateObjects = new[] // This is indexed by BallColor!
+            _stateObjects = new[] // This is indexed by BallColor!
             {
                 settings.colorPlaceholder,
                 settings.colorNoTeam,
                 settings.colorRedTeam,
                 settings.colorBlueTeam,
                 settings.colorGhosted,
-                settings.colorHidden,
+                settings.colorHidden
             };
-            teamAreaMaskValue = settings.teamAreaMask.value;
-            headMaskValue = settings.headMask.value;
-            shieldMaskValue = settings.shieldMask.value;
-            brickMaskValue = settings.brickMask.value;
-            wallMaskValue = settings.wallMask.value;
+            _teamAreaMaskValue = settings.teamAreaMask.value;
+            _headMaskValue = settings.headMask.value;
+            _shieldMaskValue = settings.shieldMask.value;
+            _brickMaskValue = settings.brickMask.value;
+            _wallMaskValue = settings.wallMask.value;
         }
 
         private void OnEnable()
@@ -101,8 +101,8 @@ namespace Examples2.Scripts.Battle.Ball
             if (_photonView.IsMine)
             {
                 var ball = (IBall)this;
-                ball.stopMoving();
-                ball.setColor(BallColor.Hidden);
+                ball.StopMoving();
+                ball.SetColor(BallColor.Hidden);
             }
         }
 
@@ -130,27 +130,27 @@ namespace Examples2.Scripts.Battle.Ball
             if (!_photonView.IsMine)
             {
                 var position = _rigidbody.position;
-                var isTeleport = Mathf.Abs(position.x - networkPosition.x) > ballTeleportDistance ||
-                                 Mathf.Abs(position.y - networkPosition.y) > ballTeleportDistance;
+                var isTeleport = Mathf.Abs(position.x - networkPosition.x) > BallTeleportDistance ||
+                                 Mathf.Abs(position.y - networkPosition.y) > BallTeleportDistance;
                 _rigidbody.position = isTeleport
                     ? networkPosition
                     : Vector2.MoveTowards(position, networkPosition, Time.deltaTime);
                 return;
             }
-            if (isCheckVelocityTime && checkVelocityTime > Time.time)
+            if (_isCheckVelocityTime && _checkVelocityTime > Time.time)
             {
-                isCheckVelocityTime = false;
+                _isCheckVelocityTime = false;
                 if (!Mathf.Approximately(currentSpeed, _rigidbody.velocity.magnitude))
                 {
                     Debug.Log("fix velocity");
-                    keepConstantVelocity();
+                    KeepConstantVelocity();
                 }
             }
             // Just for testing - this is expensive call!
             ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
         }
 
-        private void keepConstantVelocity()
+        private void KeepConstantVelocity()
         {
             _rigidbody.velocity = _rigidbody.velocity.normalized * currentSpeed;
         }
@@ -175,7 +175,7 @@ namespace Examples2.Scripts.Battle.Ball
             if (!otherGameObject.CompareTag(Tags.Untagged))
             {
                 var colliderMask = 1 << layer;
-                if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onEnterTeamArea))
+                if (CallbackEvent(_teamAreaMaskValue, colliderMask, otherGameObject, _onEnterTeamArea))
                 {
                     return;
                 }
@@ -199,7 +199,7 @@ namespace Examples2.Scripts.Battle.Ball
             if (!otherGameObject.CompareTag(Tags.Untagged))
             {
                 var colliderMask = 1 << layer;
-                if (callbackEvent(teamAreaMaskValue, colliderMask, otherGameObject, _onExitTeamArea))
+                if (CallbackEvent(_teamAreaMaskValue, colliderMask, otherGameObject, _onExitTeamArea))
                 {
                     return;
                 }
@@ -213,8 +213,8 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
             }
-            isCheckVelocityTime = true;
-            checkVelocityTime = Time.time + checkVelocityDelay;
+            _isCheckVelocityTime = true;
+            _checkVelocityTime = Time.time + CheckVelocityDelay;
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
             if (layer == 0)
@@ -223,19 +223,19 @@ namespace Examples2.Scripts.Battle.Ball
                 return;
             }
             var colliderMask = 1 << layer;
-            if (callbackEvent(headMaskValue, colliderMask, otherGameObject, _onHeadCollision))
+            if (CallbackEvent(_headMaskValue, colliderMask, otherGameObject, _onHeadCollision))
             {
                 return;
             }
-            if (callbackEvent(shieldMaskValue, colliderMask, otherGameObject, _onShieldCollision))
+            if (CallbackEvent(_shieldMaskValue, colliderMask, otherGameObject, _onShieldCollision))
             {
                 return;
             }
-            if (callbackEvent(brickMaskValue, colliderMask, otherGameObject, _onBrickCollision))
+            if (CallbackEvent(_brickMaskValue, colliderMask, otherGameObject, _onBrickCollision))
             {
                 return;
             }
-            if (isCallbackEvent(wallMaskValue, colliderMask))
+            if (IsCallbackEvent(_wallMaskValue, colliderMask))
             {
                 if (!otherGameObject.CompareTag(Tags.Untagged))
                 {
@@ -246,12 +246,12 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"UNHANDLED collision_enter {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
         }
 
-        private static bool isCallbackEvent(int maskValue, int colliderMask)
+        private static bool IsCallbackEvent(int maskValue, int colliderMask)
         {
             return maskValue == (maskValue | colliderMask);
         }
 
-        private static bool callbackEvent(int maskValue, int colliderMask, GameObject gameObject, Action<GameObject> callback)
+        private static bool CallbackEvent(int maskValue, int colliderMask, GameObject gameObject, Action<GameObject> callback)
         {
             if (maskValue == (maskValue | colliderMask))
             {
@@ -265,9 +265,9 @@ namespace Examples2.Scripts.Battle.Ball
 
         #region IBall
 
-        IBallCollision IBall.ballCollision => this;
+        IBallCollision IBall.BallCollision => this;
 
-        void IBall.stopMoving()
+        void IBall.StopMoving()
         {
             Debug.Log($"stopMoving {state.isMoving} <- {false}");
             state.isMoving = false;
@@ -279,7 +279,7 @@ namespace Examples2.Scripts.Battle.Ball
             _rigidbody.velocity = Vector2.zero;
         }
 
-        void IBall.startMoving(Vector2 position, Vector2 velocity)
+        void IBall.StartMoving(Vector2 position, Vector2 velocity)
         {
             Debug.Log($"startMoving {state.isMoving} <- {true} position {position} velocity {velocity}");
             state.isMoving = true;
@@ -293,16 +293,16 @@ namespace Examples2.Scripts.Battle.Ball
             currentSpeed = _rigidbody.velocity.magnitude;
         }
 
-        void IBall.setColor(BallColor ballColor)
+        void IBall.SetColor(BallColor ballColor)
         {
             if (_photonView.IsMine)
             {
-                _photonView.RPC(nameof(setBallColorRpc), RpcTarget.All, (byte)ballColor);
+                _photonView.RPC(nameof(SetBallColorRpc), RpcTarget.All, (byte)ballColor);
             }
         }
 
         [PunRPC]
-        private void setBallColorRpc(byte ballColor)
+        private void SetBallColorRpc(byte ballColor)
         {
             _setBallColorLocal((BallColor)ballColor);
         }
@@ -310,46 +310,46 @@ namespace Examples2.Scripts.Battle.Ball
         private void _setBallColorLocal(BallColor ballColor)
         {
             //Debug.Log($"setColor {state.ballColor} <- {ballColor}");
-            stateObjects[(int)state.ballColor].SetActive(false);
+            _stateObjects[(int)state.ballColor].SetActive(false);
             state.ballColor = ballColor;
-            stateObjects[(int)state.ballColor].SetActive(true);
+            _stateObjects[(int)state.ballColor].SetActive(true);
         }
 
         #endregion
 
         #region IBallCollision
 
-        Action<GameObject> IBallCollision.onHeadCollision
+        Action<GameObject> IBallCollision.OnHeadCollision
         {
             get => _onHeadCollision;
             set => _onHeadCollision = value;
         }
 
-        Action<GameObject> IBallCollision.onShieldCollision
+        Action<GameObject> IBallCollision.OnShieldCollision
         {
             get => _onShieldCollision;
             set => _onShieldCollision = value;
         }
 
-        Action<GameObject> IBallCollision.onWallCollision
+        Action<GameObject> IBallCollision.OnWallCollision
         {
             get => _onWallCollision;
             set => _onWallCollision = value;
         }
 
-        Action<GameObject> IBallCollision.onBrickCollision
+        Action<GameObject> IBallCollision.OnBrickCollision
         {
             get => _onBrickCollision;
             set => _onBrickCollision = value;
         }
 
-        Action<GameObject> IBallCollision.onEnterTeamArea
+        Action<GameObject> IBallCollision.OnEnterTeamArea
         {
             get => _onEnterTeamArea;
             set => _onEnterTeamArea = value;
         }
 
-        Action<GameObject> IBallCollision.onExitTeamArea
+        Action<GameObject> IBallCollision.OnExitTeamArea
         {
             get => _onExitTeamArea;
             set => _onExitTeamArea = value;

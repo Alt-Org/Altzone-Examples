@@ -28,7 +28,7 @@ namespace Examples2.Scripts.Battle.Room
             }
             if (PhotonNetwork.InRoom)
             {
-                continueToNextStage();
+                ContinueToNextStage();
                 enabled = false;
             }
         }
@@ -40,7 +40,7 @@ namespace Examples2.Scripts.Battle.Room
             if (state == ClientState.PeerCreated || state == ClientState.Disconnected)
             {
                 Debug.Log($"connect: {PhotonNetwork.NetworkClientState}");
-                var playerName = PhotonBattle.getLocalPlayerName();
+                var playerName = PhotonBattle.GetLocalPlayerName();
                 PhotonNetwork.OfflineMode = isOfflineMode;
                 if (isOfflineMode)
                 {
@@ -56,18 +56,18 @@ namespace Examples2.Scripts.Battle.Room
             throw new UnityException($"OnEnable: invalid connection state: {PhotonNetwork.NetworkClientState}");
         }
 
-        private void continueToNextStage()
+        private void ContinueToNextStage()
         {
             if (PhotonNetwork.IsMasterClient)
             {
                 // Mark room "closed"
-                PhotonLobby.closeRoom(keepVisible: true);
+                PhotonLobby.closeRoom(true);
             }
             // Enable game objects when this room stage is ready to play
-            StartCoroutine(activateObjects(objectsToActivate));
+            StartCoroutine(ActivateObjects(objectsToActivate));
         }
 
-        private static IEnumerator activateObjects(GameObject[] objectsToActivate)
+        private static IEnumerator ActivateObjects(GameObject[] objectsToActivate)
         {
             // Enable game objects one per frame in array sequence
             for (var i = 0; i < objectsToActivate.LongLength; i++)
@@ -94,14 +94,14 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            PhotonBattle.setDebugPlayerPos(PhotonNetwork.LocalPlayer, debugPlayerPos);
+            PhotonBattle.SetDebugPlayerPos(PhotonNetwork.LocalPlayer, debugPlayerPos);
         }
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             var player = PhotonNetwork.LocalPlayer;
             Debug.Log($"Start game for: {player.GetDebugLabel()}");
-            continueToNextStage();
+            ContinueToNextStage();
         }
     }
 }

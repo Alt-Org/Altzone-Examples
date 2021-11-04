@@ -7,7 +7,7 @@ namespace Examples2.Scripts.Battle.interfaces
     {
         None,
         Red,
-        Blue,
+        Blue
     }
 
     internal enum BallColor : byte
@@ -17,24 +17,24 @@ namespace Examples2.Scripts.Battle.interfaces
         RedTeam = 2,
         BlueTeam = 3,
         Ghosted = 4,
-        Hidden = 5,
+        Hidden = 5
     }
 
     internal interface IBall
     {
-        IBallCollision ballCollision { get; }
-        void stopMoving();
-        void startMoving(Vector2 position, Vector2 velocity);
-        void setColor(BallColor ballColor);
+        IBallCollision BallCollision { get; }
+        void StopMoving();
+        void StartMoving(Vector2 position, Vector2 velocity);
+        void SetColor(BallColor ballColor);
     }
 
     internal interface IBallCollision
     {
-        Action<GameObject> onHeadCollision { get; set; }
-        Action<GameObject> onShieldCollision { get; set; }
-        Action<GameObject> onBrickCollision { get; set; }
-        Action<GameObject> onWallCollision { get; set; }
-        Action<GameObject> onEnterTeamArea { get; set; }
-        Action<GameObject> onExitTeamArea { get; set; }
+        Action<GameObject> OnHeadCollision { get; set; }
+        Action<GameObject> OnShieldCollision { get; set; }
+        Action<GameObject> OnBrickCollision { get; set; }
+        Action<GameObject> OnWallCollision { get; set; }
+        Action<GameObject> OnEnterTeamArea { get; set; }
+        Action<GameObject> OnExitTeamArea { get; set; }
     }
 }

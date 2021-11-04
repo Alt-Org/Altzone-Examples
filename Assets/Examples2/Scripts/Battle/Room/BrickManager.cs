@@ -11,50 +11,50 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     public class BrickManager : MonoBehaviour, IBrickManager
     {
-        private const int msgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 0;
+        private const int MsgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 0;
 
         [Header("Settings"), SerializeField] private GameObject upperBricks;
         [SerializeField] private GameObject lowerBricks;
 
-        private readonly Dictionary<int, IdMarker> bricks = new Dictionary<int, IdMarker>();
+        private readonly Dictionary<int, IdMarker> _bricks = new Dictionary<int, IdMarker>();
 
-        private PhotonEventDispatcher photonEventDispatcher;
+        private PhotonEventDispatcher _photonEventDispatcher;
 
         private void Awake()
         {
             Debug.Log("Awake");
-            createBrickMarkersFor(upperBricks.transform, bricks);
-            createBrickMarkersFor(lowerBricks.transform, bricks);
-            photonEventDispatcher = PhotonEventDispatcher.Get();
-            photonEventDispatcher.registerEventListener(msgDeleteBrick, data => { onDeleteBrick(data.CustomData); });
+            CreateBrickMarkersFrom(upperBricks.transform, _bricks);
+            CreateBrickMarkersFrom(lowerBricks.transform, _bricks);
+            _photonEventDispatcher = PhotonEventDispatcher.Get();
+            _photonEventDispatcher.registerEventListener(MsgDeleteBrick, data => { ONDeleteBrick(data.CustomData); });
         }
 
         #region Photon Events
 
-        private void onDeleteBrick(object data)
+        private void ONDeleteBrick(object data)
         {
             var payload = (byte[])data;
-            Assert.AreEqual((byte)msgDeleteBrick, payload[0], "Invalid message id");
+            Assert.AreEqual((byte)MsgDeleteBrick, payload[0], "Invalid message id");
             var brickId = (int)payload[1];
-            if (bricks.TryGetValue(brickId, out var marker))
+            if (_bricks.TryGetValue(brickId, out var marker))
             {
-                bricks.Remove(brickId);
-                destroyBrick(marker);
+                _bricks.Remove(brickId);
+                DestroyBrick(marker);
             }
         }
 
-        void IBrickManager.deleteBrick(GameObject brick)
+        void IBrickManager.DeleteBrick(GameObject brick)
         {
             var brickId = brick.GetComponent<IdMarker>().Id;
-            var payload = new[] { (byte)msgDeleteBrick, (byte)brickId };
-            photonEventDispatcher.RaiseEvent(msgDeleteBrick, payload);
+            var payload = new[] { (byte)MsgDeleteBrick, (byte)brickId };
+            _photonEventDispatcher.RaiseEvent(MsgDeleteBrick, payload);
         }
 
         #endregion
 
         #region Brick Management
 
-        private static void createBrickMarkersFor(Transform parentTransform, Dictionary<int, IdMarker> bricks)
+        private static void CreateBrickMarkersFrom(Transform parentTransform, IDictionary<int, IdMarker> bricks)
         {
             var childCount = parentTransform.childCount;
             for (var i = 0; i < childCount; ++i)
@@ -65,9 +65,9 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
-        private static void destroyBrick(IdMarker marker)
+        private static void DestroyBrick(IdMarker marker)
         {
-            Debug.Log($"destroyBrick {marker}");
+            Debug.Log($"destroyBrick #{marker.Id} {marker.name}");
             var gameObject = marker.gameObject;
             Assert.IsTrue(gameObject.activeSelf, "GameObject is not active for destroy");
             gameObject.SetActive(false);
