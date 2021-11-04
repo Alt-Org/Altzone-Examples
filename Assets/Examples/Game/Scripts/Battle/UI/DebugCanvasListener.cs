@@ -12,8 +12,7 @@ namespace Examples.Game.Scripts.Battle.UI
     /// </summary>
     public class DebugCanvasListener : MonoBehaviour
     {
-        private const string ScoreFormatLocal = "<color={4}>{0}({1})</color> h={2} w={3}";
-        private const string ScoreFormatVisitor = "<color={4}>{0}({1})</color> h={2} w={3}";
+        private const string ScoreFormat = "<color={4}>{0}({1})</color> h={2} w={3}";
 
         public GameObject roomStartPanel;
         public Text titleText;
@@ -68,29 +67,22 @@ namespace Examples.Game.Scripts.Battle.UI
         {
             _teamNameVisitor = data.TeamRedName;
             _teamNameHome = data.TeamBlueName;
-            if (PlayerActivator.HomeTeamIndex == 0)
-            {
-                _teamColorHome = "yellow";
-                _teamColorVisitor = "white";
-            }
-            else
-            {
-                _teamColorHome = "white";
-                _teamColorVisitor = "yellow";
-            }
+            _teamColorHome = "yellow";
+            _teamColorVisitor = "white";
         }
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
-            Debug.Log($"OnTeamScoreEvent {data} homeTeamIndex={PlayerActivator.HomeTeamIndex}");
+            Debug.Log($"OnTeamScoreEvent {data} local {PlayerActivator.LocalTeamIndex} home {PlayerActivator.HomeTeamIndex}");
             var score = data.Score;
+            // Local or remote player - left or right side
+            var isLocalTeam = score._teamIndex == PlayerActivator.LocalTeamIndex;
+            // Master client team - team name and color
             var isHomeTeam = score._teamIndex == PlayerActivator.HomeTeamIndex;
             var teamName = isHomeTeam ? _teamNameHome : _teamNameVisitor;
             var teamColor = isHomeTeam ? _teamColorHome : _teamColorVisitor;
-            var text = isHomeTeam ? leftText : rightText;
-            var isLocalTeam = score._teamIndex == PlayerActivator.LocalTeamIndex;
-            var format = isLocalTeam ? ScoreFormatLocal : ScoreFormatVisitor;
-            text.text = string.Format(format, teamName, score._teamIndex, score._headCollisionCount, score._wallCollisionCount, teamColor);
+            var text = isLocalTeam ? leftText : rightText;
+            text.text = string.Format(ScoreFormat, teamName, score._teamIndex, score._headCollisionCount, score._wallCollisionCount, teamColor);
         }
     }
 }
