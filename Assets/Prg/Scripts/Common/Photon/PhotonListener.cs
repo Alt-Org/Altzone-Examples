@@ -70,7 +70,7 @@ namespace Prg.Scripts.Common.Photon
             }
             else
             {
-                this.executeOnNextFrame(() => PhotonNetwork.AddCallbackTarget(this));
+                this.ExecuteOnNextFrame(() => PhotonNetwork.AddCallbackTarget(this));
             }
             SceneManager.sceneLoaded += sceneLoaded;
             SceneManager.sceneUnloaded += sceneUnloaded;

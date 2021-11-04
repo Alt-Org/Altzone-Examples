@@ -17,16 +17,16 @@ namespace UnityConstants
         public const string Xaxis = "Xaxis";
         public const string Goal = "Goal";
         public const string Ball = "Ball";
-        public const string PelaajaAlue_1 = "PelaajaAlue-1";
-        public const string PelaajaAlue_2 = "PelaajaAlue-2";
-        public const string PelaajaAlue_3 = "PelaajaAlue-3";
-        public const string PelaajaAlue_4 = "PelaajaAlue-4";
+        public const string PelaajaAlue1 = "PelaajaAlue-1";
+        public const string PelaajaAlue2 = "PelaajaAlue-2";
+        public const string PelaajaAlue3 = "PelaajaAlue-3";
+        public const string PelaajaAlue4 = "PelaajaAlue-4";
         public const string PalloPeliAlue = "PalloPeliAlue";
         public const string ErikoisTiili = "ErikoisTiili";
-        public const string Pelaaja_1 = "Pelaaja-1";
-        public const string Pelaaja_2 = "Pelaaja-2";
-        public const string Pelaaja_3 = "Pelaaja-3";
-        public const string Pelaaja_4 = "Pelaaja-4";
+        public const string Pelaaja1 = "Pelaaja-1";
+        public const string Pelaaja2 = "Pelaaja-2";
+        public const string Pelaaja3 = "Pelaaja-3";
+        public const string Pelaaja4 = "Pelaaja-4";
         public const string TopSide = "TopSide";
         public const string BotSide = "BotSide";
         public const string RedTeam = "RedTeam";
@@ -52,7 +52,7 @@ namespace UnityConstants
         // Index of layer
         public const int Default = 0;
         public const int TransparentFX = 1;
-        public const int Ignore_Raycast = 2;
+        public const int IgnoreRaycast = 2;
         public const int Water = 4;
         public const int UI = 5;
         public const int Shield = 8;
@@ -65,7 +65,7 @@ namespace UnityConstants
 
         // Bitmask of layer
         public const int TransparentFXMask = 1 << 1;
-        public const int Ignore_RaycastMask = 1 << 2;
+        public const int IgnoreRaycastMask = 1 << 2;
         public const int WaterMask = 1 << 4;
         public const int UIMask = 1 << 5;
         public const int ShieldMask = 1 << 8;
@@ -76,6 +76,4 @@ namespace UnityConstants
         public const int ArenaMask = 1 << 13;
         public const int BrickMask = 1 << 14;
     }
-
 }
-

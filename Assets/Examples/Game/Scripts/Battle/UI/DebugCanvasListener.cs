@@ -54,7 +54,7 @@ namespace Examples.Game.Scripts.Battle.UI
             countdown.setCountdownValue(data.curCountdownValue);
             if (data.curCountdownValue <= 0)
             {
-                this.executeAsCoroutine(new WaitForSeconds(0.67f), () =>
+                this.ExecuteAsCoroutine(new WaitForSeconds(0.67f), () =>
                 {
                     roomStartPanel.SetActive(false);
                     scorePanel.SetActive(true);

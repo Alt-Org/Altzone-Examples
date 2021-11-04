@@ -51,30 +51,30 @@ public static class UnityExtensions
     /// <summary>
     /// Execute an action as coroutine on next frame.
     /// </summary>
-    public static void executeOnNextFrame(this MonoBehaviour component, Action action)
+    public static void ExecuteOnNextFrame(this MonoBehaviour component, Action action)
     {
-        executeAsCoroutine(component, null, action);
+        ExecuteAsCoroutine(component, null, action);
     }
 
     /// <summary>
     /// Execute an action as coroutine with delay.
     /// </summary>
-    public static void executeAsCoroutine(this MonoBehaviour component, YieldInstruction wait, Action action)
+    public static void ExecuteAsCoroutine(this MonoBehaviour component, YieldInstruction wait, Action action)
     {
-        IEnumerator __delayedExecute(YieldInstruction _wait, Action _action)
+        IEnumerator DelayedExecute(YieldInstruction localWait, Action localAction)
         {
-            yield return _wait;
-            _action();
+            yield return localWait;
+            localAction();
         }
 
-        component.StartCoroutine(__delayedExecute(wait, action));
+        component.StartCoroutine(DelayedExecute(wait, action));
     }
 
     #endregion
 
     #region Rect
 
-    public static Rect inflate(this Rect rect, Vector2 size)
+    public static Rect Inflate(this Rect rect, Vector2 size)
     {
         return new Rect
         {
@@ -84,7 +84,8 @@ public static class UnityExtensions
             yMax = rect.yMax + size.y
         };
     }
-    public static Rect inflate(this Rect rect, float left, float top, float right, float bottom)
+
+    public static Rect Inflate(this Rect rect, float left, float top, float right, float bottom)
     {
         return new Rect
         {

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class PrintScreen : MonoBehaviour
 {
-    private const int superSize = 1;
+    private const int SuperSize = 1;
 
     [Header("Settings")] public string imageName = "screenshot";
 
@@ -14,9 +14,9 @@ public class PrintScreen : MonoBehaviour
     public int imageIndex;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void beforeSceneLoad()
+    private static void BeforeSceneLoad()
     {
-        UnityExtensions.CreateGameObjectAndComponent<PrintScreen>(nameof(PrintScreen), isDontDestroyOnLoad: true);
+        UnityExtensions.CreateGameObjectAndComponent<PrintScreen>(nameof(PrintScreen), true);
     }
 
     private void Awake()
@@ -35,7 +35,6 @@ public class PrintScreen : MonoBehaviour
         var oldFiles = Directory.GetFiles(imageFolder, $"{imageName.Replace("-", "_")}-???-*.png");
         var today = DateTime.Now.Day;
         foreach (var oldFile in oldFiles)
-        {
             if (File.GetCreationTime(oldFile).Day != today)
             {
                 File.Delete(oldFile);
@@ -51,7 +50,6 @@ public class PrintScreen : MonoBehaviour
                     }
                 }
             }
-        }
     }
 
     private void OnGUI()
@@ -84,7 +82,7 @@ public class PrintScreen : MonoBehaviour
                     break;
                 }
             }
-            ScreenCapture.CaptureScreenshot(filename, superSize);
+            ScreenCapture.CaptureScreenshot(filename, SuperSize);
             var sep2 = Path.DirectorySeparatorChar.ToString();
             var sep1 = Path.AltDirectorySeparatorChar.ToString();
             UnityEngine.Debug.Log($"Capture screenshot: {filename.Replace(sep1, sep2)}");

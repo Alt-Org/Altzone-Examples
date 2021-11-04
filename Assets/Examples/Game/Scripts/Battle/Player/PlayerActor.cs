@@ -132,7 +132,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             var sceneConfig = SceneConfig.Get();
             var playArea = sceneConfig.getPlayArea(activator.playerPos);
-            var restrictedArea = playArea.inflate(-playerDimensions); // deflate play area!
+            var restrictedArea = playArea.Inflate(-playerDimensions); // deflate play area!
             restrictedPlayer.setPlayArea(restrictedArea);
 
             var playerInput = gameObject.AddComponent<PlayerInput>();

@@ -30,7 +30,6 @@ public static class PhotonExtensions
         if (room.PlayerCount > 0)
         {
             foreach (var otherPlayer in PhotonNetwork.PlayerList)
-            {
                 if (!otherPlayer.Equals(player) &&
                     string.Equals(otherPlayer.NickName, playerName, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -38,7 +37,6 @@ public static class PhotonExtensions
                     uniquePlayerName = $"{playerName}{separator}{PhotonNetwork.LocalPlayer.ActorNumber}";
                     return false;
                 }
-            }
         }
         uniquePlayerName = playerName;
         return true;

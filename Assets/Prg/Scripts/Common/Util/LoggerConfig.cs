@@ -38,7 +38,7 @@ namespace Prg.Scripts.Common.Util
             var trimmed = string.IsNullOrEmpty(config.colorForClassName) ? "" : config.colorForClassName.Trim();
             if (trimmed.Length > 0)
             {
-                Debug.setColorForClassName(trimmed, ref LogWriter.logLineContentFilter);
+                Debug.SetColorForClassName(trimmed, ref LogWriter.logLineContentFilter);
             }
             // Install log filter as last thing here.
             var filterList = config.buildFilter();
@@ -46,7 +46,7 @@ namespace Prg.Scripts.Common.Util
             {
                 return;
             }
-            Debug.logLineAllowedFilter += method =>
+            Debug.LOGLineAllowedFilter += method =>
             {
                 // For anonymous types we try its parent type.
                 var isAnonymous = method.ReflectedType?.Name.StartsWith("<");
@@ -76,7 +76,7 @@ namespace Prg.Scripts.Common.Util
                 return match?.isLogged ?? false;
             };
 #if UNITY_EDITOR
-            if (!Debug.isDebugEnabled)
+            if (!Debug.IsDebugEnabled)
             {
                 UnityEngine.Debug.LogWarning($"<b>NOTE!</b> Application logging is totally disabled on platform: {Application.platform}");
             }
