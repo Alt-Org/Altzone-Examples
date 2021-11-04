@@ -113,6 +113,7 @@ namespace Examples.Game.Scripts.Battle.Scene
 
         public void rotateBackground(bool upsideDown)
         {
+            Debug.Log($"rotateBackground upsideDown {upsideDown}");
             var rotation = upsideDown
                 ? Quaternion.Euler(0f, 0f, 180f) // Upside down
                 : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
@@ -122,6 +123,7 @@ namespace Examples.Game.Scripts.Battle.Scene
         public void rotateGameCamera(bool upsideDown)
         {
             // Rotate game camera for upper team
+            Debug.Log($"rotateGameCamera upsideDown {upsideDown}");
             var cameraTransform = _camera.transform;
             isCameraRotated = upsideDown;
             var rotation = upsideDown

@@ -91,7 +91,7 @@ namespace Examples.Game.Scripts.Battle.Player
             if (sceneConfig.isCameraRotated)
             {
                 // Rotate player to align with camera orientation
-                playerRotation.transform.rotation = Quaternion.Euler(0f, 0f, 180f); // Upside down
+                rotatePlayer(playerRotation.transform, true);
             }
         }
 
@@ -273,6 +273,14 @@ namespace Examples.Game.Scripts.Battle.Player
                 default:
                     throw new UnityException($"unknown play mode: {playMode}");
             }
+        }
+        private static void rotatePlayer(Transform playerTransform,  bool upsideDown)
+        {
+            Debug.Log($"rotatePlayer {playerTransform.name} upsideDown {upsideDown}");
+            var rotation = upsideDown
+                ? Quaternion.Euler(0f, 0f, 180f) // Upside down
+                : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
+            playerTransform.rotation = rotation;
         }
     }
 }

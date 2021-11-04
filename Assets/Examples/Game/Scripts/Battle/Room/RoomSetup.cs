@@ -56,22 +56,24 @@ namespace Examples.Game.Scripts.Battle.Room
             var player = PhotonNetwork.LocalPlayer;
             PhotonBattle.getPlayerProperties(player, out var playerPos, out var teamIndex);
             Debug.Log($"OnEnable pos={playerPos} team={teamIndex} {player.GetDebugLabel()}");
+            if (teamIndex != 1)
+            {
+                return;
+            }
             var sceneConfig = SceneConfig.Get();
             var features = RuntimeGameConfig.Get().features;
             if (features.isRotateGameCamera)
             {
-                if (teamIndex == 1)
-                {
-                    // Rotate game camera for upper team
-                    sceneConfig.rotateGameCamera(upsideDown: true);
-                }
+                // Rotate game camera for upper team
+                sceneConfig.rotateGameCamera(upsideDown: true);
             }
             if (features.isLocalPLayerOnTeamBlue)
             {
                 sceneConfig.rotateBackground(upsideDown: true);
-                if (teamIndex == 1 && sceneConfig.upperTeamSprite.enabled && sceneConfig.lowerTeamSprite.enabled)
+                // Separate sprites for each team gameplay area - these might not be visible in final game
+                if (sceneConfig.upperTeamSprite.enabled && sceneConfig.lowerTeamSprite.enabled)
                 {
-                    // c# swap via deconstruction - these might not be visible in final game
+                    // c# swap via deconstruction
                     (sceneConfig.upperTeamSprite.color, sceneConfig.lowerTeamSprite.color) =
                         (sceneConfig.lowerTeamSprite.color, sceneConfig.upperTeamSprite.color);
                 }
