@@ -89,9 +89,13 @@ namespace Examples.Lobby.Scripts.InRoom
             var text = line.GetComponent<Text>();
             var nickName = player.IsLocal ? $"<color=blue>{player.NickName}</color>" : player.NickName;
             var pos = player.GetCustomProperty(playerPositionKey, playerIsGuest);
-            var skill = Mathf.Clamp(player.GetCustomProperty(playerMainSkillKey, 0), 0, skillNames.Length - 1);
-            var skillName = skillNames[skill];
-            var status = $" pos={pos} skill={skillName}";
+            var status = $" p={pos}";
+            if (pos >= 0 && pos <= 3)
+            {
+                var skill = Mathf.Clamp(player.GetCustomProperty(playerMainSkillKey, 0), 0, skillNames.Length - 1);
+                var skillName = skillNames[skill];
+                status += $" s=<color=green>{skillName}</color>";
+            }
             if (player.IsMasterClient)
             {
                 status += " <color=yellow>[M]</color>";
