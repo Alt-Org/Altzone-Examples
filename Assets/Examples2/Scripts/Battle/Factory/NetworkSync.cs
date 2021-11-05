@@ -24,6 +24,7 @@ namespace Examples2.Scripts.Battle.Factory
 
         private void Awake()
         {
+            Assert.IsTrue(_componentsToActivate.Length > 0, "No components to activate");
             if (PhotonNetwork.OfflineMode)
             {
                 ActivateAllComponents();
@@ -31,7 +32,7 @@ namespace Examples2.Scripts.Battle.Factory
                 return;
             }
             _requiredComponentCount = PhotonNetwork.CurrentRoom.PlayerCount;
-            Debug.Log($"Awake required {_requiredComponentCount} type {_componentTypeId}");
+            Debug.Log($"Awake {name} required {_requiredComponentCount} type {_componentTypeId}");
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnNetworkCreated(data.CustomData); });
             _photonEventDispatcher.registerEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
@@ -59,7 +60,7 @@ namespace Examples2.Scripts.Battle.Factory
             if (componentTypeId == _componentTypeId)
             {
                 _currentComponentCount += 1;
-                Debug.Log($"OnNetworkCreated required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId}");
+                Debug.Log($"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId}");
                 if (_currentComponentCount == _requiredComponentCount)
                 {
                     if (PhotonNetwork.IsMasterClient)
@@ -84,7 +85,7 @@ namespace Examples2.Scripts.Battle.Factory
             var componentTypeId = (int)payload[1];
             if (componentTypeId == _componentTypeId)
             {
-                Debug.Log($"OnMsgNetworkReady required {_requiredComponentCount} type {componentTypeId}");
+                Debug.Log($"OnMsgNetworkReady {name} required {_requiredComponentCount} type {componentTypeId}");
                 ActivateAllComponents();
                 enabled = false;
             }
@@ -94,7 +95,7 @@ namespace Examples2.Scripts.Battle.Factory
 
         private void ActivateAllComponents()
         {
-            Debug.Log($"ActivateAllComponents components {_componentsToActivate.Length} type {_componentTypeId}");
+            Debug.Log($"ActivateAllComponents {name} components {_componentsToActivate.Length} type {_componentTypeId}");
             StartCoroutine(ActivateComponents(_componentsToActivate));
         }
 
