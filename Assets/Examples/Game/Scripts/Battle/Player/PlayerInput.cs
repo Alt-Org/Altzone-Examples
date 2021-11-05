@@ -1,17 +1,10 @@
+using Examples.Game.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity.Input;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
 {
-    /// <summary>
-    /// Interface to move player towards given position.
-    /// </summary>
-    public interface IMovablePlayer
-    {
-        void moveTo(Vector3 position);
-    }
-
     /// <summary>
     /// Listens <c>InputManager</c> click down and up events and forwards them to <c>IMovablePlayer</c> for processing.
     /// </summary>

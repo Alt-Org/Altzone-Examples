@@ -1,3 +1,4 @@
+using Examples.Game.Scripts.Battle.interfaces;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player
