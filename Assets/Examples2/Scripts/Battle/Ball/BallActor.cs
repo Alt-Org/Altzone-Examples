@@ -1,7 +1,6 @@
+using System;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
-using System;
-using System.Collections;
 using TMPro;
 using UnityConstants;
 using UnityEngine;
@@ -96,12 +95,6 @@ namespace Examples2.Scripts.Battle.Ball
             _brickMaskValue = _settings._brickMask.value;
             _wallMaskValue = _settings._wallMask.value;
             _ballInfoParent = _ballInfo.gameObject;
-            // We wait until networking etc has been established and all game clients are ready, then somebody should enable us.
-            // - remote clients can continue as there will be no network traffic yet!
-            if (_photonView.IsMine)
-            {
-                enabled = false;
-            }
         }
 
         private void OnEnable()
