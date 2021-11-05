@@ -5,15 +5,6 @@ using UnityEngine;
 namespace Examples.Game.Scripts.Battle.Player
 {
     /// <summary>
-    /// Interface to restrict player movement to given area.
-    /// </summary>
-    public interface IRestrictedPlayer
-    {
-        void setPlayArea(Rect area);
-        bool canMove { get; set; }
-    }
-
-    /// <summary>
     /// Simple player movement using external controller for movement and synchronized across network using <c>RPC</c>.
     /// </summary>
     /// <remarks>
