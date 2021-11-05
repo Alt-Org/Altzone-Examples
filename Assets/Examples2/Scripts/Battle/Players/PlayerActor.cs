@@ -42,6 +42,10 @@ namespace Examples2.Scripts.Battle.Players
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} players {players.Length}");
             _state._teamMate = players
                 .FirstOrDefault(x => x._state._teamIndex == _state._teamIndex && x._state._playerPos != _state._playerPos);
+            if (_photonView.IsMine)
+            {
+                gameObject.AddComponent<LocalPlayer>();
+            }
         }
     }
 }

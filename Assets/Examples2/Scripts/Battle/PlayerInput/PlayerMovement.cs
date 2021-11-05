@@ -1,5 +1,4 @@
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
 using UnityEngine;
 
@@ -14,8 +13,9 @@ namespace Examples2.Scripts.Battle.PlayerInput
     [RequireComponent(typeof(PhotonView))]
     public class PlayerMovement : MonoBehaviour, IMovablePlayer, IRestrictedPlayer
     {
-        [Header("Live Data"), SerializeField] protected PhotonView _photonView;
-        [SerializeField] protected Transform _transform;
+        [Header("Live Data"), SerializeField] private PhotonView _photonView;
+        [SerializeField] private Camera _camera;
+        [SerializeField] private Transform _transform;
 
         [Header("Debug"), SerializeField] private bool _canMove;
         [SerializeField] private float _speed;
@@ -28,6 +28,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
         {
             _photonView = PhotonView.Get(this);
             _transform = GetComponent<Transform>();
+            _camera = Camera.main;
             _currentTarget = _transform.position;
             _playArea = Rect.MinMaxRect(-100, -100, 100, 100);
             _canMove = true;
@@ -47,6 +48,8 @@ namespace Examples2.Scripts.Battle.PlayerInput
             _isMoving = nextPosition != _currentTarget;
             _transform.position = nextPosition;
         }
+
+        Camera IMovablePlayer.Camera => _camera;
 
         Transform IMovablePlayer.Transform => _transform;
 

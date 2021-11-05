@@ -7,6 +7,7 @@ namespace Examples2.Scripts.Battle.interfaces
     /// </summary>
     public interface IMovablePlayer
     {
+        Camera Camera { get; }
         Transform Transform { get; }
         float Speed { get; set; }
         void MoveTo(Vector2 position);

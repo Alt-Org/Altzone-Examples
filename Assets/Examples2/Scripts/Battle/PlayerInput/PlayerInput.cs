@@ -12,16 +12,9 @@ namespace Examples2.Scripts.Battle.PlayerInput
     public class PlayerInput : MonoBehaviour
     {
         [Header("Live Data"), SerializeField] private Camera _camera;
-        [SerializeField] protected Transform _transform;
         [SerializeField] private Vector2 _mousePosition;
 
         private IMovablePlayer _playerMovement;
-
-        public Camera Camera
-        {
-            get => _camera;
-            set => _camera = value;
-        }
 
         public IMovablePlayer PlayerMovement
         {
@@ -29,7 +22,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
             set
             {
                 _playerMovement = value;
-                _transform = _playerMovement.Transform;
+                _camera = _playerMovement.Camera;
                 this.Subscribe<InputManager.ClickDownEvent>(OnClickDownEvent);
                 this.Subscribe<InputManager.ClickUpEvent>(OnClickUpEvent);
                 enabled = true;
