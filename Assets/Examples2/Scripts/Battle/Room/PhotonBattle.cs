@@ -1,8 +1,8 @@
+using System;
+using System.Diagnostics;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using System;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Room
@@ -40,6 +40,19 @@ namespace Examples2.Scripts.Battle.Room
         public static int GetPlayerPos(Player player)
         {
             return player.GetCustomProperty(PlayerPositionKey, -1);
+        }
+
+        public static int GetTeamIndex(int playerPos)
+        {
+            if (playerPos == 1 || playerPos == 3)
+            {
+                return 1;
+            }
+            if (playerPos == 0 || playerPos == 2)
+            {
+                return 0;
+            }
+            return -1;
         }
 
         [Conditional("UNITY_EDITOR")]
