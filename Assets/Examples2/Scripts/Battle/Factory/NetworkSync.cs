@@ -9,6 +9,7 @@ namespace Examples2.Scripts.Battle.Factory
     /// <summary>
     /// Activates networked components when all participants have been created, on for each player.
     /// </summary>
+    [RequireComponent(typeof(PhotonView))]
     public class NetworkSync : MonoBehaviour
     {
         private const int MsgNetworkCreated = PhotonEventDispatcher.eventCodeBase + 1;
@@ -70,7 +71,8 @@ namespace Examples2.Scripts.Battle.Factory
             if (componentTypeId == _componentTypeId)
             {
                 _currentComponentCount += 1;
-                Debug.Log($"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId} master {PhotonNetwork.IsMasterClient}");
+                Debug.Log(
+                    $"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId} master {PhotonNetwork.IsMasterClient}");
                 if (_currentComponentCount == _requiredComponentCount)
                 {
                     if (PhotonNetwork.IsMasterClient)

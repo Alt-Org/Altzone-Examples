@@ -34,6 +34,7 @@ namespace Examples2.Scripts.Battle.Ball
         public bool _isMoving;
     }
 
+    [RequireComponent(typeof(PhotonView))]
     internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
     {
         private const float BallTeleportDistance = 1f;

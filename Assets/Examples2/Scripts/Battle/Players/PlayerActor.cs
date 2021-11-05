@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Players
 {
+    [RequireComponent(typeof(PhotonView))]
     public class PlayerActor : MonoBehaviour
     {
         [Header("Debug"), SerializeField] private TMP_Text _playerInfo;
