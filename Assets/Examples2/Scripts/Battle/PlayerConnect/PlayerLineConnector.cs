@@ -1,9 +1,12 @@
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.PlayerConnect
 {
-    public class PlayerLineConnector : MonoBehaviour
+    public class PlayerLineConnector : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private LineRenderer _line;
         [SerializeField] private Vector3 _referencePoint;
@@ -39,6 +42,7 @@ namespace Examples2.Scripts.Battle.PlayerConnect
 
         public void Connect(IPlayerActor playerActor)
         {
+            Debug.Log($"Connect {playerActor}");
             _transformA = playerActor.Transform;
             _playerActorA = playerActor;
             if (playerActor.TeamMate != null)
@@ -55,8 +59,22 @@ namespace Examples2.Scripts.Battle.PlayerConnect
             gameObject.SetActive(true);
         }
 
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            if (!PhotonBattle.IsRealPlayer(otherPlayer))
+            {
+                return; // Ignore non players
+            }
+            var teamIndex = PhotonBattle.GetTeamIndex(PhotonBattle.GetPlayerPos(otherPlayer));
+            if (teamIndex == _playerActorA.TeamIndex)
+            {
+                Hide();
+            }
+        }
+
         public IPlayerActor GetNearest()
         {
+            Debug.Log($"GetNearest {_playerActorA} a={_distanceA} b={_distanceB}");
             if (_playerActorB == null || _distanceA < _distanceB)
             {
                 return _playerActorA;
@@ -66,6 +84,7 @@ namespace Examples2.Scripts.Battle.PlayerConnect
 
         public void Hide()
         {
+            Debug.Log($"Hide {_playerActorA}");
             gameObject.SetActive(false);
         }
     }
