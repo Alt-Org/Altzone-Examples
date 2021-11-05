@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -15,6 +16,11 @@ namespace Examples2.Scripts.Battle.Room
         private const string PlayerNameKey = "PlayerData.PlayerName";
         private const string PlayerPositionKey = "pp";
         private const string PlayerMainSkillKey = "mk";
+
+        public static int CountRealPlayers()
+        {
+            return PhotonNetwork.CurrentRoom.Players.Values.Where(IsRealPlayer).Count();
+        }
 
         public static string GetLocalPlayerName()
         {
@@ -44,15 +50,17 @@ namespace Examples2.Scripts.Battle.Room
 
         public static int GetTeamIndex(int playerPos)
         {
-            if (playerPos == 1 || playerPos == 3)
+            switch (playerPos)
             {
-                return 1;
+                case 0:
+                case 2:
+                    return 0;
+                case 1:
+                case 3:
+                    return 1;
+                default:
+                    return -1;
             }
-            if (playerPos == 0 || playerPos == 2)
-            {
-                return 0;
-            }
-            return -1;
         }
 
         [Conditional("UNITY_EDITOR")]

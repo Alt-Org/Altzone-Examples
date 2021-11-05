@@ -1,4 +1,5 @@
 using System.Collections;
+using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace Examples2.Scripts.Battle.Factory
                 enabled = false;
                 return;
             }
-            _requiredComponentCount = PhotonNetwork.CurrentRoom.PlayerCount;
+            _requiredComponentCount = PhotonBattle.CountRealPlayers();
             Debug.Log($"Awake {name} required {_requiredComponentCount} type {_componentTypeId}");
             _photonView = PhotonView.Get(this);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
