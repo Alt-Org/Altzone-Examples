@@ -73,7 +73,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
             position.x = Mathf.Clamp(_inputTarget.x, _playArea.xMin, _playArea.xMax);
             position.y = Mathf.Clamp(_inputTarget.y, _playArea.yMin, _playArea.yMax);
             // Send position to all players
-            _photonView.RPC(nameof(MoveTowardsRpc), RpcTarget.All, position, _speed);
+            _photonView.RPC(nameof(MovePlayerRpc), RpcTarget.All, position, _speed);
         }
 
         bool IRestrictedPlayer.CanMove
@@ -88,7 +88,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
         }
 
         [PunRPC]
-        private void MoveTowardsRpc(Vector2 targetPosition, float targetSpeed)
+        private void MovePlayerRpc(Vector2 targetPosition, float targetSpeed)
         {
             _isMoving = true;
             _currentTarget.x = targetPosition.x;

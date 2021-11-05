@@ -34,11 +34,11 @@ MonoBehaviour:
   StartInOfflineMode: 0
   RpcList:
   - catchABallRpc
+  - MovePlayerRpc
   - MoveTowardsRpc
+  - SetBallColorRpc
   - setBallVisibilityRpc
   - setPlayerPlayModeRpc
-  - setBallColorRpc
-  - SetBallColorRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
