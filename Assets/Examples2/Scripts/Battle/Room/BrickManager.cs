@@ -13,8 +13,8 @@ namespace Examples2.Scripts.Battle.Room
     {
         private const int MsgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 0;
 
-        [Header("Settings"), SerializeField] private GameObject upperBricks;
-        [SerializeField] private GameObject lowerBricks;
+        [Header("Settings"), SerializeField] private GameObject _upperBricks;
+        [SerializeField] private GameObject _lowerBricks;
 
         private readonly Dictionary<int, IdMarker> _bricks = new Dictionary<int, IdMarker>();
 
@@ -23,17 +23,18 @@ namespace Examples2.Scripts.Battle.Room
         private void Awake()
         {
             Debug.Log("Awake");
-            CreateBrickMarkersFrom(upperBricks.transform, _bricks);
-            CreateBrickMarkersFrom(lowerBricks.transform, _bricks);
+            CreateBrickMarkersFrom(_upperBricks.transform, _bricks);
+            CreateBrickMarkersFrom(_lowerBricks.transform, _bricks);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
-            _photonEventDispatcher.registerEventListener(MsgDeleteBrick, data => { ONDeleteBrick(data.CustomData); });
+            _photonEventDispatcher.registerEventListener(MsgDeleteBrick, data => { OnDeleteBrick(data.CustomData); });
         }
 
         #region Photon Events
 
-        private void ONDeleteBrick(object data)
+        private void OnDeleteBrick(object data)
         {
             var payload = (byte[])data;
+            Assert.AreEqual(payload.Length, 2, "Invalid message length");
             Assert.AreEqual((byte)MsgDeleteBrick, payload[0], "Invalid message id");
             var brickId = (int)payload[1];
             if (_bricks.TryGetValue(brickId, out var marker))

@@ -8099,8 +8099,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d26bd3f70f946d391827cb931d353da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upperBricks: {fileID: 1609926444}
-  lowerBricks: {fileID: 431618933}
+  _upperBricks: {fileID: 1609926444}
+  _lowerBricks: {fileID: 431618933}
 --- !u!4 &1651784408
 Transform:
   m_ObjectHideFlags: 0
@@ -8109,7 +8109,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1651784406}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.825679, y: 0.25806624, z: -0.7419082}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
