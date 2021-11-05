@@ -5,7 +5,7 @@ using Prg.Scripts.Common.Photon;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Examples2.Scripts.Battle.Factory
+namespace Examples2.Scripts.Battle.Photon
 {
     /// <summary>
     /// Activates networked components when all participants have been created, on for each player.
