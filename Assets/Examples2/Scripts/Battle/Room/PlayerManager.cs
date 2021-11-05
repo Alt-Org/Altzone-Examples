@@ -1,3 +1,4 @@
+using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;

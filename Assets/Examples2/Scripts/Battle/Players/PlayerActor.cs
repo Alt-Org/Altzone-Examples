@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Examples2.Scripts.Battle.Photon;
 using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using TMPro;

@@ -6,7 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-namespace Examples2.Scripts.Battle.Room
+namespace Examples2.Scripts.Battle.Photon
 {
     /// <summary>
     /// Convenience class to manage some Photon related stuff in one place.
