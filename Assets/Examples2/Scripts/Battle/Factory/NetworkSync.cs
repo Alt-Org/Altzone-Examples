@@ -20,11 +20,16 @@ namespace Examples2.Scripts.Battle.Factory
         [Header("Live Data"), SerializeField] private int _requiredComponentCount;
         [SerializeField] private int _currentComponentCount;
 
+        private PhotonView _photonView;
         private PhotonEventDispatcher _photonEventDispatcher;
 
         private void Awake()
         {
             Assert.IsTrue(_componentsToActivate.Length > 0, "No components to activate");
+            foreach (var component in _componentsToActivate)
+            {
+                Assert.IsFalse(component.enabled, $"Component is active: {component.GetType().Name}");
+            }
             if (PhotonNetwork.OfflineMode)
             {
                 ActivateAllComponents();
@@ -33,6 +38,7 @@ namespace Examples2.Scripts.Battle.Factory
             }
             _requiredComponentCount = PhotonNetwork.CurrentRoom.PlayerCount;
             Debug.Log($"Awake {name} required {_requiredComponentCount} type {_componentTypeId}");
+            _photonView = PhotonView.Get(this);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnNetworkCreated(data.CustomData); });
             _photonEventDispatcher.registerEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
@@ -40,7 +46,11 @@ namespace Examples2.Scripts.Battle.Factory
 
         private void OnEnable()
         {
-            SendNetworkCreated(_componentTypeId);
+            if (_photonView.IsMine || _photonView.IsRoomView)
+            {
+                Debug.Log($"OnEnable {name} required {_requiredComponentCount} type {_componentTypeId}");
+                SendNetworkCreated(_componentTypeId);
+            }
         }
 
         #region Photon Events
@@ -60,7 +70,7 @@ namespace Examples2.Scripts.Battle.Factory
             if (componentTypeId == _componentTypeId)
             {
                 _currentComponentCount += 1;
-                Debug.Log($"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId}");
+                Debug.Log($"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId} master {PhotonNetwork.IsMasterClient}");
                 if (_currentComponentCount == _requiredComponentCount)
                 {
                     if (PhotonNetwork.IsMasterClient)
