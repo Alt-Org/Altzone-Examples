@@ -394,6 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _state:
+    _transform: {fileID: 0}
     _playerPos: 0
     _teamIndex: 0
     _teamMate: {fileID: 0}

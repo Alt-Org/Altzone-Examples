@@ -1,5 +1,6 @@
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.PlayerConnect;
 using Examples2.Scripts.Battle.Room;
 using UnityEngine;
 
@@ -16,5 +17,9 @@ namespace Examples2.Scripts.Battle.Factory
         internal static IBall GetBall => Object.FindObjectOfType<BallActor>();
 
         internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
+
+        internal static PlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 0
+            ? Object.FindObjectOfType<HelpersCollection>()._teamBlueLineConnector
+            : Object.FindObjectOfType<HelpersCollection>()._teamRedLineConnector;
     }
 }
