@@ -81,9 +81,12 @@ namespace Examples2.Scripts.Battle.Photon
             Assert.IsTrue(_currentComponentCount <= _requiredComponentCount);
             if (_currentComponentCount == _requiredComponentCount)
             {
-                if (PhotonNetwork.IsMasterClient)
+                if (_photonView.IsMine || _photonView.IsRoomView)
                 {
-                    SendMsgNetworkReady();
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        SendMsgNetworkReady();
+                    }
                 }
             }
         }
