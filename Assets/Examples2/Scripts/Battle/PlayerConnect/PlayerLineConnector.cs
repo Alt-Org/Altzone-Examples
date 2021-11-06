@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.PlayerConnect
 {
-    public class PlayerLineConnector : MonoBehaviourPunCallbacks, IPlayerLineConnector
+    internal class PlayerLineConnector : MonoBehaviourPunCallbacks, IPlayerLineConnector
     {
         [Header("Settings"), SerializeField] private LineRenderer _line;
         [SerializeField] private Vector3 _referencePoint;
@@ -60,14 +60,14 @@ namespace Examples2.Scripts.Battle.PlayerConnect
             gameObject.SetActive(true);
         }
 
-        IPlayerActor IPlayerLineConnector.GetNearest()
+        PlayerLineResult IPlayerLineConnector.GetNearest()
         {
             Debug.Log($"GetNearest {_transformA.name} a={_distanceA} b={_distanceB}");
             if (_playerActorB == null || _distanceA < _distanceB)
             {
-                return _playerActorA;
+                return new PlayerLineResult(_playerActorA, _distanceA, _positionA - _positionB);
             }
-            return _playerActorB;
+            return new PlayerLineResult(_playerActorB, _distanceB, _positionB - _positionA);
         }
 
         void IPlayerLineConnector.Hide()

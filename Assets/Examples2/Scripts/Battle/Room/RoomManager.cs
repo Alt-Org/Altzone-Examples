@@ -14,7 +14,6 @@ namespace Examples2.Scripts.Battle.Room
     {
         [Header("Live Data"), SerializeField] private int _requiredActorCount;
         [SerializeField] private int _currentActorCount;
-        [SerializeField] private bool _isMaster;
         [SerializeField] private bool _isWaitForActors;
         [SerializeField] private bool _isWaitForCountdown;
 
@@ -24,10 +23,9 @@ namespace Examples2.Scripts.Battle.Room
         {
             _requiredActorCount = 1 + PhotonBattle.CountRealPlayers();
             _currentActorCount = 0;
-            _isMaster = PhotonNetwork.IsMasterClient;
             _isWaitForActors = true;
             _isWaitForCountdown = false;
-            Debug.Log($"Awake required {_requiredActorCount} master {_isMaster}");
+            Debug.Log($"Awake required {_requiredActorCount} master {PhotonNetwork.IsMasterClient}");
             this.Subscribe<ActorReportEvent>(OnActorReportEvent);
         }
 
@@ -40,14 +38,21 @@ namespace Examples2.Scripts.Battle.Room
         {
             _currentActorCount += 1;
             Debug.Log(
-                $"OnActorReportEvent component {data.ComponentTypeId} required {_requiredActorCount} current {_currentActorCount} master {_isMaster}");
+                $"OnActorReportEvent component {data.ComponentTypeId} required {_requiredActorCount} current {_currentActorCount} master {PhotonNetwork.IsMasterClient}");
             if (_currentActorCount == _requiredActorCount)
             {
                 _isWaitForActors = false;
                 _isWaitForCountdown = true;
                 _playerManager = Context.GetPlayerManager;
-                _playerManager.StartCountdown();
+                _playerManager.StartCountdown(OnCountdownFinished);
             }
+        }
+
+        private void OnCountdownFinished()
+        {
+            Debug.Log($"OnCountdownFinished master {PhotonNetwork.IsMasterClient}");
+            _isWaitForCountdown = false;
+            _playerManager.StartGameplay();
         }
 
         internal class ActorReportEvent

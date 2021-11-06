@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
@@ -20,7 +21,9 @@ namespace Examples2.Scripts.Battle.Room
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private ICountdownManager _countdownManager;
+        private Action _countdownFinished;
         private IPlayerLineConnector _playerLineConnector;
+        private PlayerLineResult _nearest;
 
         private void Awake()
         {
@@ -67,8 +70,11 @@ namespace Examples2.Scripts.Battle.Room
             {
                 _countdownManager.HideCountdown();
                 _countdownManager = null;
+                _nearest = _playerLineConnector.GetNearest();
                 _playerLineConnector.Hide();
                 _playerLineConnector = null;
+                _countdownFinished?.Invoke();
+                _countdownFinished = null;
             }
         }
 
@@ -98,11 +104,12 @@ namespace Examples2.Scripts.Battle.Room
 
         #region IPlayerManager
 
-        void IPlayerManager.StartCountdown()
+        void IPlayerManager.StartCountdown(Action countdownFinished)
         {
             var player = PhotonNetwork.LocalPlayer;
-            Debug.Log($"StartCountdown {player.GetDebugLabel()}");
+            Debug.Log($"StartCountdown {player.GetDebugLabel()} master {PhotonNetwork.IsMasterClient}");
             _countdownManager = Context.GetCountdownManager;
+            _countdownFinished = countdownFinished;
             if (PhotonNetwork.IsMasterClient)
             {
                 StartCoroutine(DoCountdown(3));
@@ -114,7 +121,23 @@ namespace Examples2.Scripts.Battle.Room
 
         void IPlayerManager.StartGameplay()
         {
-            Debug.Log($"StartGameplay {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+            Debug.Log(
+                $"StartGameplay nearest {_nearest.PlayerActor.Transform.name} distY {_nearest.DistanceY:F1} master {PhotonNetwork.IsMasterClient}");
+            foreach (var playerActor in Context.GetPlayers)
+            {
+                var actorTransform = playerActor.Transform;
+                var actorPosition = actorTransform.position;
+                var dist = Mathf.Abs((actorPosition - Vector3.zero).magnitude);
+                Debug.Log($"{actorTransform.name} x={actorPosition.x:F1} y={actorPosition.y:F1} dist={dist:F1}");
+            }
+            if (PhotonNetwork.IsMasterClient)
+            {
+                //_nearest.PlayerActor.Transform.gameObject.SetActive(false);
+                var ball = Context.GetBall;
+                ball.SetColor(BallColor.NoTeam);
+                var position = _nearest.PlayerActor.Transform.position;
+                ball.StartMoving(position, _nearest.Force);
+            }
         }
 
         void IPlayerManager.StopGameplay()
