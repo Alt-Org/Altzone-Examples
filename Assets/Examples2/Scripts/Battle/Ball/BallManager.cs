@@ -104,19 +104,16 @@ namespace Examples2.Scripts.Battle.Ball
         {
             if (state._isRedTeamActive && !state._isBlueTeamActive)
             {
-                Debug.Log($"ActiveTeamEvent team RED");
                 ball.SetColor(BallColor.RedTeam);
                 ball.Publish(new ActiveTeamEvent(1));
                 return;
             }
             if (state._isBlueTeamActive && !state._isRedTeamActive)
             {
-                Debug.Log($"ActiveTeamEvent team BLUE");
                 ball.SetColor(BallColor.BlueTeam);
                 ball.Publish(new ActiveTeamEvent(0));
                 return;
             }
-            Debug.Log($"ActiveTeamEvent team ---");
             ball.SetColor(BallColor.NoTeam);
             ball.Publish(new ActiveTeamEvent(-1));
         }
