@@ -2,6 +2,7 @@ using System.Collections;
 using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
+using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,7 +12,7 @@ namespace Examples2.Scripts.Battle.Photon
     /// Activates networked components when all participants have been created, on for each player.
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
-    public class NetworkSync : MonoBehaviour
+    internal class NetworkSync : MonoBehaviour
     {
         private const int MsgNetworkCreated = PhotonEventDispatcher.eventCodeBase + 1;
         private const int MsgNetworkReady = PhotonEventDispatcher.eventCodeBase + 2;
@@ -109,17 +110,19 @@ namespace Examples2.Scripts.Battle.Photon
         private void ActivateAllComponents()
         {
             Debug.Log($"ActivateAllComponents {name} components {_componentsToActivate.Length} type {_componentTypeId}");
-            StartCoroutine(ActivateComponents(_componentsToActivate));
+            StartCoroutine(ActivateComponents());
         }
 
-        private static IEnumerator ActivateComponents(MonoBehaviour[] componentsToActivate)
+        private IEnumerator ActivateComponents()
         {
             // Enable one component per frame in array sequence
-            for (var i = 0; i < componentsToActivate.LongLength; i++)
+            for (var i = 0; i < _componentsToActivate.LongLength; i++)
             {
                 yield return null;
-                componentsToActivate[i].enabled = true;
+                _componentsToActivate[i].enabled = true;
             }
+            yield return null;
+            this.Publish(new RoomManager.ActorReportEvent(_componentTypeId));
         }
     }
 }

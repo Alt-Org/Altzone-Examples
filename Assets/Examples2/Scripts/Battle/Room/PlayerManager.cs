@@ -1,16 +1,32 @@
+using System.Collections;
+using Examples2.Scripts.Battle.Factory;
+using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
-using TMPro;
+using Prg.Scripts.Common.Photon;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Room
 {
     /// <summary>
     /// Manages players initial creation and gameplay start.
     /// </summary>
-    public class PlayerManager : MonoBehaviour
+    internal class PlayerManager : MonoBehaviour, IPlayerManager
     {
+        private const int MsgCountdown = PhotonEventDispatcher.eventCodeBase + 3;
+
         [SerializeField] private GameObject _playerPrefab;
+
+        private PhotonEventDispatcher _photonEventDispatcher;
+        private ICountdownManager _countdownManager;
+
+        private void Awake()
+        {
+            Debug.Log("Awake");
+            _photonEventDispatcher = PhotonEventDispatcher.Get();
+            _photonEventDispatcher.registerEventListener(MsgCountdown, data => { OnCountdown(data.CustomData); });
+        }
 
         private void OnEnable()
         {
@@ -27,5 +43,76 @@ namespace Examples2.Scripts.Battle.Room
             Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
             PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
         }
+
+        #region Photon Events
+
+        private void OnCountdown(object data)
+        {
+            var payload = (int[])data;
+            Assert.AreEqual(payload.Length, 3, "Invalid message length");
+            Assert.AreEqual(MsgCountdown, payload[0], "Invalid message id");
+            var curValue = payload[1];
+            var maxValue = payload[2];
+            if (curValue == maxValue)
+            {
+                _countdownManager.StartCountdown(curValue);
+            }
+            else if (curValue >= 0)
+            {
+                _countdownManager.ShowCountdown(curValue);
+            }
+            else
+            {
+                _countdownManager.HideCountdown();
+            }
+        }
+
+        private void SendCountdown(int curValue, int maxValue)
+        {
+            var payload = new[] { MsgCountdown, curValue, maxValue };
+            _photonEventDispatcher.RaiseEvent(MsgCountdown, payload);
+        }
+
+        #endregion
+
+        private IEnumerator DoCountdown(int startValue)
+        {
+            var curValue = startValue;
+            SendCountdown(curValue, startValue);
+            var delay = new WaitForSeconds(1f);
+            for (;;)
+            {
+                yield return delay;
+                SendCountdown(--curValue, startValue);
+                if (curValue < 0)
+                {
+                    yield break;
+                }
+            }
+        }
+
+        #region IPlayerManager
+
+        void IPlayerManager.StartCountdown()
+        {
+            Debug.Log($"StartCountdown {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+            if (_countdownManager == null)
+            {
+                _countdownManager = Context.GetCountdownManager;
+            }
+            StartCoroutine(DoCountdown(3));
+        }
+
+        void IPlayerManager.StartGameplay()
+        {
+            Debug.Log($"StartGameplay {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+        }
+
+        void IPlayerManager.StopGameplay()
+        {
+            Debug.Log($"StopGameplay {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+        }
+
+        #endregion
     }
 }

@@ -17,11 +17,15 @@ namespace Examples2.Scripts.Battle.Factory
     /// </remarks>
     internal static class Context
     {
+        internal static IPlayerManager GetPlayerManager => Object.FindObjectOfType<PlayerManager>();
+
         internal static IBall GetBall => Object.FindObjectOfType<BallActor>();
 
         internal static List<IPlayerActor> GetPlayers => Object.FindObjectsOfType<PlayerActor>().Cast<IPlayerActor>().ToList();
 
         internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
+
+        internal static ICountdownManager GetCountdownManager => Object.FindObjectOfType<CountdownManager>();
 
         internal static PlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 0
             ? Object.FindObjectOfType<HelpersCollection>()?._teamBlueLineConnector
