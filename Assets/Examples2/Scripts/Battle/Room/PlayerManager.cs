@@ -20,6 +20,7 @@ namespace Examples2.Scripts.Battle.Room
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private ICountdownManager _countdownManager;
+        private IPlayerLineConnector _playerLineConnector;
 
         private void Awake()
         {
@@ -64,6 +65,9 @@ namespace Examples2.Scripts.Battle.Room
             else
             {
                 _countdownManager.HideCountdown();
+                _countdownManager = null;
+                _playerLineConnector.Hide();
+                _playerLineConnector = null;
             }
         }
 
@@ -95,12 +99,14 @@ namespace Examples2.Scripts.Battle.Room
 
         void IPlayerManager.StartCountdown()
         {
-            Debug.Log($"StartCountdown {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
-            if (_countdownManager == null)
-            {
-                _countdownManager = Context.GetCountdownManager;
-            }
+            var player = PhotonNetwork.LocalPlayer;
+            Debug.Log($"StartCountdown {player.GetDebugLabel()}");
+            _countdownManager = Context.GetCountdownManager;
             StartCoroutine(DoCountdown(3));
+            // Testing stuff here!
+            var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));
+            _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamIndex);
+            _playerLineConnector.Connect(playerActor);
         }
 
         void IPlayerManager.StartGameplay()

@@ -23,11 +23,17 @@ namespace Examples2.Scripts.Battle.Factory
 
         internal static List<IPlayerActor> GetPlayers => Object.FindObjectsOfType<PlayerActor>().Cast<IPlayerActor>().ToList();
 
+        internal static IPlayerActor GetPlayer(int playerPos) =>
+            Object.FindObjectsOfType<PlayerActor>().Cast<IPlayerActor>().First(x => x.PlayerPos == playerPos);
+
+        internal static IPlayerActor FindPlayer(int playerPos) =>
+            Object.FindObjectsOfType<PlayerActor>().Cast<IPlayerActor>().FirstOrDefault(x => x.PlayerPos == playerPos);
+
         internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
 
         internal static ICountdownManager GetCountdownManager => Object.FindObjectOfType<CountdownManager>();
 
-        internal static PlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 0
+        internal static IPlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 0
             ? Object.FindObjectOfType<HelpersCollection>()?._teamBlueLineConnector
             : Object.FindObjectOfType<HelpersCollection>()?._teamRedLineConnector;
     }

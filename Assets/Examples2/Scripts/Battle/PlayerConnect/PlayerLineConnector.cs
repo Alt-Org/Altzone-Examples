@@ -1,3 +1,4 @@
+using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.PlayerConnect
 {
-    public class PlayerLineConnector : MonoBehaviourPunCallbacks
+    public class PlayerLineConnector : MonoBehaviourPunCallbacks, IPlayerLineConnector
     {
         [Header("Settings"), SerializeField] private LineRenderer _line;
         [SerializeField] private Vector3 _referencePoint;
@@ -40,9 +41,8 @@ namespace Examples2.Scripts.Battle.PlayerConnect
             }
         }
 
-        public void Connect(IPlayerActor playerActor)
+        void IPlayerLineConnector.Connect(IPlayerActor playerActor)
         {
-            Debug.Log($"Connect {playerActor}");
             _transformA = playerActor.Transform;
             _playerActorA = playerActor;
             if (playerActor.TeamMate != null)
@@ -56,25 +56,13 @@ namespace Examples2.Scripts.Battle.PlayerConnect
                 _transformB = GetComponent<Transform>();
                 _playerActorB = null;
             }
+            Debug.Log($"Connect {_transformA.name} <-> {_transformB.name}");
             gameObject.SetActive(true);
         }
 
-        public override void OnPlayerLeftRoom(Player otherPlayer)
+        IPlayerActor IPlayerLineConnector.GetNearest()
         {
-            if (!PhotonBattle.IsRealPlayer(otherPlayer))
-            {
-                return; // Ignore non players
-            }
-            var teamIndex = PhotonBattle.GetTeamIndex(PhotonBattle.GetPlayerPos(otherPlayer));
-            if (teamIndex == _playerActorA.TeamIndex)
-            {
-                Hide();
-            }
-        }
-
-        public IPlayerActor GetNearest()
-        {
-            Debug.Log($"GetNearest {_playerActorA} a={_distanceA} b={_distanceB}");
+            Debug.Log($"GetNearest {_transformA.name} a={_distanceA} b={_distanceB}");
             if (_playerActorB == null || _distanceA < _distanceB)
             {
                 return _playerActorA;
@@ -82,10 +70,23 @@ namespace Examples2.Scripts.Battle.PlayerConnect
             return _playerActorB;
         }
 
-        public void Hide()
+        void IPlayerLineConnector.Hide()
         {
-            Debug.Log($"Hide {_playerActorA}");
+            Debug.Log($"Hide {_transformA.name}");
             gameObject.SetActive(false);
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            if (!PhotonBattle.IsRealPlayer(otherPlayer))
+            {
+                return;
+            }
+            var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(otherPlayer));
+            if (playerActor.TeamIndex == _playerActorA.TeamIndex)
+            {
+                ((IPlayerLineConnector)this).Hide();
+            }
         }
     }
 }

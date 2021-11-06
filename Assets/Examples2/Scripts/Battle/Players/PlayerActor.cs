@@ -19,11 +19,6 @@ namespace Examples2.Scripts.Battle.Players
             public int _playerPos;
             public int _teamIndex;
             public PlayerActor _teamMate;
-
-            public override string ToString()
-            {
-                return $"{_transform.name}, mate: {_teamMate}";
-            }
         }
 
         [Header("Live Data"), SerializeField]private PlayerState _state;
@@ -61,10 +56,5 @@ namespace Examples2.Scripts.Battle.Players
         int IPlayerActor.TeamIndex => _state._teamIndex;
 
         IPlayerActor IPlayerActor.TeamMate => _state._teamMate;
-
-        public override string ToString()
-        {
-            return _state.ToString();
-        }
     }
 }
