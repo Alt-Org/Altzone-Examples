@@ -44,11 +44,20 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
-        void IBrickManager.DeleteBrick(GameObject brick)
+        private void SendDeleteBrick(GameObject brick)
         {
             var brickId = brick.GetComponent<IdMarker>().Id;
             var payload = new[] { (byte)MsgDeleteBrick, (byte)brickId };
             _photonEventDispatcher.RaiseEvent(MsgDeleteBrick, payload);
+        }
+
+        #endregion
+
+        #region IBrickManager
+
+        void IBrickManager.DeleteBrick(GameObject brick)
+        {
+            SendDeleteBrick(brick);
         }
 
         #endregion
