@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Examples2.Scripts.Battle.Players
 {
     [RequireComponent(typeof(PhotonView))]
-    public class PlayerActor : MonoBehaviour, IPlayerActor
+    internal class PlayerActor : MonoBehaviour, IPlayerActor
     {
         private const int PlayModeNormal = 0;
         private const int PlayModeFrozen = 1;

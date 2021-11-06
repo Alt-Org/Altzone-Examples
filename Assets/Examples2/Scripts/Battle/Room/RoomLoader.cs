@@ -12,7 +12,7 @@ namespace Examples2.Scripts.Battle.Room
     /// <summary>
     /// Game room loader to establish a well known state for the room before actual gameplay starts.
     /// </summary>
-    public class RoomLoader : MonoBehaviourPunCallbacks
+    internal class RoomLoader : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private bool isOfflineMode;
         [SerializeField] private int debugPlayerPos;

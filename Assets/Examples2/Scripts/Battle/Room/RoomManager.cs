@@ -4,6 +4,7 @@ using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Room
 {
@@ -39,9 +40,12 @@ namespace Examples2.Scripts.Battle.Room
             _currentActorCount += 1;
             Debug.Log(
                 $"OnActorReportEvent component {data.ComponentTypeId} required {_requiredActorCount} current {_currentActorCount} master {PhotonNetwork.IsMasterClient}");
+            Assert.IsFalse(_currentActorCount > _requiredActorCount);
             if (_currentActorCount == _requiredActorCount)
             {
+                Assert.IsTrue(_isWaitForActors);
                 _isWaitForActors = false;
+                Assert.IsFalse(_isWaitForCountdown);
                 _isWaitForCountdown = true;
                 _playerManager = Context.GetPlayerManager;
                 _playerManager.StartCountdown(OnCountdownFinished);
@@ -51,6 +55,7 @@ namespace Examples2.Scripts.Battle.Room
         private void OnCountdownFinished()
         {
             Debug.Log($"OnCountdownFinished master {PhotonNetwork.IsMasterClient}");
+            Assert.IsTrue(_isWaitForCountdown);
             _isWaitForCountdown = false;
             _playerManager.StartGameplay();
         }

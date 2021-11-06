@@ -11,7 +11,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
     /// Player movement can be restricted to given area.
     /// </remarks>
     [RequireComponent(typeof(PhotonView))]
-    public class PlayerMovement : MonoBehaviour, IMovablePlayer, IRestrictedPlayer
+    internal class PlayerMovement : MonoBehaviour, IMovablePlayer, IRestrictedPlayer
     {
         [Header("Live Data"), SerializeField] private PhotonView _photonView;
         [SerializeField] private Camera _camera;

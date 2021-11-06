@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
     /// <summary>
     /// Listens <c>InputManager</c> click down and up events and forwards them to <c>IMovablePlayer</c> for processing.
     /// </summary>
-    public class PlayerInput : MonoBehaviour
+    internal class PlayerInput : MonoBehaviour
     {
         [Header("Live Data"), SerializeField] private Camera _camera;
         [SerializeField] private Vector2 _mousePosition;

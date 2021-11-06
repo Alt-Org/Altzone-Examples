@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.Room
     /// <summary>
     /// Brick manager for the room that synchronizes brick state over network.
     /// </summary>
-    public class BrickManager : MonoBehaviour, IBrickManager
+    internal class BrickManager : MonoBehaviour, IBrickManager
     {
         private const int MsgDeleteBrick = PhotonEventDispatcher.eventCodeBase + 0;
 

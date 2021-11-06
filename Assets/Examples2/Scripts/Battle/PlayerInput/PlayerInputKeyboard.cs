@@ -6,7 +6,7 @@ namespace Examples2.Scripts.Battle.PlayerInput
     /// <summary>
     /// Polls joystick "Horizontal" and "Vertical" movements and forwards them to <c>IMovablePlayer</c> for processing.
     /// </summary>
-    public class PlayerInputKeyboard : MonoBehaviour
+    internal class PlayerInputKeyboard : MonoBehaviour
     {
         // Current gameplay area for one team is about 10.0 x 8.5
         private const float UnReachableDistance = 20;

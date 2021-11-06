@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.Players
     /// Local player manager to handle input.
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
-    public class LocalPlayer : MonoBehaviour
+    internal class LocalPlayer : MonoBehaviour
     {
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private PlayerInput.PlayerInput _playerInput;
