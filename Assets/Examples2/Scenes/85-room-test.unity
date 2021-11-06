@@ -8725,6 +8725,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1651784408}
   - component: {fileID: 1651784410}
+  - component: {fileID: 1651784412}
   - component: {fileID: 1651784407}
   - component: {fileID: 1651784411}
   - component: {fileID: 1651784409}
@@ -8775,6 +8776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8742ff6b398d49448b9910857cf9b67c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _actorParent: {fileID: 1374902844}
   _playerPrefab: {fileID: 8607368454165204979, guid: 01c71bf87fde35546aa9563e80581cc8,
     type: 3}
 --- !u!114 &1651784410
@@ -8821,6 +8823,18 @@ MonoBehaviour:
   _currentActorCount: 0
   _isWaitForActors: 0
   _isWaitForCountdown: 0
+--- !u!114 &1651784412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651784406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bfbda57998a4e6089de965c70d1c272, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1685972412
 GameObject:
   m_ObjectHideFlags: 0

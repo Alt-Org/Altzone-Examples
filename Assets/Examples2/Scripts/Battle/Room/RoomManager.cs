@@ -40,7 +40,7 @@ namespace Examples2.Scripts.Battle.Room
             _currentActorCount += 1;
             Debug.Log(
                 $"OnActorReportEvent component {data.ComponentTypeId} required {_requiredActorCount} current {_currentActorCount} master {PhotonNetwork.IsMasterClient}");
-            Assert.IsFalse(_currentActorCount > _requiredActorCount);
+            Assert.IsTrue(_currentActorCount <= _requiredActorCount);
             if (_currentActorCount == _requiredActorCount)
             {
                 Assert.IsTrue(_isWaitForActors);

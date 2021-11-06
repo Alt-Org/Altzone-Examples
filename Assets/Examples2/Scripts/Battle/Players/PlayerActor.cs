@@ -45,7 +45,8 @@ namespace Examples2.Scripts.Battle.Players
             _state._transform = GetComponent<Transform>();
             _state._playerPos = PhotonBattle.GetPlayerPos(player);
             _state._teamIndex = PhotonBattle.GetTeamIndex(_state._playerPos);
-            name = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamIndex}:{player.NickName}";
+            var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamIndex}";
+            name = $"{prefix}:{player.NickName}";
             _playerInfo = GetComponentInChildren<TMP_Text>();
             _playerInfo.text = _state._playerPos.ToString("N0");
             Debug.Log($"Awake {name}");
@@ -70,6 +71,11 @@ namespace Examples2.Scripts.Battle.Players
         {
             if (data.TeamIndex == _state._teamIndex)
             {
+                // Ghosted -> Frozen is not allowed
+                if (_state._currentMode != PlayModeNormal)
+                {
+                    return;
+                }
                 ((IPlayerActor)this).SetFrozenMode();
             }
             else
@@ -85,6 +91,14 @@ namespace Examples2.Scripts.Battle.Players
         int IPlayerActor.TeamIndex => _state._teamIndex;
 
         IPlayerActor IPlayerActor.TeamMate => _state._teamMate;
+
+        void IPlayerActor.HeadCollision()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeGhosted);
+            }
+        }
 
         void IPlayerActor.SetNormalMode()
         {

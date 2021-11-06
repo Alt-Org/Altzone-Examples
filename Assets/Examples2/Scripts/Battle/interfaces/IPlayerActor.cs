@@ -8,6 +8,7 @@ namespace Examples2.Scripts.Battle.interfaces
         int PlayerPos { get; }
         int TeamIndex { get; }
         IPlayerActor TeamMate { get; }
+        void HeadCollision();
         void SetNormalMode();
         void SetFrozenMode();
         void SetGhostedMode();

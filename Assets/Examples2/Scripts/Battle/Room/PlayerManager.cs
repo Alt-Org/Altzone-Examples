@@ -17,7 +17,7 @@ namespace Examples2.Scripts.Battle.Room
     {
         private const int MsgCountdown = PhotonEventDispatcher.eventCodeBase + 3;
 
-        [SerializeField] private GameObject _playerPrefab;
+        [Header("Settings"), SerializeField] private GameObject _playerPrefab;
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private ICountdownManager _countdownManager;
@@ -45,7 +45,7 @@ namespace Examples2.Scripts.Battle.Room
             var y = playerPos == 1 || playerPos == 3 ? 4.25f : -4.25f;
             var instantiationPosition = new Vector3(x, y);
             Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
-            PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
+            var instance = PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
         }
 
         #region Photon Events

@@ -40,54 +40,57 @@ namespace Examples2.Scripts.Battle.Photon
                 return;
             }
             _requiredComponentCount = PhotonBattle.CountRealPlayers();
-            Debug.Log($"Awake {name} required {_requiredComponentCount} type {_componentTypeId}");
+            _currentComponentCount = 0;
             _photonView = PhotonView.Get(this);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
-            _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnNetworkCreated(data.CustomData); });
+            _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnMsgNetworkCreated(data.CustomData); });
             _photonEventDispatcher.registerEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
         }
 
         private void OnEnable()
         {
+            Debug.Log(
+                $"OnEnable type {_componentTypeId} {name} required {_requiredComponentCount} sending {_photonView.IsMine || _photonView.IsRoomView}");
             if (_photonView.IsMine || _photonView.IsRoomView)
             {
-                Debug.Log($"OnEnable {name} required {_requiredComponentCount} type {_componentTypeId}");
-                SendNetworkCreated(_componentTypeId);
+                SendMsgNetworkCreated();
             }
         }
 
         #region Photon Events
 
-        private void SendNetworkCreated(int componentTypeId)
+        private void SendMsgNetworkCreated()
         {
-            var payload = new object[] { (byte)MsgNetworkCreated, componentTypeId };
+            var payload = new object[] { (byte)MsgNetworkCreated, _componentTypeId };
             _photonEventDispatcher.RaiseEvent(MsgNetworkCreated, payload);
         }
 
-        private void OnNetworkCreated(object data)
+        private void OnMsgNetworkCreated(object data)
         {
             var payload = (object[])data;
             Assert.AreEqual(payload.Length, 2, "Invalid message length");
             Assert.AreEqual((byte)MsgNetworkCreated, (byte)payload[0], "Invalid message id");
             var componentTypeId = (int)payload[1];
-            if (componentTypeId == _componentTypeId)
+            if (componentTypeId != _componentTypeId)
             {
-                _currentComponentCount += 1;
-                Debug.Log(
-                    $"OnNetworkCreated {name} required {_requiredComponentCount} current {_currentComponentCount} type {componentTypeId} master {PhotonNetwork.IsMasterClient}");
-                if (_currentComponentCount == _requiredComponentCount)
+                return;
+            }
+            _currentComponentCount += 1;
+            Debug.Log(
+                $"OnNetworkCreated type {_componentTypeId} {name} required {_requiredComponentCount} current {_currentComponentCount} master {PhotonNetwork.IsMasterClient}");
+            Assert.IsTrue(_currentComponentCount <= _requiredComponentCount);
+            if (_currentComponentCount == _requiredComponentCount)
+            {
+                if (PhotonNetwork.IsMasterClient)
                 {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        SendMsgNetworkReady(_componentTypeId);
-                    }
+                    SendMsgNetworkReady();
                 }
             }
         }
 
-        private void SendMsgNetworkReady(int componentTypeId)
+        private void SendMsgNetworkReady()
         {
-            var payload = new object[] { (byte)MsgNetworkCreated, componentTypeId };
+            var payload = new object[] { (byte)MsgNetworkReady, _componentTypeId };
             _photonEventDispatcher.RaiseEvent(MsgNetworkReady, payload);
         }
 
@@ -95,14 +98,15 @@ namespace Examples2.Scripts.Battle.Photon
         {
             var payload = (object[])data;
             Assert.AreEqual(payload.Length, 2, "Invalid message length");
-            Assert.AreEqual((byte)MsgNetworkCreated, (byte)payload[0], "Invalid message id");
+            Assert.AreEqual((byte)MsgNetworkReady, (byte)payload[0], "Invalid message id");
             var componentTypeId = (int)payload[1];
-            if (componentTypeId == _componentTypeId)
+            if (componentTypeId != _componentTypeId)
             {
-                Debug.Log($"OnMsgNetworkReady {name} required {_requiredComponentCount} type {componentTypeId}");
-                ActivateAllComponents();
-                enabled = false;
+                return;
             }
+            Debug.Log($"OnMsgNetworkReady type {_componentTypeId} {name} required {_requiredComponentCount}");
+            ActivateAllComponents();
+            enabled = false;
         }
 
         #endregion

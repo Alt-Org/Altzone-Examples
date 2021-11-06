@@ -1,6 +1,7 @@
 using System;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityConstants;
@@ -43,6 +44,8 @@ namespace Examples2.Scripts.Battle.Ball
         private void OnHeadCollision(GameObject other)
         {
             Debug.Log($"onHeadCollision {other.name}");
+            var playerActor = other.GetComponentInParent<IPlayerActor>();
+            playerActor.HeadCollision();
         }
 
         private void OnShieldCollision(GameObject other)
@@ -101,17 +104,21 @@ namespace Examples2.Scripts.Battle.Ball
         {
             if (state._isRedTeamActive && !state._isBlueTeamActive)
             {
+                Debug.Log($"ActiveTeamEvent team RED");
                 ball.SetColor(BallColor.RedTeam);
                 ball.Publish(new ActiveTeamEvent(1));
                 return;
             }
             if (state._isBlueTeamActive && !state._isRedTeamActive)
             {
+                Debug.Log($"ActiveTeamEvent team BLUE");
                 ball.SetColor(BallColor.BlueTeam);
                 ball.Publish(new ActiveTeamEvent(0));
                 return;
             }
+            Debug.Log($"ActiveTeamEvent team ---");
             ball.SetColor(BallColor.NoTeam);
+            ball.Publish(new ActiveTeamEvent(-1));
         }
 
         internal class ActiveTeamEvent
