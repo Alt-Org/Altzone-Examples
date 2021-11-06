@@ -54,6 +54,7 @@ namespace Examples2.Scripts.Battle.Room
             Assert.AreEqual(MsgCountdown, payload[0], "Invalid message id");
             var curValue = payload[1];
             var maxValue = payload[2];
+            Debug.Log($"OnCountdown {curValue}/{maxValue}");
             if (curValue == maxValue)
             {
                 _countdownManager.StartCountdown(curValue);
@@ -102,8 +103,10 @@ namespace Examples2.Scripts.Battle.Room
             var player = PhotonNetwork.LocalPlayer;
             Debug.Log($"StartCountdown {player.GetDebugLabel()}");
             _countdownManager = Context.GetCountdownManager;
-            StartCoroutine(DoCountdown(3));
-            // Testing stuff here!
+            if (PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(DoCountdown(3));
+            }
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));
             _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamIndex);
             _playerLineConnector.Connect(playerActor);
