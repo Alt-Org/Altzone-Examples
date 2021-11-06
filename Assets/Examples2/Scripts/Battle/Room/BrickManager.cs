@@ -34,7 +34,7 @@ namespace Examples2.Scripts.Battle.Room
         private void OnDeleteBrick(object data)
         {
             var payload = (byte[])data;
-            Assert.AreEqual(payload.Length, 2, "Invalid message length");
+            Assert.AreEqual(2, payload.Length, "Invalid message length");
             Assert.AreEqual((byte)MsgDeleteBrick, payload[0], "Invalid message id");
             var brickId = (int)payload[1];
             if (_bricks.TryGetValue(brickId, out var marker))

@@ -68,7 +68,7 @@ namespace Examples2.Scripts.Battle.Photon
         private void OnMsgNetworkCreated(object data)
         {
             var payload = (object[])data;
-            Assert.AreEqual(payload.Length, 2, "Invalid message length");
+            Assert.AreEqual(2, payload.Length, "Invalid message length");
             Assert.AreEqual((byte)MsgNetworkCreated, (byte)payload[0], "Invalid message id");
             var componentTypeId = (int)payload[1];
             if (componentTypeId != _componentTypeId)
@@ -100,7 +100,7 @@ namespace Examples2.Scripts.Battle.Photon
         private void OnMsgNetworkReady(object data)
         {
             var payload = (object[])data;
-            Assert.AreEqual(payload.Length, 2, "Invalid message length");
+            Assert.AreEqual(2, payload.Length, "Invalid message length");
             Assert.AreEqual((byte)MsgNetworkReady, (byte)payload[0], "Invalid message id");
             var componentTypeId = (int)payload[1];
             if (componentTypeId != _componentTypeId)

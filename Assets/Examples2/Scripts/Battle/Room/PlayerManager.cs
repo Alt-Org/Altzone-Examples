@@ -53,7 +53,7 @@ namespace Examples2.Scripts.Battle.Room
         private void OnCountdown(object data)
         {
             var payload = (int[])data;
-            Assert.AreEqual(payload.Length, 3, "Invalid message length");
+            Assert.AreEqual(3, payload.Length, "Invalid message length");
             Assert.AreEqual(MsgCountdown, payload[0], "Invalid message id");
             var curValue = payload[1];
             var maxValue = payload[2];
