@@ -52,9 +52,6 @@ namespace Examples2.Scripts.Battle.Players
             _state._teamMate = players
                 .FirstOrDefault(x => x._state._teamIndex == _state._teamIndex && x._state._playerPos != _state._playerPos);
             gameObject.AddComponent<LocalPlayer>();
-            // Testing stuff here!
-            var lineConnector = Context.GetTeamLineConnector(_state._teamIndex);
-            lineConnector.Connect(this);
         }
 
         Transform IPlayerActor.Transform => _state._transform;
