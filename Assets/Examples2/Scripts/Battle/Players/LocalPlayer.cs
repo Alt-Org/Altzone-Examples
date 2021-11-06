@@ -33,9 +33,6 @@ namespace Examples2.Scripts.Battle.Players
             _playerInputKeyboard.PlayerMovement = _playerMovement;
 
             ((IMovablePlayer)_playerMovement).Speed = 7f;
-
-            var sprite = GetComponentInChildren<SpriteRenderer>();
-            sprite.color = Color.yellow;
         }
     }
 }

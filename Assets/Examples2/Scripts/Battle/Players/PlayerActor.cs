@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
+using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
 
@@ -25,7 +27,8 @@ namespace Examples2.Scripts.Battle.Players
             public PlayerActor _teamMate;
         }
 
-        [Header("Settings"), SerializeField] private SpriteRenderer _stateSprite;
+        [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
+        [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
 
         [Header("Live Data"), SerializeField] private PlayerState _state;
@@ -46,6 +49,11 @@ namespace Examples2.Scripts.Battle.Players
             _playerInfo = GetComponentInChildren<TMP_Text>();
             _playerInfo.text = _state._playerPos.ToString("N0");
             Debug.Log($"Awake {name}");
+            this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
+            if (_photonView.IsMine)
+            {
+                _highlightSprite.color = Color.yellow;
+            }
         }
 
         private void OnEnable()
@@ -56,6 +64,18 @@ namespace Examples2.Scripts.Battle.Players
                 .FirstOrDefault(x => x._state._teamIndex == _state._teamIndex && x._state._playerPos != _state._playerPos);
             gameObject.AddComponent<LocalPlayer>();
             ((IPlayerActor)this).SetNormalMode();
+        }
+
+        private void OnActiveTeamEvent(BallManager.ActiveTeamEvent data)
+        {
+            if (data.TeamIndex == _state._teamIndex)
+            {
+                ((IPlayerActor)this).SetFrozenMode();
+            }
+            else
+            {
+                ((IPlayerActor)this).SetNormalMode();
+            }
         }
 
         Transform IPlayerActor.Transform => _state._transform;
