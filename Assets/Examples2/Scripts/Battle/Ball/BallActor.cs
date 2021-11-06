@@ -75,11 +75,6 @@ namespace Examples2.Scripts.Battle.Ball
         {
             Debug.Log($"Awake");
             _photonView = PhotonView.Get(this);
-            if (!_photonView.ObservedComponents.Contains(this))
-            {
-                // If not set in Editor
-                _photonView.ObservedComponents.Add(this);
-            }
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.isKinematic = !_photonView.IsMine;
             _stateObjects = new[] // This is indexed by BallColor!
@@ -100,7 +95,13 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable IsMine {_photonView.IsMine}");
+            Debug.Log($"OnEnable IsMine {_photonView.IsMine} add observed {!_photonView.ObservedComponents.Contains(this)}");
+            if (!_photonView.ObservedComponents.Contains(this))
+            {
+                // If not set in Editor
+                // - and this helps to avoid unnecessary warnings when view starts to serialize itself "too early" for other views not yet ready.
+                _photonView.ObservedComponents.Add(this);
+            }
         }
 
         #region Movement
