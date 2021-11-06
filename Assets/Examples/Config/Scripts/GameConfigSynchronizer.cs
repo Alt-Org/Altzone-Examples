@@ -1,8 +1,11 @@
 using Prg.Scripts.Common.Photon;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Prg.Scripts.Common.Util;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples.Config.Scripts
 {
@@ -15,7 +18,7 @@ namespace Examples.Config.Scripts
     }
 
     /// <summary>
-    /// Synchronize runtime game config over network.
+    /// Synchronize runtime game config over network using <c>byte</c> array.
     /// </summary>
     /// <remarks>
     /// Only Master Client can do this while in a room.
@@ -26,6 +29,8 @@ namespace Examples.Config.Scripts
         private const byte EndByte = 0xFE;
         private const int OverheadBytes = 2;
 
+        private static readonly Dictionary<Type, int> TypesSizesCache = new Dictionary<Type, int>();
+
         public static void Listen()
         {
             Get(); // Instantiate our private instance for listening synchronize events
@@ -33,6 +38,7 @@ namespace Examples.Config.Scripts
 
         public static void Synchronize(What what)
         {
+            //--Debug.Log($"Synchronize {what}");
             if (!PhotonWrapper.InRoom || !PhotonWrapper.IsMasterClient)
             {
                 throw new UnityException("only master client can synchronize in a room");
@@ -54,8 +60,8 @@ namespace Examples.Config.Scripts
                 _instance = FindObjectOfType<GameConfigSynchronizer>();
                 if (_instance == null)
                 {
-                    _instance = UnityExtensions.CreateGameObjectAndComponent<GameConfigSynchronizer>(nameof(GameConfigSynchronizer),
-                        isDontDestroyOnLoad: true);
+                    _instance =
+                        UnityExtensions.CreateGameObjectAndComponent<GameConfigSynchronizer>(nameof(GameConfigSynchronizer), true);
                 }
             }
             return _instance;
@@ -80,16 +86,11 @@ namespace Examples.Config.Scripts
         {
             if (data is byte[] bytes)
             {
-                if (bytes.Length < 3)
-                {
-                    throw new UnityException($"invalid synchronization message length: {bytes.Length}");
-                }
+                Assert.IsTrue(bytes.Length > 2);
                 var lastByte = bytes[bytes.Length - 1];
-                if (lastByte != EndByte)
-                {
-                    throw new UnityException($"invalid synchronization message end: {lastByte}");
-                }
+                Assert.AreEqual(EndByte, lastByte, $"invalid synchronization message end: {lastByte}");
                 var firstByte = bytes[0];
+                Assert.IsTrue(firstByte > 0);
                 if (firstByte == (byte)What.Features)
                 {
                     ReadFeatures(bytes);
@@ -113,20 +114,15 @@ namespace Examples.Config.Scripts
                 using (var writer = new BinaryWriter(stream))
                 {
                     writer.Write(first);
-                    writer.Write(features.isRotateGameCamera);
-                    writer.Write(features.isLocalPLayerOnTeamBlue);
-                    writer.Write(features.isSPawnMiniBall);
-                    writer.Write(features.isSinglePlayerShieldOn);
+                    BinarySerializer.Serialize(features, writer);
                     writer.Write(last);
                 }
                 var bytes = stream.ToArray();
                 var type = features.GetType();
-                var fieldsLength = CountFieldsByteSize(type);
+                var fieldsByteSize = CountFieldsByteSize(type);
                 //--Debug.Log($"send data> {bytes.Length}: {string.Join(", ", bytes)}");
-                if (bytes.Length != fieldsLength)
-                {
-                    throw new UnityException($"mismatch in type {type} fields size {fieldsLength} and written fields size {bytes.Length}");
-                }
+                Assert.AreEqual(fieldsByteSize, bytes.Length,
+                    $"mismatch in type {type} fields size {fieldsByteSize} and written fields size {bytes.Length}");
                 _photonEventDispatcher.RaiseEvent(MsgSynchronize, bytes);
             }
         }
@@ -134,16 +130,13 @@ namespace Examples.Config.Scripts
         private static void ReadFeatures(byte[] bytes)
         {
             //--Debug.Log($"recv data< {bytes.Length}: {string.Join(", ", bytes)}");
-            var features = new GameFeatures();
+            GameFeatures features;
             using (var stream = new MemoryStream(bytes))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     reader.ReadByte(); // skip first
-                    features.isRotateGameCamera = reader.ReadBoolean();
-                    features.isLocalPLayerOnTeamBlue = reader.ReadBoolean();
-                    features.isSPawnMiniBall = reader.ReadBoolean();
-                    features.isSinglePlayerShieldOn = reader.ReadBoolean();
+                    features = BinarySerializer.Deserialize<GameFeatures>(reader).Item1;
                     reader.ReadByte(); // skip last
                 }
             }
@@ -158,27 +151,15 @@ namespace Examples.Config.Scripts
                 using (var writer = new BinaryWriter(stream))
                 {
                     writer.Write(first);
-                    writer.Write(variables.roomStartDelay);
-                    writer.Write(variables.ballMoveSpeedMultiplier);
-                    writer.Write(variables.ballLerpSmoothingFactor);
-                    writer.Write(variables.ballTeleportDistance);
-                    writer.Write(variables.minSlingShotDistance);
-                    writer.Write(variables.maxSlingShotDistance);
-                    writer.Write(variables.ballRestartDelay);
-                    writer.Write(variables.playerMoveSpeedMultiplier);
-                    writer.Write(variables.playerSqrMinRotationDistance);
-                    writer.Write(variables.playerSqrMaxRotationDistance);
-                    writer.Write(variables.shieldDistanceMultiplier);
+                    BinarySerializer.Serialize(variables, writer);
                     writer.Write(last);
                 }
                 var bytes = stream.ToArray();
                 var type = variables.GetType();
-                var fieldsLength = CountFieldsByteSize(type);
+                var fieldsByteSize = CountFieldsByteSize(type);
                 //--Debug.Log($"send data> {bytes.Length}: {string.Join(", ", bytes)}");
-                if (bytes.Length != fieldsLength)
-                {
-                    throw new UnityException($"mismatch in type {type} fields size {fieldsLength} and written fields size {bytes.Length}");
-                }
+                Assert.AreEqual(fieldsByteSize, bytes.Length,
+                    $"mismatch in type {type} fields size {fieldsByteSize} and written fields size {bytes.Length}");
                 _photonEventDispatcher.RaiseEvent(MsgSynchronize, bytes);
             }
         }
@@ -186,23 +167,13 @@ namespace Examples.Config.Scripts
         private static void ReadVariables(byte[] bytes)
         {
             //--Debug.Log($"recv data< {bytes.Length}: {string.Join(", ", bytes)}");
-            var variables = new GameVariables();
+            GameVariables variables;
             using (var stream = new MemoryStream(bytes))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     reader.ReadByte(); // skip first
-                    variables.roomStartDelay = reader.ReadInt32();
-                    variables.ballMoveSpeedMultiplier = reader.ReadSingle();
-                    variables.ballLerpSmoothingFactor = reader.ReadSingle();
-                    variables.ballTeleportDistance = reader.ReadSingle();
-                    variables.minSlingShotDistance = reader.ReadSingle();
-                    variables.maxSlingShotDistance = reader.ReadSingle();
-                    variables.ballRestartDelay = reader.ReadInt32();
-                    variables.playerMoveSpeedMultiplier = reader.ReadSingle();
-                    variables.playerSqrMinRotationDistance = reader.ReadSingle();
-                    variables.playerSqrMaxRotationDistance = reader.ReadSingle();
-                    variables.shieldDistanceMultiplier = reader.ReadSingle();
+                    variables = BinarySerializer.Deserialize<GameVariables>(reader).Item1;
                     reader.ReadByte(); // skip last
                 }
             }
@@ -211,6 +182,10 @@ namespace Examples.Config.Scripts
 
         private static int CountFieldsByteSize(Type type)
         {
+            if (TypesSizesCache.TryGetValue(type, out var size))
+            {
+                return size;
+            }
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             var countBytes = OverheadBytes; // stream start and end bytes
             foreach (var fieldInfo in fields)
@@ -231,6 +206,7 @@ namespace Examples.Config.Scripts
                         throw new UnityException($"unknown field type: {fieldTypeName}");
                 }
             }
+            TypesSizesCache.Add(type, countBytes);
             return countBytes;
         }
     }
