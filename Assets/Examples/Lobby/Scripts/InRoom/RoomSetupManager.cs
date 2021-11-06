@@ -138,11 +138,11 @@ namespace Examples.Lobby.Scripts.InRoom
             {
                 // While in the game room that is going to start playing soon
                 // we will send known runtime settings every time something significant changes, regardless of what to be on the safe side :)
-                GameConfigSynchronizer.synchronize(What.All);
+                GameConfigSynchronizer.Synchronize(What.All);
             }
             else
             {
-                GameConfigSynchronizer.listen();
+                GameConfigSynchronizer.Listen();
             }
         }
 

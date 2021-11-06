@@ -22,16 +22,16 @@ namespace Examples.Config.Scripts
     /// </remarks>
     public class GameConfigSynchronizer : MonoBehaviour
     {
-        private const int msgSynchronize = PhotonEventDispatcher.eventCodeBase + 0;
-        private const byte endByte = 0xFE;
-        private const int overheadBytes = 2;
+        private const int MsgSynchronize = PhotonEventDispatcher.eventCodeBase + 0;
+        private const byte EndByte = 0xFE;
+        private const int OverheadBytes = 2;
 
-        public static void listen()
+        public static void Listen()
         {
             Get(); // Instantiate our private instance for listening synchronize events
         }
 
-        public static void synchronize(What what)
+        public static void Synchronize(What what)
         {
             if (!PhotonWrapper.InRoom || !PhotonWrapper.IsMasterClient)
             {
@@ -39,44 +39,44 @@ namespace Examples.Config.Scripts
             }
             if (what.HasFlag(What.All) || what.HasFlag(What.Features))
             {
-                Get().sendSynchronizeFeatures((byte)What.Features, endByte);
+                Get().SendSynchronizeFeatures((byte)What.Features, EndByte);
             }
             if (what.HasFlag(What.All) || what.HasFlag(What.Variables))
             {
-                Get().sendSynchronizeVariables((byte)What.Variables, endByte);
+                Get().SendSynchronizeVariables((byte)What.Variables, EndByte);
             }
         }
 
         private static GameConfigSynchronizer Get()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = FindObjectOfType<GameConfigSynchronizer>();
-                if (_Instance == null)
+                _instance = FindObjectOfType<GameConfigSynchronizer>();
+                if (_instance == null)
                 {
-                    _Instance = UnityExtensions.CreateGameObjectAndComponent<GameConfigSynchronizer>(nameof(GameConfigSynchronizer),
+                    _instance = UnityExtensions.CreateGameObjectAndComponent<GameConfigSynchronizer>(nameof(GameConfigSynchronizer),
                         isDontDestroyOnLoad: true);
                 }
             }
-            return _Instance;
+            return _instance;
         }
 
-        private static GameConfigSynchronizer _Instance;
+        private static GameConfigSynchronizer _instance;
 
-        private PhotonEventDispatcher photonEventDispatcher;
+        private PhotonEventDispatcher _photonEventDispatcher;
 
         private void Awake()
         {
-            photonEventDispatcher = PhotonEventDispatcher.Get();
-            photonEventDispatcher.registerEventListener(msgSynchronize, data => onSynchronize(data.CustomData));
+            _photonEventDispatcher = PhotonEventDispatcher.Get();
+            _photonEventDispatcher.registerEventListener(MsgSynchronize, data => OnSynchronize(data.CustomData));
         }
 
         private void OnDestroy()
         {
-            _Instance = null;
+            _instance = null;
         }
 
-        private static void onSynchronize(object data)
+        private static void OnSynchronize(object data)
         {
             if (data is byte[] bytes)
             {
@@ -85,18 +85,18 @@ namespace Examples.Config.Scripts
                     throw new UnityException($"invalid synchronization message length: {bytes.Length}");
                 }
                 var lastByte = bytes[bytes.Length - 1];
-                if (lastByte != endByte)
+                if (lastByte != EndByte)
                 {
                     throw new UnityException($"invalid synchronization message end: {lastByte}");
                 }
                 var firstByte = bytes[0];
                 if (firstByte == (byte)What.Features)
                 {
-                    readFeatures(bytes);
+                    ReadFeatures(bytes);
                 }
                 else if (firstByte == (byte)What.Variables)
                 {
-                    readVariables(bytes);
+                    ReadVariables(bytes);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace Examples.Config.Scripts
             }
         }
 
-        private void sendSynchronizeFeatures(byte first, byte last)
+        private void SendSynchronizeFeatures(byte first, byte last)
         {
             var features = RuntimeGameConfig.Get().features;
             using (var stream = new MemoryStream())
@@ -121,17 +121,17 @@ namespace Examples.Config.Scripts
                 }
                 var bytes = stream.ToArray();
                 var type = features.GetType();
-                var fieldsLength = countFieldsByteSize(type, out var fieldCount);
-                //--Debug.Log($"send data> {bytes.Length}({fieldCount}): {string.Join(", ", bytes)}");
+                var fieldsLength = CountFieldsByteSize(type);
+                //--Debug.Log($"send data> {bytes.Length}: {string.Join(", ", bytes)}");
                 if (bytes.Length != fieldsLength)
                 {
                     throw new UnityException($"mismatch in type {type} fields size {fieldsLength} and written fields size {bytes.Length}");
                 }
-                photonEventDispatcher.RaiseEvent(msgSynchronize, bytes);
+                _photonEventDispatcher.RaiseEvent(MsgSynchronize, bytes);
             }
         }
 
-        private static void readFeatures(byte[] bytes)
+        private static void ReadFeatures(byte[] bytes)
         {
             //--Debug.Log($"recv data< {bytes.Length}: {string.Join(", ", bytes)}");
             var features = new GameFeatures();
@@ -150,7 +150,7 @@ namespace Examples.Config.Scripts
             RuntimeGameConfig.Get().features = features;
         }
 
-        private void sendSynchronizeVariables(byte first, byte last)
+        private void SendSynchronizeVariables(byte first, byte last)
         {
             var variables = RuntimeGameConfig.Get().variables;
             using (var stream = new MemoryStream())
@@ -173,17 +173,17 @@ namespace Examples.Config.Scripts
                 }
                 var bytes = stream.ToArray();
                 var type = variables.GetType();
-                var fieldsLength = countFieldsByteSize(type, out var fieldCount);
-                //--Debug.Log($"send data> {bytes.Length}({fieldCount}): {string.Join(", ", bytes)}");
+                var fieldsLength = CountFieldsByteSize(type);
+                //--Debug.Log($"send data> {bytes.Length}: {string.Join(", ", bytes)}");
                 if (bytes.Length != fieldsLength)
                 {
                     throw new UnityException($"mismatch in type {type} fields size {fieldsLength} and written fields size {bytes.Length}");
                 }
-                photonEventDispatcher.RaiseEvent(msgSynchronize, bytes);
+                _photonEventDispatcher.RaiseEvent(MsgSynchronize, bytes);
             }
         }
 
-        private static void readVariables(byte[] bytes)
+        private static void ReadVariables(byte[] bytes)
         {
             //--Debug.Log($"recv data< {bytes.Length}: {string.Join(", ", bytes)}");
             var variables = new GameVariables();
@@ -209,10 +209,10 @@ namespace Examples.Config.Scripts
             RuntimeGameConfig.Get().variables = variables;
         }
 
-        private static int countFieldsByteSize(Type type, out int fieldCount)
+        private static int CountFieldsByteSize(Type type)
         {
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            var countBytes = overheadBytes; // stream start and end bytes
+            var countBytes = OverheadBytes; // stream start and end bytes
             foreach (var fieldInfo in fields)
             {
                 var fieldTypeName = fieldInfo.FieldType.Name;
@@ -231,7 +231,6 @@ namespace Examples.Config.Scripts
                         throw new UnityException($"unknown field type: {fieldTypeName}");
                 }
             }
-            fieldCount = fields.Length;
             return countBytes;
         }
     }

@@ -14,19 +14,19 @@ namespace Examples.Config.Scripts.Test
             if (synchronizeAll)
             {
                 synchronizeAll = false;
-                GameConfigSynchronizer.synchronize(What.All);
+                GameConfigSynchronizer.Synchronize(What.All);
                 return;
             }
             if (synchronizeFeatures)
             {
                 synchronizeFeatures = false;
-                GameConfigSynchronizer.synchronize(What.Features);
+                GameConfigSynchronizer.Synchronize(What.Features);
                 return;
             }
             if (synchronizeVariables)
             {
                 synchronizeVariables = false;
-                GameConfigSynchronizer.synchronize(What.Variables);
+                GameConfigSynchronizer.Synchronize(What.Variables);
             }
         }
     }
