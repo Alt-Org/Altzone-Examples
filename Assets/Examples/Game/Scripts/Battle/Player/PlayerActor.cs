@@ -166,7 +166,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeNormal);
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, playModeNormal);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeFrozen);
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, playModeFrozen);
             }
         }
 
@@ -182,7 +182,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeGhosted);
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, playModeGhosted);
             }
         }
 
@@ -190,7 +190,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(setPlayerPlayModeRpc), RpcTarget.All, playModeSpecial);
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, playModeSpecial);
             }
         }
 
@@ -244,7 +244,7 @@ namespace Examples.Game.Scripts.Battle.Player
         }
 
         [PunRPC]
-        private void setPlayerPlayModeRpc(int playMode)
+        private void SetPlayerPlayModeRpc(int playMode)
         {
             if (_playMode == playModeSpecial && playMode == playModeFrozen)
             {

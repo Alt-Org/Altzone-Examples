@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
@@ -12,16 +11,24 @@ namespace Examples2.Scripts.Battle.Players
     [RequireComponent(typeof(PhotonView))]
     public class PlayerActor : MonoBehaviour, IPlayerActor
     {
+        private const int PlayModeNormal = 0;
+        private const int PlayModeFrozen = 1;
+        private const int PlayModeGhosted = 2;
+
         [Serializable]
         internal class PlayerState
         {
+            public int _currentMode;
             public Transform _transform;
             public int _playerPos;
             public int _teamIndex;
             public PlayerActor _teamMate;
         }
 
-        [Header("Live Data"), SerializeField]private PlayerState _state;
+        [Header("Settings"), SerializeField] private SpriteRenderer _stateSprite;
+        [SerializeField] private Collider2D _collider;
+
+        [Header("Live Data"), SerializeField] private PlayerState _state;
 
         [Header("Debug"), SerializeField] private TMP_Text _playerInfo;
 
@@ -31,6 +38,7 @@ namespace Examples2.Scripts.Battle.Players
         {
             _photonView = PhotonView.Get(this);
             var player = _photonView.Owner;
+            _state._currentMode = PlayModeNormal;
             _state._transform = GetComponent<Transform>();
             _state._playerPos = PhotonBattle.GetPlayerPos(player);
             _state._teamIndex = PhotonBattle.GetTeamIndex(_state._playerPos);
@@ -47,6 +55,7 @@ namespace Examples2.Scripts.Battle.Players
             _state._teamMate = players
                 .FirstOrDefault(x => x._state._teamIndex == _state._teamIndex && x._state._playerPos != _state._playerPos);
             gameObject.AddComponent<LocalPlayer>();
+            ((IPlayerActor)this).SetNormalMode();
         }
 
         Transform IPlayerActor.Transform => _state._transform;
@@ -56,5 +65,50 @@ namespace Examples2.Scripts.Battle.Players
         int IPlayerActor.TeamIndex => _state._teamIndex;
 
         IPlayerActor IPlayerActor.TeamMate => _state._teamMate;
+
+        void IPlayerActor.SetNormalMode()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeNormal);
+            }
+        }
+
+        void IPlayerActor.SetFrozenMode()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeFrozen);
+            }
+        }
+
+        void IPlayerActor.SetGhostedMode()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeGhosted);
+            }
+        }
+
+        [PunRPC]
+        private void SetPlayerPlayModeRpc(int playMode)
+        {
+            _state._currentMode = playMode;
+            switch (playMode)
+            {
+                case PlayModeNormal:
+                    _collider.enabled = true;
+                    _stateSprite.color = Color.blue;
+                    return;
+                case PlayModeFrozen:
+                    _collider.enabled = true;
+                    _stateSprite.color = Color.magenta;
+                    return;
+                case PlayModeGhosted:
+                    _collider.enabled = false;
+                    _stateSprite.color = Color.grey;
+                    return;
+            }
+        }
     }
 }

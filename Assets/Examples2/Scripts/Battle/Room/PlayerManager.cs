@@ -132,7 +132,7 @@ namespace Examples2.Scripts.Battle.Room
             }
             if (PhotonNetwork.IsMasterClient)
             {
-                //_nearest.PlayerActor.Transform.gameObject.SetActive(false);
+                _nearest.PlayerActor.SetGhostedMode();
                 var ball = Context.GetBall;
                 ball.SetColor(BallColor.NoTeam);
                 var position = _nearest.PlayerActor.Transform.position;
