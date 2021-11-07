@@ -1,9 +1,9 @@
-using ExitGames.Client.Photon;
-using Photon.Pun;
-using Photon.Realtime;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,23 +18,23 @@ namespace Prg.Scripts.Common.Photon
     public class PhotonListener : MonoBehaviour,
         IConnectionCallbacks, ILobbyCallbacks, IMatchmakingCallbacks, IInRoomCallbacks, IPunOwnershipCallbacks
     {
-        private const int maxTimeDifferenceMs = 60 * 60 * 1000;
-        private const int minTimeDifferenceMs = -60 * 60 * 1000;
-        private static int lastServerTimestamp;
+        private const int MaxTimeDifferenceMs = 60 * 60 * 1000;
+        private const int MinTimeDifferenceMs = -60 * 60 * 1000;
+        private static int _lastServerTimestamp;
 
-        private static readonly Dictionary<string, string> photonRoomPropNames;
-        private static readonly Dictionary<string, string> photonPlayerPropNames;
+        private static readonly Dictionary<string, string> PhotonRoomPropNames;
+        private static readonly Dictionary<string, string> PhotonPlayerPropNames;
 
         static PhotonListener()
         {
             // https://doc-api.photonengine.com/en/pun/v2/class_photon_1_1_realtime_1_1_game_property_key.html
-            photonPlayerPropNames = new Dictionary<string, string>
+            PhotonPlayerPropNames = new Dictionary<string, string>
             {
                 { ActorProperties.PlayerName.ToString(), nameof(ActorProperties.PlayerName) },
                 { ActorProperties.IsInactive.ToString(), nameof(ActorProperties.IsInactive) },
                 { ActorProperties.UserId.ToString(), nameof(ActorProperties.UserId) },
             };
-            photonRoomPropNames = new Dictionary<string, string>
+            PhotonRoomPropNames = new Dictionary<string, string>
             {
                 { GamePropertyKey.MaxPlayers.ToString(), nameof(GamePropertyKey.MaxPlayers) },
                 { GamePropertyKey.IsVisible.ToString(), nameof(GamePropertyKey.IsVisible) },
@@ -72,8 +72,8 @@ namespace Prg.Scripts.Common.Photon
             {
                 this.ExecuteOnNextFrame(() => PhotonNetwork.AddCallbackTarget(this));
             }
-            SceneManager.sceneLoaded += sceneLoaded;
-            SceneManager.sceneUnloaded += sceneUnloaded;
+            SceneManager.sceneLoaded += SceneLoaded;
+            SceneManager.sceneUnloaded += SceneUnloaded;
         }
 
         private void Start()
@@ -83,8 +83,8 @@ namespace Prg.Scripts.Common.Photon
 
         private void OnDisable()
         {
-            SceneManager.sceneLoaded -= sceneLoaded;
-            SceneManager.sceneUnloaded -= sceneUnloaded;
+            SceneManager.sceneLoaded -= SceneLoaded;
+            SceneManager.sceneUnloaded -= SceneUnloaded;
             PhotonNetwork.RemoveCallbackTarget(this);
         }
 
@@ -101,12 +101,12 @@ namespace Prg.Scripts.Common.Photon
             _logMessage($"{methodName} {message}");
         }
 
-        private static void sceneLoaded(Scene scene, LoadSceneMode mode)
+        private static void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
             _logMessage($"sceneLoaded {scene.name} ({scene.buildIndex})");
         }
 
-        private static void sceneUnloaded(Scene scene)
+        private static void SceneUnloaded(Scene scene)
         {
             _logMessage($"sceneUnloaded {scene.name} ({scene.buildIndex})");
         }
@@ -114,10 +114,10 @@ namespace Prg.Scripts.Common.Photon
         private static void _logMessage(string message)
         {
             var c = PhotonNetwork.IsConnectedAndReady ? "r" : PhotonNetwork.IsConnected ? "c" : "-";
-            var deltaTime = PhotonNetwork.ServerTimestamp - lastServerTimestamp;
-            if (deltaTime > maxTimeDifferenceMs || deltaTime < minTimeDifferenceMs)
+            var deltaTime = PhotonNetwork.ServerTimestamp - _lastServerTimestamp;
+            if (deltaTime > MaxTimeDifferenceMs || deltaTime < MinTimeDifferenceMs)
             {
-                lastServerTimestamp = PhotonNetwork.ServerTimestamp;
+                _lastServerTimestamp = PhotonNetwork.ServerTimestamp;
                 deltaTime = 0;
                 c += ">";
             }
@@ -277,12 +277,13 @@ namespace Prg.Scripts.Common.Photon
 
         public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
-            LogPhotonStatus($"{PhotonNetwork.CurrentRoom.GetDebugLabel()} changed {HashtableToString(propertiesThatChanged, photonRoomPropNames)}");
+            LogPhotonStatus(
+                $"{PhotonNetwork.CurrentRoom.GetDebugLabel()} changed {HashtableToString(propertiesThatChanged, PhotonRoomPropNames)}");
         }
 
         public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
-            LogPhotonStatus($"{targetPlayer.GetDebugLabel()} changed {HashtableToString(changedProps, photonPlayerPropNames)}");
+            LogPhotonStatus($"{targetPlayer.GetDebugLabel()} changed {HashtableToString(changedProps, PhotonPlayerPropNames)}");
         }
 
         public void OnMasterClientSwitched(Player newMasterClient)
