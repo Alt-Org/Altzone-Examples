@@ -73,6 +73,8 @@ namespace Examples2.Scripts.Battle.Players
             this.Unsubscribe();
         }
 
+        #region External events
+
         private void OnActiveTeamEvent(BallManager.ActiveTeamEvent data)
         {
             if (data.TeamIndex == _state._teamIndex)
@@ -89,6 +91,10 @@ namespace Examples2.Scripts.Battle.Players
                 ((IPlayerActor)this).SetNormalMode();
             }
         }
+
+        #endregion
+
+        #region IPlayerActor
 
         Transform IPlayerActor.Transform => _state._transform;
 
@@ -150,5 +156,7 @@ namespace Examples2.Scripts.Battle.Players
                     return;
             }
         }
+
+        #endregion
     }
 }
