@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Reflection;
 using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
@@ -18,10 +20,14 @@ namespace Examples2.Scripts.Battle.Photon
         private const int MsgNetworkReady = PhotonEventDispatcher.eventCodeBase + 2;
 
         [Header("Settings"), Min(1), SerializeField] private int _componentTypeId;
+        [SerializeField, Min(1)] private float _failSafeActivationDelay;
         [SerializeField] private MonoBehaviour[] _componentsToActivate;
 
         [Header("Live Data"), SerializeField] private int _requiredComponentCount;
         [SerializeField] private int _currentComponentCount;
+        [SerializeField] private int _ownerActorNr;
+        [SerializeField] private float _failSafeActivationTime;
+        [SerializeField] private bool _isMsgNetworkReadySent;
 
         private PhotonView _photonView;
         private PhotonEventDispatcher _photonEventDispatcher;
@@ -39,9 +45,17 @@ namespace Examples2.Scripts.Battle.Photon
                 enabled = false;
                 return;
             }
-            _requiredComponentCount = PhotonBattle.CountRealPlayers();
-            _currentComponentCount = 0;
             _photonView = PhotonView.Get(this);
+            _requiredComponentCount = PhotonBattle.CountRealPlayers();
+            if (!_photonView.IsRoomView)
+            {
+                // This is Peer-To-Peer network: total is 1, 4, 9 or 16 instances to confirm its creation
+                _requiredComponentCount *= _requiredComponentCount;
+            }
+            _currentComponentCount = 0;
+            _ownerActorNr = _photonView.OwnerActorNr;
+            _failSafeActivationTime = float.MaxValue;
+            _isMsgNetworkReadySent = false;
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnMsgNetworkCreated(data.CustomData); });
             _photonEventDispatcher.registerEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
@@ -49,56 +63,83 @@ namespace Examples2.Scripts.Battle.Photon
 
         private void OnEnable()
         {
-            Debug.Log(
-                $"OnEnable type {_componentTypeId} {name} required {_requiredComponentCount} sending {_photonView.IsMine || _photonView.IsRoomView}");
-            if (_photonView.IsMine || _photonView.IsRoomView)
+            Debug.Log($"OnEnable type {_componentTypeId} owner {_ownerActorNr} {name} required {_requiredComponentCount}");
+            SendMsgNetworkCreated();
+            _failSafeActivationTime = Time.time + _failSafeActivationDelay;
+        }
+
+        private void OnDisable()
+        {
+            Debug.Log($"OnDisable type {_componentTypeId} owner {_ownerActorNr} {name} required {_requiredComponentCount}");
+        }
+
+        private void Update()
+        {
+            if (_isMsgNetworkReadySent)
             {
-                SendMsgNetworkCreated();
+                return;
             }
+            if (Time.time < _failSafeActivationTime)
+            {
+                return;
+            }
+            SendMsgNetworkReady();
         }
 
         #region Photon Events
 
         private void SendMsgNetworkCreated()
         {
-            var payload = new object[] { (byte)MsgNetworkCreated, _componentTypeId };
+            var payload = new object[] { (byte)MsgNetworkCreated, _componentTypeId, _ownerActorNr };
             _photonEventDispatcher.RaiseEvent(MsgNetworkCreated, payload);
         }
 
         private void OnMsgNetworkCreated(object data)
         {
+            _failSafeActivationTime = Time.time + _failSafeActivationDelay;
             var payload = (object[])data;
-            Assert.AreEqual(2, payload.Length, "Invalid message length");
+            Assert.AreEqual(3, payload.Length, "Invalid message length");
             Assert.AreEqual((byte)MsgNetworkCreated, (byte)payload[0], "Invalid message id");
             var componentTypeId = (int)payload[1];
             if (componentTypeId != _componentTypeId)
             {
                 return;
             }
+            var ownerActorNr = (int)payload[2];
             _currentComponentCount += 1;
             Debug.Log(
-                $"OnNetworkCreated type {_componentTypeId} {name} required {_requiredComponentCount} current {_currentComponentCount} master {PhotonNetwork.IsMasterClient}");
+                $"OnNetworkCreated type {_componentTypeId} owner {ownerActorNr} {name} required {_requiredComponentCount} current {_currentComponentCount} master {PhotonNetwork.IsMasterClient}");
             Assert.IsTrue(_currentComponentCount <= _requiredComponentCount);
-            if (_currentComponentCount == _requiredComponentCount)
+            if (_currentComponentCount < _requiredComponentCount)
             {
-                if (_photonView.IsMine || _photonView.IsRoomView)
-                {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        SendMsgNetworkReady();
-                    }
-                }
+                return;
             }
+            SendMsgNetworkReady();
         }
 
         private void SendMsgNetworkReady()
         {
+            if (_isMsgNetworkReadySent)
+            {
+                return;
+            }
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+            if (!(_photonView.IsMine || _photonView.IsRoomView))
+            {
+                return;
+            }
+            _isMsgNetworkReadySent = true;
             var payload = new object[] { (byte)MsgNetworkReady, _componentTypeId };
             _photonEventDispatcher.RaiseEvent(MsgNetworkReady, payload);
+            _failSafeActivationTime = Time.time + _failSafeActivationDelay;
         }
 
         private void OnMsgNetworkReady(object data)
         {
+            _failSafeActivationTime = Time.time + _failSafeActivationDelay;
             var payload = (object[])data;
             Assert.AreEqual(2, payload.Length, "Invalid message length");
             Assert.AreEqual((byte)MsgNetworkReady, (byte)payload[0], "Invalid message id");
@@ -107,7 +148,7 @@ namespace Examples2.Scripts.Battle.Photon
             {
                 return;
             }
-            Debug.Log($"OnMsgNetworkReady type {_componentTypeId} {name} required {_requiredComponentCount}");
+            Debug.Log($"OnMsgNetworkReady type {_componentTypeId} {name}");
             ActivateAllComponents();
             enabled = false;
         }

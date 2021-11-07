@@ -8280,11 +8280,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _componentTypeId: 1
+  _failSafeActivationDelay: 1
   _componentsToActivate:
   - {fileID: 1685972415}
   - {fileID: 1685972414}
   _requiredComponentCount: 0
   _currentComponentCount: 0
+  _ownerActorNr: 0
+  _failSafeActivationTime: 0
+  _isMsgNetworkReadySent: 0
 --- !u!1 &1688737731
 GameObject:
   m_ObjectHideFlags: 0
