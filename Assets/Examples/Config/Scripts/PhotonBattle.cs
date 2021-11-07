@@ -9,8 +9,8 @@ namespace Examples.Config.Scripts
     {
         public const string playerPositionKey = "pp";
         public const string playerMainSkillKey = "mk";
-        public const string TeamBlueKey = "t1";
-        public const string TeamRedKey = "t2";
+        public const string TeamBlueKey = "tb";
+        public const string TeamRedKey = "tr";
 
         public static bool isRealPlayer(Player player)
         {
