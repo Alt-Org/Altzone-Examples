@@ -1,10 +1,38 @@
 ﻿using System;
+using System.Diagnostics;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Prg.Scripts.Common.PubSub
 {
     public static class PubSubExtensions
     {
         private static readonly Hub Hub = new Hub();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void InitializeOnLoad()
+        {
+            InstallListeners();
+        }
+
+        [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
+        private static void InstallListeners()
+        {
+            void CheckHandlerCount()
+            {
+                var handlerCount = Hub.handlers.Count;
+                if (handlerCount > 0)
+                {
+                    foreach (var h in Hub.handlers)
+                    {
+                        UnityEngine.Debug.Log($"handler {h}");
+                    }
+                    UnityEngine.Debug.LogWarning($"PubSubExtensions.HandlerCount is {handlerCount}");
+                }
+            }
+
+            SceneManager.sceneUnloaded += (s) => CheckHandlerCount();
+        }
 
         public static bool Exists<T>(this object obj)
         {
@@ -42,7 +70,7 @@ namespace Prg.Scripts.Common.PubSub
 
         public static void Unsubscribe<T>(this object obj)
         {
-            Hub.Unsubscribe(obj, (Action<T>) null);
+            Hub.Unsubscribe(obj, (Action<T>)null);
         }
 
         public static void Unsubscribe<T>(this object obj, Action<T> handler)
