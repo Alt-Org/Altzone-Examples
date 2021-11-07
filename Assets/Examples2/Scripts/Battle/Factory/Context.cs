@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.PlayerConnect;
 using Examples2.Scripts.Battle.Players;
 using Examples2.Scripts.Battle.Room;
 using UnityEngine;

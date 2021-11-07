@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Reflection;
 using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
