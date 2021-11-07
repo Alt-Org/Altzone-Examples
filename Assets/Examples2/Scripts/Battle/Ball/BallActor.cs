@@ -1,6 +1,7 @@
 using System;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
 using UnityConstants;
 using UnityEngine;
@@ -35,7 +36,7 @@ namespace Examples2.Scripts.Battle.Ball
     }
 
     [RequireComponent(typeof(PhotonView))]
-    internal class BallActor : MonoBehaviour, IPunObservable, IBall, IBallCollision
+    internal class BallActor : MonoBehaviourPunCallbacks, IPunObservable, IBall, IBallCollision
     {
         private const float BallTeleportDistance = 1f;
         private const float CheckVelocityDelay = 0.5f;
@@ -47,7 +48,7 @@ namespace Examples2.Scripts.Battle.Ball
         [SerializeField] private float _networkLag;
 
         [Header("Debug"), SerializeField] private TMP_Text _ballInfo;
-        private GameObject _ballInfoParent;
+        private GameObject _debugInfoParent;
 
         private PhotonView _photonView;
         private Rigidbody2D _rigidbody;
@@ -56,6 +57,7 @@ namespace Examples2.Scripts.Battle.Ball
         private bool _isCheckVelocityTime;
         private float _checkVelocityTime;
 
+        // This is indexed by BallColor!
         private GameObject[] _stateObjects;
 
         private int _teamAreaMaskValue;
@@ -73,11 +75,10 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void Awake()
         {
-            Debug.Log($"Awake");
+            Debug.Log("Awake");
             _photonView = PhotonView.Get(this);
             _rigidbody = GetComponent<Rigidbody2D>();
-            _rigidbody.isKinematic = !_photonView.IsMine;
-            _stateObjects = new[] // This is indexed by BallColor!
+            _stateObjects = new[]
             {
                 _settings._colorNoTeam,
                 _settings._colorRedTeam,
@@ -90,11 +91,35 @@ namespace Examples2.Scripts.Battle.Ball
             _shieldMaskValue = _settings._shieldMask.value;
             _brickMaskValue = _settings._brickMask.value;
             _wallMaskValue = _settings._wallMask.value;
-            _ballInfoParent = _ballInfo.gameObject;
+            _debugInfoParent = _ballInfo.gameObject;
+            PhotonSetup();
         }
 
-        private void OnEnable()
+        private void PhotonSetup()
         {
+            Debug.Log($"PhotonSetup mine {_photonView.IsMine} room {_photonView.IsRoomView} master {PhotonNetwork.IsMasterClient}");
+            _rigidbody.isKinematic = !PhotonNetwork.IsMasterClient;
+        }
+
+        private void PhotonTakeover()
+        {
+            Debug.Log($"PhotonTakeover mine {_photonView.IsMine} room {_photonView.IsRoomView} master {PhotonNetwork.IsMasterClient}");
+            var velocity = _rigidbody.velocity;
+            Debug.Log($"_rigidbody position {_rigidbody.position} velocity {velocity} isKinematic {_rigidbody.isKinematic}");
+            _rigidbody.isKinematic = !PhotonNetwork.IsMasterClient;
+            if (velocity.x != 0f || velocity.y != 0f)
+            {
+                ((IBall)this).StartMoving(_rigidbody.position, velocity);
+            }
+            else
+            {
+                ((IBall)this).StopMoving();
+            }
+        }
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
             Debug.Log($"OnEnable IsMine {_photonView.IsMine} add observed {!_photonView.ObservedComponents.Contains(this)}");
             if (!_photonView.ObservedComponents.Contains(this))
             {
@@ -128,7 +153,7 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void Update()
         {
-            if (!_photonView.IsMine)
+            if (!PhotonNetwork.IsMasterClient)
             {
                 var position = _rigidbody.position;
                 var isTeleport = Mathf.Abs(position.x - _networkPosition.x) > BallTeleportDistance ||
@@ -270,9 +295,9 @@ namespace Examples2.Scripts.Battle.Ball
 
         void IBall.StopMoving()
         {
-            Debug.Log($"stopMoving {_state._isMoving} <- {false}");
+            Debug.Log($"StopMoving {_state._isMoving} <- {false}");
             _state._isMoving = false;
-            if (_photonView.IsMine)
+            if (PhotonNetwork.IsMasterClient)
             {
                 _settings._ballCollider.SetActive(false);
             }
@@ -282,14 +307,9 @@ namespace Examples2.Scripts.Battle.Ball
 
         void IBall.StartMoving(Vector2 position, Vector2 velocity)
         {
-            if (_photonView.IsMine)
-            {
-                // Hackish way to enable us
-                enabled = true;
-            }
-            Debug.Log($"startMoving {_state._isMoving} <- {true} position {position} velocity {velocity}");
+            Debug.Log($"StartMoving {_state._isMoving} <- {true} position {position} velocity {velocity}");
             _state._isMoving = true;
-            if (_photonView.IsMine)
+            if (PhotonNetwork.IsMasterClient)
             {
                 _settings._ballCollider.SetActive(true);
 
@@ -302,7 +322,7 @@ namespace Examples2.Scripts.Battle.Ball
 
         void IBall.SetColor(BallColor ballColor)
         {
-            if (_photonView.IsMine)
+            if (PhotonNetwork.IsMasterClient)
             {
                 _photonView.RPC(nameof(SetBallColorRpc), RpcTarget.All, (byte)ballColor);
             }
@@ -316,11 +336,11 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void _setBallColorLocal(BallColor ballColor)
         {
-            //Debug.Log($"setColor {state.ballColor} <- {ballColor}");
+            //Debug.Log($"_setBallColorLocal {state.ballColor} <- {ballColor}");
             _stateObjects[(int)_state._ballColor].SetActive(false);
             _state._ballColor = ballColor;
             _stateObjects[(int)_state._ballColor].SetActive(true);
-            _ballInfoParent.SetActive(ballColor != BallColor.Hidden);
+            _debugInfoParent.SetActive(ballColor != BallColor.Hidden);
         }
 
         #endregion
@@ -361,6 +381,18 @@ namespace Examples2.Scripts.Battle.Ball
         {
             get => _onExitTeamArea;
             set => _onExitTeamArea = value;
+        }
+
+        #endregion
+
+        #region Photon
+
+        public override void OnMasterClientSwitched(Player newMasterClient)
+        {
+            if (newMasterClient.Equals(PhotonNetwork.LocalPlayer))
+            {
+                PhotonTakeover();
+            }
         }
 
         #endregion

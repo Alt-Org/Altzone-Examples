@@ -1,14 +1,15 @@
 using System;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.Players;
-using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityConstants;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Ball
 {
+    /// <summary>
+    /// <c>BallManager</c> listens events from the <c>IBall</c> and forwards them where applicable - even to the <c>IBall</c> itself.
+    /// </summary>
     public class BallManager : MonoBehaviour
     {
         [Serializable]
@@ -19,16 +20,13 @@ namespace Examples2.Scripts.Battle.Ball
         }
 
         [SerializeField] private State _state;
+
         private IBall _ball;
         private IBrickManager _brickManager;
 
         private void Awake()
         {
-            Debug.Log($"Awake master {PhotonNetwork.IsMasterClient}");
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                enabled = false;
-            }
+            Debug.Log("Awake");
             _ball = Context.GetBall;
             _brickManager = Context.GetBrickManager;
             var ballCollision = _ball.BallCollision;
@@ -39,6 +37,7 @@ namespace Examples2.Scripts.Battle.Ball
             ballCollision.OnEnterTeamArea = OnEnterTeamArea;
             ballCollision.OnExitTeamArea = OnExitTeamArea;
         }
+
         #region IBallCollision callback events
 
         private void OnHeadCollision(GameObject other)
@@ -98,8 +97,6 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"UNHANDLED onExitTeamArea {other.name} {other.tag}");
         }
 
-        #endregion
-
         private static void SetBallColor(IBall ball, State state)
         {
             if (state._isRedTeamActive && !state._isBlueTeamActive)
@@ -118,6 +115,14 @@ namespace Examples2.Scripts.Battle.Ball
             ball.Publish(new ActiveTeamEvent(-1));
         }
 
+        #endregion
+
+        /// <summary>
+        /// Active team event is sent whenever active team is changed.
+        /// </summary>
+        /// <remarks>
+        /// <c>TeamIndex</c> is -1 when no team is active.
+        /// </remarks>
         internal class ActiveTeamEvent
         {
             public readonly int TeamIndex;
