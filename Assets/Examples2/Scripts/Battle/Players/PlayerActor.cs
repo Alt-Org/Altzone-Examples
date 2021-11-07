@@ -67,6 +67,12 @@ namespace Examples2.Scripts.Battle.Players
             ((IPlayerActor)this).SetNormalMode();
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log($"OnDestroy {name}");
+            this.Unsubscribe();
+        }
+
         private void OnActiveTeamEvent(BallManager.ActiveTeamEvent data)
         {
             if (data.TeamIndex == _state._teamIndex)
