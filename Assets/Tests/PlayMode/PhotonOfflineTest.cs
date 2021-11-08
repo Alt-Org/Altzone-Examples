@@ -37,13 +37,13 @@ namespace Tests.PlayMode
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.
         [UnityTest]
-        public IEnumerator ConnectToPhoton()
+        public IEnumerator CustomPropertiesTests()
         {
             Debug.Log($"test start {PhotonWrapper.NetworkClientState}");
 
             var inRoomTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InRoom, inRoomTimeout));
-            Assert.IsTrue(PhotonNetwork.InRoom, "Not in room");
+            Assert.That(PhotonNetwork.InRoom, Is.True, "Not in room");
 
             yield return RoomCustomPropertiesTests(PhotonNetwork.CurrentRoom);
             yield return null;
@@ -63,22 +63,48 @@ namespace Tests.PlayMode
             const string stringValue = "123";
             const string newStringValue = "321";
 
-            var hasProp = room.HasCustomProperty(intPropName);
-            Assert.IsFalse(hasProp);
             yield return null;
+            var hasProp = room.HasCustomProperty(intPropName);
+            Assert.That(hasProp, Is.False);
+
+            // int tests - except SafeSetCustomProperty failure
 
             room.SetCustomProperty(intPropName, intValue);
             yield return null;
 
             hasProp = room.HasCustomProperty(intPropName);
-            Assert.IsTrue(hasProp);
+            Assert.That(hasProp, Is.True);
             yield return null;
+
+            object propValue = room.GetCustomProperty(intPropName, -1);
+            Assert.That(propValue, Is.EqualTo(intValue));
+            yield return null;
+
+            room.SafeSetCustomProperty(intPropName, newIntValue, intValue);
+            yield return null;
+
+            propValue = room.GetCustomProperty(intPropName, -1);
+            Assert.That(propValue, Is.EqualTo(newIntValue));
+            yield return null;
+
+            // string tests - except SafeSetCustomProperty failure
 
             room.SetCustomProperty(stringPropName, stringValue);
             yield return null;
 
             hasProp = room.HasCustomProperty(stringPropName);
-            Assert.IsTrue(hasProp);
+            Assert.That(hasProp, Is.True);
+            yield return null;
+
+            propValue = room.GetCustomProperty(stringPropName, string.Empty);
+            Assert.That(propValue, Is.EqualTo(stringValue));
+            yield return null;
+
+            room.SafeSetCustomProperty(stringPropName, newStringValue, stringValue);
+            yield return null;
+
+            propValue = room.GetCustomProperty(stringPropName, string.Empty);
+            Assert.That(propValue, Is.EqualTo(newStringValue));
             yield return null;
         }
 
@@ -95,20 +121,46 @@ namespace Tests.PlayMode
 
             yield return null;
             var hasProp = player.HasCustomProperty(intPropName);
-            Assert.IsFalse(hasProp);
+            Assert.That(hasProp, Is.False);
+
+            // int tests - except SafeSetCustomProperty failure
 
             player.SetCustomProperty(intPropName, intValue);
             yield return null;
 
             hasProp = player.HasCustomProperty(intPropName);
-            Assert.IsTrue(hasProp);
+            Assert.That(hasProp, Is.True);
             yield return null;
+
+            object propValue = player.GetCustomProperty(intPropName, -1);
+            Assert.That(propValue, Is.EqualTo(intValue));
+            yield return null;
+
+            player.SafeSetCustomProperty(intPropName, newIntValue, intValue);
+            yield return null;
+
+            propValue = player.GetCustomProperty(intPropName, -1);
+            Assert.That(propValue, Is.EqualTo(newIntValue));
+            yield return null;
+
+            // string tests - except SafeSetCustomProperty failure
 
             player.SetCustomProperty(stringPropName, stringValue);
             yield return null;
 
             hasProp = player.HasCustomProperty(stringPropName);
-            Assert.IsTrue(hasProp);
+            Assert.That(hasProp, Is.True);
+            yield return null;
+
+            propValue = player.GetCustomProperty(stringPropName, string.Empty);
+            Assert.That(propValue, Is.EqualTo(stringValue));
+            yield return null;
+
+            player.SafeSetCustomProperty(stringPropName, newStringValue, stringValue);
+            yield return null;
+
+            propValue = player.GetCustomProperty(stringPropName, string.Empty);
+            Assert.That(propValue, Is.EqualTo(newStringValue));
             yield return null;
         }
 

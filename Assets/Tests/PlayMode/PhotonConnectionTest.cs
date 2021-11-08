@@ -14,44 +14,37 @@ namespace Tests.PlayMode
         private const string RoomName = "Test1";
         private const float Timeout = 2.0f;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            Debug.Log($"OneTimeSetUp start {PhotonWrapper.NetworkClientState}");
-            PhotonLobby.connect(PlayerName);
-            Debug.Log($"OneTimeSetUp exit {PhotonWrapper.NetworkClientState}");
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            Debug.Log($"OneTimeTearDown start {PhotonWrapper.NetworkClientState}");
-            PhotonLobby.disconnect();
-            Debug.Log($"OneTimeTearDown exit {PhotonWrapper.NetworkClientState}");
-        }
-
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
         [UnityTest]
         public IEnumerator ConnectToPhoton()
         {
             Debug.Log($"test start {PhotonWrapper.NetworkClientState}");
 
+            PhotonLobby.connect(PlayerName);
+            yield return null;
+
             var canJoinLobbyTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.CanJoinLobby, canJoinLobbyTimeout));
-            Assert.IsTrue(PhotonWrapper.CanJoinLobby, "Can not join lobby");
+            Assert.That(PhotonWrapper.CanJoinLobby, Is.True, "Can not join lobby");
 
             PhotonLobby.joinLobby();
+            yield return null;
 
             var inLobbyTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InLobby, inLobbyTimeout));
-            Assert.IsTrue(PhotonNetwork.InLobby, "Not in lobby");
+            Assert.That(PhotonNetwork.InLobby, Is.True, "Not in lobby");
 
             PhotonLobby.joinOrCreateRoom(RoomName, null, null);
 
             var inRoomTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InRoom, inRoomTimeout));
-            Assert.IsTrue(PhotonNetwork.InRoom, "Not in room");
+            Assert.That(PhotonNetwork.InRoom, Is.True, "Not in room");
+
+            PhotonLobby.disconnect();
+            yield return null;
+
+            var isPhotonReadyTimeout = Time.time + Timeout;
+            yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.IsPhotonReady, isPhotonReadyTimeout));
+            Assert.That(PhotonNetwork.IsConnected, Is.False, "Is connected");
 
             Debug.Log($"test end {PhotonWrapper.NetworkClientState}");
         }
