@@ -32,7 +32,7 @@ namespace Prg.Scripts.Common.Photon
             {
                 { ActorProperties.PlayerName.ToString(), nameof(ActorProperties.PlayerName) },
                 { ActorProperties.IsInactive.ToString(), nameof(ActorProperties.IsInactive) },
-                { ActorProperties.UserId.ToString(), nameof(ActorProperties.UserId) },
+                { ActorProperties.UserId.ToString(), nameof(ActorProperties.UserId) }
             };
             PhotonRoomPropNames = new Dictionary<string, string>
             {
@@ -46,7 +46,7 @@ namespace Prg.Scripts.Common.Photon
                 { GamePropertyKey.MasterClientId.ToString(), nameof(GamePropertyKey.MasterClientId) },
                 { GamePropertyKey.ExpectedUsers.ToString(), nameof(GamePropertyKey.ExpectedUsers) },
                 { GamePropertyKey.PlayerTtl.ToString(), nameof(GamePropertyKey.PlayerTtl) },
-                { GamePropertyKey.EmptyRoomTtl.ToString(), nameof(GamePropertyKey.EmptyRoomTtl) },
+                { GamePropertyKey.EmptyRoomTtl.ToString(), nameof(GamePropertyKey.EmptyRoomTtl) }
             };
         }
 

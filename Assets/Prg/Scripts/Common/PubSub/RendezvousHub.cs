@@ -30,7 +30,7 @@ namespace Prg.Scripts.Common.PubSub
             handler = new Handler
             {
                 Action = handshake,
-                Client = new WeakReference(client),
+                Client = new WeakReference(client)
             };
             pairHandlers.Add(type, handler);
         }
@@ -72,7 +72,7 @@ namespace Prg.Scripts.Common.PubSub
             var handler = new Handler
             {
                 Action = handshake,
-                Client = new WeakReference(client),
+                Client = new WeakReference(client)
             };
             handlerList.Add(handler);
         }

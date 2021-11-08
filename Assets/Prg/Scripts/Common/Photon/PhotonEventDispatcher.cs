@@ -25,7 +25,7 @@ namespace Prg.Scripts.Common.Photon
 
         private readonly RaiseEventOptions raiseEventOptions = new RaiseEventOptions
         {
-            Receivers = ReceiverGroup.All,
+            Receivers = ReceiverGroup.All
         };
 
         public static PhotonEventDispatcher Get()

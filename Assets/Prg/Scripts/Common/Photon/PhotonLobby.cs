@@ -112,7 +112,7 @@ namespace Prg.Scripts.Common.Photon
             var options = roomOptions ?? new RoomOptions
             {
                 IsOpen = true,
-                IsVisible = true,
+                IsVisible = true
             };
             PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         }
@@ -147,7 +147,7 @@ namespace Prg.Scripts.Common.Photon
             var options = new RoomOptions
             {
                 CustomRoomProperties = customRoomProperties,
-                CustomRoomPropertiesForLobby = lobbyPropertyNames,
+                CustomRoomPropertiesForLobby = lobbyPropertyNames
             };
             PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
             PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);

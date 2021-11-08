@@ -141,7 +141,7 @@ namespace Prg.Scripts.Common.Util
                     var filter = new RegExpFilter
                     {
                         regex = new Regex(line, regexOptions),
-                        isLogged = isLogged,
+                        isLogged = isLogged
                     };
                     list.Add(filter);
                 }
