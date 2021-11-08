@@ -7,11 +7,11 @@ public class PrintScreen : MonoBehaviour
 {
     private const int SuperSize = 1;
 
-    [Header("Settings")] public string imageName = "screenshot";
+    [Header("Settings")] public string _imageName = "screenshot";
 
-    [Header("Live Data")] public bool capturing;
-    public string imageFolder;
-    public int imageIndex;
+    [Header("Live Data")] public bool _capturing;
+    public string _imageFolder;
+    public int _imageIndex;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void BeforeSceneLoad()
@@ -30,9 +30,9 @@ public class PrintScreen : MonoBehaviour
         }
 
         // Keep numbering from largest found index.
-        imageIndex = 0;
-        imageFolder = Application.persistentDataPath;
-        var oldFiles = Directory.GetFiles(imageFolder, $"{imageName.Replace("-", "_")}-???-*.png");
+        _imageIndex = 0;
+        _imageFolder = Application.persistentDataPath;
+        var oldFiles = Directory.GetFiles(_imageFolder, $"{_imageName.Replace("-", "_")}-???-*.png");
         var today = DateTime.Now.Day;
         foreach (var oldFile in oldFiles)
             if (File.GetCreationTime(oldFile).Day != today)
@@ -44,9 +44,9 @@ public class PrintScreen : MonoBehaviour
                 var tokens = Path.GetFileName(oldFile).Split('-');
                 if (tokens.Length == 3 && int.TryParse(tokens[1], out var fileIndex))
                 {
-                    if (fileIndex > imageIndex)
+                    if (fileIndex > _imageIndex)
                     {
-                        imageIndex = fileIndex;
+                        _imageIndex = fileIndex;
                     }
                 }
             }
@@ -54,29 +54,29 @@ public class PrintScreen : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!capturing && Event.current.type == EventType.KeyUp)
+        if (!_capturing && Event.current.type == EventType.KeyUp)
         {
             if (Event.current.keyCode == KeyCode.Print
                 || Event.current.keyCode == KeyCode.SysReq // This is actually Print Screen!
                 || Event.current.keyCode == KeyCode.F6 // Works for Mac
             )
             {
-                capturing = true;
+                _capturing = true;
             }
         }
     }
 
     private void LateUpdate()
     {
-        if (capturing)
+        if (_capturing)
         {
-            capturing = false;
+            _capturing = false;
             var sceneName = SceneManager.GetActiveScene().name;
             string filename;
             for (;;)
             {
-                imageIndex += 1;
-                filename = $"{imageFolder}{Path.AltDirectorySeparatorChar}{imageName}-{imageIndex:000}-{sceneName}.png";
+                _imageIndex += 1;
+                filename = $"{_imageFolder}{Path.AltDirectorySeparatorChar}{_imageName}-{_imageIndex:000}-{sceneName}.png";
                 if (!File.Exists(filename))
                 {
                     break;
