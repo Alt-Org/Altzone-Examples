@@ -52,6 +52,13 @@ public static class PhotonExtensions
         return player.CustomProperties.ContainsKey(key);
     }
 
+    public static void SetCustomProperty(this Player player, string key, object value)
+    {
+        Assert.IsNotNull(value);
+        var props = new Hashtable { { key, value } };
+        player.SetCustomProperties(props);
+    }
+
     public static void SafeSetCustomProperty<T>(this Player player, string key, T newValue, T currentValue) where T : struct
     {
         CheckIsTypeAcceptable(newValue);
@@ -60,6 +67,8 @@ public static class PhotonExtensions
 
     public static void SafeSetCustomProperty(this Player player, string key, string newValue, string currentValue)
     {
+        Assert.IsFalse(string.IsNullOrWhiteSpace(newValue));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(currentValue));
         DoSetCustomProperty(player, key, newValue, currentValue);
     }
 
@@ -92,6 +101,13 @@ public static class PhotonExtensions
         return room.CustomProperties.ContainsKey(key);
     }
 
+    public static void SetCustomProperty(this Room room, string key, object value)
+    {
+        Assert.IsNotNull(value);
+        var props = new Hashtable { { key, value } };
+        room.SetCustomProperties(props);
+    }
+
     public static void SafeSetCustomProperty<T>(this Room room, string key, T newValue, T currentValue) where T : struct
     {
         CheckIsTypeAcceptable(newValue);
@@ -100,6 +116,8 @@ public static class PhotonExtensions
 
     public static void SafeSetCustomProperty(this Room room, string key, string newValue, string currentValue)
     {
+        Assert.IsFalse(string.IsNullOrWhiteSpace(newValue));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(currentValue));
         DoSetCustomProperty(room, key, newValue, currentValue);
     }
 
