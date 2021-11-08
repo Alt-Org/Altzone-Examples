@@ -8,6 +8,13 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+/// <summary>
+/// Extension methods to Photon <c>Player</c> and <c>Room</c> (<c>RoomInfo</c>) objects.
+/// </summary>
+/// <remarks>
+/// Delete property and <c>null</c> values has a bit fuzzy semantics and this need more work to enforce strict rules.<br />
+/// For now it might be better not to use <c>null </c> values.
+/// </remarks>
 public static class PhotonExtensions
 {
     #region Room
@@ -74,7 +81,6 @@ public static class PhotonExtensions
 
     public static void RemoveCustomProperty(this Player player, string key)
     {
-        Assert.IsTrue(PhotonNetwork.CurrentRoom.DeleteNullProperties);
         if (player.CustomProperties.ContainsKey(key))
         {
             var props = new Hashtable { { key, null } };
@@ -84,7 +90,7 @@ public static class PhotonExtensions
 
     public static T GetCustomProperty<T>(this Player player, string key, T defaultValue = default)
     {
-        if (player.CustomProperties.TryGetValue(key, out var propValue))
+        if (player.CustomProperties.TryGetValue(key, out var propValue) && propValue != null)
         {
             if (propValue is T valueOfCorrectType)
             {
@@ -123,7 +129,7 @@ public static class PhotonExtensions
 
     public static T GetCustomProperty<T>(this RoomInfo room, string key, T defaultValue = default)
     {
-        if (room.CustomProperties.TryGetValue(key, out var propValue))
+        if (room.CustomProperties.TryGetValue(key, out var propValue) && propValue != null)
         {
             if (propValue is T valueOfCorrectType)
             {
@@ -137,7 +143,6 @@ public static class PhotonExtensions
 
     public static void RemoveCustomProperty(this Room room, string key)
     {
-        Assert.IsTrue(room.DeleteNullProperties);
         if (room.CustomProperties.ContainsKey(key))
         {
             var props = new Hashtable { { key, null } };

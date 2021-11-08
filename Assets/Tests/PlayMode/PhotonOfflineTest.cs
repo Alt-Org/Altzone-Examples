@@ -12,7 +12,6 @@ namespace Tests.PlayMode
     public class PhotonOfflineTest
     {
         private const string PlayerName = "Teppo";
-        private const string RoomName = "Test1";
         private const float Timeout = 2.0f;
 
         [OneTimeSetUp]
@@ -54,7 +53,7 @@ namespace Tests.PlayMode
 
         private static IEnumerator RoomCustomPropertiesTests(Room room)
         {
-            Debug.Log($"test {room.GetDebugLabel()}");
+            Debug.Log($"test start {room.GetDebugLabel()}");
 
             const string intPropName = "INT";
             const string stringPropName = "STR";
@@ -87,6 +86,13 @@ namespace Tests.PlayMode
             Assert.That(propValue, Is.EqualTo(newIntValue));
             yield return null;
 
+            room.RemoveCustomProperty(intPropName);
+            yield return null;
+
+            hasProp = room.HasCustomProperty(intPropName);
+            Assert.That(hasProp, Is.False);
+            yield return null;
+
             // string tests - except SafeSetCustomProperty failure
 
             room.SetCustomProperty(stringPropName, stringValue);
@@ -106,11 +112,19 @@ namespace Tests.PlayMode
             propValue = room.GetCustomProperty(stringPropName, string.Empty);
             Assert.That(propValue, Is.EqualTo(newStringValue));
             yield return null;
+
+            room.RemoveCustomProperty(stringPropName);
+            yield return null;
+
+            hasProp = room.HasCustomProperty(stringPropName);
+            Assert.That(hasProp, Is.False);
+
+            Debug.Log($"test end {room.GetDebugLabel()}");
         }
 
         private static IEnumerator PlayerCustomPropertiesTests(Player player)
         {
-            Debug.Log($"test {player.GetDebugLabel()}");
+            Debug.Log($"test start {player.GetDebugLabel()}");
 
             const string intPropName = "INT";
             const string stringPropName = "STR";
@@ -143,6 +157,13 @@ namespace Tests.PlayMode
             Assert.That(propValue, Is.EqualTo(newIntValue));
             yield return null;
 
+            player.RemoveCustomProperty(intPropName);
+            yield return null;
+
+            hasProp = player.HasCustomProperty(intPropName);
+            Assert.That(hasProp, Is.False);
+            yield return null;
+
             // string tests - except SafeSetCustomProperty failure
 
             player.SetCustomProperty(stringPropName, stringValue);
@@ -162,6 +183,14 @@ namespace Tests.PlayMode
             propValue = player.GetCustomProperty(stringPropName, string.Empty);
             Assert.That(propValue, Is.EqualTo(newStringValue));
             yield return null;
+
+            player.RemoveCustomProperty(stringPropName);
+            yield return null;
+
+            hasProp = player.HasCustomProperty(stringPropName);
+            Assert.That(hasProp, Is.False);
+
+            Debug.Log($"test end {player.GetDebugLabel()}");
         }
 
         private static bool TimedWait(Func<bool> action, float timeoutTime)
