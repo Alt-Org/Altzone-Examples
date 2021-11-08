@@ -59,7 +59,7 @@ namespace Prg.Scripts.Common.Photon
         [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
         private static void Create()
         {
-            UnityExtensions.CreateGameObjectAndComponent<PhotonListener>(nameof(PhotonListener), isDontDestroyOnLoad: true);
+            UnityExtensions.CreateGameObjectAndComponent<PhotonListener>(nameof(PhotonListener), true);
         }
 
         private void OnEnable()

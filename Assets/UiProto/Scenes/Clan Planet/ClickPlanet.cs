@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Prg.Scripts.Common.Unity.Events;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Scenes.Clan_Planet

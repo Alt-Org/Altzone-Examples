@@ -99,7 +99,7 @@ namespace Prg.Scripts.Common.Util
                 return message;
             }
 
-            UnityExtensions.CreateGameObjectAndComponent<LogWriter>(nameof(LogWriter), isDontDestroyOnLoad: true);
+            UnityExtensions.CreateGameObjectAndComponent<LogWriter>(nameof(LogWriter), true);
             LogWriter.logLineContentFilter += filterPhotonLogMessage;
         }
 

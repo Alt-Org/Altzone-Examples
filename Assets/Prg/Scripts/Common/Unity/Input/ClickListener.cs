@@ -41,7 +41,7 @@ namespace Prg.Scripts.Common.Unity.Input
             var hitObject = hit.collider.gameObject;
             var _layer = hitObject.layer;
             var hasTag = !string.IsNullOrEmpty(clickableTagName) && hitObject.CompareTag(clickableTagName);
-            var hasLayer = layerMask == (layerMask | 1 << _layer); // unity3d check if layer mask contains layer
+            var hasLayer = layerMask == (layerMask | (1 << _layer)); // unity3d check if layer mask contains layer
 
             //Debug.Log($"CLICK {hitObject.GetFullPath()} tag {hitObject.tag} ({hasTag}) layer {_layer} {LayerMask.LayerToName(_layer)} ({hasLayer})");
             if (hasTag || hasLayer)

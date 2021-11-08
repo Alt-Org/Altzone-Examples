@@ -203,7 +203,7 @@ namespace Examples.Config.Scripts
                 _instance = FindObjectOfType<RuntimeGameConfig>();
                 if (_instance == null)
                 {
-                    _instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), isDontDestroyOnLoad: true);
+                    _instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), true);
                     LoadGameConfig();
                 }
             }

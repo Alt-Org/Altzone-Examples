@@ -35,7 +35,7 @@ namespace Prg.Scripts.Common.Photon
                 _Instance = FindObjectOfType<PhotonEventDispatcher>();
                 if (_Instance == null)
                 {
-                    UnityExtensions.CreateGameObjectAndComponent<PhotonEventDispatcher>(nameof(PhotonEventDispatcher), isDontDestroyOnLoad: false);
+                    UnityExtensions.CreateGameObjectAndComponent<PhotonEventDispatcher>(nameof(PhotonEventDispatcher), false);
                 }
             }
             return _Instance;

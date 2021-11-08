@@ -31,7 +31,7 @@ namespace Prg.Scripts.Common.PubSub
                 }
             }
 
-            SceneManager.sceneUnloaded += (s) => CheckHandlerCount();
+            SceneManager.sceneUnloaded += s => CheckHandlerCount();
         }
 
         public static bool Exists<T>(this object obj)
