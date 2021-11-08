@@ -1,10 +1,10 @@
+using System.Diagnostics;
+using System.Globalization;
+using System.Threading;
 using Altzone.Scripts.Config;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using Prg.Scripts.Common.Util;
-using System.Diagnostics;
-using System.Globalization;
-using System.Threading;
 using UnityEngine;
 
 namespace Altzone.Scripts
@@ -12,7 +12,7 @@ namespace Altzone.Scripts
     public class BootLoader : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void beforeSceneLoad()
+        private static void BeforeSceneLoad()
         {
             var localDevConfig = ResourceLoader.Get().LoadAsset<LocalDevConfig>(nameof(LocalDevConfig));
             LocalDevConfig.Instance = Instantiate(localDevConfig);
@@ -23,11 +23,11 @@ namespace Altzone.Scripts
             var loggerConfig = resourceLoader.LoadAsset<LoggerConfig>(nameof(LoggerConfig));
             LoggerConfig.createLoggerConfig(loggerConfig);
 
-            setDevelopmentStatus();
+            SetDevelopmentStatus();
         }
 
         [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
-        private static void setDevelopmentStatus()
+        private static void SetDevelopmentStatus()
         {
             // This is just for debugging to get strings (numbers) formatted consistently
             // - everything that goes to UI should go through Localizer using player's locale preferences
@@ -39,6 +39,7 @@ namespace Altzone.Scripts
             {
                 PhotonLobby._gameVersion = () => $"{LocalDevConfig.Instance.photonVersionPrefix}{Application.version}";
             }
+            UnityEngine.Debug.Log($"Photon {Debug.Brown(PhotonLobby.gameVersion)}");
         }
     }
 }
