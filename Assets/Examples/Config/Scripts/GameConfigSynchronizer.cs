@@ -108,7 +108,7 @@ namespace Examples.Config.Scripts
 
         private void SendSynchronizeFeatures(byte first, byte last)
         {
-            var features = RuntimeGameConfig.Get().features;
+            var features = RuntimeGameConfig.Get().Features;
             using (var stream = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(stream))
@@ -140,12 +140,12 @@ namespace Examples.Config.Scripts
                     reader.ReadByte(); // skip last
                 }
             }
-            RuntimeGameConfig.Get().features = features;
+            RuntimeGameConfig.Get().Features = features;
         }
 
         private void SendSynchronizeVariables(byte first, byte last)
         {
-            var variables = RuntimeGameConfig.Get().variables;
+            var variables = RuntimeGameConfig.Get().Variables;
             using (var stream = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(stream))
@@ -177,7 +177,7 @@ namespace Examples.Config.Scripts
                     reader.ReadByte(); // skip last
                 }
             }
-            RuntimeGameConfig.Get().variables = variables;
+            RuntimeGameConfig.Get().Variables = variables;
         }
 
         private static int CountFieldsByteSize(Type type)

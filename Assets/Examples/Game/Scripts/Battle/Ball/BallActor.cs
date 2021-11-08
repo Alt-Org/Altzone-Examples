@@ -57,7 +57,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         private void Awake()
         {
             Debug.Log("Awake");
-            variables = RuntimeGameConfig.Get().variables;
+            variables = RuntimeGameConfig.Get().Variables;
             _rigidbody = GetComponent<Rigidbody2D>();
             _photonView = PhotonView.Get(this);
             _rigidbody.isKinematic = !_photonView.IsMine;

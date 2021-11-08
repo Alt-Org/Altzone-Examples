@@ -36,7 +36,7 @@ namespace Examples.Game.Scripts.Battle.Room
             if (state == ClientState.PeerCreated || state == ClientState.Disconnected)
             {
                 Debug.Log($"connect: {PhotonNetwork.NetworkClientState}");
-                var playerData = RuntimeGameConfig.Get().playerDataCache;
+                var playerData = RuntimeGameConfig.Get().PlayerDataCache;
                 //PhotonLobby.isAllowOfflineMode = isOfflineMode;
                 PhotonNetwork.OfflineMode = isOfflineMode;
                 if (isOfflineMode)

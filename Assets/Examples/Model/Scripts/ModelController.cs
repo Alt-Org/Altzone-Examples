@@ -19,7 +19,7 @@ namespace Examples.Model.Scripts
         {
             Debug.Log("Start");
             view.titleText.text = $"Choose your character\r\nfor {Application.productName} {PhotonLobby.gameVersion}";
-            var player = RuntimeGameConfig.Get().playerDataCache;
+            var player = RuntimeGameConfig.Get().PlayerDataCache;
             view.playerName.text = player.PlayerName;
             view.hideCharacter();
             view.continueButton.onClick.AddListener(() =>

@@ -64,7 +64,7 @@ namespace Examples.Lobby.Scripts.InRoom
             var player = PhotonNetwork.LocalPlayer;
             player.CustomProperties.Clear();
             // Guest by default
-            var playerDataCache = RuntimeGameConfig.Get().playerDataCache;
+            var playerDataCache = RuntimeGameConfig.Get().PlayerDataCache;
             var defence = playerDataCache.CharacterModel.MainDefence;
             player.SetCustomProperties(new Hashtable
             {

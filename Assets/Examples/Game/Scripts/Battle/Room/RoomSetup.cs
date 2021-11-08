@@ -61,7 +61,7 @@ namespace Examples.Game.Scripts.Battle.Room
                 return;
             }
             var sceneConfig = SceneConfig.Get();
-            var features = RuntimeGameConfig.Get().features;
+            var features = RuntimeGameConfig.Get().Features;
             if (features.isRotateGameCamera)
             {
                 // Rotate game camera for upper team

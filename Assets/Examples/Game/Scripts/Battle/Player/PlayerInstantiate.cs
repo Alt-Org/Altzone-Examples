@@ -26,7 +26,7 @@ namespace Examples.Game.Scripts.Battle.Player
             {
                 throw new UnityException($"invalid team index '{teamIndex}' for player {player.GetDebugLabel()}");
             }
-            var playerDataCache = RuntimeGameConfig.Get().playerDataCache;
+            var playerDataCache = RuntimeGameConfig.Get().PlayerDataCache;
             var defence = playerDataCache.CharacterModel.MainDefence;
             var playerPrefab = getPlayerPrefab(defence);
 
@@ -39,7 +39,7 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private static GameObject getPlayerPrefab(Defence defence)
         {
-            var prefabs = RuntimeGameConfig.Get().prefabs;
+            var prefabs = RuntimeGameConfig.Get().Prefabs;
             switch (defence)
             {
                 case Defence.Desensitisation:

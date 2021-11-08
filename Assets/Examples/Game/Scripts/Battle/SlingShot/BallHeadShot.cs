@@ -85,11 +85,11 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         private void startBall()
         {
-            var variables = RuntimeGameConfig.Get().variables;
+            var variables = RuntimeGameConfig.Get().Variables;
             var delta = a - b;
             var direction = delta.normalized;
             var clampedSpeed = Mathf.Clamp(Mathf.Abs(delta.magnitude), variables.minSlingShotDistance, variables.maxSlingShotDistance);
-            var multiplier = RuntimeGameConfig.Get().variables.ballMoveSpeedMultiplier;
+            var multiplier = RuntimeGameConfig.Get().Variables.ballMoveSpeedMultiplier;
             var speed = clampedSpeed * multiplier;
             startTheBall(ballControl, ballTransform.position, teamIndex, direction, speed);
         }
@@ -123,7 +123,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             deltaBall = (ballTransform.position - followA.position) * (1f + gapToBall);
             distanceBall = Mathf.Abs(deltaBall.magnitude);
 
-            ballStartTime = Time.time + RuntimeGameConfig.Get().variables.ballRestartDelay;
+            ballStartTime = Time.time + RuntimeGameConfig.Get().Variables.ballRestartDelay;
 
             line.gameObject.SetActive(true);
             enabled = true;

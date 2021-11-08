@@ -94,14 +94,14 @@ namespace Examples.Config.Scripts
     [Serializable]
     public class PlayerDataCache
     {
+        [SerializeField] protected string _playerName;
+
         /// <summary>
         /// Player name.
         /// </summary>
         /// <remarks>
         /// This should be validated and sanitized before accepting a new value.
         /// </remarks>
-        [SerializeField] protected string _playerName;
-
         public string PlayerName
         {
             get => _playerName;
@@ -115,11 +115,11 @@ namespace Examples.Config.Scripts
             }
         }
 
+        [SerializeField] protected int _characterModelId;
+
         /// <summary>
         /// Player character model id.
         /// </summary>
-        [SerializeField] protected int _characterModelId;
-
         public int CharacterModelId
         {
             get => _characterModelId;
@@ -133,8 +133,17 @@ namespace Examples.Config.Scripts
             }
         }
 
-        public CharacterModel CharacterModel => Models.GetById<CharacterModel>(_characterModelId) ??
-                                                new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
+        /// <summary>
+        /// Player character model.
+        /// </summary>
+        /// <remarks>
+        /// This is guaranteed to be valid reference all the time even <c>CharacterModelId</c> is invalid.
+        /// </remarks>
+        public CharacterModel CharacterModel =>
+            Models.FindById<CharacterModel>(_characterModelId) ??
+            new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
+
+        [SerializeField] protected string _playerHandle;
 
         /// <summary>
         /// Unique string to identify this player across devices and systems.
@@ -142,8 +151,6 @@ namespace Examples.Config.Scripts
         /// <remarks>
         /// When new player is detected this should be given and persisted in all external systems in order to identify this player unambiguously.
         /// </remarks>
-        [SerializeField] protected string _playerHandle;
-
         public string PlayerHandle
         {
             get => _playerHandle;
@@ -168,7 +175,7 @@ namespace Examples.Config.Scripts
         /// <summary>
         /// Public <c>BatchSave</c> method to save several properties at once.
         /// </summary>
-        /// <param name="saveSettings"></param>
+        /// <param name="saveSettings">The action to save all properties in one go.</param>
         public virtual void BatchSave(Action saveSettings)
         {
             // Placeholder for actual implementation in derived class.
@@ -191,62 +198,62 @@ namespace Examples.Config.Scripts
     {
         public static RuntimeGameConfig Get()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = FindObjectOfType<RuntimeGameConfig>();
-                if (_Instance == null)
+                _instance = FindObjectOfType<RuntimeGameConfig>();
+                if (_instance == null)
                 {
-                    _Instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), isDontDestroyOnLoad: true);
-                    loadGameConfig();
+                    _instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), isDontDestroyOnLoad: true);
+                    LoadGameConfig();
                 }
             }
-            return _Instance;
+            return _instance;
         }
 
-        private static RuntimeGameConfig _Instance;
+        private static RuntimeGameConfig _instance;
 
         [SerializeField] private GameFeatures _permanentFeatures;
         [SerializeField] private GameVariables _permanentVariables;
         [SerializeField] private GamePrefabs _permanentPrefabs;
         [SerializeField] private PlayerDataCache _playerDataCache;
 
-        public GameFeatures features
+        public GameFeatures Features
         {
             get => _permanentFeatures;
             set => _permanentFeatures.CopyFrom(value);
         }
 
-        public GameVariables variables
+        public GameVariables Variables
         {
             get => _permanentVariables;
             set => _permanentVariables.CopyFrom(value);
         }
 
-        public GamePrefabs prefabs
+        public GamePrefabs Prefabs
         {
             get => _permanentPrefabs;
             private set => _permanentPrefabs.CopyFrom(value);
         }
 
-        public PlayerDataCache playerDataCache => _playerDataCache;
+        public PlayerDataCache PlayerDataCache => _playerDataCache;
 
-        private static void loadGameConfig()
+        private static void LoadGameConfig()
         {
             // We can use models
             ModelLoader.LoadModels();
             // Create default values
-            _Instance._permanentFeatures = new GameFeatures();
-            _Instance._permanentVariables = new GameVariables();
-            _Instance._permanentPrefabs = new GamePrefabs();
+            _instance._permanentFeatures = new GameFeatures();
+            _instance._permanentVariables = new GameVariables();
+            _instance._permanentPrefabs = new GamePrefabs();
             // Set persistent values
             var gameSettings = Resources.Load<PersistentGameSettings>(nameof(PersistentGameSettings));
-            _Instance.features = gameSettings.features;
-            _Instance.variables = gameSettings.variables;
-            _Instance.prefabs = gameSettings.prefabs;
-            _Instance._playerDataCache = loadPlayerDataCache();
+            _instance.Features = gameSettings.features;
+            _instance.Variables = gameSettings.variables;
+            _instance.Prefabs = gameSettings.prefabs;
+            _instance._playerDataCache = LoadPlayerDataCache();
         }
 
-        private static PlayerDataCache loadPlayerDataCache()
+        private static PlayerDataCache LoadPlayerDataCache()
         {
             return new PlayerDataCacheLocal();
         }
@@ -257,8 +264,8 @@ namespace Examples.Config.Scripts
             private const string PlayerHandleKey = "PlayerData.PlayerHandle";
             private const string CharacterModelIdKey = "PlayerData.CharacterModelId";
 
-            private bool isBatchSave;
-            private string currentState;
+            private bool _isBatchSave;
+            private string _currentState;
 
             public PlayerDataCacheLocal()
             {
@@ -275,7 +282,7 @@ namespace Examples.Config.Scripts
                     _playerHandle = Guid.NewGuid().ToString();
                     PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
                 }
-                currentState = ToString();
+                _currentState = ToString();
             }
 
             public sealed override string ToString()
@@ -286,31 +293,31 @@ namespace Examples.Config.Scripts
 
             protected override void Save()
             {
-                internalSave();
+                InternalSave();
             }
 
             public override void BatchSave(Action saveSettings)
             {
-                isBatchSave = true;
+                _isBatchSave = true;
                 saveSettings?.Invoke();
-                isBatchSave = false;
-                internalSave();
+                _isBatchSave = false;
+                InternalSave();
             }
 
-            private void internalSave()
+            private void InternalSave()
             {
-                if (isBatchSave)
+                if (_isBatchSave)
                 {
                     return; // Defer saving until later
                 }
-                if (currentState == ToString())
+                if (_currentState == ToString())
                 {
                     return; // Skip saving when nothing has changed
                 }
                 PlayerPrefs.SetString(PlayerNameKey, PlayerName);
                 PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
                 PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
-                currentState = ToString();
+                _currentState = ToString();
             }
         }
     }

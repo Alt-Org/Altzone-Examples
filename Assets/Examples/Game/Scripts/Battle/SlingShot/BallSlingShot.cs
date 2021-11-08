@@ -44,7 +44,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         private void Awake()
         {
             Debug.Log("Awake");
-            var variables = RuntimeGameConfig.Get().variables;
+            var variables = RuntimeGameConfig.Get().Variables;
             sqrMinSlingShotDistance = variables.minSlingShotDistance * variables.minSlingShotDistance;
             sqrMaxSlingShotDistance = variables.maxSlingShotDistance * variables.maxSlingShotDistance;
             photonEventDispatcher = PhotonEventDispatcher.Get();
@@ -119,7 +119,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
             var startPosition = b;
             var direction = deltaVector.normalized;
-            var multiplier = RuntimeGameConfig.Get().variables.ballMoveSpeedMultiplier;
+            var multiplier = RuntimeGameConfig.Get().Variables.ballMoveSpeedMultiplier;
             var speed = deltaVector.magnitude * multiplier;
             startTheBall(ballControl, startPosition, teamIndex, direction, speed);
             sendHideSlingShot();

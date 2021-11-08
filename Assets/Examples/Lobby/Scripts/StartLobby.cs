@@ -28,7 +28,7 @@ namespace Examples.Lobby.Scripts
         {
             if (PhotonWrapper.InLobby)
             {
-                var playerData = RuntimeGameConfig.Get().playerDataCache;
+                var playerData = RuntimeGameConfig.Get().PlayerDataCache;
                 if (PhotonNetwork.NickName != playerData.PlayerName)
                 {
                     // Fix player name if it has been changed
@@ -50,7 +50,7 @@ namespace Examples.Lobby.Scripts
             }
             if (PhotonWrapper.CanConnect)
             {
-                var playerData = RuntimeGameConfig.Get().playerDataCache;
+                var playerData = RuntimeGameConfig.Get().PlayerDataCache;
                 PhotonLobby.connect(playerData.PlayerName);
             }
         }

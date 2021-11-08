@@ -37,7 +37,7 @@ namespace Examples.Config.Scripts
         public static CharacterModel getPlayerCharacterModel(Player player)
         {
             var skillId = player.GetCustomProperty(playerMainSkillKey, -1);
-            return Models.GetById<CharacterModel>(skillId);
+            return Models.FindById<CharacterModel>(skillId);
         }
 
         [Conditional("UNITY_EDITOR")]

@@ -10,30 +10,30 @@ namespace Examples.Model.Scripts.Model
     /// </summary>
     public static class Models
     {
-        private static readonly Dictionary<string, AbstractModel> models = new Dictionary<string, AbstractModel>();
+        private static readonly Dictionary<string, AbstractModel> ModelsMap = new Dictionary<string, AbstractModel>();
 
         public static void Clear()
         {
-            models.Clear();
+            ModelsMap.Clear();
         }
 
         public static void Add(AbstractModel model, string modelName)
         {
             var modelType = model.GetType();
             var key = $"{modelType.Name}.{modelName}";
-            if (models.ContainsKey(key))
+            if (ModelsMap.ContainsKey(key))
             {
                 throw new UnityException($"model key already exists: {key}");
             }
             //-Debug.Log($"Add model: {key}={model}");
-            models.Add(key, model);
+            ModelsMap.Add(key, model);
         }
 
         public static T GetByName<T>(object modelName) where T : AbstractModel
         {
             var modelType = typeof(T);
             var key = $"{modelType.Name}.{modelName}";
-            if (!models.TryGetValue(key, out var anyModel))
+            if (!ModelsMap.TryGetValue(key, out var anyModel))
             {
                 throw new UnityException($"model not found for key: {key}");
             }
@@ -45,19 +45,19 @@ namespace Examples.Model.Scripts.Model
             return exactModel;
         }
 
-        public static T GetById<T>(int id) where T : AbstractModel
+        public static T FindById<T>(int id) where T : AbstractModel
         {
-            return models.Values.OfType<T>().FirstOrDefault(x => x.Id == id);
+            return ModelsMap.Values.OfType<T>().FirstOrDefault(x => x.Id == id);
         }
 
-        public static T Get<T>(Predicate<T> selector) where T : AbstractModel
+        public static T Find<T>(Predicate<T> selector) where T : AbstractModel
         {
-            return models.Values.OfType<T>().FirstOrDefault(x => selector(x));
+            return ModelsMap.Values.OfType<T>().FirstOrDefault(x => selector(x));
         }
 
         public static List<T> GetAll<T>() where T : AbstractModel
         {
-            return models.Values.OfType<T>().ToList();
+            return ModelsMap.Values.OfType<T>().ToList();
         }
     }
 }

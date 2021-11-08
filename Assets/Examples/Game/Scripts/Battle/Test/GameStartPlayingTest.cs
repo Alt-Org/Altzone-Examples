@@ -24,7 +24,7 @@ namespace Examples.Game.Scripts.Battle.Test
 
         private void Awake()
         {
-            variables = RuntimeGameConfig.Get().variables;
+            variables = RuntimeGameConfig.Get().Variables;
             photonEventDispatcher = PhotonEventDispatcher.Get();
             photonEventDispatcher.registerEventListener(photonEventCode, data => { handleRoomTimerProgress(data.CustomData); });
         }

@@ -43,7 +43,7 @@ namespace Examples.Game.Scripts.Battle.Player
             _transform = GetComponent<Transform>();
             var player = _photonView.Owner;
             var model = PhotonBattle.getPlayerCharacterModel(player);
-            var multiplier = RuntimeGameConfig.Get().variables.shieldDistanceMultiplier;
+            var multiplier = RuntimeGameConfig.Get().Variables.shieldDistanceMultiplier;
             sqrShieldDistance = model.Defence * multiplier * 2f;
             upperShield.SetActive(false);
             lowerShield.SetActive(false);
@@ -72,7 +72,7 @@ namespace Examples.Game.Scripts.Battle.Player
             var teamMate = playerActor.TeamMate;
             if (teamMate == null)
             {
-                var features = RuntimeGameConfig.Get().features;
+                var features = RuntimeGameConfig.Get().Features;
                 if (features.isSinglePlayerShieldOn)
                 {
                     _otherTransform = _transform; // measure distance to ourself: shield will be always on!
