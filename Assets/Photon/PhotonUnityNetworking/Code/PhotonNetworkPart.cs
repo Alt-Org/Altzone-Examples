@@ -1000,7 +1000,7 @@ namespace Photon.Pun
             bool isViewListed = photonViewList.TryGetValue(netView.ViewID, out listedView);
             if (isViewListed)
             {
-                // if some other view is in the list already, we got a problem. it might be undestructible. print out error
+                // if some other view is in the list already, we got a problem. it might be indestructible. print out error
                 if (netView != listedView)
                 {
                     Debug.LogError(string.Format("PhotonView ID duplicate found: {0}. New: {1} old: {2}. Maybe one wasn't destroyed on scene load?! Check for 'DontDestroyOnLoad'. Destroying old entry, adding new.", netView.ViewID, netView, listedView));
@@ -1015,6 +1015,7 @@ namespace Photon.Pun
 
             // Debug.Log("adding view to known list: " + netView);
             photonViewList.Add(netView.ViewID, netView);
+            netView.removedFromLocalViewList = false;
 
             //Debug.LogError("view being added. " + netView);	// Exit Games internal log
 
@@ -2238,11 +2239,15 @@ namespace Photon.Pun
                 case PunEvent.CloseConnection:
 
                     // MasterClient "requests" a disconnection from us
-                    if (originatingPlayer == null || !originatingPlayer.IsMasterClient)
+                    if (PhotonNetwork.EnableCloseConnection == false)
                     {
-                        Debug.LogError("Error: Someone else(" + originatingPlayer + ") then the masterserver requests a disconnect!");
+                        Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". PhotonNetwork.EnableCloseConnection is false. Ignoring the request (this client stays in the room).");
                     }
-                    else
+                    else if (originatingPlayer == null || !originatingPlayer.IsMasterClient)
+                    {
+                        Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". That player is not the Master Client. " + PhotonNetwork.MasterClient + " is.");
+                    }
+                    else if (PhotonNetwork.EnableCloseConnection)
                     {
                         PhotonNetwork.LeaveRoom(false);
                     }
@@ -2411,6 +2416,16 @@ namespace Photon.Pun
                             int newOwnerId = viewOwnerPair[i];
 
                             PhotonView view = GetPhotonView(viewId);
+                            if (view == null)
+                            {
+                                if (PhotonNetwork.LogLevel >= PunLogLevel.ErrorsOnly)
+                                {
+                                    Debug.LogErrorFormat("Failed to find a PhotonView with ID={0} for incoming OwnershipUpdate event (newOwnerActorNumber={1}), sender={2}. If you load scenes, make sure to pause the message queue.", viewId, newOwnerId, actorNr);
+                                }
+
+                                continue;
+                            }
+
                             Player prevOwner = view.Owner;
                             Player newOwner = CurrentRoom.GetPlayer(newOwnerId, true);
 
