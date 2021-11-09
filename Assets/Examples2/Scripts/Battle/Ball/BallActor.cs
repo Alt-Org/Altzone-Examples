@@ -47,7 +47,7 @@ namespace Examples2.Scripts.Battle.Ball
         [Header("Photon"), SerializeField] private Vector2 _networkPosition;
         [SerializeField] private float _networkLag;
 
-        [Header("Debug"), SerializeField] private TMP_Text _ballInfo;
+        [Header("Debug"), SerializeField] private TextMeshPro _debugInfoText;
         private GameObject _debugInfoParent;
 
         private PhotonView _photonView;
@@ -91,7 +91,7 @@ namespace Examples2.Scripts.Battle.Ball
             _shieldMaskValue = _settings._shieldMask.value;
             _brickMaskValue = _settings._brickMask.value;
             _wallMaskValue = _settings._wallMask.value;
-            _debugInfoParent = _ballInfo.gameObject;
+            _debugInfoParent = _debugInfoText.gameObject;
             PhotonSetup();
         }
 
@@ -147,7 +147,7 @@ namespace Examples2.Scripts.Battle.Ball
                 _networkPosition += _rigidbody.velocity * _networkLag;
 
                 // Just for testing - this is expensive call!
-                _ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
+                _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
             }
         }
 
@@ -173,7 +173,7 @@ namespace Examples2.Scripts.Battle.Ball
                 }
             }
             // Just for testing - this is expensive call!
-            _ballInfo.text = _rigidbody.velocity.magnitude.ToString("F1");
+            _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
         }
 
         private void KeepConstantVelocity()

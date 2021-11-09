@@ -407,7 +407,7 @@ MonoBehaviour:
     _playerPos: 0
     _teamIndex: 0
     _teamMate: {fileID: 0}
-  _playerInfo: {fileID: 0}
+  _playerInfo: {fileID: 8867706765776995095}
 --- !u!1 &9101303184460959390
 GameObject:
   m_ObjectHideFlags: 0

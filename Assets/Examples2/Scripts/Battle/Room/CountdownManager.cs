@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     internal class CountdownManager : MonoBehaviour, ICountdownManager
     {
-        [Header("Settings"), SerializeField] private TMP_Text _countdownText;
+        [Header("Settings"), SerializeField] private TextMeshPro _countdownText;
 
         private GameObject _countdown;
 

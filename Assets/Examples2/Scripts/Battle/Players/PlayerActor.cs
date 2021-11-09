@@ -33,7 +33,7 @@ namespace Examples2.Scripts.Battle.Players
 
         [Header("Live Data"), SerializeField] private PlayerState _state;
 
-        [Header("Debug"), SerializeField] private TMP_Text _playerInfo;
+        [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
         private PhotonView _photonView;
 
@@ -47,7 +47,7 @@ namespace Examples2.Scripts.Battle.Players
             _state._teamIndex = PhotonBattle.GetTeamIndex(_state._playerPos);
             var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamIndex}";
             name = $"{prefix}:{player.NickName}";
-            _playerInfo = GetComponentInChildren<TMP_Text>();
+            _playerInfo = GetComponentInChildren<TextMeshPro>();
             _playerInfo.text = _state._playerPos.ToString("N0");
             Debug.Log($"Awake {name}");
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);

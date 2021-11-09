@@ -8265,7 +8265,7 @@ MonoBehaviour:
     _isMoving: 0
   _networkPosition: {x: 0, y: 0}
   _networkLag: 0
-  _ballInfo: {fileID: 1463858629}
+  _debugInfoText: {fileID: 1463858629}
   _currentSpeed: 0
 --- !u!114 &1685972416
 MonoBehaviour:
