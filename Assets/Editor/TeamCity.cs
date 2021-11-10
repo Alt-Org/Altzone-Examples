@@ -98,7 +98,9 @@ namespace Editor
         private static void create_Build_Script()
         {
             const string scriptName = "m_BuildScript.bat";
-            var unityName = @"C:\Program Files\Unity\Hub\Editor\2019.4.28f1\Editor\Unity.exe";
+            var sep1 = Path.AltDirectorySeparatorChar.ToString();
+            var sep2 = Path.DirectorySeparatorChar.ToString();
+            var unityName = EditorApplication.applicationPath.Replace(sep1, sep2);
             var methodName = $"{typeof(TeamCity).FullName}.{nameof(Build)}";
             var script = MyCmdLineScripts.BuildScript
                 .Replace("<<unity_name>>", unityName)
