@@ -178,7 +178,7 @@ namespace Prg.Scripts.Common.Photon
                 }
                 return $"avg lag {sum / sampleCount:0.000} s ({sampleCount}) : {sampleCount / samplingDuration: 0.0} msg/s";
             }
-#endif
         }
+#endif
     }
 }

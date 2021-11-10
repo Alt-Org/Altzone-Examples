@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using UnityEngine;
 
 namespace Examples.Config.Scripts.Test
@@ -9,6 +8,7 @@ namespace Examples.Config.Scripts.Test
         public bool synchronizeFeatures;
         public bool synchronizeVariables;
 
+#if UNITY_EDITOR
         private void Update()
         {
             if (synchronizeAll)
@@ -29,6 +29,6 @@ namespace Examples.Config.Scripts.Test
                 GameConfigSynchronizer.Synchronize(What.Variables);
             }
         }
+#endif
     }
 }
-#endif
