@@ -19,12 +19,12 @@ namespace Editor
     /// </remarks>
     internal static class TeamCity
     {
-        private const string LogPrefix = nameof(TeamCity);
+        private const string LogPrefix = "LOG_" + nameof(TeamCity);
         private const string LogSeparator = "========================================";
 
-        private const string OutputAndroid = "buildAndroid";
-        private const string OutputWebgl = "buildWebGL";
-        private const string OutputWin64 = "buildWin64";
+        private const string OutputFolderAndroid = "buildAndroid";
+        private const string OutputFolderWebgl = "buildWebGL";
+        private const string OutputFolderWin64 = "buildWin64";
 
         private static readonly List<string> LogMessages = new List<string>
         {
@@ -80,13 +80,13 @@ namespace Editor
                 File.WriteAllText(htmlFile, newHtmlContent);
             }
 
-            var indexHtml = Path.Combine(OutputWebgl, "index.html");
+            var indexHtml = Path.Combine(OutputFolderWebgl, "index.html");
             var curName = Application.productName;
             var title = $"{Application.productName} built {DateTime.Now:u}";
             var gitTagCompliantLabel =
                 title.Substring(0, title.Length - 4) // remove seconds
-                .Replace(" ", "_")
-                .Replace(":", ".");
+                    .Replace(" ", "_")
+                    .Replace(":", ".");
             PatchIndexHtml(indexHtml, curName, gitTagCompliantLabel);
 
             const string scriptName = "m_BuildScript_PostProcess.bat";
@@ -132,16 +132,16 @@ namespace Editor
                 switch (args.BuildTarget)
                 {
                     case BuildTarget.Android:
-                        outputDir = Path.Combine(OutputAndroid, GetOutputFile(args.BuildTarget));
+                        outputDir = Path.Combine(OutputFolderAndroid, GetOutputFile(args.BuildTarget));
                         targetGroup = BuildTargetGroup.Android;
                         configure_Android(args);
                         break;
                     case BuildTarget.WebGL:
-                        outputDir = OutputWebgl;
+                        outputDir = OutputFolderWebgl;
                         targetGroup = BuildTargetGroup.WebGL;
                         break;
                     case BuildTarget.StandaloneWindows64:
-                        outputDir = Path.Combine(OutputWin64, GetOutputFile(args.BuildTarget));
+                        outputDir = Path.Combine(OutputFolderWin64, GetOutputFile(args.BuildTarget));
                         targetGroup = BuildTargetGroup.Standalone;
                         break;
                     default:
