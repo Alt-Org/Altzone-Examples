@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>
@@ -24,6 +25,17 @@ public static class Debug
 #endif
 #endif
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void RuntimeInitializeOnLoadMethod()
+    {
+        // Reset static fields even when Domain Reloading is disabled.
+        _isClassNameColor = false;
+        _classNameColor = null;
+        _classNameColorFilter = null;
+        CachedMethods.Clear();
+        _logLineAllowedFilter = null;
+    }
+
     public static bool IsDebugEnabled =>
 #if FORCE_LOG || DEVELOPMENT_BUILD
         true;
@@ -34,6 +46,23 @@ public static class Debug
     private static string _classNameColorFilter;
     private static string _classNameColor;
     private static bool _isClassNameColor;
+
+    // Cache methods if method lookup is expensive.
+    private static readonly Dictionary<MethodBase, bool> CachedMethods = new Dictionary<MethodBase, bool>();
+
+    /// <summary>
+    /// Filters log lines based on method name or other method properties.
+    /// </summary>
+    private static Func<MethodBase, bool> _logLineAllowedFilter;
+
+    /// <summary>
+    /// Adds log line filter.
+    /// </summary>
+    [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
+    public static void AddLogLineAllowedFilter(Func<MethodBase, bool> filter)
+    {
+        _logLineAllowedFilter += filter;
+    }
 
     /// <summary>
     /// Sets color for class name field in debug log line.
@@ -70,14 +99,6 @@ public static class Debug
             logLineContentFilter += RemoveColorFromLogLine;
         }
     }
-
-    // Cache methods if method lookup is expensive.
-    private static readonly Dictionary<MethodBase, bool> CachedMethods = new Dictionary<MethodBase, bool>();
-
-    /// <summary>
-    /// Filters log lines based on method who initiated logging.
-    /// </summary>
-    public static Func<MethodBase, bool> LOGLineAllowedFilter;
 
     [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
     public static void Log(string message)
@@ -137,14 +158,14 @@ public static class Debug
 
     private static bool IsMethodAllowedForLog(MethodBase method)
     {
-        if (LOGLineAllowedFilter != null)
+        if (_logLineAllowedFilter != null)
         {
             if (CachedMethods.TryGetValue(method, out var isMethodAllowed))
             {
                 return isMethodAllowed;
             }
             // Invocation list works like OR and it will use short-circuit evaluation.
-            var invocationList = LOGLineAllowedFilter.GetInvocationList();
+            var invocationList = _logLineAllowedFilter.GetInvocationList();
             foreach (var callback in invocationList)
             {
                 var result = callback.DynamicInvoke(method);

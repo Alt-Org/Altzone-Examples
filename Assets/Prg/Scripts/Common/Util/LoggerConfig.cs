@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -17,11 +18,11 @@ namespace Prg.Scripts.Common.Util
         /// </summary>
         private class RegExpFilter
         {
-            public bool isLogged;
-            public Regex regex;
+            public bool IsLogged;
+            public Regex Regex;
         }
 
-        private const RegexOptions regexOptions = RegexOptions.Singleline | RegexOptions.CultureInvariant;
+        private const RegexOptions RegexOptions = System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.CultureInvariant;
 
         [Header("Settings")] public bool isLogToFile;
         public string colorForClassName;
@@ -32,7 +33,7 @@ namespace Prg.Scripts.Common.Util
         {
             if (config.isLogToFile)
             {
-                createLogWriter();
+                CreateLogWriter();
             }
             // Log color
             var trimmed = string.IsNullOrEmpty(config.colorForClassName) ? "" : config.colorForClassName.Trim();
@@ -40,13 +41,13 @@ namespace Prg.Scripts.Common.Util
             {
                 Debug.SetColorForClassName(trimmed, ref LogWriter.logLineContentFilter);
             }
-            // Install log filter as last thing here.
-            var filterList = config.buildFilter();
+            var filterList = config.BuildFilter();
             if (filterList.Count == 0)
             {
                 return;
             }
-            Debug.LOGLineAllowedFilter += method =>
+            // Install log filter as last thing here.
+            bool LogLineAllowedFilter(MethodBase method)
             {
                 // For anonymous types we try its parent type.
                 var isAnonymous = method.ReflectedType?.Name.StartsWith("<");
@@ -72,9 +73,10 @@ namespace Prg.Scripts.Common.Util
                         return false;
                     }
 #endif
-                var match = filterList.FirstOrDefault(x => x.regex.IsMatch(className));
-                return match?.isLogged ?? false;
-            };
+                var match = filterList.FirstOrDefault(x => x.Regex.IsMatch(className));
+                return match?.IsLogged ?? false;
+            }
+            Debug.AddLogLineAllowedFilter(LogLineAllowedFilter);
 #if UNITY_EDITOR
             if (!Debug.IsDebugEnabled)
             {
@@ -84,9 +86,9 @@ namespace Prg.Scripts.Common.Util
         }
 
         [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
-        private static void createLogWriter()
+        private static void CreateLogWriter()
         {
-            string filterPhotonLogMessage(string message)
+            string FilterPhotonLogMessage(string message)
             {
                 // This is mainly to remove "formatting" form Photon ToString and ToStringFull messages and make then one liners!
                 if (!string.IsNullOrEmpty(message))
@@ -100,10 +102,10 @@ namespace Prg.Scripts.Common.Util
             }
 
             UnityExtensions.CreateGameObjectAndComponent<LogWriter>(nameof(LogWriter), true);
-            LogWriter.logLineContentFilter += filterPhotonLogMessage;
+            LogWriter.logLineContentFilter += FilterPhotonLogMessage;
         }
 
-        private List<RegExpFilter> buildFilter()
+        private List<RegExpFilter> BuildFilter()
         {
             // Note that line parsing relies on TextArea JSON serialization which I have not tested very well!
             // - lines can start and end with "'" if content has something that needs to be "protected" during JSON parsing
@@ -140,8 +142,8 @@ namespace Prg.Scripts.Common.Util
                     }
                     var filter = new RegExpFilter
                     {
-                        regex = new Regex(line, regexOptions),
-                        isLogged = isLogged
+                        Regex = new Regex(line, RegexOptions),
+                        IsLogged = isLogged
                     };
                     list.Add(filter);
                 }
