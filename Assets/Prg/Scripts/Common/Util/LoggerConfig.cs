@@ -22,8 +22,6 @@ namespace Prg.Scripts.Common.Util
             public Regex Regex;
         }
 
-        private const RegexOptions RegexOptions = System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.CultureInvariant;
-
         [Header("Settings")] public bool isLogToFile;
         public string colorForClassName;
 
@@ -46,6 +44,7 @@ namespace Prg.Scripts.Common.Util
             {
                 return;
             }
+
             // Install log filter as last thing here.
             bool LogLineAllowedFilter(MethodBase method)
             {
@@ -59,29 +58,13 @@ namespace Prg.Scripts.Common.Util
                 {
                     return false;
                 }
-#if UNITY_EDITOR && false
-                    if (Application.platform == RuntimePlatform.WindowsEditor)
-                    {
-                        foreach (var regex in filterList)
-                        {
-                            if (regex.regex.IsMatch(className))
-                            {
-                                UnityEngine.Debug.Log($"MATCH {className} : {regex.regex} = {regex.isLogged}");
-                                return regex.isLogged;
-                            }
-                        }
-                        return false;
-                    }
-#endif
                 var match = filterList.FirstOrDefault(x => x.Regex.IsMatch(className));
                 return match?.IsLogged ?? false;
             }
+
             Debug.AddLogLineAllowedFilter(LogLineAllowedFilter);
-#if UNITY_EDITOR
-            if (!Debug.IsDebugEnabled)
-            {
-                UnityEngine.Debug.LogWarning($"<b>NOTE!</b> Application logging is totally disabled on platform: {Application.platform}");
-            }
+#if FORCE_LOG || DEVELOPMENT_BUILD
+            UnityEngine.Debug.LogWarning($"<b>NOTE!</b> Application logging is totally disabled on platform: {Application.platform}");
 #endif
         }
 
@@ -140,9 +123,10 @@ namespace Prg.Scripts.Common.Util
                         UnityEngine.Debug.LogError($"invalid Regex pattern '{line}', do not use '=' here");
                         continue;
                     }
+                    const RegexOptions regexOptions = RegexOptions.Singleline | RegexOptions.CultureInvariant;
                     var filter = new RegExpFilter
                     {
-                        Regex = new Regex(line, RegexOptions),
+                        Regex = new Regex(line, regexOptions),
                         IsLogged = isLogged
                     };
                     list.Add(filter);

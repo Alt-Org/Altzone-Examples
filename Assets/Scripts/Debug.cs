@@ -36,13 +36,6 @@ public static class Debug
         _logLineAllowedFilter = null;
     }
 
-    public static bool IsDebugEnabled =>
-#if FORCE_LOG || DEVELOPMENT_BUILD
-        true;
-#else
-        false;
-#endif
-
     private static string _classNameColorFilter;
     private static string _classNameColor;
     private static bool _isClassNameColor;
