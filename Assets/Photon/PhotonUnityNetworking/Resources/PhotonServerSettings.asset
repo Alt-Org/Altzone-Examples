@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppSettings:
     AppIdRealtime: abba
+    AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
@@ -39,6 +40,7 @@ MonoBehaviour:
   - SetBallColorRpc
   - setBallVisibilityRpc
   - SetPlayerPlayModeRpc
+  - SendMessageRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

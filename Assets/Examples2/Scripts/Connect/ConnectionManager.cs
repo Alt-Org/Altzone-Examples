@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Examples2.Scripts.Connect
 {
@@ -90,6 +87,16 @@ namespace Examples2.Scripts.Connect
             }
         }
 
+        private void UpdatePlayerInRoom(Player player)
+        {
+            Debug.Log($"UpdatePlayerInRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
+            var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
+            if (existingPlayer != null)
+            {
+                existingPlayer.UpdatePlayer(player);
+            }
+        }
+
         private void RemovePlayerFromRoom(Player player)
         {
             Debug.Log($"RemovePlayerFromRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
@@ -118,6 +125,13 @@ namespace Examples2.Scripts.Connect
         public override void OnJoinedRoom()
         {
             Debug.Log($"OnJoinedRoom {PhotonNetwork.NetworkClientState}");
+            var room = PhotonNetwork.CurrentRoom;
+            var player = PhotonNetwork.LocalPlayer;
+            if (!room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "", out var uniquePlayerName))
+            {
+                // Make player name unique within this room if it was not!
+                PhotonNetwork.NickName = uniquePlayerName;
+            }
             RoomIsReadyToPlay();
         }
 
@@ -136,6 +150,11 @@ namespace Examples2.Scripts.Connect
         {
             Debug.Log($"OnPlayerLeftRoom {otherPlayer.GetDebugLabel()}");
             RemovePlayerFromRoom(otherPlayer);
+        }
+
+        public override void OnMasterClientSwitched(Player newMasterClient)
+        {
+            UpdatePlayerInRoom(newMasterClient);
         }
     }
 }

@@ -17,6 +17,9 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private TMP_Text _remotePlayer3;
         [SerializeField] private TMP_Text _remotePlayer4;
 
+        private int _playerId;
+        private int _instanceId;
+
         public void Reset()
         {
             _title.text = string.Empty;
@@ -28,15 +31,28 @@ namespace Examples2.Scripts.Connect
             _remotePlayer4.text = string.Empty;
         }
 
-        public void SetPlayer(Player player)
+        public void SetPlayer(Player player, int playerId)
         {
             Debug.Log($"SetPlayer {player.GetDebugLabel()}");
             Reset();
             if (player == null)
             {
+                _playerId = 0;
                 return;
             }
-            _title.text = "connected";
+            _playerId = playerId;
+            _title.text = $"connected:{_playerId}";
+            UpdatePlayer(player);
+        }
+
+        public void SetInstanceId(int instanceId)
+        {
+            _instanceId = instanceId;
+            _title.text = $"connected:{_playerId}:{_instanceId}";
+        }
+
+        public void UpdatePlayer(Player player)
+        {
             _playerName.text = player.NickName;
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
