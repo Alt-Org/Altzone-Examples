@@ -1,31 +1,38 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Connect
 {
-    public class PlayerHandshake : MonoBehaviour
+    public class PlayerHandshake : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     {
-        private const string HelloMessage = "hello";
-
         [SerializeField] private PhotonView _photonView;
         [SerializeField] private ConnectInfo _connectInfo;
         [SerializeField] private int _playerId;
         [SerializeField] private int _instanceId;
+        [SerializeField] private int _nameHash;
 
-        private void OnEnable()
+        private bool isCustomPropertySet;
+        
+        public override void OnEnable()
         {
+            base.OnEnable();
+            PhotonNetwork.AddCallbackTarget(this);
             _photonView = PhotonView.Get(this);
-            if (_photonView.IsMine)
-            {
-                _instanceId = 1;
-            }
-            Debug.Log($"OnEnable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
-            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, HelloMessage);
+            var localPlayer = PhotonNetwork.LocalPlayer;
+            _instanceId = localPlayer.ActorNumber;
+            Debug.Log(
+                $"OnEnable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
         }
 
-        private void OnDisable()
+        public override void OnDisable()
         {
-            Debug.Log($"OnDisable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
+            base.OnDisable();
+            PhotonNetwork.RemoveCallbackTarget(this);
+            Debug.Log(
+                $"OnDisable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
         }
 
         public void SetPlayerId(int playerId, ConnectInfo connectInfo)
@@ -36,9 +43,57 @@ namespace Examples2.Scripts.Connect
         }
 
         [PunRPC]
-        private void SendMessageRpc(string message)
+        private void SendMessageRpc(int playerId, int instanceId, int nameHash)
         {
-            Debug.Log($"RECV {_playerId}:{_instanceId} {_photonView.Controller.GetDebugLabel()} message {message}");
+            Assert.IsTrue(playerId == _playerId, "playerId != _playerId");
+            _nameHash = nameHash;
+            Debug.Log($"RECV {_playerId}:{_instanceId}:{_nameHash:X} {_photonView.Controller.GetDebugLabel()}");
+        }
+
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+        {
+            if (!targetPlayer.Equals(_photonView.Controller))
+            {
+                return;
+            }
+            if (!targetPlayer.HasCustomProperty("i"))
+            {
+                return;
+            }
+            // Can send RPC
+            var localPlayer = PhotonNetwork.LocalPlayer;
+            _nameHash = localPlayer.NickName.GetHashCode();
+            Debug.Log($"SEND {_playerId}:{_instanceId}:{_nameHash:X} {_photonView.Controller.GetDebugLabel()}");
+            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, _playerId, _instanceId, _nameHash);
+        }
+
+        void IPunOwnershipCallbacks.OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+        {
+            // NOP
+        }
+
+        void IPunOwnershipCallbacks.OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+        {
+            if (isCustomPropertySet)
+            {
+                return;
+            }
+            if (targetView.ViewID != _photonView.ViewID)
+            {
+                return;
+            }
+            var controller = _photonView.Controller;
+            Debug.Log($"OnOwnershipTransfered {_playerId}:{_instanceId} {controller.GetDebugLabel()}");
+            if (_photonView.IsMine && !controller.HasCustomProperty("i"))
+            {
+                isCustomPropertySet = true;
+                controller.SetCustomProperty("i", (byte)_instanceId);
+            }
+        }
+
+        void IPunOwnershipCallbacks.OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
+        {
+            // NOP
         }
     }
 }

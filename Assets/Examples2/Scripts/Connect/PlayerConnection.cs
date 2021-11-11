@@ -45,9 +45,9 @@ namespace Examples2.Scripts.Connect
                 Destroy(_playerHandshake);
                 return;
             }
-            _photonView.TransferOwnership(player);
             _playerHandshake = gameObject.AddComponent<PlayerHandshake>();
             _playerHandshake.SetPlayerId(_playerId, _connectInfo);
+            _photonView.TransferOwnership(player);
         }
 
         public void UpdatePlayer(Player player)
