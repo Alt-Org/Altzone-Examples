@@ -51,20 +51,20 @@ namespace Editor.Prg.Util
         [MenuItem("Window/ALT-Zone/Util/Editor Log/Show location")]
         private static void Show()
         {
-            getLogFilePath();
+            GetLogFilePath();
         }
 
         [MenuItem("Window/ALT-Zone/Util/Editor Log/Open in text editor")]
         private static void Load()
         {
-            var path = getLogFilePath();
+            var path = GetLogFilePath();
             if (File.Exists(path))
             {
                 InternalEditorUtility.OpenFileAtLineExternal(path, 1);
             }
         }
 
-        private static string getLogFilePath()
+        private static string GetLogFilePath()
         {
             var path = Path.Combine(Application.persistentDataPath, LogWriter.GetLogName());
             if (Application.platform.ToString().ToLower().Contains("windows"))
