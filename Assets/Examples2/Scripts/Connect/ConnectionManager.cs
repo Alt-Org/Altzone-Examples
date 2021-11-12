@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Photon;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Connect
 {
@@ -13,9 +15,7 @@ namespace Examples2.Scripts.Connect
     /// </summary>
     public class ConnectionManager : MonoBehaviourPunCallbacks
     {
-        [Header("Settings"), SerializeField] private bool _isOfflineMode;
-
-        [Header("Players"), SerializeField] private PlayerConnection _player1;
+        [Header("Settings"), SerializeField] private PlayerConnection _player1;
         [SerializeField] private PlayerConnection _player2;
         [SerializeField] private PlayerConnection _player3;
         [SerializeField] private PlayerConnection _player4;
@@ -42,16 +42,7 @@ namespace Examples2.Scripts.Connect
             {
                 Debug.Log($"connect {PhotonNetwork.NetworkClientState}");
                 var playerName = PhotonBattle.GetLocalPlayerName();
-                PhotonNetwork.OfflineMode = _isOfflineMode;
-                if (_isOfflineMode)
-                {
-                    PhotonNetwork.NickName = playerName;
-                    PhotonNetwork.JoinRandomRoom();
-                }
-                else
-                {
-                    PhotonLobby.connect(playerName);
-                }
+                PhotonLobby.connect(playerName);
                 return;
             }
             throw new UnityException($"OnEnable: invalid connection state {PhotonNetwork.NetworkClientState}");
@@ -73,10 +64,17 @@ namespace Examples2.Scripts.Connect
 
         private void AddPlayerToRoom(Player player)
         {
-            Debug.Log($"AddPlayerToRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
-            var freePlayer = _players.FirstOrDefault(x => !x.HasPlayer);
+            var room = PhotonNetwork.CurrentRoom;
+            var playerPos = room.GetFreePlayerPosition();
+            Debug.Log($"AddPlayerToRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()} free playerPos {playerPos}");
+            if (playerPos < 1 || playerPos > 4)
+            {
+                return;
+            }
+            var freePlayer = _players.FirstOrDefault(x => x.PlayerPos == playerPos);
             if (freePlayer != null)
             {
+                Assert.IsTrue(!freePlayer.HasPlayer);
                 freePlayer.SetPhotonPlayer(player);
             }
         }
@@ -103,17 +101,21 @@ namespace Examples2.Scripts.Connect
 
         public override void OnConnectedToMaster()
         {
-            if (!_isOfflineMode)
-            {
-                Debug.Log($"OnConnectedToMaster -> joinLobby {PhotonNetwork.NetworkClientState}");
-                PhotonLobby.joinLobby();
-            }
+            Debug.Log($"OnConnectedToMaster -> joinLobby {PhotonNetwork.NetworkClientState}");
+            PhotonLobby.joinLobby();
         }
 
         public override void OnJoinedLobby()
         {
             Debug.Log($"OnJoinedLobby -> createRoom {PhotonNetwork.NetworkClientState}");
-            PhotonLobby.joinOrCreateRoom("testing", null, null);
+            Hashtable customRoomProperties = new Hashtable()
+            {
+                { PhotonKeyNames.PlayerPosition1, (byte)0 },
+                { PhotonKeyNames.PlayerPosition2, (byte)0 },
+                { PhotonKeyNames.PlayerPosition3, (byte)0 },
+                { PhotonKeyNames.PlayerPosition4, (byte)0 }
+            };
+            PhotonLobby.joinOrCreateRoom("testing", customRoomProperties);
         }
 
         public override void OnJoinedRoom()
@@ -144,6 +146,11 @@ namespace Examples2.Scripts.Connect
         {
             Debug.Log($"OnPlayerLeftRoom {otherPlayer.GetDebugLabel()}");
             RemovePlayerFromRoom(otherPlayer);
+        }
+
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+        {
+            UpdatePlayerInRoom(targetPlayer);
         }
 
         public override void OnMasterClientSwitched(Player newMasterClient)

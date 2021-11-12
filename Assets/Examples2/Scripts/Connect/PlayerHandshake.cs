@@ -2,30 +2,20 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Connect
 {
     public class PlayerHandshake : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     {
         [SerializeField] private PhotonView _photonView;
-        [SerializeField] private int _playerId;
-        [SerializeField] private int _instanceId;
-        [SerializeField] private int _nameHash;
 
-        private bool _isCustomPropertySet;
-
-        public int InstanceId => _instanceId;
-        
         public override void OnEnable()
         {
             base.OnEnable();
             PhotonNetwork.AddCallbackTarget(this);
             _photonView = PhotonView.Get(this);
-            var localPlayer = PhotonNetwork.LocalPlayer;
-            _instanceId = localPlayer.ActorNumber;
             Debug.Log(
-                $"OnEnable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
+                $"OnEnable {PhotonNetwork.NetworkClientState} {_photonView}");
         }
 
         public override void OnDisable()
@@ -33,37 +23,20 @@ namespace Examples2.Scripts.Connect
             base.OnDisable();
             PhotonNetwork.RemoveCallbackTarget(this);
             Debug.Log(
-                $"OnDisable {_playerId}:{_instanceId} {PhotonNetwork.NetworkClientState} mine {_photonView.IsMine} room {_photonView.IsRoomView}");
-        }
-
-        public void SetPlayerId(int playerId, ConnectInfo connectInfo)
-        {
-            _playerId = playerId;
+                $"OnDisable {PhotonNetwork.NetworkClientState} {_photonView}");
         }
 
         [PunRPC]
         private void SendMessageRpc(int playerId, int instanceId, int nameHash)
         {
-            Assert.IsTrue(playerId == _playerId, "playerId != _playerId");
-            _nameHash = nameHash;
-            Debug.Log($"RECV {_playerId}:{_instanceId}:{_nameHash:X} {_photonView.Controller.GetDebugLabel()}");
+            Debug.Log($"RECV: {_photonView.Controller.GetDebugLabel()} {_photonView}");
         }
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
-            if (!targetPlayer.Equals(_photonView.Controller))
-            {
-                return;
-            }
-            if (!targetPlayer.HasCustomProperty("i"))
-            {
-                return;
-            }
-            // Can send RPC
             var localPlayer = PhotonNetwork.LocalPlayer;
-            _nameHash = localPlayer.NickName.GetHashCode();
-            Debug.Log($"SEND {_playerId}:{_instanceId}:{_nameHash:X} {_photonView.Controller.GetDebugLabel()}");
-            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, _playerId, _instanceId, _nameHash);
+            Debug.Log($"SEND: {_photonView.Controller.GetDebugLabel()} {_photonView}");
+            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, -1, -1, -1);
         }
 
         void IPunOwnershipCallbacks.OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
@@ -73,21 +46,12 @@ namespace Examples2.Scripts.Connect
 
         void IPunOwnershipCallbacks.OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
         {
-            if (_isCustomPropertySet)
-            {
-                return;
-            }
             if (targetView.ViewID != _photonView.ViewID)
             {
                 return;
             }
             var controller = _photonView.Controller;
-            Debug.Log($"OnOwnershipTransfered {_playerId}:{_instanceId} {controller.GetDebugLabel()}");
-            if (_photonView.IsMine && !controller.HasCustomProperty("i"))
-            {
-                _isCustomPropertySet = true;
-                controller.SetCustomProperty("i", (byte)_instanceId);
-            }
+            Debug.Log($"OnOwnershipTransfered {controller.GetDebugLabel()} {_photonView}");
         }
 
         void IPunOwnershipCallbacks.OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)

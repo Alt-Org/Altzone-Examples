@@ -1,5 +1,4 @@
-﻿using Photon.Pun;
-using Photon.Realtime;
+﻿using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 
@@ -17,9 +16,6 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private TMP_Text _remotePlayer3;
         [SerializeField] private TMP_Text _remotePlayer4;
 
-        private int _playerId;
-        private int _instanceId;
-
         public void Reset()
         {
             _title.text = string.Empty;
@@ -31,17 +27,14 @@ namespace Examples2.Scripts.Connect
             _remotePlayer4.text = string.Empty;
         }
 
-        public void SetPlayer(Player player, int playerId, int instanceId)
+        public void SetPlayer(Player player)
         {
             Debug.Log($"SetPlayer {player.GetDebugLabel()}");
             Reset();
             if (player == null)
             {
-                _playerId = 0;
                 return;
             }
-            _playerId = playerId;
-            _instanceId = instanceId;
             UpdatePlayer(player);
         }
 
@@ -50,7 +43,7 @@ namespace Examples2.Scripts.Connect
             _playerName.text = player.NickName;
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
-            _title.text = $"connected:p={_playerId}:i={_instanceId}";
+            _title.text = $"connected";
             _localStatus.text = $"#{player.ActorNumber}{master}{local}";
         }
     }
