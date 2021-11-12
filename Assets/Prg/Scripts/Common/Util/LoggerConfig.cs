@@ -64,6 +64,7 @@ namespace Prg.Scripts.Common.Util
 
             Debug.AddLogLineAllowedFilter(LogLineAllowedFilter);
 #if FORCE_LOG || DEVELOPMENT_BUILD
+#else
             UnityEngine.Debug.LogWarning($"<b>NOTE!</b> Application logging is totally disabled on platform: {Application.platform}");
 #endif
         }
