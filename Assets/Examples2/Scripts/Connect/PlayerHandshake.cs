@@ -9,12 +9,13 @@ namespace Examples2.Scripts.Connect
     public class PlayerHandshake : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     {
         [SerializeField] private PhotonView _photonView;
-        [SerializeField] private ConnectInfo _connectInfo;
         [SerializeField] private int _playerId;
         [SerializeField] private int _instanceId;
         [SerializeField] private int _nameHash;
 
-        private bool isCustomPropertySet;
+        private bool _isCustomPropertySet;
+
+        public int InstanceId => _instanceId;
         
         public override void OnEnable()
         {
@@ -38,8 +39,6 @@ namespace Examples2.Scripts.Connect
         public void SetPlayerId(int playerId, ConnectInfo connectInfo)
         {
             _playerId = playerId;
-            _connectInfo = connectInfo;
-            _connectInfo.SetInstanceId(_instanceId);
         }
 
         [PunRPC]
@@ -74,7 +73,7 @@ namespace Examples2.Scripts.Connect
 
         void IPunOwnershipCallbacks.OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
         {
-            if (isCustomPropertySet)
+            if (_isCustomPropertySet)
             {
                 return;
             }
@@ -86,7 +85,7 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"OnOwnershipTransfered {_playerId}:{_instanceId} {controller.GetDebugLabel()}");
             if (_photonView.IsMine && !controller.HasCustomProperty("i"))
             {
-                isCustomPropertySet = true;
+                _isCustomPropertySet = true;
                 controller.SetCustomProperty("i", (byte)_instanceId);
             }
         }

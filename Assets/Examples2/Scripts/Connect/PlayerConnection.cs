@@ -7,8 +7,9 @@ namespace Examples2.Scripts.Connect
 {
     public class PlayerConnection : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private ConnectInfo _connectInfo;
-        [SerializeField] private PhotonView _photonView;
+        [Header("Settings"), SerializeField] private ConnectInfo _connectInfo;
+
+        [Header("Live Data"), SerializeField] private PhotonView _photonView;
         [SerializeField] private int _playerId;
         [SerializeField] private PlayerHandshake _playerHandshake;
 
@@ -17,40 +18,37 @@ namespace Examples2.Scripts.Connect
         public Player Player => _player;
         public bool HasPlayer => _player != null;
 
-        private void Awake()
-        {
-            _photonView = PhotonView.Get(this);
-            Debug.Log($"Awake {_playerId} {PhotonNetwork.NetworkClientState}");
-        }
-
         public override void OnEnable()
         {
             base.OnEnable();
-            Debug.Log($"OnEnable {_playerId} {PhotonNetwork.NetworkClientState}");
+            _photonView = PhotonView.Get(this);
+            Debug.Log($"OnEnable {_playerId} {PhotonNetwork.NetworkClientState} {_photonView}");
         }
 
-        public void SetConnectTexts(ConnectInfo connectInfo)
+        public override void OnDisable()
         {
-            _connectInfo = connectInfo;
+            base.OnDisable();
+            Debug.Log($"OnDisable {_playerId} {PhotonNetwork.NetworkClientState} {_photonView}");
+            _photonView = null;
         }
 
-        public void SetPlayer(Player player)
+        public void SetPhotonPlayer(Player player)
         {
-            Debug.Log($"SetPlayer {_playerId} {player.GetDebugLabel()}");
+            Debug.Log($"SetPlayer {_playerId} {player.GetDebugLabel()} {_photonView}");
             _player = player;
-            _connectInfo.SetPlayer(player, _playerId);
             gameObject.SetActive(player != null);
             if (player == null)
             {
-                Destroy(_playerHandshake);
                 return;
             }
-            _playerHandshake = gameObject.AddComponent<PlayerHandshake>();
+            _playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             _playerHandshake.SetPlayerId(_playerId, _connectInfo);
-            _photonView.TransferOwnership(player);
+            _connectInfo.SetPlayer(player, _playerId, _playerHandshake.InstanceId);
+
+            //_photonView.TransferOwnership(player);
         }
 
-        public void UpdatePlayer(Player player)
+        public void UpdatePhotonPlayer(Player player)
         {
             Debug.Log($"UpdatePlayer {_playerId} {player.GetDebugLabel()}");
             Assert.IsTrue(_player.Equals(player), "player is not same");

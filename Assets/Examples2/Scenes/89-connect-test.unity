@@ -152,10 +152,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isOfflineMode: 0
-  _player1Info: {fileID: 1559131252294910849}
-  _player2Info: {fileID: 1920337647}
-  _player3Info: {fileID: 483909735}
-  _player4Info: {fileID: 524937502}
   _player1: {fileID: 1611120635}
   _player2: {fileID: 1709856628}
   _player3: {fileID: 1403563943}
@@ -1398,7 +1394,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c268fd72e5c04fd2a33e2bda75702fc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _connectInfo: {fileID: 0}
+  _connectInfo: {fileID: 524937502}
   _photonView: {fileID: 0}
   _playerId: 4
   _playerHandshake: {fileID: 0}
@@ -1634,7 +1630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c268fd72e5c04fd2a33e2bda75702fc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _connectInfo: {fileID: 0}
+  _connectInfo: {fileID: 483909735}
   _photonView: {fileID: 0}
   _playerId: 3
   _playerHandshake: {fileID: 0}
@@ -1843,7 +1839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c268fd72e5c04fd2a33e2bda75702fc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _connectInfo: {fileID: 0}
+  _connectInfo: {fileID: 1559131252294910849}
   _photonView: {fileID: 0}
   _playerId: 1
   _playerHandshake: {fileID: 0}
@@ -1977,7 +1973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c268fd72e5c04fd2a33e2bda75702fc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _connectInfo: {fileID: 0}
+  _connectInfo: {fileID: 1920337647}
   _photonView: {fileID: 0}
   _playerId: 2
   _playerHandshake: {fileID: 0}

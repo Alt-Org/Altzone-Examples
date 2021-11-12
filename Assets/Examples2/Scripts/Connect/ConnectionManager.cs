@@ -8,14 +8,12 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Connect
 {
+    /// <summary>
+    /// Manages <c>Photon</c> <c>Player</c>s and associated <c>PlayerConnection</c>s when players enter or exit this room.
+    /// </summary>
     public class ConnectionManager : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private bool _isOfflineMode;
-
-        [Header("Player Texts"), SerializeField] private ConnectInfo _player1Info;
-        [SerializeField] private ConnectInfo _player2Info;
-        [SerializeField] private ConnectInfo _player3Info;
-        [SerializeField] private ConnectInfo _player4Info;
 
         [Header("Players"), SerializeField] private PlayerConnection _player1;
         [SerializeField] private PlayerConnection _player2;
@@ -27,10 +25,6 @@ namespace Examples2.Scripts.Connect
         private void Awake()
         {
             Debug.Log($"Awake {PhotonNetwork.NetworkClientState}");
-            _player1.SetConnectTexts(_player1Info);
-            _player2.SetConnectTexts(_player2Info);
-            _player3.SetConnectTexts(_player3Info);
-            _player4.SetConnectTexts(_player4Info);
             _players.AddRange(new[] { _player1, _player2, _player3, _player4 });
         }
 
@@ -69,7 +63,7 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"RoomIsReadyToPlay {PhotonNetwork.NetworkClientState} master {PhotonNetwork.IsMasterClient} players {room.PlayerCount}");
             foreach (var playerConnection in _players)
             {
-                playerConnection.SetPlayer(null);
+                playerConnection.SetPhotonPlayer(null);
             }
             foreach (var player in room.GetPlayersByActorNumber())
             {
@@ -83,7 +77,7 @@ namespace Examples2.Scripts.Connect
             var freePlayer = _players.FirstOrDefault(x => !x.HasPlayer);
             if (freePlayer != null)
             {
-                freePlayer.SetPlayer(player);
+                freePlayer.SetPhotonPlayer(player);
             }
         }
 
@@ -93,7 +87,7 @@ namespace Examples2.Scripts.Connect
             var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
             if (existingPlayer != null)
             {
-                existingPlayer.UpdatePlayer(player);
+                existingPlayer.UpdatePhotonPlayer(player);
             }
         }
 
@@ -103,7 +97,7 @@ namespace Examples2.Scripts.Connect
             var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
             if (existingPlayer != null)
             {
-                existingPlayer.SetPlayer(null);
+                existingPlayer.SetPhotonPlayer(null);
             }
         }
 

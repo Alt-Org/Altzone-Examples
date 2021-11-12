@@ -31,7 +31,7 @@ namespace Examples2.Scripts.Connect
             _remotePlayer4.text = string.Empty;
         }
 
-        public void SetPlayer(Player player, int playerId)
+        public void SetPlayer(Player player, int playerId, int instanceId)
         {
             Debug.Log($"SetPlayer {player.GetDebugLabel()}");
             Reset();
@@ -41,14 +41,8 @@ namespace Examples2.Scripts.Connect
                 return;
             }
             _playerId = playerId;
-            _title.text = $"connected:{_playerId}";
-            UpdatePlayer(player);
-        }
-
-        public void SetInstanceId(int instanceId)
-        {
             _instanceId = instanceId;
-            _title.text = $"connected:{_playerId}:{_instanceId}";
+            UpdatePlayer(player);
         }
 
         public void UpdatePlayer(Player player)
@@ -56,6 +50,7 @@ namespace Examples2.Scripts.Connect
             _playerName.text = player.NickName;
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
+            _title.text = $"connected:p={_playerId}:i={_instanceId}";
             _localStatus.text = $"#{player.ActorNumber}{master}{local}";
         }
     }
