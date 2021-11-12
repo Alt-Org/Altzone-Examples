@@ -90,8 +90,8 @@ namespace Prg.Scripts.Common.Photon
                 keys.Sort((a, b) => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
                 foreach (var key in keys)
                 {
-                    var propValue = props[key].ToString();
-                    label += $"\r\n{key}={propValue}";
+                    var propValue = props[key];
+                    label += $"\r\n{key}={propValue} [{propValue.GetType().Name}]";
                 }
                 label += "\r\nPlayers:";
                 foreach (var player in room.GetPlayersByActorNumber())
@@ -105,8 +105,8 @@ namespace Prg.Scripts.Common.Photon
                         keys.Sort((a, b) => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
                         foreach (var key in keys)
                         {
-                            var propValue = props[key].ToString();
-                            label += $"\r\n{key}={propValue}";
+                            var propValue = props[key];
+                            label += $"\r\n{key}={propValue} [{propValue.GetType().Name}]";
                         }
                     }
                 }
