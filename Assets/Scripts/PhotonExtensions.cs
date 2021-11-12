@@ -69,6 +69,7 @@ public static class PhotonExtensions
     public static void SafeSetCustomProperty<T>(this Player player, string key, T newValue, T currentValue) where T : struct
     {
         CheckIsTypeAcceptable(newValue);
+        Assert.IsTrue(newValue.GetType() == currentValue.GetType(),"newValue.GetType() == currentValue.GetType()");
         DoSetCustomProperty(player, key, newValue, currentValue);
     }
 
@@ -117,6 +118,7 @@ public static class PhotonExtensions
     public static void SafeSetCustomProperty<T>(this Room room, string key, T newValue, T currentValue) where T : struct
     {
         CheckIsTypeAcceptable(newValue);
+        Assert.IsTrue(newValue.GetType() == currentValue.GetType(), "newValue.GetType() == currentValue.GetType()");
         DoSetCustomProperty(room, key, newValue, currentValue);
     }
 
@@ -153,29 +155,31 @@ public static class PhotonExtensions
     private static void DoSetCustomProperty(this Player player, string key, object newValue, object currentValue)
     {
         var props = new Hashtable { { key, newValue } };
-        if (!player.CustomProperties.ContainsKey(key))
+        if (!player.CustomProperties.TryGetValue(key, out var propValue))
         {
-            player.SetCustomProperties(props); // can not check!
+            player.SetCustomProperties(props);
+            return;
         }
-        else
-        {
-            var expectedProps = new Hashtable { { key, currentValue } };
-            player.SetCustomProperties(props, expectedProps);
-        }
+        Assert.IsTrue(newValue.GetType() == propValue.GetType(), "newValue.GetType() == propValue.GetType()");
+        Assert.IsTrue(!newValue.Equals(currentValue), "!newValue.Equals(currentValue)");
+        Assert.IsTrue(currentValue.Equals(propValue), "currentValue.Equals(propValue)");
+        var expectedProps = new Hashtable { { key, currentValue } };
+        player.SetCustomProperties(props, expectedProps);
     }
 
     private static void DoSetCustomProperty(this Room room, string key, object newValue, object currentValue)
     {
         var props = new Hashtable { { key, newValue } };
-        if (!room.CustomProperties.ContainsKey(key))
+        if (!room.CustomProperties.TryGetValue(key, out var propValue))
         {
-            room.SetCustomProperties(props); // can not check!
+            room.SetCustomProperties(props);
+            return;
         }
-        else
-        {
-            var expectedProps = new Hashtable { { key, currentValue } };
-            room.SetCustomProperties(props, expectedProps);
-        }
+        Assert.IsTrue(newValue.GetType() == propValue.GetType(), "newValue.GetType() == propValue.GetType()");
+        Assert.IsTrue(!newValue.Equals(currentValue), "!newValue.Equals(currentValue)");
+        Assert.IsTrue(currentValue.Equals(propValue), "currentValue.Equals(propValue)");
+        var expectedProps = new Hashtable { { key, currentValue } };
+        room.SetCustomProperties(props, expectedProps);
     }
 
     private static void CheckIsTypeAcceptable<T>(T value) where T : struct
