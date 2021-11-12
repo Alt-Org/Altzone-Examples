@@ -1,5 +1,6 @@
 using System.Linq;
 using Photon.Realtime;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Connect
 {
@@ -11,6 +12,12 @@ namespace Examples2.Scripts.Connect
         public const string PlayerPosition4 = "p4";
 
         public const string PlayerPosition = "p";
+
+        public static string GetPlayerPositionKey(int playerPos)
+        {
+            Assert.IsTrue(playerPos >= 1 && playerPos <= 4, "playerPos >= 1 && playerPos <= 4");
+            return $"p{playerPos}";
+        }
 
         public static int GetFreePlayerPosition(this Room room)
         {

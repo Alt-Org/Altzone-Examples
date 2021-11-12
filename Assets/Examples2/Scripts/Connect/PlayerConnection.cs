@@ -47,9 +47,9 @@ namespace Examples2.Scripts.Connect
             var localPlayer = PhotonNetwork.LocalPlayer;
             _instanceId = localPlayer.ActorNumber;
             _handle = (short)(1000 * _playerPos + _instanceId);
-            _playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             _connectInfo.SetPlayer(player);
 
+            //_playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             //_photonView.TransferOwnership(player);
         }
 

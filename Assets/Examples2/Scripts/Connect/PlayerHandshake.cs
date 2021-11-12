@@ -34,7 +34,6 @@ namespace Examples2.Scripts.Connect
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
-            var localPlayer = PhotonNetwork.LocalPlayer;
             Debug.Log($"SEND: {_photonView.Controller.GetDebugLabel()} {_photonView}");
             _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, -1, -1, -1);
         }

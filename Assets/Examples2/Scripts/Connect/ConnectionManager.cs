@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Photon;
 using ExitGames.Client.Photon;
@@ -65,7 +66,15 @@ namespace Examples2.Scripts.Connect
         private void AddPlayerToRoom(Player player)
         {
             var room = PhotonNetwork.CurrentRoom;
-            var playerPos = room.GetFreePlayerPosition();
+            int playerPos;
+            if (PhotonNetwork.IsMasterClient)
+            {
+                playerPos = room.GetFreePlayerPosition();
+            }
+            else
+            {
+                playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+            }
             Debug.Log($"AddPlayerToRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()} free playerPos {playerPos}");
             if (playerPos < 1 || playerPos > 4)
             {
@@ -75,6 +84,12 @@ namespace Examples2.Scripts.Connect
             if (freePlayer != null)
             {
                 Assert.IsTrue(!freePlayer.HasPlayer);
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    var key = PhotonKeyNames.GetPlayerPositionKey(playerPos);
+                    room.SafeSetCustomProperty(key, (byte)playerPos, (byte)0);
+                }
+                player.SetCustomProperty(PhotonKeyNames.PlayerPosition, (byte)playerPos);
                 freePlayer.SetPhotonPlayer(player);
             }
         }
@@ -86,6 +101,11 @@ namespace Examples2.Scripts.Connect
             if (existingPlayer != null)
             {
                 existingPlayer.UpdatePhotonPlayer(player);
+                return;
+            }
+            if (player.HasCustomProperty(PhotonKeyNames.PlayerPosition))
+            {
+                AddPlayerToRoom(player);
             }
         }
 
@@ -95,6 +115,12 @@ namespace Examples2.Scripts.Connect
             var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
             if (existingPlayer != null)
             {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    var room = PhotonNetwork.CurrentRoom;
+                    var key = PhotonKeyNames.GetPlayerPositionKey(existingPlayer.PlayerPos);
+                    room.SetCustomProperty(key, (byte)0);
+                }
                 existingPlayer.SetPhotonPlayer(null);
             }
         }
