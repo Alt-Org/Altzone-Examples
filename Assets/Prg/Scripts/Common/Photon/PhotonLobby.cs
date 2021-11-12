@@ -132,8 +132,8 @@ namespace Prg.Scripts.Common.Photon
             return isJoined;
         }
 
-        public static void joinOrCreateRoom(string roomName, Hashtable customRoomProperties, string[] lobbyPropertyNames,
-            bool isAutomaticallySyncScene = false)
+        public static void joinOrCreateRoom(string roomName,
+            Hashtable customRoomProperties = null, string[] lobbyPropertyNames = null, bool isAutomaticallySyncScene = false)
         {
             if (_isApplicationQuitting)
             {
