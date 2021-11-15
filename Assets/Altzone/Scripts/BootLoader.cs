@@ -39,7 +39,7 @@ namespace Altzone.Scripts
             {
                 PhotonLobby._gameVersion = () => $"{LocalDevConfig.Instance.photonVersionPrefix}{Application.version}";
             }
-            UnityEngine.Debug.Log($"Photon {Debug.Brown(PhotonLobby.gameVersion)}");
+            UnityEngine.Debug.Log($"Photon {RichText.Brown(PhotonLobby.gameVersion)}");
         }
     }
 }

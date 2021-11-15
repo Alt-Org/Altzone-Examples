@@ -45,7 +45,7 @@ namespace Examples2.Scripts.Connect
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
             var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition, 0);
-            _playerName.text = player.IsLocal ? $"<color=yellow>{player.NickName}</color>" : player.NickName;
+            _playerName.text = player.IsLocal ? RichText.Yellow(player.NickName) : player.NickName;
             _title.text = _handle > 0 ? $"handle {_handle}" : "connected";
             _localStatus.text = $"#{player.ActorNumber}:{playerPos}{master}{local}";
         }
