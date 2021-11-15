@@ -14,7 +14,6 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private MeshRenderer _renderer;
         [SerializeField] private PlayerHandshake _playerHandshake;
         [SerializeField] private int _actorNumber;
-        [SerializeField] private short _handle;
 
         public int PlayerPos => _playerPos;
         public int ActorNumber => _actorNumber;
@@ -43,30 +42,34 @@ namespace Examples2.Scripts.Connect
             }
         }
 
+        public void UpdatePeers(PlayerHandshakeState state)
+        {
+            Debug.Log($"UpdatePeers pp={_playerPos} actor={_actorNumber} state {state}");
+            _connectInfo.UpdatePeers(state);
+        }
+
         public void ShowPhotonPlayer(Player player)
         {
             Debug.Log($"ShowPhotonPlayer pp={_playerPos} {player.GetDebugLabel()} {_photonView}");
             _actorNumber = player.ActorNumber;
-            _handle = (short)(10 * PhotonNetwork.LocalPlayer.ActorNumber + _playerPos);
             _playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             ShowPlayerCube(true);
-            _connectInfo.ShowPlayer(player, _handle);
+            _connectInfo.ShowPlayer(player);
         }
 
         public void HidePhotonPlayer()
         {
-            Debug.Log($"HidePhotonPlayer pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle}");
+            Debug.Log($"HidePhotonPlayer pp={_playerPos} _actorNumber {_actorNumber}");
             ShowPlayerCube(false);
             _connectInfo.HidePlayer();
             _actorNumber = 0;
-            _handle = 0;
         }
 
         public void UpdatePhotonPlayer(Player player)
         {
-            Debug.Log($"UpdatePlayer pp={_playerPos} {player.GetDebugLabel()} _handle {_handle}");
+            Debug.Log($"UpdatePlayer pp={_playerPos} {player.GetDebugLabel()}");
             Assert.IsTrue(player.ActorNumber == _actorNumber, "player is not same");
-            _connectInfo.UpdatePlayer(player, _handle);
+            _connectInfo.UpdatePlayer(player);
         }
     }
 }

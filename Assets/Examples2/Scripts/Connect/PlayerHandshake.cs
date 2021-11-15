@@ -1,25 +1,52 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 
 namespace Examples2.Scripts.Connect
 {
+    [Serializable]
+    public class PlayerHandshakeState
+    {
+        public int _localActorNumber;
+        public int _playerPos;
+        public int _playerActorNumber;
+        public int _messagesOut;
+        public int _messagesIn;
+
+        public bool IsMine(int playerPos, int localActorNumber, int playerActorNumber)
+        {
+            return playerPos == _playerPos && localActorNumber == _localActorNumber && playerActorNumber == _playerActorNumber;
+        }
+
+        public override string ToString()
+        {
+            return $"{_localActorNumber}-{_playerPos} {_playerActorNumber} : o={_messagesOut} i={_messagesIn}";
+        }
+    }
+
     public class PlayerHandshake : MonoBehaviour
     {
-        [SerializeField] private PhotonView _photonView;
+        [Header("Live Data"), SerializeField] private PhotonView _photonView;
         [SerializeField] private PlayerConnection _playerConnection;
+        [SerializeField] private PlayerHandshakeState _state;
 
-        [SerializeField] private int _playerPos;
-        [SerializeField] private int _localActorNumber;
-        [SerializeField] private int _playerActorNumber;
+        private readonly List<PlayerHandshakeState> states = new List<PlayerHandshakeState>();
 
         private void OnEnable()
         {
             _photonView = PhotonView.Get(this);
             _playerConnection = GetComponent<PlayerConnection>();
-            _playerPos = _playerConnection.PlayerPos;
-            _localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
-            _playerActorNumber = _playerConnection.ActorNumber;
+            _state = new PlayerHandshakeState
+            {
+                _localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber,
+                _playerPos = _playerConnection.PlayerPos,
+                _playerActorNumber = _playerConnection.ActorNumber
+            };
+            states.Clear();
             Debug.Log($"OnEnable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
+            SendMessage();
         }
 
         private void OnDisable()
@@ -29,14 +56,33 @@ namespace Examples2.Scripts.Connect
 
         private void SendMessage()
         {
-            Debug.Log($"SendMessage SEND pp={_playerPos} L={_localActorNumber} A={_playerActorNumber}");
-            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.Others, _playerPos, _localActorNumber, _playerActorNumber);
+            _state._messagesOut += 1;
+            Debug.Log($"SendMessage SEND state {_state}");
+            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.Others, _state._localActorNumber, _state._playerPos, _state._playerActorNumber);
         }
 
         [PunRPC]
-        private void SendMessageRpc(int playerPos, int localActorNumber, int playerActorNumber)
+        private void SendMessageRpc(int localActorNumber, int playerPos, int playerActorNumber)
         {
-            Debug.Log($"SendMessageRpc RECV pp={playerPos} L={localActorNumber} A={playerActorNumber}");
+            _state._messagesIn += 1;
+            Debug.Log($"SendMessageRpc RECV state {_state} L={localActorNumber} pp={playerPos} A={playerActorNumber}");
+            _playerConnection.UpdatePeers(_state);
+            if (_state.IsMine(playerPos, localActorNumber, playerActorNumber))
+            {
+                return;
+            }
+            var otherState = states.FirstOrDefault(x => x.IsMine(playerPos, localActorNumber, playerActorNumber));
+            if (otherState == null)
+            {
+                otherState= new PlayerHandshakeState
+                {
+                    _localActorNumber = localActorNumber,
+                    _playerPos = playerPos,
+                    _playerActorNumber = playerActorNumber
+                };
+            }
+            otherState._messagesIn += 1;
+            _playerConnection.UpdatePeers(otherState);
         }
     }
 }
