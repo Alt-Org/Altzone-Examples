@@ -11,15 +11,12 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private int _playerPos;
 
         [Header("Live Data"), SerializeField] private PhotonView _photonView;
-        [SerializeField] private int _instanceId;
+        [SerializeField] private int _actorNumber;
         [SerializeField] private short _handle;
         [SerializeField] private PlayerHandshake _playerHandshake;
 
-        private Player _player;
-
         public int PlayerPos => _playerPos;
-        public bool HasPlayer => _player != null;
-        public Player Player => _player;
+        public int ActorNumber => _actorNumber;
 
         public override void OnEnable()
         {
@@ -37,26 +34,39 @@ namespace Examples2.Scripts.Connect
 
         public void SetPhotonPlayer(Player player)
         {
-            Debug.Log($"SetPlayer {_playerPos} {player.GetDebugLabel()} {_photonView}");
-            _player = player;
+            Debug.Log($"SetPhotonPlayer {_playerPos} {player.GetDebugLabel()} {_photonView}");
             gameObject.SetActive(player != null);
             if (player == null)
             {
+                _actorNumber = 0;
+                _handle = 0;
+                _connectInfo.SetPlayer(null);
                 return;
             }
+            _actorNumber = player.ActorNumber;
             var localPlayer = PhotonNetwork.LocalPlayer;
-            _instanceId = localPlayer.ActorNumber;
-            _handle = (short)(1000 * _playerPos + _instanceId);
+            _handle = (short)(10 * localPlayer.ActorNumber + _playerPos);
             _connectInfo.SetPlayer(player);
+
+            _connectInfo.UpdatePlayerHandle(_photonView.Controller, _handle);
+            //_photonView.RPC(nameof(UpdatePlayerHandleRpc), RpcTarget.Others, _handle);
 
             //_playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             //_photonView.TransferOwnership(player);
         }
 
+        [PunRPC]
+        private void UpdatePlayerHandleRpc(short handle)
+        {
+            _handle = handle;
+            Debug.Log($"UpdatePlayerHandleRpc: {_photonView.Controller.GetDebugLabel()} {handle}");
+            _connectInfo.UpdatePlayerHandle(_photonView.Controller, handle);
+        }
+
         public void UpdatePhotonPlayer(Player player)
         {
             Debug.Log($"UpdatePlayer {_playerPos} {player.GetDebugLabel()}");
-            Assert.IsTrue(_player.Equals(player), "player is not same");
+            Assert.IsTrue(player.ActorNumber == _actorNumber, "player is not same");
             _connectInfo.UpdatePlayer(player);
         }
     }

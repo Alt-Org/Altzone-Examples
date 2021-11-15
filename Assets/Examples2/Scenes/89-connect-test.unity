@@ -1394,8 +1394,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _connectInfo: {fileID: 524937502}
-  _photonView: {fileID: 0}
   _playerPos: 4
+  _photonView: {fileID: 0}
+  _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &698148437
 MonoBehaviour:
@@ -1630,8 +1631,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _connectInfo: {fileID: 483909735}
-  _photonView: {fileID: 0}
   _playerPos: 3
+  _photonView: {fileID: 0}
+  _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1403563944
 MonoBehaviour:
@@ -1839,8 +1841,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _connectInfo: {fileID: 1559131252294910849}
-  _photonView: {fileID: 0}
   _playerPos: 1
+  _photonView: {fileID: 0}
+  _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1611120636
 MonoBehaviour:
@@ -1973,8 +1976,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _connectInfo: {fileID: 1920337647}
-  _photonView: {fileID: 0}
   _playerPos: 2
+  _photonView: {fileID: 0}
+  _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1709856629
 MonoBehaviour:

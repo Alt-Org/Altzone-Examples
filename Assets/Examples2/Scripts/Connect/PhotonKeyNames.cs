@@ -21,7 +21,7 @@ namespace Examples2.Scripts.Connect
 
         public static int GetFreePlayerPosition(this Room room)
         {
-            var posKeys = new[] { PlayerPosition1, PlayerPosition2, PlayerPosition1, PlayerPosition2 };
+            var posKeys = new[] { PlayerPosition1, PlayerPosition2, PlayerPosition3, PlayerPosition4 };
             foreach (var entry in room.CustomProperties)
             {
                 if (!posKeys.Contains(entry.Key))

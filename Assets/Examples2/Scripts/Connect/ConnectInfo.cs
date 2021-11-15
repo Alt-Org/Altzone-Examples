@@ -16,6 +16,8 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private TMP_Text _remotePlayer3;
         [SerializeField] private TMP_Text _remotePlayer4;
 
+        [SerializeField] private short _handle;
+
         public void Reset()
         {
             _title.text = string.Empty;
@@ -40,11 +42,18 @@ namespace Examples2.Scripts.Connect
 
         public void UpdatePlayer(Player player)
         {
-            _playerName.text = player.NickName;
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
-            _title.text = $"connected";
-            _localStatus.text = $"#{player.ActorNumber}{master}{local}";
+            var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition, 0);
+            _playerName.text = player.IsLocal ? $"<color=yellow>{player.NickName}</color>" : player.NickName;
+            _title.text = _handle > 0 ? $"handle {_handle}" : "connected";
+            _localStatus.text = $"#{player.ActorNumber}:{playerPos}{master}{local}";
+        }
+
+        public void UpdatePlayerHandle(Player player, short handle)
+        {
+            _handle = handle;
+            UpdatePlayer(player);
         }
     }
 }

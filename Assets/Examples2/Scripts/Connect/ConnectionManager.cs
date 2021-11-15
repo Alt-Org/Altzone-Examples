@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Photon;
 using ExitGames.Client.Photon;
@@ -14,6 +13,9 @@ namespace Examples2.Scripts.Connect
     /// <summary>
     /// Manages <c>Photon</c> <c>Player</c>s and associated <c>PlayerConnection</c>s when players enter or exit this room.
     /// </summary>
+    /// <remarks>
+    /// We use room and player properties for player position bookkeeping.
+    /// </remarks>
     public class ConnectionManager : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private PlayerConnection _player1;
@@ -66,15 +68,9 @@ namespace Examples2.Scripts.Connect
         private void AddPlayerToRoom(Player player)
         {
             var room = PhotonNetwork.CurrentRoom;
-            int playerPos;
-            if (PhotonNetwork.IsMasterClient)
-            {
-                playerPos = room.GetFreePlayerPosition();
-            }
-            else
-            {
-                playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
-            }
+            var playerPos = PhotonNetwork.IsMasterClient
+                ? room.GetFreePlayerPosition()
+                : player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
             Debug.Log($"AddPlayerToRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()} free playerPos {playerPos}");
             if (playerPos < 1 || playerPos > 4)
             {
@@ -83,7 +79,7 @@ namespace Examples2.Scripts.Connect
             var freePlayer = _players.FirstOrDefault(x => x.PlayerPos == playerPos);
             if (freePlayer != null)
             {
-                Assert.IsTrue(!freePlayer.HasPlayer);
+                Assert.IsTrue(freePlayer.ActorNumber < 1);
                 if (PhotonNetwork.IsMasterClient)
                 {
                     var key = PhotonKeyNames.GetPlayerPositionKey(playerPos);
@@ -97,7 +93,7 @@ namespace Examples2.Scripts.Connect
         private void UpdatePlayerInRoom(Player player)
         {
             Debug.Log($"UpdatePlayerInRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
-            var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
+            var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
             if (existingPlayer != null)
             {
                 existingPlayer.UpdatePhotonPlayer(player);
@@ -112,17 +108,19 @@ namespace Examples2.Scripts.Connect
         private void RemovePlayerFromRoom(Player player)
         {
             Debug.Log($"RemovePlayerFromRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
-            var existingPlayer = _players.FirstOrDefault(x => player.Equals(x.Player));
-            if (existingPlayer != null)
+            var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
+            if (existingPlayer == null)
             {
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    var room = PhotonNetwork.CurrentRoom;
-                    var key = PhotonKeyNames.GetPlayerPositionKey(existingPlayer.PlayerPos);
-                    room.SetCustomProperty(key, (byte)0);
-                }
-                existingPlayer.SetPhotonPlayer(null);
+                Debug.Log("not found");
+                return;
             }
+            if (PhotonNetwork.IsMasterClient)
+            {
+                var room = PhotonNetwork.CurrentRoom;
+                var key = PhotonKeyNames.GetPlayerPositionKey(existingPlayer.PlayerPos);
+                room.SetCustomProperty(key, (byte)0);
+            }
+            existingPlayer.SetPhotonPlayer(null);
         }
 
         public override void OnConnectedToMaster()

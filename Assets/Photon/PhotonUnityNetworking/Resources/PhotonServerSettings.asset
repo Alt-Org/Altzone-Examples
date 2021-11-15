@@ -41,6 +41,7 @@ MonoBehaviour:
   - setBallVisibilityRpc
   - SetPlayerPlayModeRpc
   - SendMessageRpc
+  - UpdatePlayerHandleRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
