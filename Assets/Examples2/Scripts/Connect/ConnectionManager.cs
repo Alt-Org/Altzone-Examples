@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.Photon;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -90,21 +91,6 @@ namespace Examples2.Scripts.Connect
             }
         }
 
-        private void UpdatePlayerInRoom(Player player)
-        {
-            Debug.Log($"UpdatePlayerInRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
-            var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
-            if (existingPlayer != null)
-            {
-                existingPlayer.UpdatePhotonPlayer(player);
-                return;
-            }
-            if (player.HasCustomProperty(PhotonKeyNames.PlayerPosition))
-            {
-                AddPlayerToRoom(player);
-            }
-        }
-
         private void RemovePlayerFromRoom(Player player)
         {
             Debug.Log($"RemovePlayerFromRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
@@ -121,6 +107,34 @@ namespace Examples2.Scripts.Connect
                 room.SetCustomProperty(key, (byte)0);
             }
             existingPlayer.HidePhotonPlayer();
+        }
+
+        private void UpdateAll()
+        {
+            foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
+            {
+                var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
+                if (existingPlayer == null)
+                {
+                    continue;
+                }
+                existingPlayer.UpdatePhotonPlayer(player);
+            }
+        }
+
+        private void UpdatePlayerInRoom(Player player)
+        {
+            Debug.Log($"UpdatePlayerInRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()}");
+            var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
+            if (existingPlayer != null)
+            {
+                existingPlayer.UpdatePhotonPlayer(player);
+                return;
+            }
+            if (player.HasCustomProperty(PhotonKeyNames.PlayerPosition))
+            {
+                AddPlayerToRoom(player);
+            }
         }
 
         public override void OnConnectedToMaster()
@@ -155,31 +169,30 @@ namespace Examples2.Scripts.Connect
             RoomIsReadyToPlay();
         }
 
-        public override void OnLeftRoom()
-        {
-            Debug.Log($"OnLeftRoom {PhotonNetwork.NetworkClientState}");
-        }
-
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             Debug.Log($"OnPlayerEnteredRoom {newPlayer.GetDebugLabel()}");
             AddPlayerToRoom(newPlayer);
+            UpdateAll();
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             Debug.Log($"OnPlayerLeftRoom {otherPlayer.GetDebugLabel()}");
             RemovePlayerFromRoom(otherPlayer);
+            UpdateAll();
         }
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             UpdatePlayerInRoom(targetPlayer);
+            UpdateAll();
         }
 
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
             UpdatePlayerInRoom(newMasterClient);
+            UpdateAll();
         }
     }
 }
