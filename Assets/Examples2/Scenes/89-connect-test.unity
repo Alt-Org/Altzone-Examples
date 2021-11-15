@@ -1397,9 +1397,9 @@ MonoBehaviour:
   _playerPos: 4
   _photonView: {fileID: 0}
   _renderer: {fileID: 0}
+  _playerHandshake: {fileID: 0}
   _actorNumber: 0
   _handle: 0
-  _playerHandshake: {fileID: 0}
 --- !u!114 &698148437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1636,9 +1636,9 @@ MonoBehaviour:
   _playerPos: 3
   _photonView: {fileID: 0}
   _renderer: {fileID: 0}
+  _playerHandshake: {fileID: 0}
   _actorNumber: 0
   _handle: 0
-  _playerHandshake: {fileID: 0}
 --- !u!114 &1403563944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1848,9 +1848,9 @@ MonoBehaviour:
   _playerPos: 1
   _photonView: {fileID: 0}
   _renderer: {fileID: 0}
+  _playerHandshake: {fileID: 0}
   _actorNumber: 0
   _handle: 0
-  _playerHandshake: {fileID: 0}
 --- !u!114 &1611120636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1985,9 +1985,9 @@ MonoBehaviour:
   _playerPos: 2
   _photonView: {fileID: 0}
   _renderer: {fileID: 0}
+  _playerHandshake: {fileID: 0}
   _actorNumber: 0
   _handle: 0
-  _playerHandshake: {fileID: 0}
 --- !u!114 &1709856629
 MonoBehaviour:
   m_ObjectHideFlags: 0

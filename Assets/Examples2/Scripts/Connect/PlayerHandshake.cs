@@ -1,61 +1,42 @@
-using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 
 namespace Examples2.Scripts.Connect
 {
-    public class PlayerHandshake : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
+    public class PlayerHandshake : MonoBehaviour
     {
         [SerializeField] private PhotonView _photonView;
+        [SerializeField] private PlayerConnection _playerConnection;
 
-        public override void OnEnable()
+        [SerializeField] private int _playerPos;
+        [SerializeField] private int _localActorNumber;
+        [SerializeField] private int _playerActorNumber;
+
+        private void OnEnable()
         {
-            base.OnEnable();
-            PhotonNetwork.AddCallbackTarget(this);
             _photonView = PhotonView.Get(this);
-            Debug.Log(
-                $"OnEnable {PhotonNetwork.NetworkClientState} {_photonView}");
+            _playerConnection = GetComponent<PlayerConnection>();
+            _playerPos = _playerConnection.PlayerPos;
+            _localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            _playerActorNumber = _playerConnection.ActorNumber;
+            Debug.Log($"OnEnable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
         }
 
-        public override void OnDisable()
+        private void OnDisable()
         {
-            base.OnDisable();
-            PhotonNetwork.RemoveCallbackTarget(this);
-            Debug.Log(
-                $"OnDisable {PhotonNetwork.NetworkClientState} {_photonView}");
+            Debug.Log($"OnDisable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
+        }
+
+        private void SendMessage()
+        {
+            Debug.Log($"SendMessage SEND pp={_playerPos} L={_localActorNumber} A={_playerActorNumber}");
+            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.Others, _playerPos, _localActorNumber, _playerActorNumber);
         }
 
         [PunRPC]
-        private void SendMessageRpc(int playerId, int instanceId, int nameHash)
+        private void SendMessageRpc(int playerPos, int localActorNumber, int playerActorNumber)
         {
-            Debug.Log($"RECV: {_photonView.Controller.GetDebugLabel()} {_photonView}");
-        }
-
-        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-        {
-            Debug.Log($"SEND: {_photonView.Controller.GetDebugLabel()} {_photonView}");
-            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All, -1, -1, -1);
-        }
-
-        void IPunOwnershipCallbacks.OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
-        {
-            // NOP
-        }
-
-        void IPunOwnershipCallbacks.OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
-        {
-            if (targetView.ViewID != _photonView.ViewID)
-            {
-                return;
-            }
-            var controller = _photonView.Controller;
-            Debug.Log($"OnOwnershipTransfered {controller.GetDebugLabel()} {_photonView}");
-        }
-
-        void IPunOwnershipCallbacks.OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
-        {
-            // NOP
+            Debug.Log($"SendMessageRpc RECV pp={playerPos} L={localActorNumber} A={playerActorNumber}");
         }
     }
 }

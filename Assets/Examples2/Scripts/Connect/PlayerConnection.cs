@@ -12,9 +12,9 @@ namespace Examples2.Scripts.Connect
 
         [Header("Live Data"), SerializeField] private PhotonView _photonView;
         [SerializeField] private MeshRenderer _renderer;
+        [SerializeField] private PlayerHandshake _playerHandshake;
         [SerializeField] private int _actorNumber;
         [SerializeField] private short _handle;
-        [SerializeField] private PlayerHandshake _playerHandshake;
 
         public int PlayerPos => _playerPos;
         public int ActorNumber => _actorNumber;
@@ -37,14 +37,19 @@ namespace Examples2.Scripts.Connect
         private void ShowPlayerCube(bool isVisible)
         {
             _renderer.enabled = isVisible;
+            if (_playerHandshake != null)
+            {
+                _playerHandshake.enabled = isVisible;
+            }
         }
 
         public void ShowPhotonPlayer(Player player)
         {
             Debug.Log($"ShowPhotonPlayer pp={_playerPos} {player.GetDebugLabel()} {_photonView}");
-            ShowPlayerCube(true);
             _actorNumber = player.ActorNumber;
             _handle = (short)(10 * PhotonNetwork.LocalPlayer.ActorNumber + _playerPos);
+            _playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
+            ShowPlayerCube(true);
             _connectInfo.ShowPlayer(player, _handle);
         }
 
