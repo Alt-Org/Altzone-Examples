@@ -1306,7 +1306,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &698148432
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1327,7 +1327,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 698148431}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1396,6 +1396,8 @@ MonoBehaviour:
   _connectInfo: {fileID: 524937502}
   _playerPos: 4
   _photonView: {fileID: 0}
+  _renderer: {fileID: 0}
+  _actorNumber: 0
   _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &698148437
@@ -1543,7 +1545,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1403563939
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1564,7 +1566,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1403563938}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1633,6 +1635,8 @@ MonoBehaviour:
   _connectInfo: {fileID: 483909735}
   _playerPos: 3
   _photonView: {fileID: 0}
+  _renderer: {fileID: 0}
+  _actorNumber: 0
   _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1403563944
@@ -1753,7 +1757,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1611120631
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1774,7 +1778,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1611120630}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1843,6 +1847,8 @@ MonoBehaviour:
   _connectInfo: {fileID: 1559131252294910849}
   _playerPos: 1
   _photonView: {fileID: 0}
+  _renderer: {fileID: 0}
+  _actorNumber: 0
   _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1611120636
@@ -1888,7 +1894,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1709856624
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1909,7 +1915,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709856623}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1978,6 +1984,8 @@ MonoBehaviour:
   _connectInfo: {fileID: 1920337647}
   _playerPos: 2
   _photonView: {fileID: 0}
+  _renderer: {fileID: 0}
+  _actorNumber: 0
   _handle: 0
   _playerHandshake: {fileID: 0}
 --- !u!114 &1709856629

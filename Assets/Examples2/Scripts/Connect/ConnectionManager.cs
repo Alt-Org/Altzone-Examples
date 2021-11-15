@@ -84,8 +84,8 @@ namespace Examples2.Scripts.Connect
                 {
                     var key = PhotonKeyNames.GetPlayerPositionKey(playerPos);
                     room.SafeSetCustomProperty(key, (byte)playerPos, (byte)0);
+                    player.SetCustomProperty(PhotonKeyNames.PlayerPosition, (byte)playerPos);
                 }
-                player.SetCustomProperty(PhotonKeyNames.PlayerPosition, (byte)playerPos);
                 freePlayer.SetPhotonPlayer(player);
             }
         }

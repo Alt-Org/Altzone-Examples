@@ -37,11 +37,11 @@ MonoBehaviour:
   - catchABallRpc
   - MovePlayerRpc
   - MoveTowardsRpc
+  - SendMessageRpc
   - SetBallColorRpc
   - setBallVisibilityRpc
   - SetPlayerPlayModeRpc
-  - SendMessageRpc
-  - UpdatePlayerHandleRpc
+  - SyncPlayerHandleRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

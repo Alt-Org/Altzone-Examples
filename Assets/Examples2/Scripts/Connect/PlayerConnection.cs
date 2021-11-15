@@ -11,6 +11,7 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private int _playerPos;
 
         [Header("Live Data"), SerializeField] private PhotonView _photonView;
+        [SerializeField] private MeshRenderer _renderer;
         [SerializeField] private int _actorNumber;
         [SerializeField] private short _handle;
         [SerializeField] private PlayerHandshake _playerHandshake;
@@ -22,52 +23,56 @@ namespace Examples2.Scripts.Connect
         {
             base.OnEnable();
             _photonView = PhotonView.Get(this);
-            Debug.Log($"OnEnable {_playerPos} {PhotonNetwork.NetworkClientState} {_photonView}");
+            _renderer = GetComponent<MeshRenderer>();
+            Debug.Log($"OnEnable pp={_playerPos} {PhotonNetwork.NetworkClientState} {_photonView}");
         }
 
         public override void OnDisable()
         {
             base.OnDisable();
-            Debug.Log($"OnDisable {_playerPos} {PhotonNetwork.NetworkClientState} {_photonView}");
+            Debug.Log($"OnDisable pp={_playerPos} {PhotonNetwork.NetworkClientState} {_photonView}");
             _photonView = null;
+        }
+
+        private void ShowPlayerCube(bool isVisible)
+        {
+            _renderer.enabled = isVisible;
         }
 
         public void SetPhotonPlayer(Player player)
         {
-            Debug.Log($"SetPhotonPlayer {_playerPos} {player.GetDebugLabel()} {_photonView}");
-            gameObject.SetActive(player != null);
+            Debug.Log($"SetPhotonPlayer pp={_playerPos} {player.GetDebugLabel()} {_photonView}");
+            ShowPlayerCube(player != null);
             if (player == null)
             {
                 _actorNumber = 0;
                 _handle = 0;
-                _connectInfo.SetPlayer(null);
+                _connectInfo.ShowPlayer(null, _handle);
                 return;
             }
             _actorNumber = player.ActorNumber;
-            var localPlayer = PhotonNetwork.LocalPlayer;
-            _handle = (short)(10 * localPlayer.ActorNumber + _playerPos);
-            _connectInfo.SetPlayer(player);
+            _handle = (short)(10 * PhotonNetwork.LocalPlayer.ActorNumber + _playerPos);
+            _connectInfo.ShowPlayer(player, _handle);
 
-            _connectInfo.UpdatePlayerHandle(_photonView.Controller, _handle);
-            //_photonView.RPC(nameof(UpdatePlayerHandleRpc), RpcTarget.Others, _handle);
+            _photonView.RPC(nameof(SyncPlayerHandleRpc), RpcTarget.Others, _handle);
 
             //_playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             //_photonView.TransferOwnership(player);
         }
 
         [PunRPC]
-        private void UpdatePlayerHandleRpc(short handle)
+        private void SyncPlayerHandleRpc(short handle)
         {
-            _handle = handle;
-            Debug.Log($"UpdatePlayerHandleRpc: {_photonView.Controller.GetDebugLabel()} {handle}");
-            _connectInfo.UpdatePlayerHandle(_photonView.Controller, handle);
+            Debug.Log($"SyncPlayerHandleRpc pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle} <- {handle}");
+
+            //_connectInfo.UpdatePlayerHandle(_photonView.Controller, handle);
         }
 
         public void UpdatePhotonPlayer(Player player)
         {
-            Debug.Log($"UpdatePlayer {_playerPos} {player.GetDebugLabel()}");
+            Debug.Log($"UpdatePlayer pp={_playerPos} {player.GetDebugLabel()} _handle {_handle}");
             Assert.IsTrue(player.ActorNumber == _actorNumber, "player is not same");
-            _connectInfo.UpdatePlayer(player);
+            _connectInfo.UpdatePlayer(player, _handle);
         }
     }
 }
