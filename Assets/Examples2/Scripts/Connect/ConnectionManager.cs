@@ -57,7 +57,7 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"RoomIsReadyToPlay {PhotonNetwork.NetworkClientState} master {PhotonNetwork.IsMasterClient} players {room.PlayerCount}");
             foreach (var playerConnection in _players)
             {
-                playerConnection.SetPhotonPlayer(null);
+                playerConnection.HidePhotonPlayer();
             }
             foreach (var player in room.GetPlayersByActorNumber())
             {
@@ -86,7 +86,7 @@ namespace Examples2.Scripts.Connect
                     room.SafeSetCustomProperty(key, (byte)playerPos, (byte)0);
                     player.SetCustomProperty(PhotonKeyNames.PlayerPosition, (byte)playerPos);
                 }
-                freePlayer.SetPhotonPlayer(player);
+                freePlayer.ShowPhotonPlayer(player);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Examples2.Scripts.Connect
                 var key = PhotonKeyNames.GetPlayerPositionKey(existingPlayer.PlayerPos);
                 room.SetCustomProperty(key, (byte)0);
             }
-            existingPlayer.SetPhotonPlayer(null);
+            existingPlayer.HidePhotonPlayer();
         }
 
         public override void OnConnectedToMaster()

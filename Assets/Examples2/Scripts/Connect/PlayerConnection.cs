@@ -7,6 +7,10 @@ namespace Examples2.Scripts.Connect
 {
     public class PlayerConnection : MonoBehaviourPunCallbacks
     {
+        private const byte OperationAdd = 1;
+        private const byte OperationRemove = 2;
+        private static string[] OpNames = { "", "ADD", "REM"};
+
         [Header("Settings"), SerializeField] private ConnectInfo _connectInfo;
         [SerializeField] private int _playerPos;
 
@@ -39,33 +43,56 @@ namespace Examples2.Scripts.Connect
             _renderer.enabled = isVisible;
         }
 
-        public void SetPhotonPlayer(Player player)
+        public void ShowPhotonPlayer(Player player)
         {
-            Debug.Log($"SetPhotonPlayer pp={_playerPos} {player.GetDebugLabel()} {_photonView}");
-            ShowPlayerCube(player != null);
-            if (player == null)
-            {
-                _actorNumber = 0;
-                _handle = 0;
-                _connectInfo.ShowPlayer(null, _handle);
-                return;
-            }
+            Debug.Log($"ShowPhotonPlayer pp={_playerPos} {player.GetDebugLabel()} {_photonView}");
+            ShowPlayerCube(true);
             _actorNumber = player.ActorNumber;
             _handle = (short)(10 * PhotonNetwork.LocalPlayer.ActorNumber + _playerPos);
             _connectInfo.ShowPlayer(player, _handle);
 
-            _photonView.RPC(nameof(SyncPlayerHandleRpc), RpcTarget.Others, _handle);
+            SendSynchronization();
 
             //_playerHandshake = gameObject.GetOrAddComponent<PlayerHandshake>();
             //_photonView.TransferOwnership(player);
         }
 
-        [PunRPC]
-        private void SyncPlayerHandleRpc(short handle)
+        private void SendSynchronization()
         {
-            Debug.Log($"SyncPlayerHandleRpc pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle} <- {handle}");
+            Debug.Log($"SyncPlayerHandleRpc SEND pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle} -> {OpNames[OperationAdd]}");
+            _photonView.RPC(nameof(SyncPlayerHandleRpc), RpcTarget.Others, OperationAdd, _handle);
+        }
 
-            //_connectInfo.UpdatePlayerHandle(_photonView.Controller, handle);
+        public void HidePhotonPlayer()
+        {
+            Debug.Log($"HidePhotonPlayer pp={_playerPos} _actorNumber {_actorNumber} _handle");
+            ShowPlayerCube(false);
+            _actorNumber = 0;
+            _handle = 0;
+            _connectInfo.HidePlayer();
+            Debug.Log($"SyncPlayerHandleRpc SEND pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle} -> {OpNames[OperationRemove]}");
+            _photonView.RPC(nameof(SyncPlayerHandleRpc), RpcTarget.Others, OperationRemove, _handle);
+        }
+
+        [PunRPC]
+        private void SyncPlayerHandleRpc(byte operation, short handle)
+        {
+            Debug.Log($"SyncPlayerHandleRpc RECV pp={_playerPos} _actorNumber {_actorNumber} _handle {_handle} <- {OpNames[operation]} {handle}");
+            switch (operation)
+            {
+                case OperationAdd:
+                    _connectInfo.AddRemoteHandle(handle);
+                    break;
+                case OperationRemove:
+                    _connectInfo.RemoveRemoteHandle(handle);
+                    break;
+                default:
+                    throw new UnityException($"invalid operation: {operation}");
+            }
+            if (PhotonNetwork.LocalPlayer.ActorNumber == _actorNumber)
+            {
+                SendSynchronization();
+            }
         }
 
         public void UpdatePhotonPlayer(Player player)
