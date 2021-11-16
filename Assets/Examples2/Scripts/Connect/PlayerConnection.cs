@@ -45,7 +45,7 @@ namespace Examples2.Scripts.Connect
         public void UpdatePeers(PlayerHandshakeState state)
         {
             Debug.Log($"UpdatePeers pp={_playerPos} actor={_actorNumber} state {state}");
-            _connectInfo.UpdatePeers(state);
+            _connectInfo.UpdatePeers(state, 1);
         }
 
         public void ShowPhotonPlayer(Player player)

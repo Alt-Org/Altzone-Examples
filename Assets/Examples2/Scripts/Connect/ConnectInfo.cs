@@ -59,7 +59,19 @@ namespace Examples2.Scripts.Connect
             _localStatus.text = $"L={PhotonNetwork.LocalPlayer.ActorNumber} pp={playerPos} (actors {actors})";
         }
 
-        public void UpdatePeers(PlayerHandshakeState state)
+        public void UpdatePeers(PlayerHandshakeState state, int add)
+        {
+            if (add == 1)
+            {
+                UpdateRemoteHandle(state);
+            }
+            else
+            {
+                RemoveRemoteHandle(state);
+            }
+        }
+
+        private void UpdateRemoteHandle(PlayerHandshakeState state)
         {
             var remoteHandle = state.GetHandle();
             if (!_handleMap.TryGetValue(remoteHandle, out var handleText))
@@ -70,10 +82,11 @@ namespace Examples2.Scripts.Connect
             }
             handleText.text =
                 $"{state._localActorNumber}-{state._playerPos} {state._playerActorNumber} : o={state._messagesOut} i={state._messagesIn}";
-       }
+        }
 
-        public void RemoveRemoteHandle(short remoteHandle)
+        private void RemoveRemoteHandle(PlayerHandshakeState state)
         {
+            var remoteHandle = state.GetHandle();
             if (!_handleMap.TryGetValue(remoteHandle, out var handleText))
             {
                 return;
