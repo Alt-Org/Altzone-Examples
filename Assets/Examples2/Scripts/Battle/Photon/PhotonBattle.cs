@@ -22,6 +22,17 @@ namespace Examples2.Scripts.Battle.Photon
         private const string TeamBlueKey = "tb";
         private const string TeamRedKey = "tr";
 
+        public const int PlayerPositionGuest = 0;
+        public const int PlayerPosition1 = 1;
+        public const int PlayerPosition2 = 2;
+        public const int PlayerPosition3 = 3;
+        public const int PlayerPosition4 = 4;
+        public const int PlayerPositionSpectator = 11;
+
+        public const int NoTeamValue = 0;
+        public const int TeamBlueValue = 1;
+        public const int TeamRedValue = 2;
+
         public static int CountRealPlayers()
         {
             return PhotonNetwork.CurrentRoom.Players.Values.Where(IsRealPlayer).Count();
@@ -45,39 +56,36 @@ namespace Examples2.Scripts.Battle.Photon
 
         public static bool IsRealPlayer(Player player)
         {
-            var playerPos = player.GetCustomProperty(PlayerPositionKey, -1);
-            return playerPos >= 0 && playerPos <= 3;
+            var playerPos = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
+            return playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4;
         }
 
         public static int GetPlayerPos(Player player)
         {
-            return player.GetCustomProperty(PlayerPositionKey, -1);
+            return player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
         }
 
         public static string GetTeamName(int teamIndex)
         {
-            Assert.IsTrue(teamIndex >= 0 && teamIndex <= 1, $"Invalid team index: {teamIndex}");
+            Assert.IsTrue(teamIndex >= TeamBlueValue && teamIndex <= TeamRedValue, $"Invalid team index: {teamIndex}");
             var room = PhotonNetwork.CurrentRoom;
-            var teamName = room.GetCustomProperty(teamIndex == 0 ? TeamBlueKey : TeamRedKey, string.Empty);
-            if (!string.IsNullOrEmpty(teamName))
-            {
-                return teamName;
-            }
-            return $"?{teamIndex}?";
+            var key = teamIndex == TeamBlueValue ? TeamBlueKey : TeamRedKey;
+            var teamName = room.GetCustomProperty(key, string.Empty);
+            return !string.IsNullOrEmpty(teamName) ? teamName : $"?{teamIndex}?";
         }
 
         public static int GetTeamIndex(int playerPos)
         {
             switch (playerPos)
             {
-                case 0:
-                case 2:
-                    return 0;
-                case 1:
-                case 3:
-                    return 1;
+                case PlayerPosition1:
+                case PlayerPosition3:
+                    return TeamBlueValue;
+                case PlayerPosition2:
+                case PlayerPosition4:
+                    return TeamRedValue;
                 default:
-                    return -1;
+                    return NoTeamValue;
             }
         }
 
@@ -86,8 +94,8 @@ namespace Examples2.Scripts.Battle.Photon
         {
             player.SetCustomProperties(new Hashtable
             {
-                { PlayerPositionKey, playerPos }
-                //{ playerMainSkillKey, (int)Defence.Deflection }
+                { PlayerPositionKey, playerPos },
+                { PlayerMainSkillKey, 1 }
             });
             Debug.Log($"setDebugPlayerProps {player.GetDebugLabel()}");
         }

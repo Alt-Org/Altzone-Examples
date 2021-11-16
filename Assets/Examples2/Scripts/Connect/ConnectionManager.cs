@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Examples2.Scripts.Battle.Photon;
-using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Examples2.Scripts.Connect
 {
@@ -41,8 +42,8 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"OnEnable {PhotonNetwork.NetworkClientState}");
             if (PhotonNetwork.InRoom)
             {
-                RoomIsReadyToPlay();
-                enabled = false;
+                StartCoroutine(WaitForPlayerSetup());
+                return;
             }
             var state = PhotonNetwork.NetworkClientState;
             if (state == ClientState.PeerCreated || state == ClientState.Disconnected)
@@ -53,6 +54,29 @@ namespace Examples2.Scripts.Connect
                 return;
             }
             throw new UnityException($"OnEnable: invalid connection state {PhotonNetwork.NetworkClientState}");
+        }
+
+        private IEnumerator WaitForPlayerSetup()
+        {
+            for (;;)
+            {
+                yield return null;
+                var readyPlayerCount = 0;
+                foreach (var playerConnection in _players)
+                {
+                    if (playerConnection.enabled)
+                    {
+                        readyPlayerCount += 1;
+                    }
+                }
+                Debug.Log($"readyPlayerCount {readyPlayerCount}");
+                if (readyPlayerCount == _players.Count)
+                {
+                    break;
+                }
+            }
+            RoomIsReadyToPlay();
+            enabled = false;
         }
 
         private void RoomIsReadyToPlay()
