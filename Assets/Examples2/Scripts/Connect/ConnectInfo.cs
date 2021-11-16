@@ -48,16 +48,11 @@ namespace Examples2.Scripts.Connect
 
         public void UpdatePlayer(Player player)
         {
-            string FormatTitle(int pp, int an)
-            {
-                return $"handle {PhotonNetwork.LocalPlayer.ActorNumber}-{pp} #{an}";
-            }
-
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
             var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition, 0);
             var playerName = player.IsLocal ? RichText.Yellow(player.NickName) : player.NickName;
-            _title.text = FormatTitle(playerPos, player.ActorNumber);
+            _title.text = PlayerHandshakeState.FormatTitle(playerPos, player.ActorNumber);
             _playerName.text = $"{playerName}{master}{local}";
 
             var actors = string.Join(",", PhotonNetwork.CurrentRoom.Players.Keys.OrderBy(x => x));
@@ -66,7 +61,7 @@ namespace Examples2.Scripts.Connect
 
         public void UpdatePeers(PlayerHandshakeState state)
         {
-            var remoteHandle = state._playerActorNumber;
+            var remoteHandle = state.GetHandle();
             if (!_handleMap.TryGetValue(remoteHandle, out var handleText))
             {
                 handleText = _remoteTexts[0];

@@ -20,6 +20,16 @@ namespace Examples2.Scripts.Connect
             return playerPos == _playerPos && localActorNumber == _localActorNumber && playerActorNumber == _playerActorNumber;
         }
 
+        public int GetHandle()
+        {
+            return 1000 * _localActorNumber + 100 * _playerPos + _localActorNumber;
+        }
+
+        public static string FormatTitle(int playerPos, int localActorNumber)
+        {
+            return $"handle {PhotonNetwork.LocalPlayer.ActorNumber}-{playerPos} #{localActorNumber}";
+        }
+
         public override string ToString()
         {
             return $"{_localActorNumber}-{_playerPos} {_playerActorNumber} : o={_messagesOut} i={_messagesIn}";
@@ -46,7 +56,7 @@ namespace Examples2.Scripts.Connect
             };
             _states.Clear();
             Debug.Log($"OnEnable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
-            SendMessage();
+            SendMessageOut();
         }
 
         private void OnDisable()
@@ -54,10 +64,10 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"OnDisable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
         }
 
-        private void SendMessage()
+        private void SendMessageOut()
         {
             _state._messagesOut += 1;
-            Debug.Log($"SendMessage SEND state {_state}");
+            Debug.Log($"SendMessageOut SEND state {_state}");
             _photonView.RPC(nameof(SendMessageRpc), RpcTarget.Others, _state._localActorNumber, _state._playerPos, _state._playerActorNumber);
         }
 
@@ -84,6 +94,11 @@ namespace Examples2.Scripts.Connect
             }
             otherState._messagesIn += 1;
             _playerConnection.UpdatePeers(otherState);
+            if (otherState._messagesIn == 1)
+            {
+                // Resend again for new peers.
+                SendMessageOut();
+            }
         }
     }
 }
