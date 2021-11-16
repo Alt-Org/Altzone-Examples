@@ -32,7 +32,7 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private PlayerConnection _playerConnection;
         [SerializeField] private PlayerHandshakeState _state;
 
-        private readonly List<PlayerHandshakeState> states = new List<PlayerHandshakeState>();
+        private readonly List<PlayerHandshakeState> _states = new List<PlayerHandshakeState>();
 
         private void OnEnable()
         {
@@ -44,7 +44,7 @@ namespace Examples2.Scripts.Connect
                 _playerPos = _playerConnection.PlayerPos,
                 _playerActorNumber = _playerConnection.ActorNumber
             };
-            states.Clear();
+            _states.Clear();
             Debug.Log($"OnEnable {PhotonNetwork.NetworkClientState} {_photonView} {_photonView.Controller.GetDebugLabel()}");
             SendMessage();
         }
@@ -65,21 +65,22 @@ namespace Examples2.Scripts.Connect
         private void SendMessageRpc(int localActorNumber, int playerPos, int playerActorNumber)
         {
             _state._messagesIn += 1;
-            Debug.Log($"SendMessageRpc RECV state {_state} L={localActorNumber} pp={playerPos} A={playerActorNumber}");
+            Debug.Log($"SendMessageRpc state {_state} RECV {localActorNumber}-{playerPos} {playerActorNumber}");
             _playerConnection.UpdatePeers(_state);
             if (_state.IsMine(playerPos, localActorNumber, playerActorNumber))
             {
                 return;
             }
-            var otherState = states.FirstOrDefault(x => x.IsMine(playerPos, localActorNumber, playerActorNumber));
+            var otherState = _states.FirstOrDefault(x => x.IsMine(playerPos, localActorNumber, playerActorNumber));
             if (otherState == null)
             {
-                otherState= new PlayerHandshakeState
+                otherState = new PlayerHandshakeState
                 {
                     _localActorNumber = localActorNumber,
                     _playerPos = playerPos,
                     _playerActorNumber = playerActorNumber
                 };
+                _states.Add(otherState);
             }
             otherState._messagesIn += 1;
             _playerConnection.UpdatePeers(otherState);
