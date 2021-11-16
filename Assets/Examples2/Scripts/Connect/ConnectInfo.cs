@@ -48,8 +48,8 @@ namespace Examples2.Scripts.Connect
 
         public void UpdatePlayer(Player player)
         {
-            var master = player.IsMasterClient ? " [M]" : "";
-            var local = player.IsLocal ? " [L]" : "";
+            var master = player.IsMasterClient ? " [M]" : string.Empty;
+            var local = player.IsLocal ? " [L]" : string.Empty;
             var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
             var playerName = player.IsLocal ? RichText.Yellow(player.NickName) : player.NickName;
             _title.text = PlayerHandshakeState.FormatTitle(playerPos, player.ActorNumber);
@@ -92,7 +92,7 @@ namespace Examples2.Scripts.Connect
                 return;
             }
             _handleMap.Remove(remoteHandle);
-            handleText.text = "";
+            handleText.text = string.Empty;
             _remoteTexts.Insert(0, handleText);
         }
     }
