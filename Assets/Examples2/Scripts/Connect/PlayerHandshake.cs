@@ -80,7 +80,8 @@ namespace Examples2.Scripts.Connect
         {
             _state._messagesOut += 1;
             Debug.Log($"SendMessageOut SEND state {_state}");
-            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.Others, _state._playerPos, _state._localActorNumber, _state._playerActorNumber);
+            _photonView.RPC(nameof(SendMessageRpc), RpcTarget.All,
+                _state._playerPos, _state._localActorNumber, _state._playerActorNumber);
         }
 
         [PunRPC]

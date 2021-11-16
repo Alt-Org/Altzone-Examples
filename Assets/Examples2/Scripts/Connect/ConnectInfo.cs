@@ -31,7 +31,9 @@ namespace Examples2.Scripts.Connect
             _remotePlayer2.text = string.Empty;
             _remotePlayer3.text = string.Empty;
             _remotePlayer4.text = string.Empty;
+            _remoteTexts.Clear();
             _remoteTexts.AddRange(new[] { _remotePlayer1, _remotePlayer2, _remotePlayer3, _remotePlayer4 });
+            _handleMap.Clear();
         }
 
         public void ShowPlayer(Player player)
