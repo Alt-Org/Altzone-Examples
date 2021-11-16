@@ -10,6 +10,11 @@ namespace Prg.Scripts.Common.Util
     /// </summary>
     public class LogWriter : MonoBehaviour
     {
+        /// <summary>
+        /// Be nice and follow UNITY lifecycle but can loose some last log message on <c>OnApplicationQuit</c>.
+        /// </summary>
+        private static bool _isNiceCleanup;
+
         public static Func<string, string> LogLineContentFilter;
 
         private static readonly UTF8Encoding FileEncoding = new UTF8Encoding(false, false);
@@ -24,23 +29,12 @@ namespace Prg.Scripts.Common.Util
 
         private void Awake()
         {
-            if (_instance == null)
+            if (_instance != null)
             {
-                // Register us as the singleton!
-                _instance = this;
-                return;
+                throw new UnityException("LogWriter already created");
             }
-            Destroy(this);
-            throw new UnityException($"LogWriter already created: {_instance}");
-        }
-
-        private void OnDestroy()
-        {
-            if (_instance == this)
-            {
-                Close();
-                _instance = null;
-            }
+            // Register us as the singleton!
+            _instance = this;
         }
 
         private void OnEnable()
@@ -83,18 +77,13 @@ namespace Prg.Scripts.Common.Util
             }
         }
 
-        private void OnDisable()
-        {
-            if (_instance != this)
-            {
-                return;
-            }
-            Application.logMessageReceivedThreaded -= UnityLogCallback;
-        }
-
         public void OnApplicationQuit()
         {
-            Close();
+            if (_isNiceCleanup)
+            {
+                Application.logMessageReceivedThreaded -= UnityLogCallback;
+                Close();
+            }
         }
 
         private void WriteLogInternal(string message)
@@ -184,6 +173,11 @@ namespace Prg.Scripts.Common.Util
         }
 
         private const string LogFileSuffix = "game.log";
+
+        public static void BeNice()
+        {
+            _isNiceCleanup = true;
+        }
 
         public static string GetLogName()
         {
