@@ -17,7 +17,7 @@ namespace Examples.Game.Scripts.Battle.Player
             var sceneConfig = SceneConfig.Get();
             var playerStartPos = sceneConfig.playerStartPos;
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.getPlayerProperties(PhotonNetwork.LocalPlayer, out var playerPos, out var teamIndex);
+            PhotonBattle.GetPlayerProperties(PhotonNetwork.LocalPlayer, out var playerPos, out var teamIndex);
             if (playerPos < 0 || playerPos >= playerStartPos.Length)
             {
                 throw new UnityException($"invalid player position '{playerPos}' for player {player.GetDebugLabel()}");

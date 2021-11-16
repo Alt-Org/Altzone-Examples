@@ -5446,7 +5446,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOfflineMode: 0
-  debugPlayerPos: 0
+  debugPlayerPos: 1
   objectsToActivate:
   - {fileID: 1651784406}
   - {fileID: 1374902844}

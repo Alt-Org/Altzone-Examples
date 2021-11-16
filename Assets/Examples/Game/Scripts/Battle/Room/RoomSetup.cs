@@ -21,7 +21,7 @@ namespace Examples.Game.Scripts.Battle.Room
     {
         [Header("Settings"), SerializeField] private GameObject[] objectsToManage;
 
-        [Header("Live Data"), SerializeField] private List<PlayerActor> playerActors;
+        [Header("Live Data"), SerializeField] private List<PlayerActor> _playerActors;
 
         private void Awake()
         {
@@ -29,34 +29,34 @@ namespace Examples.Game.Scripts.Battle.Room
             PlayerActivator.AllPlayerActors.Clear();
             PlayerActivator.HomeTeamIndex = -1;
             PlayerActivator.LocalTeamIndex = -1;
-            prepareCurrentStage();
+            PrepareCurrentStage();
         }
 
         private void OnEnable()
         {
-            setupLocalPlayer();
-            StartCoroutine(setupAllPlayers());
+            SetupLocalPlayer();
+            StartCoroutine(SetupAllPlayers());
         }
 
-        private void prepareCurrentStage()
+        private void PrepareCurrentStage()
         {
             // Disable game objects until this room stage is ready
             Array.ForEach(objectsToManage, x => x.SetActive(false));
         }
 
-        private void continueToNextStage()
+        private void ContinueToNextStage()
         {
             enabled = false;
             // Enable game objects when this room stage is ready to play
             Array.ForEach(objectsToManage, x => x.SetActive(true));
         }
 
-        private void setupLocalPlayer()
+        private void SetupLocalPlayer()
         {
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.getPlayerProperties(player, out var playerPos, out var teamIndex);
+            PhotonBattle.GetPlayerProperties(player, out var playerPos, out var teamIndex);
             Debug.Log($"OnEnable pos={playerPos} team={teamIndex} {player.GetDebugLabel()}");
-            if (teamIndex != 1)
+            if (teamIndex != PhotonBattle.TeamBlueValue)
             {
                 return;
             }
@@ -80,22 +80,22 @@ namespace Examples.Game.Scripts.Battle.Room
             }
         }
 
-        private IEnumerator setupAllPlayers()
+        private IEnumerator SetupAllPlayers()
         {
             var playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
-            playerActors = FindObjectsOfType<PlayerActor>().ToList();
+            _playerActors = FindObjectsOfType<PlayerActor>().ToList();
             var wait = new WaitForSeconds(0.1f);
             // Wait for players so that everybody can know (find) each other if required!
-            while (playerActors.Count != playerCount && PhotonNetwork.InRoom)
+            while (_playerActors.Count != playerCount && PhotonNetwork.InRoom)
             {
-                Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={playerActors.Count} wait");
+                Debug.Log($"setupAllPlayers playerCount={playerCount} playerActors={_playerActors.Count} wait");
                 yield return wait;
-                playerActors = FindObjectsOfType<PlayerActor>().ToList();
+                _playerActors = FindObjectsOfType<PlayerActor>().ToList();
             }
             // All player have been instantiated in the scene, wait until they are in known state
             for (; PhotonNetwork.InRoom;)
             {
-                if (checkPlayerActors(playerActors) == playerCount)
+                if (CheckPlayerActors(_playerActors) == playerCount)
                 {
                     break;
                 }
@@ -107,10 +107,10 @@ namespace Examples.Game.Scripts.Battle.Room
             }
             // TODO: this need more work to make it better and easier to understand
             // Save current player actor list for easy access later!
-            PlayerActivator.AllPlayerActors.AddRange(playerActors);
+            PlayerActivator.AllPlayerActors.AddRange(_playerActors);
             Debug.Log($"setupAllPlayers playerCount={playerCount} allPlayerActors={PlayerActivator.AllPlayerActors.Count} ready");
             // Now we can activate all players safely with two passes over them!
-            foreach (var playerActor in playerActors)
+            foreach (var playerActor in _playerActors)
             {
                 if (!PhotonNetwork.InRoom)
                 {
@@ -119,7 +119,7 @@ namespace Examples.Game.Scripts.Battle.Room
                 playerActor.LateAwakePass1();
                 ((IPlayerActor)playerActor).setGhostedMode();
             }
-            foreach (var playerActor in playerActors)
+            foreach (var playerActor in _playerActors)
             {
                 if (!PhotonNetwork.InRoom)
                 {
@@ -127,10 +127,10 @@ namespace Examples.Game.Scripts.Battle.Room
                 }
                 playerActor.LateAwakePass2();
             }
-            continueToNextStage();
+            ContinueToNextStage();
         }
 
-        private static int checkPlayerActors(List<PlayerActor> playerActors)
+        private static int CheckPlayerActors(List<PlayerActor> playerActors)
         {
             var activeCount = 0;
             foreach (var playerActor in playerActors)

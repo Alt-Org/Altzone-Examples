@@ -26,7 +26,7 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             var photonView = PhotonView.Get(this);
             var player = photonView.Owner;
-            PhotonBattle.getPlayerProperties(player, out _playerPos, out _teamIndex);
+            PhotonBattle.GetPlayerProperties(player, out _playerPos, out _teamIndex);
             _isLocal = photonView.IsMine;
             if (player.IsMasterClient)
             {
@@ -39,33 +39,11 @@ namespace Examples.Game.Scripts.Battle.Player
                 Debug.Log($"localTeamIndex={LocalTeamIndex} pos={_playerPos}");
                 LocalTeamIndex = _teamIndex;
             }
-            _oppositeTeamIndex = GETOppositeTeamIndex(_teamIndex);
-            _teamMatePos = GETTeamMatePos(_playerPos);
+            _oppositeTeamIndex = PhotonBattle.GetOppositeTeamIndex(_teamIndex);
+            _teamMatePos = PhotonBattle.GetTeamMatePos(_playerPos);
             Debug.Log($"Awake {player.NickName} pos={_playerPos} team={_teamIndex}");
 
             _isAwake = true; // Signal that we have configured ourself
-        }
-
-        private static int GETOppositeTeamIndex(int teamIndex)
-        {
-            return teamIndex == 0 ? 1 : 0;
-        }
-
-        private static int GETTeamMatePos(int playerPos)
-        {
-            switch (playerPos)
-            {
-                case 0:
-                    return 2;
-                case 1:
-                    return 3;
-                case 2:
-                    return 0;
-                case 3:
-                    return 1;
-                default:
-                    throw new UnityException($"invalid player pos: {playerPos}");
-            }
         }
     }
 }

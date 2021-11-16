@@ -41,8 +41,8 @@ namespace Examples2.Scripts.Battle.Room
                 return;
             }
             var playerPos = PhotonBattle.GetPlayerPos(player);
-            var x = playerPos == 1 || playerPos == 2 ? 2.5f : -2.5f;
-            var y = playerPos == 1 || playerPos == 3 ? 4.25f : -4.25f;
+            var x = playerPos == 2 || playerPos == 3 ? 2.5f : -2.5f;
+            var y = playerPos == 2 || playerPos == 4 ? 4.25f : -4.25f;
             var instantiationPosition = new Vector3(x, y);
             Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
             PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);

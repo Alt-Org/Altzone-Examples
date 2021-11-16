@@ -12,11 +12,20 @@ namespace Examples.Lobby.Scripts.InRoom
     /// </summary>
     public class RoomSetupManager : MonoBehaviour, IInRoomCallbacks
     {
-        private const string PlayerPositionKey = PhotonBattle.playerPositionKey;
-        private const string PlayerMainSkillKey = PhotonBattle.playerMainSkillKey;
-        private const int PlayerIsGuest = LobbyManager.playerIsGuest;
+        private const string PlayerPositionKey = PhotonBattle.PlayerPositionKey;
+        private const string PlayerMainSkillKey = PhotonBattle.PlayerMainSkillKey;
+
+        private const int PlayerPositionGuest = PhotonBattle.PlayerPositionGuest;
+        private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
+        private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
+        private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
+        private const int PlayerPosition4 = PhotonBattle.PlayerPosition4;
+        private const int PlayerPositionSpectator = PhotonBattle.PlayerPositionSpectator;
+
         private const string TeamBlueKey = PhotonBattle.TeamBlueKey;
         private const string TeamRedKey = PhotonBattle.TeamRedKey;
+        private const int TeamBlueValue = PhotonBattle.TeamBlueValue;
+        private const int TeamRedValue = PhotonBattle.TeamRedValue;
 
         [Header("Settings"), SerializeField] private Text _upperTeamText;
         [SerializeField] private Text _lowerTeamText;
@@ -68,7 +77,7 @@ namespace Examples.Lobby.Scripts.InRoom
             var defence = playerDataCache.CharacterModel.MainDefence;
             player.SetCustomProperties(new Hashtable
             {
-                { PlayerPositionKey, LobbyManager.playerIsGuest },
+                { PlayerPositionKey, PlayerPositionGuest },
                 { PlayerMainSkillKey, (int)defence }
             });
             if (player.IsMasterClient)
@@ -99,7 +108,7 @@ namespace Examples.Lobby.Scripts.InRoom
             ResetState();
             // We need local player to check against other players
             var localPLayer = PhotonNetwork.LocalPlayer;
-            _localPlayerPosition = localPLayer.GetCustomProperty(PlayerPositionKey, PlayerIsGuest);
+            _localPlayerPosition = localPLayer.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
             _isLocalPlayerPositionUnique = true;
 
             CheckMasterClient();
@@ -164,20 +173,20 @@ namespace Examples.Lobby.Scripts.InRoom
 
         private static int GetTeam(int playerPos)
         {
-            if (playerPos == 1 || playerPos == 3)
+            if (playerPos == PlayerPosition1 || playerPos == PlayerPosition3)
             {
-                return 1;
+                return TeamBlueValue;
             }
-            if (playerPos == 0 || playerPos == 2)
+            if (playerPos == PlayerPosition4 || playerPos == PlayerPosition2)
             {
-                return 0;
+                return TeamRedValue;
             }
             return -1;
         }
 
         private void CheckMasterClient()
         {
-            var curValue = PhotonNetwork.MasterClient.GetCustomProperty(PlayerPositionKey, -1);
+            var curValue = PhotonNetwork.MasterClient.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
             _masterClientPosition = curValue;
         }
 
@@ -188,8 +197,8 @@ namespace Examples.Lobby.Scripts.InRoom
             {
                 return;
             }
-            var curValue = player.GetCustomProperty(PlayerPositionKey, -1);
-            if (_isLocalPlayerPositionUnique && curValue >= LobbyManager.playerPosition0 && curValue <= LobbyManager.playerPosition3)
+            var curValue = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
+            if (_isLocalPlayerPositionUnique && curValue >= PlayerPosition1 && curValue <= PlayerPosition4)
             {
                 if (curValue == _localPlayerPosition)
                 {
@@ -199,19 +208,19 @@ namespace Examples.Lobby.Scripts.InRoom
             }
             switch (curValue)
             {
-                case LobbyManager.playerPosition0:
+                case PlayerPosition1:
                     _interactablePlayerP0 = false;
                     _captionPlayerP0 = player.NickName;
                     break;
-                case LobbyManager.playerPosition1:
+                case PlayerPosition2:
                     _interactablePlayerP1 = false;
                     _captionPlayerP1 = player.NickName;
                     break;
-                case LobbyManager.playerPosition2:
+                case PlayerPosition3:
                     _interactablePlayerP2 = false;
                     _captionPlayerP2 = player.NickName;
                     break;
-                case LobbyManager.playerPosition3:
+                case PlayerPosition4:
                     _interactablePlayerP3 = false;
                     _captionPlayerP3 = player.NickName;
                     break;
@@ -221,32 +230,32 @@ namespace Examples.Lobby.Scripts.InRoom
         private void CheckLocalPlayer(Player player)
         {
             Debug.Log($"checkLocalPlayer {player.GetDebugLabel()} pos={_localPlayerPosition} ok={_isLocalPlayerPositionUnique}");
-            var curValue = player.GetCustomProperty(PlayerPositionKey, PlayerIsGuest);
+            var curValue = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
             // Master client can *only* start the game when in room as player!
-            _interactableStartPlay = player.IsMasterClient && curValue >= LobbyManager.playerPosition0 && curValue <= LobbyManager.playerPosition3;
+            _interactableStartPlay = player.IsMasterClient && curValue >= PlayerPosition1 && curValue <= PlayerPosition4;
             switch (curValue)
             {
-                case LobbyManager.playerPosition0:
+                case PlayerPosition1:
                     _interactablePlayerP0 = false;
                     _captionPlayerP0 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case LobbyManager.playerPosition1:
+                case PlayerPosition2:
                     _interactablePlayerP1 = false;
                     _captionPlayerP1 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case LobbyManager.playerPosition2:
+                case PlayerPosition3:
                     _interactablePlayerP2 = false;
                     _captionPlayerP2 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case LobbyManager.playerPosition3:
+                case PlayerPosition4:
                     _interactablePlayerP3 = false;
                     _captionPlayerP3 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case LobbyManager.playerIsGuest:
+                case PlayerPositionGuest:
                     _interactableGuest = false;
                     _captionGuest = $"<color=blue>{player.NickName}</color>";
                     break;
-                case LobbyManager.playerIsSpectator:
+                case PlayerPositionSpectator:
                     _interactableSpectator = false;
                     _captionSpectator = $"<color=blue>{player.NickName}</color>";
                     break;

@@ -50,7 +50,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
-            if (!PhotonBattle.isRealPlayer(otherPlayer))
+            if (!PhotonBattle.IsRealPlayer(otherPlayer))
             {
                 return; // Ignore non players
             }

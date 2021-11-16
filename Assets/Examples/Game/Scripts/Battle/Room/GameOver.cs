@@ -38,7 +38,7 @@ namespace Examples.Game.Scripts.Battle.Room
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
             Debug.Log($"OnPlayerLeftRoom {otherPlayer.GetDebugLabel()}");
-            if (PhotonNetwork.IsMasterClient && PhotonBattle.isRealPlayer(otherPlayer))
+            if (PhotonNetwork.IsMasterClient && PhotonBattle.IsRealPlayer(otherPlayer))
             {
                 gotoMainMenu();
                 enabled = false;

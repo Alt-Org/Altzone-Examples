@@ -70,7 +70,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         private void OnEnable()
         {
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.getPlayerProperties(player, out var playerPos, out var teamIndex);
+            PhotonBattle.GetPlayerProperties(player, out var playerPos, out var teamIndex);
             if (teamIndex == 1)
             {
                 // c# swap via deconstruction

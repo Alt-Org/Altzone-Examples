@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using Examples.Config.Scripts;
+using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,27 +16,27 @@ namespace Examples.Lobby.Scripts.InRoom
 
         private void Start()
         {
-            buttons[0].onClick.AddListener(setPlayerAsGuest);
-            buttons[1].onClick.AddListener(setPlayerAsSpectator);
-            buttons[2].onClick.AddListener(startPlaying);
+            buttons[0].onClick.AddListener(SetPlayerAsGuest);
+            buttons[1].onClick.AddListener(SetPlayerAsSpectator);
+            buttons[2].onClick.AddListener(StartPlaying);
         }
 
-        private void setPlayerAsGuest()
+        private void SetPlayerAsGuest()
         {
-            Debug.Log($"setPlayerAsGuest {LobbyManager.playerIsGuest}");
-            this.Publish(new LobbyManager.PlayerPosEvent(LobbyManager.playerIsGuest));
+            Debug.Log($"setPlayerAsGuest {PhotonBattle.PlayerPositionGuest}");
+            this.Publish(new LobbyManager.PlayerPosEvent(PhotonBattle.PlayerPositionGuest));
         }
 
-        private void setPlayerAsSpectator()
+        private void SetPlayerAsSpectator()
         {
-            Debug.Log($"setPlayerAsSpectator {LobbyManager.playerIsSpectator}");
-            this.Publish(new LobbyManager.PlayerPosEvent(LobbyManager.playerIsSpectator));
+            Debug.Log($"setPlayerAsSpectator {PhotonBattle.PlayerPositionSpectator}");
+            this.Publish(new LobbyManager.PlayerPosEvent(PhotonBattle.PlayerPositionSpectator));
         }
 
-        private void startPlaying()
+        private void StartPlaying()
         {
-            Debug.Log($"startPlaying {LobbyManager.startPlaying}");
-            this.Publish(new LobbyManager.PlayerPosEvent(LobbyManager.startPlaying));
+            Debug.Log($"startPlaying {PhotonBattle.StartPlayingEvent}");
+            this.Publish(new LobbyManager.PlayerPosEvent(PhotonBattle.StartPlayingEvent));
         }
 
         /// <summary>

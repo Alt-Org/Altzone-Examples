@@ -1,9 +1,8 @@
-﻿using Examples.Config.Scripts;
+﻿using System.Linq;
+using Examples.Config.Scripts;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,9 +13,14 @@ namespace Examples.Lobby.Scripts.InRoom
     /// </summary>
     public class PanePlayerListing : MonoBehaviour, IInRoomCallbacks
     {
-        private const string playerPositionKey = PhotonBattle.playerPositionKey;
-        private const string playerMainSkillKey = PhotonBattle.playerMainSkillKey;
-        private const int playerIsGuest = LobbyManager.playerIsGuest;
+        private const string PlayerPositionKey = PhotonBattle.PlayerPositionKey;
+        private const string PlayerMainSkillKey = PhotonBattle.PlayerMainSkillKey;
+        private const int PlayerPositionGuest = PhotonBattle.PlayerPositionGuest;
+
+        private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
+        private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
+        private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
+        private const int PlayerPosition4 = PhotonBattle.PlayerPosition4;
 
         [SerializeField] private Transform contentRoot;
         [SerializeField] private Text textTemplate;
@@ -25,7 +29,7 @@ namespace Examples.Lobby.Scripts.InRoom
         {
             if (PhotonNetwork.InRoom)
             {
-                updateStatus();
+                UpdateStatus();
             }
             PhotonNetwork.AddCallbackTarget(this);
         }
@@ -33,15 +37,15 @@ namespace Examples.Lobby.Scripts.InRoom
         private void OnDisable()
         {
             PhotonNetwork.RemoveCallbackTarget(this);
-            deleteExtraLines(contentRoot);
+            DeleteExtraLines(contentRoot);
         }
 
-        private void updateStatus()
+        private void UpdateStatus()
         {
             // Use PaneRoomListing.updateStatus() style to manage dynamic text lines - IMHO is has better implementation!
             if (!PhotonNetwork.InRoom)
             {
-                deleteExtraLines(contentRoot);
+                DeleteExtraLines(contentRoot);
                 return;
             }
             var players = PhotonNetwork.CurrentRoom.GetPlayersByNickName().ToList();
@@ -59,7 +63,7 @@ namespace Examples.Lobby.Scripts.InRoom
                 var lineObject = contentRoot.GetChild(i).gameObject;
                 lineObject.SetActive(true);
                 var line = lineObject.GetComponent<Text>();
-                update(line, player);
+                UpdatePlayerLine(line, player);
             }
             // Hide extra lines
             if (contentRoot.childCount > players.Count)
@@ -82,18 +86,18 @@ namespace Examples.Lobby.Scripts.InRoom
             instance.SetActive(true);
         }
 
-        private static readonly string[] skillNames = { "---", "Des", "Def", "Int", "Pro", "Ret", "Ego", "Con" };
+        private static readonly string[] SkillNames = { "---", "Des", "Def", "Int", "Pro", "Ret", "Ego", "Con" };
 
-        private static void update(Text line, Player player)
+        private static void UpdatePlayerLine(Text line, Player player)
         {
             var text = line.GetComponent<Text>();
             var nickName = player.IsLocal ? $"<color=blue>{player.NickName}</color>" : player.NickName;
-            var pos = player.GetCustomProperty(playerPositionKey, playerIsGuest);
+            var pos = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
             var status = $" p={pos}";
-            if (pos >= 0 && pos <= 3)
+            if (pos >= PlayerPosition1 && pos <= PlayerPosition4)
             {
-                var skill = Mathf.Clamp(player.GetCustomProperty(playerMainSkillKey, 0), 0, skillNames.Length - 1);
-                var skillName = skillNames[skill];
+                var skill = Mathf.Clamp(player.GetCustomProperty(PlayerMainSkillKey, 0), 0, SkillNames.Length - 1);
+                var skillName = SkillNames[skill];
                 status += $" s=<color=green>{skillName}</color>";
             }
             if (player.IsMasterClient)
@@ -105,7 +109,7 @@ namespace Examples.Lobby.Scripts.InRoom
             text.text = playerText;
         }
 
-        private static void deleteExtraLines(Transform parent)
+        private static void DeleteExtraLines(Transform parent)
         {
             var childCount = parent.childCount;
             for (var i = childCount - 1; i >= 0; --i)
@@ -117,12 +121,12 @@ namespace Examples.Lobby.Scripts.InRoom
 
         void IInRoomCallbacks.OnPlayerEnteredRoom(Player newPlayer)
         {
-            updateStatus();
+            UpdateStatus();
         }
 
         void IInRoomCallbacks.OnPlayerLeftRoom(Player otherPlayer)
         {
-            updateStatus();
+            UpdateStatus();
         }
 
         void IInRoomCallbacks.OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
@@ -132,7 +136,7 @@ namespace Examples.Lobby.Scripts.InRoom
 
         void IInRoomCallbacks.OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
-            updateStatus();
+            UpdateStatus();
         }
 
         void IInRoomCallbacks.OnMasterClientSwitched(Player newMasterClient)

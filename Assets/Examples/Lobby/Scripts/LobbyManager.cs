@@ -20,15 +20,15 @@ namespace Examples.Lobby.Scripts
     /// </remarks>
     public class LobbyManager : MonoBehaviourPunCallbacks
     {
-        private const string playerPositionKey = PhotonBattle.playerPositionKey;
+        private const string PlayerPositionKey = PhotonBattle.PlayerPositionKey;
 
-        public const int playerPosition0 = 0;
-        public const int playerPosition1 = 1;
-        public const int playerPosition2 = 2;
-        public const int playerPosition3 = 3;
-        public const int playerIsGuest = 10;
-        public const int playerIsSpectator = 11;
-        public const int startPlaying = 123;
+        private const int PlayerPositionGuest = PhotonBattle.PlayerPositionGuest;
+        private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
+        private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
+        private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
+        private const int PlayerPosition4 = PhotonBattle.PlayerPosition4;
+        private const int PlayerPositionSpectator = PhotonBattle.PlayerPositionSpectator;
+        private const int StartPlayingEvent = PhotonBattle.StartPlayingEvent;
 
         [SerializeField] private UnitySceneName gameScene;
         [SerializeField] private UnitySceneName cancelScene;
@@ -69,23 +69,23 @@ namespace Examples.Lobby.Scripts
         private void OnPlayerPosEvent(PlayerPosEvent data)
         {
             Debug.Log($"onEvent {data}");
-            if (data.playerPosition == startPlaying)
+            if (data.PlayerPosition == StartPlayingEvent)
             {
-                StartCoroutine(startTheGameplay(gameScene.sceneName));
+                StartCoroutine(StartTheGameplay(gameScene.sceneName));
                 return;
             }
-            setPlayer(PhotonNetwork.LocalPlayer, data.playerPosition);
+            SetPlayer(PhotonNetwork.LocalPlayer, data.PlayerPosition);
         }
 
-        private static IEnumerator startTheGameplay(string levelName)
+        private static IEnumerator StartTheGameplay(string levelName)
         {
             Debug.Log($"startTheGameplay {levelName}");
             if (!PhotonNetwork.IsMasterClient)
             {
                 throw new UnityException("only master client can start the game");
             }
-            var masterPosition = PhotonNetwork.LocalPlayer.GetCustomProperty(playerPositionKey, -1);
-            if (masterPosition < playerPosition0 || masterPosition > playerPosition3)
+            var masterPosition = PhotonNetwork.LocalPlayer.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
+            if (masterPosition < PlayerPosition1 || masterPosition > PlayerPosition4)
             {
                 throw new UnityException($"master client does not have valid player position: {masterPosition}");
             }
@@ -93,29 +93,29 @@ namespace Examples.Lobby.Scripts
             var players = PhotonNetwork.CurrentRoom.Players.Values.ToList();
             foreach (var player in players)
             {
-                var curValue = player.GetCustomProperty(playerPositionKey, -1);
-                if (curValue >= playerPosition0 && curValue <= playerPosition3 || curValue == playerIsSpectator)
+                var curValue = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
+                if (curValue >= PlayerPosition1 && curValue <= PlayerPosition4 || curValue == PlayerPositionSpectator)
                 {
                     continue;
                 }
-                Debug.Log($"KICK and CloseConnection for {player.GetDebugLabel()} {playerPositionKey}={curValue}");
+                Debug.Log($"Kick player (close connection) {player.GetDebugLabel()} {PlayerPositionKey}={curValue}");
                 PhotonNetwork.CloseConnection(player);
                 yield return null;
             }
             PhotonNetwork.LoadLevel(levelName);
         }
 
-        private static void setPlayer(Player player, int playerPosition)
+        private static void SetPlayer(Player player, int playerPosition)
         {
-            if (!player.HasCustomProperty(playerPositionKey))
+            if (!player.HasCustomProperty(PlayerPositionKey))
             {
-                Debug.Log($"setPlayer {playerPositionKey}={playerPosition}");
-                player.SetCustomProperties(new Hashtable { { playerPositionKey, playerPosition } });
+                Debug.Log($"setPlayer {PlayerPositionKey}={playerPosition}");
+                player.SetCustomProperties(new Hashtable { { PlayerPositionKey, playerPosition } });
                 return;
             }
-            var curValue = player.GetCustomProperty<int>(playerPositionKey);
-            Debug.Log($"setPlayer {playerPositionKey}=({curValue}<-){playerPosition}");
-            player.SafeSetCustomProperty(playerPositionKey, playerPosition, curValue);
+            var curValue = player.GetCustomProperty<int>(PlayerPositionKey);
+            Debug.Log($"setPlayer {PlayerPositionKey}=({curValue}<-){playerPosition}");
+            player.SafeSetCustomProperty(PlayerPositionKey, playerPosition, curValue);
         }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -139,16 +139,16 @@ namespace Examples.Lobby.Scripts
 
         public class PlayerPosEvent
         {
-            public readonly int playerPosition;
+            public readonly int PlayerPosition;
 
             public PlayerPosEvent(int playerPosition)
             {
-                this.playerPosition = playerPosition;
+                this.PlayerPosition = playerPosition;
             }
 
             public override string ToString()
             {
-                return $"{nameof(playerPosition)}: {playerPosition}";
+                return $"{nameof(PlayerPosition)}: {PlayerPosition}";
             }
         }
     }

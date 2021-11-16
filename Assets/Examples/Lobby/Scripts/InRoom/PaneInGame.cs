@@ -1,4 +1,5 @@
-﻿using Prg.Scripts.Common.PubSub;
+﻿using Examples.Config.Scripts;
+using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,9 +12,9 @@ namespace Examples.Lobby.Scripts.InRoom
     {
         [SerializeField] private Button[] buttons;
 
-        private static readonly int[] positionMap =
+        private static readonly int[] PositionMap =
         {
-            LobbyManager.playerPosition0, LobbyManager.playerPosition1, LobbyManager.playerPosition2, LobbyManager.playerPosition3,
+            PhotonBattle.PlayerPosition1, PhotonBattle.PlayerPosition2, PhotonBattle.PlayerPosition3, PhotonBattle.PlayerPosition4,
         };
 
         private void Start()
@@ -21,18 +22,18 @@ namespace Examples.Lobby.Scripts.InRoom
             for (var i = 0; i < buttons.Length; ++i)
             {
                 var capturedPositionIndex = i;
-                buttons[i].onClick.AddListener(() => setPlayerPosition(capturedPositionIndex));
+                buttons[i].onClick.AddListener(() => SetPlayerPosition(capturedPositionIndex));
             }
         }
 
-        private void setPlayerPosition(int positionIndex)
+        private void SetPlayerPosition(int positionIndex)
         {
-            Debug.Log($"setPlayerPosition {positionIndex}");
-            if (positionIndex < 0 || positionIndex > 3)
+            Debug.Log($"SetPlayerPosition {positionIndex}");
+            if (positionIndex < 0 || positionIndex >= PositionMap.Length)
             {
                 throw new UnityException($"invalid positionIndex: {positionIndex}");
             }
-            this.Publish(new LobbyManager.PlayerPosEvent(positionMap[positionIndex]));
+            this.Publish(new LobbyManager.PlayerPosEvent(PositionMap[positionIndex]));
         }
     }
 }
