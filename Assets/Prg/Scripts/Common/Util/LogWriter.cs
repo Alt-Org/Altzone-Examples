@@ -10,13 +10,13 @@ namespace Prg.Scripts.Common.Util
     /// </summary>
     public class LogWriter : MonoBehaviour
     {
-        public static Func<string, string> logLineContentFilter;
+        public static Func<string, string> LogLineContentFilter;
 
         private static readonly UTF8Encoding FileEncoding = new UTF8Encoding(false, false);
         private static LogWriter _instance;
-        private static readonly object _lock = new object();
+        private static readonly object Lock = new object();
 
-        [SerializeField] private string fileName;
+        [Header("Live Data"), SerializeField] private string _fileName;
         private StreamWriter _file;
 
         // Formatted log messages share this.
@@ -49,36 +49,36 @@ namespace Prg.Scripts.Common.Util
             try
             {
                 var baseFileName = Path.Combine(Application.persistentDataPath, baseName);
-                fileName = baseFileName;
+                _fileName = baseFileName;
                 var retry = 1;
                 for (;;)
                 {
                     try
                     {
                         // Open for overwrite!
-                        _file = new StreamWriter(fileName, false, FileEncoding) { AutoFlush = true };
+                        _file = new StreamWriter(_fileName, false, FileEncoding) { AutoFlush = true };
                         break;
                     }
                     catch (IOException) // Sharing violation if more than one instance at the same time
                     {
                         if (++retry > 10) throw new UnityException("Unable to allocate log file");
-                        var newSuffix = $"{retry:D2}_{logFileSuffix}";
-                        fileName = baseFileName.Replace(logFileSuffix, newSuffix);
+                        var newSuffix = $"{retry:D2}_{LogFileSuffix}";
+                        _fileName = baseFileName.Replace(LogFileSuffix, newSuffix);
                     }
                 }
                 // Show effective log filename.
                 if (Application.platform.ToString().ToLower().Contains("windows"))
                 {
-                    fileName = fileName.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
+                    _fileName = _fileName.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
                 }
-                Debug.LogFormat("Logfile {0}", fileName);
+                Debug.LogFormat("Logfile {0}", _fileName);
                 // Capture UNITY Console Logs in separate thread.
                 Application.logMessageReceivedThreaded += UnityLogCallback;
             }
             catch (Exception x)
             {
                 _file = null;
-                UnityEngine.Debug.LogFormat("unable to create log file '{0}'", fileName);
+                UnityEngine.Debug.LogFormat("unable to create log file '{0}'", _fileName);
                 UnityEngine.Debug.LogException(x);
             }
         }
@@ -132,7 +132,7 @@ namespace Prg.Scripts.Common.Util
 
         private static void UnityLogCallback(string logString, string stackTrace, LogType type)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 if (logString == _prevLogString && type != LogType.Error)
                 {
@@ -149,10 +149,10 @@ namespace Prg.Scripts.Common.Util
                     _prevLogLineCount = 0;
                 }
                 _prevLogString = logString;
-                if (logLineContentFilter != null)
+                if (LogLineContentFilter != null)
                 {
                     // As we can modify the input parameter on the fly we must call each delegate separately with correct input.
-                    var invocationList = logLineContentFilter.GetInvocationList();
+                    var invocationList = LogLineContentFilter.GetInvocationList();
                     foreach (var callback in invocationList)
                     {
                         logString = callback.DynamicInvoke(logString) as string;
@@ -183,14 +183,14 @@ namespace Prg.Scripts.Common.Util
             }
         }
 
-        private const string logFileSuffix = "game.log";
+        private const string LogFileSuffix = "game.log";
 
         public static string GetLogName()
         {
             if (!Application.platform.ToString().ToLower().EndsWith("editor"))
             {
                 // Delete old files.
-                var oldFiles = Directory.GetFiles(Application.persistentDataPath, $"*_{logFileSuffix}");
+                var oldFiles = Directory.GetFiles(Application.persistentDataPath, $"*_{LogFileSuffix}");
                 var today = DateTime.Now.Day;
                 foreach (var oldFile in oldFiles)
                 {
@@ -210,7 +210,7 @@ namespace Prg.Scripts.Common.Util
             var platform = Application.platform.ToString().ToLower();
             var prefix = platform.Contains("editor") ? "editor" : platform.Replace("player", "");
             var baseName = Application.productName.ToLower();
-            return $"{prefix}_{baseName}_{logFileSuffix}";
+            return $"{prefix}_{baseName}_{LogFileSuffix}";
         }
     }
 }

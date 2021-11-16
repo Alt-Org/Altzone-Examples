@@ -37,7 +37,7 @@ namespace Prg.Scripts.Common.Util
             var trimmed = string.IsNullOrEmpty(config.colorForClassName) ? "" : config.colorForClassName.Trim();
             if (trimmed.Length > 0)
             {
-                Debug.SetColorForClassName(trimmed, ref LogWriter.logLineContentFilter);
+                Debug.SetColorForClassName(trimmed, ref LogWriter.LogLineContentFilter);
             }
             var filterList = config.BuildFilter();
             if (filterList.Count == 0)
@@ -86,7 +86,7 @@ namespace Prg.Scripts.Common.Util
             }
 
             UnityExtensions.CreateGameObjectAndComponent<LogWriter>(nameof(LogWriter), true);
-            LogWriter.logLineContentFilter += FilterPhotonLogMessage;
+            LogWriter.LogLineContentFilter += FilterPhotonLogMessage;
         }
 
         private List<RegExpFilter> BuildFilter()
