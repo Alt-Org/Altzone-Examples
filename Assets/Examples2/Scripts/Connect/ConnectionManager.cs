@@ -189,6 +189,25 @@ namespace Examples2.Scripts.Connect
             UpdateAll();
         }
 
+        public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+        {
+            var room = PhotonNetwork.CurrentRoom;
+            if (room.PlayerCount < 4)
+            {
+                return;
+            }
+            foreach (var waitingPlayer in room.Players.Values)
+            {
+                var playerPos = waitingPlayer.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+                if (playerPos > 0)
+                {
+                    continue;
+                }
+                AddPlayerToRoom(waitingPlayer);
+                return;
+            }
+        }
+
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
             UpdatePlayerInRoom(newMasterClient);
