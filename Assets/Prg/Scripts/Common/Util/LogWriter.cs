@@ -8,7 +8,7 @@ namespace Prg.Scripts.Common.Util
     /// <summary>
     /// Simple file logger that catches all log messages from UNITY and writes them to a file.
     /// </summary>
-    public class LogWriter : MonoBehaviour
+    public class LogWriter : MonoBehaviour, IDisposable
     {
         /// <summary>
         /// Be nice and follow UNITY lifecycle but can loose some last log message on <c>OnApplicationQuit</c>.
@@ -205,6 +205,11 @@ namespace Prg.Scripts.Common.Util
             var prefix = platform.Contains("editor") ? "editor" : platform.Replace("player", "");
             var baseName = Application.productName.ToLower();
             return $"{prefix}_{baseName}_{LogFileSuffix}";
+        }
+
+        public void Dispose()
+        {
+            _file?.Dispose();
         }
     }
 }
