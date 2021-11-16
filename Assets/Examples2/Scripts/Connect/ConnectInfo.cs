@@ -81,7 +81,7 @@ namespace Examples2.Scripts.Connect
                 _remoteTexts.RemoveAt(0);
             }
             handleText.text =
-                $"{state._localActorNumber}-{state._playerPos} {state._playerActorNumber} : o={state._messagesOut} i={state._messagesIn}";
+                $"{state._playerPos}-{state._localActorNumber}-{state._playerActorNumber} : o={state._messagesOut} i={state._messagesIn}";
         }
 
         private void RemoveRemoteHandle(PlayerHandshakeState state)
