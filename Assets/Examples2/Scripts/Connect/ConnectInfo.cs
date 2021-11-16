@@ -50,13 +50,13 @@ namespace Examples2.Scripts.Connect
         {
             var master = player.IsMasterClient ? " [M]" : "";
             var local = player.IsLocal ? " [L]" : "";
-            var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition, 0);
+            var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
             var playerName = player.IsLocal ? RichText.Yellow(player.NickName) : player.NickName;
             _title.text = PlayerHandshakeState.FormatTitle(playerPos, player.ActorNumber);
             _playerName.text = $"{playerName}{master}{local}";
 
             var actors = string.Join(",", PhotonNetwork.CurrentRoom.Players.Keys.OrderBy(x => x));
-            _localStatus.text = $"L={PhotonNetwork.LocalPlayer.ActorNumber} pp={playerPos} (actors {actors})";
+            _localStatus.text = $"pp={playerPos} L={PhotonNetwork.LocalPlayer.ActorNumber} (actors {actors})";
         }
 
         public void UpdatePeers(PlayerHandshakeState state, int add)
