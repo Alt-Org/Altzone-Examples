@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.Photon;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -23,6 +24,7 @@ namespace Examples2.Scripts.Connect
         [SerializeField] private PlayerConnection _player2;
         [SerializeField] private PlayerConnection _player3;
         [SerializeField] private PlayerConnection _player4;
+        [SerializeField] private TMP_Text _waitingText;
 
         private readonly List<PlayerConnection> _players = new List<PlayerConnection>();
 
@@ -30,6 +32,7 @@ namespace Examples2.Scripts.Connect
         {
             Debug.Log($"Awake {PhotonNetwork.NetworkClientState}");
             _players.AddRange(new[] { _player1, _player2, _player3, _player4 });
+            _waitingText.text = string.Empty;
         }
 
         public override void OnEnable()
@@ -111,15 +114,29 @@ namespace Examples2.Scripts.Connect
 
         private void UpdateAll()
         {
+            var waitingCount = 0;
+            var playerCount = 0;
             foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
             {
+                var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+                if (playerPos == 0)
+                {
+                    waitingCount += 1;
+                    continue;
+                }
                 var existingPlayer = _players.FirstOrDefault(x => x.ActorNumber == player.ActorNumber);
                 if (existingPlayer == null)
                 {
                     continue;
                 }
+                playerCount += 1;
                 existingPlayer.UpdatePhotonPlayer(player);
             }
+            _waitingText.text = playerCount < 4
+                ? $"Missing players {4 - playerCount}"
+                : waitingCount > 0
+                    ? $"Waiting players {waitingCount}"
+                    : string.Empty;
         }
 
         private void UpdatePlayerInRoom(Player player)
@@ -161,7 +178,7 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"OnJoinedRoom {PhotonNetwork.NetworkClientState}");
             var room = PhotonNetwork.CurrentRoom;
             var player = PhotonNetwork.LocalPlayer;
-            if (!room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "", out var uniquePlayerName))
+            if (!room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, string.Empty, out var uniquePlayerName))
             {
                 // Make player name unique within this room if it was not!
                 PhotonNetwork.NickName = uniquePlayerName;
