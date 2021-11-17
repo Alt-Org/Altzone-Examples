@@ -97,7 +97,7 @@ namespace Examples2.Scripts.Connect
             var room = PhotonNetwork.CurrentRoom;
             var playerPos = PhotonNetwork.IsMasterClient
                 ? room.GetFreePlayerPosition()
-                : player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+                : player.GetCustomProperty(PhotonBattle.PlayerPositionKey, PhotonBattle.PlayerPositionGuest);
             Debug.Log($"AddPlayerToRoom master {PhotonNetwork.IsMasterClient} {player.GetDebugLabel()} free playerPos {playerPos}");
             if (playerPos < 1 || playerPos > 4)
             {
@@ -109,9 +109,9 @@ namespace Examples2.Scripts.Connect
                 Assert.IsTrue(freePlayer.ActorNumber < 1);
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    var key = PhotonKeyNames.GetPlayerPositionKey(playerPos);
-                    room.SafeSetCustomProperty(key, (byte)playerPos, (byte)0);
-                    player.SetCustomProperty(PhotonKeyNames.PlayerPosition, (byte)playerPos);
+                    var key = PhotonKeyNames.GetPlayerPositionRoomKey(playerPos);
+                    room.SafeSetCustomProperty(key, playerPos, 0);
+                    player.SetCustomProperty(PhotonBattle.PlayerPositionKey, playerPos);
                 }
                 freePlayer.ShowPhotonPlayer(player);
             }
@@ -129,8 +129,8 @@ namespace Examples2.Scripts.Connect
             if (PhotonNetwork.IsMasterClient)
             {
                 var room = PhotonNetwork.CurrentRoom;
-                var key = PhotonKeyNames.GetPlayerPositionKey(existingPlayer.PlayerPos);
-                room.SetCustomProperty(key, (byte)0);
+                var key = PhotonKeyNames.GetPlayerPositionRoomKey(existingPlayer.PlayerPos);
+                room.SetCustomProperty(key, 0);
             }
             existingPlayer.HidePhotonPlayer();
         }
@@ -141,7 +141,7 @@ namespace Examples2.Scripts.Connect
             var playerCount = 0;
             foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
             {
-                var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+                var playerPos = player.GetCustomProperty(PhotonBattle.PlayerPositionKey, PhotonBattle.PlayerPositionGuest);
                 if (playerPos == 0)
                 {
                     waitingCount += 1;
@@ -171,7 +171,7 @@ namespace Examples2.Scripts.Connect
                 existingPlayer.UpdatePhotonPlayer(player);
                 return;
             }
-            if (player.HasCustomProperty(PhotonKeyNames.PlayerPosition))
+            if (player.HasCustomProperty(PhotonBattle.PlayerPositionKey))
             {
                 AddPlayerToRoom(player);
             }
@@ -188,10 +188,10 @@ namespace Examples2.Scripts.Connect
             Debug.Log($"OnJoinedLobby -> createRoom {PhotonNetwork.NetworkClientState}");
             Hashtable customRoomProperties = new Hashtable()
             {
-                { PhotonKeyNames.PlayerPosition1, (byte)0 },
-                { PhotonKeyNames.PlayerPosition2, (byte)0 },
-                { PhotonKeyNames.PlayerPosition3, (byte)0 },
-                { PhotonKeyNames.PlayerPosition4, (byte)0 }
+                { PhotonKeyNames.PlayerPosition1, 0 },
+                { PhotonKeyNames.PlayerPosition2, 0 },
+                { PhotonKeyNames.PlayerPosition3, 0 },
+                { PhotonKeyNames.PlayerPosition4, 0 }
             };
             PhotonLobby.joinOrCreateRoom("testing", customRoomProperties);
         }
@@ -238,7 +238,7 @@ namespace Examples2.Scripts.Connect
             }
             foreach (var waitingPlayer in room.Players.Values)
             {
-                var playerPos = waitingPlayer.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+                var playerPos = waitingPlayer.GetCustomProperty(PhotonBattle.PlayerPositionKey, PhotonBattle.PlayerPositionGuest);
                 if (playerPos > 0)
                 {
                     continue;

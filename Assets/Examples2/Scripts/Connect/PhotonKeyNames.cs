@@ -11,9 +11,7 @@ namespace Examples2.Scripts.Connect
         public const string PlayerPosition3 = "p3";
         public const string PlayerPosition4 = "p4";
 
-        public const string PlayerPosition = "p";
-
-        public static string GetPlayerPositionKey(int playerPos)
+        public static string GetPlayerPositionRoomKey(int playerPos)
         {
             Assert.IsTrue(playerPos >= 1 && playerPos <= 4, "playerPos >= 1 && playerPos <= 4");
             return $"p{playerPos}";
@@ -28,7 +26,7 @@ namespace Examples2.Scripts.Connect
                 {
                     continue;
                 }
-                if ((byte)entry.Value != 0)
+                if ((int)entry.Value != 0)
                 {
                     continue;
                 }

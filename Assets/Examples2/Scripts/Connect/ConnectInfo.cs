@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Altzone.Scripts.Battle;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
@@ -52,7 +53,7 @@ namespace Examples2.Scripts.Connect
         {
             var master = player.IsMasterClient ? " [M]" : string.Empty;
             var local = player.IsLocal ? " [L]" : string.Empty;
-            var playerPos = player.GetCustomProperty<byte>(PhotonKeyNames.PlayerPosition);
+            var playerPos = player.GetCustomProperty(PhotonBattle.PlayerPositionKey, PhotonBattle.PlayerPositionGuest);
             var playerName = player.IsLocal ? RichText.Yellow(player.NickName) : player.NickName;
             _title.text = PlayerHandshakeState.FormatTitle(playerPos, player.ActorNumber);
             _playerName.text = $"{playerName}{master}{local}";
