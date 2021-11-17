@@ -16,16 +16,25 @@ namespace Altzone.Scripts.Battle
 
         public const string PlayerPositionKey = "pp";
         public const string PlayerMainSkillKey = "mk";
+        public const string TeamBlueKey = "tb";
+        public const string TeamRedKey = "tr";
+
+        //  Red team number 2
+        //  - Player numbers 3 and 4
+        // | ======= |
+        // |  3 |  4 |      Team number 0
+        // | ======= |      - Guest number is 0
+        // |  1 |  2 |      - Spectator number is 10
+        // | ======= |
+        //  Blue team number 1
+        //  - Player numbers 1 and 2
 
         public const int PlayerPositionGuest = 0;
         public const int PlayerPosition1 = 1;
         public const int PlayerPosition2 = 2;
         public const int PlayerPosition3 = 3;
         public const int PlayerPosition4 = 4;
-        public const int PlayerPositionSpectator = 11;
-
-        public const string TeamBlueKey = "tb";
-        public const string TeamRedKey = "tr";
+        public const int PlayerPositionSpectator = 10;
 
         public const int NoTeamValue = 0;
         public const int TeamBlueValue = 1;
