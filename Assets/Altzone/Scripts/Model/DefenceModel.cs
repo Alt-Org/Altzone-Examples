@@ -1,4 +1,4 @@
-﻿namespace Examples.Model.Scripts.Model
+﻿namespace Altzone.Scripts.Model
 {
     /// <summary>
     /// Enum values for Defence "attribute".

@@ -1,6 +1,6 @@
-using Examples.Model.Scripts.Model;
 using Prg.Scripts.Common.Util;
 using System;
+using Altzone.Scripts.Model;
 using UnityEngine;
 
 namespace Examples.Config.Scripts

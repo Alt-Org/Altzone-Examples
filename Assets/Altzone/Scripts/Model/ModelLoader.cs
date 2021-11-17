@@ -1,4 +1,4 @@
-﻿namespace Examples.Model.Scripts.Model
+﻿namespace Altzone.Scripts.Model
 {
     /// <summary>
     /// Utility class to load all models for runtime.

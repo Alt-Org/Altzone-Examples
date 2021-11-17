@@ -1,7 +1,7 @@
-﻿using Examples.Config.Scripts;
-using Examples.Model.Scripts.Model;
+﻿using System;
+using Altzone.Scripts.Model;
+using Examples.Config.Scripts;
 using Prg.Scripts.Common.Photon;
-using System;
 using UnityEngine;
 
 namespace Examples.Model.Scripts

@@ -1,5 +1,4 @@
-﻿using Examples.Config.Scripts;
-using Examples.Model.Scripts.Model;
+﻿using Altzone.Scripts.Model;
 using UnityEngine;
 using UnityEngine.UI;
 

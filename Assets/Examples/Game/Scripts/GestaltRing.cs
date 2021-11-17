@@ -1,7 +1,7 @@
-﻿using Examples.Model.Scripts.Model;
-using Prg.Scripts.Common.Photon;
+﻿using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using System;
+using Altzone.Scripts.Model;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

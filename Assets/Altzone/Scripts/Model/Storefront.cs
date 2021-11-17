@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Examples.Model.Scripts.Model
+namespace Altzone.Scripts.Model
 {
     public interface IStorefront
     {

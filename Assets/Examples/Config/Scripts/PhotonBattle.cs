@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Examples.Model.Scripts.Model;
+using Altzone.Scripts.Model;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
 using UnityEngine;

@@ -1,4 +1,4 @@
-﻿using Examples.Model.Scripts.Model;
+﻿using Altzone.Scripts.Model;
 using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;

@@ -1,8 +1,8 @@
 using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.Scene;
-using Examples.Model.Scripts.Model;
 using Photon.Pun;
 using System;
+using Altzone.Scripts.Model;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player

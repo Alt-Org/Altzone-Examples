@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Examples.Model.Scripts.Model
+namespace Altzone.Scripts.Model
 {
     /// <summary>
     /// Container for named model objects.

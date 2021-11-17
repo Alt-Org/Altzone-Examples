@@ -1,6 +1,4 @@
-﻿using Examples.Game.Scripts;
-
-namespace Examples.Model.Scripts.Model
+﻿namespace Altzone.Scripts.Model
 {
     /// <summary>
     /// Player character model.

@@ -1,4 +1,4 @@
-﻿using Examples.Model.Scripts.Model;
+﻿using Altzone.Scripts.Model;
 using NUnit.Framework;
 
 namespace Tests.Editor.Model
