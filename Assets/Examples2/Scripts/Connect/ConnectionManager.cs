@@ -82,6 +82,7 @@ namespace Examples2.Scripts.Connect
         {
             var room = PhotonNetwork.CurrentRoom;
             Debug.Log($"RoomIsReadyToPlay {PhotonNetwork.NetworkClientState} master {PhotonNetwork.IsMasterClient} players {room.PlayerCount}");
+            Assert.IsTrue(room.HasCustomProperty(PhotonKeyNames.PlayerPosition1), "room.HasCustomProperty(PhotonKeyNames.PlayerPosition1)");
             foreach (var playerConnection in _players)
             {
                 playerConnection.HidePhotonPlayer();
