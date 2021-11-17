@@ -5,7 +5,7 @@ namespace Examples.Game.Scripts.Battle.interfaces
         int PlayerPos { get; }
         bool IsLocal { get; }
         int TeamMatePos { get; }
-        int TeamIndex { get; }
+        int TeamNumber { get; }
         bool IsLocalTeam { get; }
         bool IsHomeTeam { get; }
         int OppositeTeam { get; }

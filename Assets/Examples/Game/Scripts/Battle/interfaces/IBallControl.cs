@@ -8,7 +8,7 @@ namespace Examples.Game.Scripts.Battle.interfaces
     public interface IBallControl
     {
         int currentTeamIndex { get; }
-        void teleportBall(Vector2 position, int teamIndex); // We need to know onto which team's side we are landing!
+        void teleportBall(Vector2 position, int teamNumber); // We need to know onto which team's side we are landing!
         void moveBall(Vector2 direction, float speed);
         void showBall();
         void hideBall();

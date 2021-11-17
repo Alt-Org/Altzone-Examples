@@ -35,7 +35,7 @@ namespace Altzone.Scripts.Battle
 
         public static bool IsRealPlayer(Player player)
         {
-            var playerPos = player.GetCustomProperty(PlayerPositionKey, -1);
+            var playerPos = player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
             return playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4;
         }
 
@@ -65,23 +65,6 @@ namespace Altzone.Scripts.Battle
             return playerName;
         }
 
-        public static void GetPlayerProperties(Player player, out int playerPos, out int teamIndex)
-        {
-            playerPos = player.GetCustomProperty(PlayerPositionKey, -1);
-            if (playerPos == PlayerPosition1 || playerPos == PlayerPosition3)
-            {
-                teamIndex = TeamBlueValue;
-            }
-            else if (playerPos == PlayerPosition4 || playerPos == PlayerPosition2)
-            {
-                teamIndex = TeamRedValue;
-            }
-            else
-            {
-                teamIndex = -1;
-            }
-        }
-
         public static int GetPlayerIndex(int playerPos)
         {
             Assert.IsTrue(playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4,
@@ -89,15 +72,14 @@ namespace Altzone.Scripts.Battle
             return playerPos - 1;
         }
 
-        public static int GetTeamIndex(int playerPos)
+        public static int GetTeamNumber(int playerPos)
         {
-            Assert.IsTrue(playerPos == int.MaxValue, "GetTeamIndex NOT IMPLEMENTED YET");
             switch (playerPos)
             {
                 case PlayerPosition1:
-                case PlayerPosition3:
-                    return TeamBlueValue;
                 case PlayerPosition2:
+                    return TeamBlueValue;
+                case PlayerPosition3:
                 case PlayerPosition4:
                     return TeamRedValue;
                 default:
@@ -105,9 +87,21 @@ namespace Altzone.Scripts.Battle
             }
         }
 
+        public static int GetOppositeTeamNumber(int teamNumber)
+        {
+            return teamNumber == TeamBlueValue ? TeamRedValue : TeamBlueValue;
+        }
+
+        public static int GetTeamIndex(int teamNumber)
+        {
+            Assert.IsTrue(teamNumber >= TeamBlueValue && teamNumber <= TeamRedValue,
+                "teamNumber >= TeamBlueValue && teamNumber <= TeamRedValue");
+            return teamNumber == TeamBlueValue ? 0 : 1;
+        }
+
         public static int GetOppositeTeamIndex(int teamIndex)
         {
-            return teamIndex == TeamBlueValue ? TeamRedValue : TeamBlueValue;
+            return teamIndex == 0 ? 1 : 0;
         }
 
         public static int GetTeamMatePos(int playerPos)
@@ -115,13 +109,13 @@ namespace Altzone.Scripts.Battle
             switch (playerPos)
             {
                 case PlayerPosition1:
-                    return PlayerPosition3;
-                case PlayerPosition2:
-                    return PlayerPosition4;
-                case PlayerPosition3:
-                    return PlayerPosition1;
-                case PlayerPosition4:
                     return PlayerPosition2;
+                case PlayerPosition2:
+                    return PlayerPosition1;
+                case PlayerPosition3:
+                    return PlayerPosition4;
+                case PlayerPosition4:
+                    return PlayerPosition3;
                 default:
                     throw new UnityException($"invalid player pos: {playerPos}");
             }
@@ -135,10 +129,15 @@ namespace Altzone.Scripts.Battle
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void SetDebugPlayerProps(Player player, int playerPos, int playerMainSkill = 1)
+        public static void SetDebugPlayerProps(Player player, int playerPos, int playerMainSkill = -1)
         {
             Assert.IsTrue(playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4,
                 "playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4");
+            if (playerMainSkill < (int)Defence.Desensitisation || playerMainSkill > (int)Defence.Confluence)
+            {
+                // Fastest movement skill to have for testing.
+                playerMainSkill = (int)Defence.Deflection;
+            }
             player.SetCustomProperties(new Hashtable
             {
                 { PlayerPositionKey, playerPos },

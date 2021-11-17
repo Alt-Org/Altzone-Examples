@@ -6,7 +6,7 @@ namespace Examples2.Scripts.Battle.interfaces
     {
         Transform Transform { get; }
         int PlayerPos { get; }
-        int TeamIndex { get; }
+        int TeamNumber { get; }
         IPlayerActor TeamMate { get; }
         void HeadCollision();
         void SetNormalMode();

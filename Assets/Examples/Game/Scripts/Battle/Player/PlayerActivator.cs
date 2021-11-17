@@ -13,13 +13,13 @@ namespace Examples.Game.Scripts.Battle.Player
     public class PlayerActivator : MonoBehaviour
     {
         public static readonly List<IPlayerActor> AllPlayerActors = new List<IPlayerActor>();
-        public static int HomeTeamIndex;
-        public static int LocalTeamIndex;
+        public static int HomeTeamNumber;
+        public static int LocalTeamNumber;
 
         [Header("Live Data")] public int _playerPos;
-        public int _teamIndex;
+        public int _teamNumber;
         public bool _isLocal;
-        public int _oppositeTeamIndex;
+        public int _oppositeTeamNumber;
         public int _teamMatePos;
         public bool _isAwake;
 
@@ -27,22 +27,23 @@ namespace Examples.Game.Scripts.Battle.Player
         {
             var photonView = PhotonView.Get(this);
             var player = photonView.Owner;
-            PhotonBattle.GetPlayerProperties(player, out _playerPos, out _teamIndex);
+            _playerPos = PhotonBattle.GetPlayerPos(player);
+            _teamNumber = PhotonBattle.GetTeamNumber(_playerPos);
             _isLocal = photonView.IsMine;
+            _oppositeTeamNumber = PhotonBattle.GetOppositeTeamNumber(_teamNumber);
+            _teamMatePos = PhotonBattle.GetTeamMatePos(_playerPos);
             if (player.IsMasterClient)
             {
                 // The player who created this room is in "home team"!
-                HomeTeamIndex = _teamIndex;
-                Debug.Log($"homeTeamIndex={HomeTeamIndex} pos={_playerPos}");
+                HomeTeamNumber = _teamNumber;
+                Debug.Log($"HomeTeamNumber={HomeTeamNumber} pos={_playerPos}");
             }
             if (_isLocal)
             {
-                Debug.Log($"localTeamIndex={LocalTeamIndex} pos={_playerPos}");
-                LocalTeamIndex = _teamIndex;
+                Debug.Log($"LocalTeamNumber={LocalTeamNumber} pos={_playerPos}");
+                LocalTeamNumber = _teamNumber;
             }
-            _oppositeTeamIndex = PhotonBattle.GetOppositeTeamIndex(_teamIndex);
-            _teamMatePos = PhotonBattle.GetTeamMatePos(_playerPos);
-            Debug.Log($"Awake {player.NickName} pos={_playerPos} team={_teamIndex}");
+            Debug.Log($"Awake {player.NickName} pos={_playerPos} team={_teamNumber}");
 
             _isAwake = true; // Signal that we have configured ourself
         }

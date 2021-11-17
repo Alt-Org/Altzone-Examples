@@ -83,7 +83,7 @@ namespace Examples2.Scripts.Battle.PlayerConnect
                 return;
             }
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(otherPlayer));
-            if (playerActor.TeamIndex == _playerActorA.TeamIndex)
+            if (playerActor.TeamNumber == _playerActorA.TeamNumber)
             {
                 ((IPlayerLineConnector)this).Hide();
             }

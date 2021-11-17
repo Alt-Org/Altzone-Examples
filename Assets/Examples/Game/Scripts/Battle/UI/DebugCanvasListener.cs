@@ -73,16 +73,16 @@ namespace Examples.Game.Scripts.Battle.UI
 
         private void OnTeamScoreEvent(ScoreManager.TeamScoreEvent data)
         {
-            Debug.Log($"OnTeamScoreEvent {data} local {PlayerActivator.LocalTeamIndex} home {PlayerActivator.HomeTeamIndex}");
+            Debug.Log($"OnTeamScoreEvent {data} local {PlayerActivator.LocalTeamNumber} home {PlayerActivator.HomeTeamNumber}");
             var score = data.Score;
             // Local or remote player - left or right side
-            var isLocalTeam = score._teamIndex == PlayerActivator.LocalTeamIndex;
+            var isLocalTeam = score._teamNumber == PlayerActivator.LocalTeamNumber;
             // Master client team - team name and color
-            var isHomeTeam = score._teamIndex == PlayerActivator.HomeTeamIndex;
+            var isHomeTeam = score._teamNumber == PlayerActivator.HomeTeamNumber;
             var teamName = isHomeTeam ? _teamNameHome : _teamNameVisitor;
             var teamColor = isHomeTeam ? _teamColorHome : _teamColorVisitor;
             var text = isLocalTeam ? leftText : rightText;
-            text.text = string.Format(ScoreFormat, teamName, score._teamIndex, score._headCollisionCount, score._wallCollisionCount, teamColor);
+            text.text = string.Format(ScoreFormat, teamName, score._teamNumber, score._headCollisionCount, score._wallCollisionCount, teamColor);
         }
     }
 }

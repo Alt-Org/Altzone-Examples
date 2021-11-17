@@ -23,7 +23,7 @@ namespace Examples2.Scripts.Battle.Players
             public int _currentMode;
             public Transform _transform;
             public int _playerPos;
-            public int _teamIndex;
+            public int _teamNumber;
             public PlayerActor _teamMate;
         }
 
@@ -44,8 +44,8 @@ namespace Examples2.Scripts.Battle.Players
             _state._currentMode = PlayModeNormal;
             _state._transform = GetComponent<Transform>();
             _state._playerPos = PhotonBattle.GetPlayerPos(player);
-            _state._teamIndex = PhotonBattle.GetTeamIndex(_state._playerPos);
-            var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamIndex}";
+            _state._teamNumber = PhotonBattle.GetTeamNumber(_state._playerPos);
+            var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamNumber}";
             name = $"{prefix}:{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
             _playerInfo.text = _state._playerPos.ToString("N0");
@@ -62,7 +62,7 @@ namespace Examples2.Scripts.Battle.Players
             var players = FindObjectsOfType<PlayerActor>();
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} players {players.Length}");
             _state._teamMate = players
-                .FirstOrDefault(x => x._state._teamIndex == _state._teamIndex && x._state._playerPos != _state._playerPos);
+                .FirstOrDefault(x => x._state._teamNumber == _state._teamNumber && x._state._playerPos != _state._playerPos);
             gameObject.AddComponent<LocalPlayer>();
             ((IPlayerActor)this).SetNormalMode();
         }
@@ -77,7 +77,7 @@ namespace Examples2.Scripts.Battle.Players
 
         private void OnActiveTeamEvent(BallManager.ActiveTeamEvent data)
         {
-            if (data.TeamIndex == _state._teamIndex)
+            if (data.TeamIndex == _state._teamNumber)
             {
                 // Ghosted -> Frozen is not allowed
                 if (_state._currentMode != PlayModeNormal)
@@ -100,7 +100,7 @@ namespace Examples2.Scripts.Battle.Players
 
         int IPlayerActor.PlayerPos => _state._playerPos;
 
-        int IPlayerActor.TeamIndex => _state._teamIndex;
+        int IPlayerActor.TeamNumber => _state._teamNumber;
 
         IPlayerActor IPlayerActor.TeamMate => _state._teamMate;
 

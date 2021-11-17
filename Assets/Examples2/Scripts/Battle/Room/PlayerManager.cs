@@ -17,7 +17,16 @@ namespace Examples2.Scripts.Battle.Room
     {
         private const int MsgCountdown = PhotonEventDispatcher.eventCodeBase + 3;
 
+        private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
+        private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
+        private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
+        private const int PlayerPosition4 = PhotonBattle.PlayerPosition4;
+
         [Header("Settings"), SerializeField] private GameObject _playerPrefab;
+        [SerializeField] private Vector2 _playerPosition1;
+        [SerializeField] private Vector2 _playerPosition2;
+        [SerializeField] private Vector2 _playerPosition3;
+        [SerializeField] private Vector2 _playerPosition4;
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private ICountdownManager _countdownManager;
@@ -41,9 +50,25 @@ namespace Examples2.Scripts.Battle.Room
                 return;
             }
             var playerPos = PhotonBattle.GetPlayerPos(player);
-            var x = playerPos == 2 || playerPos == 3 ? 2.5f : -2.5f;
-            var y = playerPos == 2 || playerPos == 4 ? 4.25f : -4.25f;
-            var instantiationPosition = new Vector3(x, y);
+            Vector2 pos;
+            switch (playerPos)
+            {
+                case PlayerPosition1:
+                    pos = _playerPosition1;
+                    break;
+                case PlayerPosition2:
+                    pos = _playerPosition2;
+                    break;
+                case PlayerPosition3:
+                    pos = _playerPosition3;
+                    break;
+                case PlayerPosition4:
+                    pos = _playerPosition4;
+                    break;
+                default:
+                    throw new UnityException($"invalid playerPos: {playerPos}");
+            }
+            var instantiationPosition = new Vector3(pos.x, pos.y);
             Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
             PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
         }
@@ -115,7 +140,7 @@ namespace Examples2.Scripts.Battle.Room
                 StartCoroutine(DoCountdown(3));
             }
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));
-            _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamIndex);
+            _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamNumber);
             _playerLineConnector.Connect(playerActor);
         }
 

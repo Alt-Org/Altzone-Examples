@@ -1,10 +1,10 @@
+using System;
+using Altzone.Scripts.Battle;
+using Examples.Game.Scripts.Battle.Player;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
-using System;
-using Altzone.Scripts.Battle;
-using Examples.Config.Scripts;
-using Examples.Game.Scripts.Battle.Player;
+using UnityConstants;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Room
@@ -15,26 +15,42 @@ namespace Examples.Game.Scripts.Battle.Room
     [Serializable]
     public class TeamScore
     {
-        public int _teamIndex;
+        public int _teamNumber;
         public int _headCollisionCount;
         public int _wallCollisionCount;
 
         public byte[] ToBytes()
         {
-            return new[] { (byte)_teamIndex, (byte)_headCollisionCount, (byte)_wallCollisionCount };
+            return new[] { (byte)_teamNumber, (byte)_headCollisionCount, (byte)_wallCollisionCount };
         }
 
-        public static void FromBytes(object data, out int teamIndex, out int headCollisionCount, out int wallCollisionCount)
+        public static void FromBytes(object data, out int teamNumber, out int headCollisionCount, out int wallCollisionCount)
         {
             var payload = (byte[])data;
-            teamIndex = payload[0];
+            teamNumber = payload[0];
             headCollisionCount = payload[1];
             wallCollisionCount = payload[2];
         }
 
+        public static TeamScore[] AllocateTeamScores()
+        {
+            var scores = new TeamScore[2];
+            var teamIndex = PhotonBattle.GetTeamIndex(PhotonBattle.TeamBlueValue);
+            scores[teamIndex] = new TeamScore
+            {
+                _teamNumber = PhotonBattle.TeamBlueValue
+            };
+            teamIndex = PhotonBattle.GetTeamIndex(PhotonBattle.TeamRedValue);
+            scores[teamIndex] = new TeamScore
+            {
+                _teamNumber = PhotonBattle.TeamRedValue
+            };
+            return scores;
+        }
+
         public override string ToString()
         {
-            return $"team: {_teamIndex}, headCollision: {_headCollisionCount}, wallCollision: {_wallCollisionCount}";
+            return $"team: {_teamNumber}, headCollision: {_headCollisionCount}, wallCollision: {_wallCollisionCount}";
         }
     }
 
@@ -62,13 +78,9 @@ namespace Examples.Game.Scripts.Battle.Room
 
         private void Awake()
         {
-            _scores = new[]
-            {
-                new TeamScore { _teamIndex = 0 },
-                new TeamScore { _teamIndex = 1 },
-            };
+            _scores = TeamScore.AllocateTeamScores();
             _photonEventDispatcher = PhotonEventDispatcher.Get();
-            _photonEventDispatcher.registerEventListener(MsgSetTeamScore, data => { ONSetTeamScore(data.CustomData); });
+            _photonEventDispatcher.registerEventListener(MsgSetTeamScore, data => { OnSetTeamScore(data.CustomData); });
         }
 
         private void OnDestroy()
@@ -78,7 +90,7 @@ namespace Examples.Game.Scripts.Battle.Room
 
         private void OnEnable()
         {
-            this.Subscribe<TeamScoreEvent>(ONTeamScoreEvent);
+            this.Subscribe<TeamScoreEvent>(OnTeamScoreEvent);
             // Set initial state for scores
             SendTeamNames();
             this.Publish(new TeamScoreEvent(_scores[0]));
@@ -95,7 +107,7 @@ namespace Examples.Game.Scripts.Battle.Room
             var room = PhotonNetwork.CurrentRoom;
             string teamRedName;
             string teamBlueName;
-            if (PlayerActivator.HomeTeamIndex == 0)
+            if (PlayerActivator.HomeTeamNumber == PhotonBattle.TeamBlueValue)
             {
                 teamRedName = room.GetCustomProperty<string>(PhotonBattle.TeamRedKey);
                 teamBlueName = room.GetCustomProperty<string>(PhotonBattle.TeamBlueKey);
@@ -113,9 +125,10 @@ namespace Examples.Game.Scripts.Battle.Room
             _photonEventDispatcher.RaiseEvent(MsgSetTeamScore, score.ToBytes());
         }
 
-        private void ONSetTeamScore(object data)
+        private void OnSetTeamScore(object data)
         {
-            TeamScore.FromBytes(data, out var teamIndex, out var headCollisionCount, out var wallCollisionCount);
+            TeamScore.FromBytes(data, out var teamNumber, out var headCollisionCount, out var wallCollisionCount);
+            var teamIndex = PhotonBattle.GetTeamIndex(teamNumber);
             var score = _scores[teamIndex];
             // Update and publish new score
             score._headCollisionCount = headCollisionCount;
@@ -123,10 +136,11 @@ namespace Examples.Game.Scripts.Battle.Room
             this.Publish(new TeamScoreEvent(score));
         }
 
-        private void ONTeamScoreEvent(TeamScoreEvent data)
+        private void OnTeamScoreEvent(TeamScoreEvent data)
         {
             var scoreNew = data.Score;
-            var score = _scores[scoreNew._teamIndex];
+            var teamIndex = PhotonBattle.GetTeamIndex(scoreNew._teamNumber);
+            var score = _scores[teamIndex];
             score._headCollisionCount = scoreNew._headCollisionCount;
             score._wallCollisionCount = scoreNew._wallCollisionCount;
         }
@@ -147,12 +161,13 @@ namespace Examples.Game.Scripts.Battle.Room
             SendSetTeamScore(score);
         }
 
-        public static void AddHeadScore(int teamIndex)
+        public static void AddHeadScore(int teamNumber)
         {
             var manager = Get();
             if (PhotonNetwork.IsMasterClient && manager != null)
             {
-                Get()._addHeadScore(teamIndex);
+                var teamIndex = PhotonBattle.GetTeamIndex(teamNumber);
+                manager._addHeadScore(teamIndex);
             }
         }
 
@@ -161,13 +176,13 @@ namespace Examples.Game.Scripts.Battle.Room
             var manager = Get();
             if (PhotonNetwork.IsMasterClient && manager != null)
             {
-                if (gameObject.CompareTag(UnityConstants.Tags.BotSide))
+                if (gameObject.CompareTag(Tags.BotSide))
                 {
-                    Get()._addWallScore(0);
+                    manager._addWallScore(PhotonBattle.GetTeamIndex(PhotonBattle.TeamBlueValue));
                 }
-                else if (gameObject.CompareTag(UnityConstants.Tags.TopSide))
+                else if (gameObject.CompareTag(Tags.TopSide))
                 {
-                    Get()._addWallScore(1);
+                    manager._addWallScore(PhotonBattle.GetTeamIndex(PhotonBattle.TeamRedValue));
                 }
             }
         }

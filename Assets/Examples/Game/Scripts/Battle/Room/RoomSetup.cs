@@ -28,8 +28,8 @@ namespace Examples.Game.Scripts.Battle.Room
         {
             Debug.Log($"Awake: {PhotonNetwork.NetworkClientState}");
             PlayerActivator.AllPlayerActors.Clear();
-            PlayerActivator.HomeTeamIndex = -1;
-            PlayerActivator.LocalTeamIndex = -1;
+            PlayerActivator.HomeTeamNumber = PhotonBattle.NoTeamValue;
+            PlayerActivator.LocalTeamNumber = PhotonBattle.NoTeamValue;
             PrepareCurrentStage();
         }
 
@@ -55,9 +55,10 @@ namespace Examples.Game.Scripts.Battle.Room
         private void SetupLocalPlayer()
         {
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.GetPlayerProperties(player, out var playerPos, out var teamIndex);
-            Debug.Log($"OnEnable pos={playerPos} team={teamIndex} {player.GetDebugLabel()}");
-            if (teamIndex != PhotonBattle.TeamBlueValue)
+            var playerPos = PhotonBattle.GetPlayerPos(player);
+            var teamNumber = PhotonBattle.GetTeamNumber(playerPos);
+            Debug.Log($"SetupLocalPlayer pos={playerPos} team={teamNumber} {player.GetDebugLabel()}");
+            if (teamNumber == PhotonBattle.TeamBlueValue)
             {
                 return;
             }
@@ -65,11 +66,12 @@ namespace Examples.Game.Scripts.Battle.Room
             var features = RuntimeGameConfig.Get().Features;
             if (features.isRotateGameCamera)
             {
-                // Rotate game camera for upper team
+                // Rotate game camera
                 sceneConfig.rotateGameCamera(upsideDown: true);
             }
             if (features.isLocalPLayerOnTeamBlue)
             {
+                // Rotate background
                 sceneConfig.rotateBackground(upsideDown: true);
                 // Separate sprites for each team gameplay area - these might not be visible in final game
                 if (sceneConfig.upperTeamSprite.enabled && sceneConfig.lowerTeamSprite.enabled)

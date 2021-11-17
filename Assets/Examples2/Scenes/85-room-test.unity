@@ -5445,9 +5445,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7c7b821e45a4220aac25cc2573daa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOfflineMode: 0
-  debugPlayerPos: 1
-  objectsToActivate:
+  _isOfflineMode: 0
+  _debugPlayerPos: 1
+  _objectsToActivate:
   - {fileID: 1651784406}
   - {fileID: 1374902844}
 --- !u!4 &1107679312
@@ -8149,6 +8149,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 8607368454165204979, guid: 01c71bf87fde35546aa9563e80581cc8,
     type: 3}
+  _playerPosition1: {x: -2.5, y: -4.25}
+  _playerPosition2: {x: 2.5, y: -4.25}
+  _playerPosition3: {x: -2.5, y: 4.25}
+  _playerPosition4: {x: 2.5, y: 4.25}
 --- !u!114 &1651784410
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -33,27 +33,27 @@ namespace Examples.Game.Scripts.Battle.Player
 
         private void onActiveTeamEvent(BallActor.ActiveTeamEvent data)
         {
-            if (data.newTeamIndex == -1)
+            if (data.newTeamNumber == -1)
             {
                 return; // Ignore indeterminate state
             }
             if (PhotonNetwork.IsMasterClient)
             {
-                sendSetActiveTeam(data.newTeamIndex);
+                sendSetActiveTeam(data.newTeamNumber);
             }
         }
 
-        private void sendSetActiveTeam(int activeTeam)
+        private void sendSetActiveTeam(int activeTeamNumber)
         {
-            photonEventDispatcher.RaiseEvent(msgSetActiveTeam, activeTeam);
+            photonEventDispatcher.RaiseEvent(msgSetActiveTeam, activeTeamNumber);
         }
 
         private void onSetActiveTeam(object data)
         {
-            var activeTeam = (int)data;
+            var activeTeamNumber = (int)data;
             foreach (var playerActor in PlayerActivator.AllPlayerActors)
             {
-                if (playerActor.TeamIndex == activeTeam)
+                if (playerActor.TeamNumber == activeTeamNumber)
                 {
                     playerActor.setFrozenMode();
                 }

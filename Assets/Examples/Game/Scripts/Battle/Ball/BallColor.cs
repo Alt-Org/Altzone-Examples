@@ -71,8 +71,9 @@ namespace Examples.Game.Scripts.Battle.Ball
         private void OnEnable()
         {
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.GetPlayerProperties(player, out var playerPos, out var teamIndex);
-            if (teamIndex == 1)
+            var playerPos = PhotonBattle.GetPlayerPos(player);
+            var teamNumber = PhotonBattle.GetTeamNumber(playerPos);
+            if (teamNumber == PhotonBattle.TeamRedValue)
             {
                 // c# swap via deconstruction
                 (upperTeamColor, lowerTeamColor) = (lowerTeamColor, upperTeamColor);
@@ -110,19 +111,19 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         private void onActiveTeamEvent(BallActor.ActiveTeamEvent data)
         {
-            switch (data.newTeamIndex)
+            switch (data.newTeamNumber)
             {
-                case 0:
+                case PhotonBattle.TeamBlueValue:
                     sendSetBallColor(lowerTeamColorIndex, isNormalMode);
                     return;
-                case 1:
+                case PhotonBattle.TeamRedValue:
                     sendSetBallColor(upperTeamColorIndex, isNormalMode);
                     return;
-                case -1:
+                case PhotonBattle.NoTeamValue:
                     sendSetBallColor(neutralColorIndex, isNormalMode);
                     return;
                 default:
-                    throw new UnityException($"unknown team index: {data.newTeamIndex}");
+                    throw new UnityException($"unknown team index: {data.newTeamNumber}");
             }
         }
     }

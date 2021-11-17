@@ -1,4 +1,5 @@
-﻿using Examples.Config.Scripts;
+﻿using Altzone.Scripts.Battle;
+using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Room;
@@ -39,7 +40,7 @@ namespace Examples.Game.Scripts.Battle.Ball
         [SerializeField] private LayerMask collisionToBrickMask;
         [SerializeField] private int collisionToBrick;
 
-        [Header("Live Data"), SerializeField] private int _curTeamIndex;
+        [Header("Live Data"), SerializeField] private int _curTeamNumber;
         [SerializeField] private float targetSpeed;
         [SerializeField] private BallCollision ballCollision;
         [SerializeField] private ICatchABall ballHeadShot;
@@ -67,7 +68,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             collisionToWall = collisionToWallMask.value;
             collisionToBrick = collisionToBrickMask.value;
 
-            _curTeamIndex = -1;
+            _curTeamNumber = PhotonBattle.NoTeamValue;
             targetSpeed = 0;
             ballCollision = gameObject.AddComponent<BallCollision>();
             ballCollision.enabled = false;
@@ -87,11 +88,11 @@ namespace Examples.Game.Scripts.Battle.Ball
             _Instance = null;
         }
 
-        private void onCurrentTeamChanged(int newTeamIndex)
+        private void onCurrentTeamChanged(int newTeamNumber)
         {
-            Debug.Log($"onCurrentTeamChanged ({_curTeamIndex}) <- ({newTeamIndex})");
-            _curTeamIndex = newTeamIndex;
-            this.Publish(new ActiveTeamEvent(newTeamIndex));
+            Debug.Log($"onCurrentTeamChanged ({_curTeamNumber}) <- ({newTeamNumber})");
+            _curTeamNumber = newTeamNumber;
+            this.Publish(new ActiveTeamEvent(newTeamNumber));
         }
 
         private void onBallCollision(Collision2D other)
@@ -115,7 +116,7 @@ namespace Examples.Game.Scripts.Battle.Ball
                 playerActor.headCollision(this);
                 return;
             }
-            Debug.Log($"onBallCollision UNHANDLED team={_curTeamIndex} other={other.gameObject.name}");
+            Debug.Log($"onBallCollision UNHANDLED team={_curTeamNumber} other={other.gameObject.name}");
         }
 
         private void OnEnable()
@@ -133,11 +134,11 @@ namespace Examples.Game.Scripts.Battle.Ball
             }
         }
 
-        int IBallControl.currentTeamIndex => _curTeamIndex;
+        int IBallControl.currentTeamIndex => _curTeamNumber;
 
-        void IBallControl.teleportBall(Vector2 position, int teamIndex)
+        void IBallControl.teleportBall(Vector2 position, int teamNumber)
         {
-            onCurrentTeamChanged(teamIndex);
+            onCurrentTeamChanged(teamNumber);
             _rigidbody.position = position;
             _collider.enabled = true;
         }
@@ -257,7 +258,7 @@ namespace Examples.Game.Scripts.Battle.Ball
             var targetVelocity = _velocity.normalized * targetSpeed;
             if (targetVelocity == Vector2.zero)
             {
-                randomReset(_curTeamIndex);
+                randomReset(_curTeamNumber);
                 return;
             }
             if (targetVelocity != _rigidbody.velocity)
@@ -300,16 +301,16 @@ namespace Examples.Game.Scripts.Battle.Ball
 
         internal class ActiveTeamEvent
         {
-            public readonly int newTeamIndex;
+            public readonly int newTeamNumber;
 
-            public ActiveTeamEvent(int newTeamIndex)
+            public ActiveTeamEvent(int newTeamNumber)
             {
-                this.newTeamIndex = newTeamIndex;
+                this.newTeamNumber = newTeamNumber;
             }
 
             public override string ToString()
             {
-                return $"team: {newTeamIndex}";
+                return $"team: {newTeamNumber}";
             }
         }
     }

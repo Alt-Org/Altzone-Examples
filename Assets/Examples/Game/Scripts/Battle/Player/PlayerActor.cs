@@ -37,8 +37,8 @@ namespace Examples.Game.Scripts.Battle.Player
         int IPlayerActor.PlayerPos => activator._playerPos;
         bool IPlayerActor.IsLocal => activator._isLocal;
         int IPlayerActor.TeamMatePos => activator._teamMatePos;
-        int IPlayerActor.TeamIndex => activator._teamIndex;
-        int IPlayerActor.OppositeTeam => activator._oppositeTeamIndex;
+        int IPlayerActor.TeamNumber => activator._teamNumber;
+        int IPlayerActor.OppositeTeam => activator._oppositeTeamNumber;
 
         bool IPlayerActor.IsLocalTeam
         {
@@ -86,7 +86,7 @@ namespace Examples.Game.Scripts.Battle.Player
             // Re-parent and set name
             var sceneConfig = SceneConfig.Get();
             transform.parent = sceneConfig.actorParent.transform;
-            name = $"{(player.IsLocal ? "L" : "R")}{activator._playerPos}:{activator._teamIndex}:{player.NickName}";
+            name = $"{(player.IsLocal ? "L" : "R")}{activator._playerPos}:{activator._teamNumber}:{player.NickName}";
 
             setupPlayer(player);
             if (sceneConfig.isCameraRotated)
@@ -101,9 +101,9 @@ namespace Examples.Game.Scripts.Battle.Player
             Debug.Log($"LateAwakePass1 name={name} players={PlayerActivator.AllPlayerActors.Count}");
             // Set our team status
             _teamMate = PlayerActivator.AllPlayerActors
-                .FirstOrDefault(x => x.TeamIndex == activator._teamIndex && x.PlayerPos != activator._playerPos) as PlayerActor;
+                .FirstOrDefault(x => x.TeamNumber == activator._teamNumber && x.PlayerPos != activator._playerPos) as PlayerActor;
             _isLocalTeam = activator._isLocal || _teamMate != null && _teamMate.activator._isLocal;
-            _isHomeTeam = activator._teamIndex == PlayerActivator.HomeTeamIndex;
+            _isHomeTeam = activator._teamNumber == PlayerActivator.HomeTeamNumber;
             _isValidTeam = true;
         }
 

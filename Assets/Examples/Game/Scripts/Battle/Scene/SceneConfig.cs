@@ -107,10 +107,13 @@ namespace Examples.Game.Scripts.Battle.Scene
             // For convenience player start positions are kept under corresponding play area as child objects.
             // - play area is marked by collider to get its bounds for player area calculation!
             var playerIndex = PhotonBattle.GetPlayerIndex(playerPos);
-            var playAreaTransform = playerStartPos[playerIndex].parent;
+            var startPos = playerStartPos[playerIndex];
+            var playAreaTransform = startPos.parent;
             var center = playAreaTransform.position;
             var bounds = playAreaTransform.GetComponent<Collider2D>().bounds;
-            return calculateRectFrom(center, bounds);
+            var rect = calculateRectFrom(center, bounds);
+            Debug.Log($"getPlayArea {playerPos} startPos {startPos.position} rect {rect}");
+            return rect;
         }
 
         public void rotateBackground(bool upsideDown)

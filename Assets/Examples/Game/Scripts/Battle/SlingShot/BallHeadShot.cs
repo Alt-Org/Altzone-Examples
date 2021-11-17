@@ -26,7 +26,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         [SerializeField] private Transform ballTransform;
         [SerializeField] private Vector3 a;
         [SerializeField] private Vector3 b;
-        [SerializeField] private int teamIndex;
+        [SerializeField] private int _teamNumber;
         [SerializeField] private float ballStartTime;
 
         [Header("Debug"), SerializeField] private Vector3 deltaBall;
@@ -92,7 +92,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             var clampedSpeed = Mathf.Clamp(Mathf.Abs(delta.magnitude), variables.minSlingShotDistance, variables.maxSlingShotDistance);
             var multiplier = RuntimeGameConfig.Get().Variables.ballMoveSpeedMultiplier;
             var speed = clampedSpeed * multiplier;
-            startTheBall(ballControl, ballTransform.position, teamIndex, direction, speed);
+            startTheBall(ballControl, ballTransform.position, _teamNumber, direction, speed);
         }
 
         public void catchABall(IBallControl ball, int playerPos)
@@ -103,7 +103,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
             var playerA = PlayerActivator.AllPlayerActors.Find(x => x.PlayerPos == playerPos);
             playerA.setGhostedMode();
-            teamIndex = playerA.TeamIndex;
+            _teamNumber = playerA.TeamNumber;
             followA = ((Component)playerA).transform;
             followAOwnerId = PhotonView.Get(followA).Owner.ActorNumber;
             var teamMate = playerA.TeamMate;
@@ -115,7 +115,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             }
             else
             {
-                followB = SceneConfig.Get().ballAnchors[teamIndex];
+                followB = SceneConfig.Get().ballAnchors[_teamNumber];
                 followBOwnerId = notPhotonOwner;
             }
             ballControl.ghostBall();

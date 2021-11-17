@@ -59,7 +59,7 @@ namespace Examples.Game.Scripts.Battle.Player
         private void OnEnable()
         {
             var playerActor = GetComponent<PlayerActor>() as IPlayerActor;
-            if (playerActor.TeamIndex == 0)
+            if (playerActor.TeamNumber == PhotonBattle.TeamBlueValue)
             {
                 currentShield = upperShield;
                 currentGhostedShield = ghostedUpperShield;

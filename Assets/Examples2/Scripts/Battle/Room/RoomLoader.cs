@@ -14,14 +14,14 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     internal class RoomLoader : MonoBehaviourPunCallbacks
     {
-        [Header("Settings"), SerializeField] private bool isOfflineMode;
-        [SerializeField] private int debugPlayerPos;
-        [SerializeField] private GameObject[] objectsToActivate;
+        [Header("Settings"), SerializeField] private bool _isOfflineMode;
+        [SerializeField, Range(1,4)] private int _debugPlayerPos;
+        [SerializeField] private GameObject[] _objectsToActivate;
 
         private void Awake()
         {
             Debug.Log($"Awake {PhotonNetwork.NetworkClientState}");
-            if (objectsToActivate.Any(x => x.activeSelf))
+            if (_objectsToActivate.Any(x => x.activeSelf))
             {
                 Debug.LogError("objectsToActivate has active items, disable them and retry");
                 enabled = false;
@@ -42,8 +42,8 @@ namespace Examples2.Scripts.Battle.Room
             {
                 Debug.Log($"connect {PhotonNetwork.NetworkClientState}");
                 var playerName = PhotonBattle.GetLocalPlayerName();
-                PhotonNetwork.OfflineMode = isOfflineMode;
-                if (isOfflineMode)
+                PhotonNetwork.OfflineMode = _isOfflineMode;
+                if (_isOfflineMode)
                 {
                     PhotonNetwork.NickName = playerName;
                     PhotonNetwork.JoinRandomRoom();
@@ -65,7 +65,7 @@ namespace Examples2.Scripts.Battle.Room
                 PhotonLobby.closeRoom(true);
             }
             // Enable game objects when this room stage is ready to play
-            StartCoroutine(ActivateObjects(objectsToActivate));
+            StartCoroutine(ActivateObjects(_objectsToActivate));
         }
 
         private static IEnumerator ActivateObjects(GameObject[] objectsToActivate)
@@ -80,7 +80,7 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnConnectedToMaster()
         {
-            if (!isOfflineMode)
+            if (!_isOfflineMode)
             {
                 Debug.Log($"joinLobby {PhotonNetwork.NetworkClientState}");
                 PhotonLobby.joinLobby();
@@ -95,7 +95,7 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            PhotonBattle.SetDebugPlayerProps(PhotonNetwork.LocalPlayer, debugPlayerPos);
+            PhotonBattle.SetDebugPlayerProps(PhotonNetwork.LocalPlayer, _debugPlayerPos);
         }
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

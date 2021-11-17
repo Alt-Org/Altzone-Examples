@@ -1,6 +1,7 @@
 using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Scene;
 using System;
+using Altzone.Scripts.Battle;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Ball
@@ -81,17 +82,17 @@ namespace Examples.Game.Scripts.Battle.Ball
             if (isUpper && !isLower)
             {
                 // activate upper team
-                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(1);
+                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(PhotonBattle.TeamRedValue);
             }
             else if (isLower && !isUpper)
             {
                 // Activate lower team
-                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(0);
+                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(PhotonBattle.TeamBlueValue);
             }
             else
             {
                 // between teams
-                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(-1);
+                ((IBallCollisionSource)this).onCurrentTeamChanged?.Invoke(PhotonBattle.NoTeamValue);
             }
         }
     }

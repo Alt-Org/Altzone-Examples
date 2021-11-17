@@ -1,4 +1,5 @@
 using System;
+using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.PubSub;
@@ -102,17 +103,17 @@ namespace Examples2.Scripts.Battle.Ball
             if (state._isRedTeamActive && !state._isBlueTeamActive)
             {
                 ball.SetColor(BallColor.RedTeam);
-                ball.Publish(new ActiveTeamEvent(1));
+                ball.Publish(new ActiveTeamEvent(PhotonBattle.TeamRedValue));
                 return;
             }
             if (state._isBlueTeamActive && !state._isRedTeamActive)
             {
                 ball.SetColor(BallColor.BlueTeam);
-                ball.Publish(new ActiveTeamEvent(0));
+                ball.Publish(new ActiveTeamEvent(PhotonBattle.TeamBlueValue));
                 return;
             }
             ball.SetColor(BallColor.NoTeam);
-            ball.Publish(new ActiveTeamEvent(-1));
+            ball.Publish(new ActiveTeamEvent(PhotonBattle.NoTeamValue));
         }
 
         #endregion

@@ -23,7 +23,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
     {
         private const int msgHideSlingShot = PhotonEventDispatcher.eventCodeBase + 2;
 
-        [Header("Settings"), SerializeField] private int teamIndex;
+        [Header("Settings"), SerializeField] private int teamNumber;
         [SerializeField] private SpriteRenderer spriteA;
         [SerializeField] private SpriteRenderer spriteB;
         [SerializeField] private LineRenderer line;
@@ -67,12 +67,12 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             base.OnEnable();
             // Get all team players ordered by their position so we can align the sling properly from A to B
             var playerActors = FindObjectsOfType<PlayerActor>()
-                .Where(x => ((IPlayerActor)x).TeamIndex == teamIndex)
+                .Where(x => ((IPlayerActor)x).TeamNumber == teamNumber)
                 .OrderBy(x => ((IPlayerActor)x).PlayerPos)
                 .ToList();
             if (playerActors.Count == 0)
             {
-                Debug.Log($"OnEnable team={teamIndex} playerActors={playerActors.Count}");
+                Debug.Log($"OnEnable team={teamNumber} playerActors={playerActors.Count}");
                 gameObject.SetActive(false); // No players for our team!
                 return;
             }
@@ -82,8 +82,9 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             {
                 ballControl.hideBall();
             }
-            followA = playerActors[0].transform;
-            _attackForce = getAttackForce(playerActors[0]);
+            var playerActorA = playerActors[0];
+            followA = playerActorA.transform;
+            _attackForce = getAttackForce(playerActorA);
             if (playerActors.Count == 2)
             {
                 followB = playerActors[1].transform;
@@ -91,10 +92,11 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             }
             else
             {
-                var teamMatePos = ((IPlayerActor)playerActors[0]).TeamMatePos;
-                followB = SceneConfig.Get().playerStartPos[teamMatePos]; // Never moves
+                var teamMatePos = ((IPlayerActor)playerActorA).TeamMatePos;
+                var playerIndex = PhotonBattle.GetPlayerIndex(teamMatePos);
+                followB = SceneConfig.Get().playerStartPos[playerIndex]; // Never moves
             }
-            Debug.Log($"OnEnable team={teamIndex} playerActors={playerActors.Count} attackForce={_attackForce}");
+            Debug.Log($"OnEnable team={teamNumber} playerActors={playerActors.Count} attackForce={_attackForce}");
             // LineRenderer should be configured ok in Editor - we just move both "ends" on the fly!
             line.positionCount = 2;
         }
@@ -117,12 +119,12 @@ namespace Examples.Game.Scripts.Battle.SlingShot
 
         void IBallSlingShot.startBall()
         {
-            Debug.Log($"startBall team={teamIndex} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
+            Debug.Log($"startBall team={teamNumber} sqrMagnitude={_sqrMagnitude} attackForce={_attackForce}");
             var startPosition = b;
             var direction = deltaVector.normalized;
             var multiplier = RuntimeGameConfig.Get().Variables.ballMoveSpeedMultiplier;
             var speed = deltaVector.magnitude * multiplier;
-            startTheBall(ballControl, startPosition, teamIndex, direction, speed);
+            startTheBall(ballControl, startPosition, teamNumber, direction, speed);
             sendHideSlingShot();
         }
 
@@ -144,9 +146,9 @@ namespace Examples.Game.Scripts.Battle.SlingShot
             _sqrMagnitude = Mathf.Clamp(deltaVector.sqrMagnitude, sqrMinSlingShotDistance, sqrMaxSlingShotDistance);
         }
 
-        private static void startTheBall(IBallControl ballControl, Vector2 position, int teamIndex, Vector2 direction, float speed)
+        private static void startTheBall(IBallControl ballControl, Vector2 position, int teamNumber, Vector2 direction, float speed)
         {
-            ballControl.teleportBall(position, teamIndex);
+            ballControl.teleportBall(position, teamNumber);
             ballControl.showBall();
             ballControl.moveBall(direction, speed);
         }
@@ -164,10 +166,10 @@ namespace Examples.Game.Scripts.Battle.SlingShot
                 .First();
 
             // Set player state on the game before ball has been started!
-            var teamIndex = ((BallSlingShot)ballSlingShot).teamIndex;
+            var teamNumber = ((BallSlingShot)ballSlingShot).teamNumber;
             foreach (var playerActor in PlayerActivator.AllPlayerActors)
             {
-                if (playerActor.TeamIndex == teamIndex)
+                if (playerActor.TeamNumber == teamNumber)
                 {
                     playerActor.setSpecialMode(); // If we were frozen ball gets stuck inside us :-(
                 }
