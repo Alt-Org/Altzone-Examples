@@ -542,9 +542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee4863c094d4f829a3148a2c6d0b303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _state:
-    _isRedTeamActive: 0
-    _isBlueTeamActive: 0
   _ballVelocity: {x: 5, y: 5}
   _startBallMoving: 1
   _stopBallMoving: 0
@@ -5061,9 +5058,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7c7b821e45a4220aac25cc2573daa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOfflineMode: 0
-  debugPlayerPos: 0
-  objectsToActivate:
+  _isOfflineMode: 0
+  _debugPlayerPos: 1
+  _objectsToActivate:
   - {fileID: 1651784406}
   - {fileID: 1374902844}
 --- !u!4 &1107679312
