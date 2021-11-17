@@ -8,10 +8,11 @@ namespace Examples2.Scripts.Connect
     public class PlayerConnection : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private ConnectInfo _connectInfo;
+        [SerializeField] private GameObject _cube;
         [SerializeField] private int _playerPos;
 
         [Header("Live Data"), SerializeField] private PhotonView _photonView;
-        [SerializeField] private MeshRenderer _renderer;
+        [SerializeField] private Vector3 _originalPosition;
         [SerializeField] private PlayerHandshake _playerHandshake;
         [SerializeField] private int _actorNumber;
 
@@ -22,7 +23,8 @@ namespace Examples2.Scripts.Connect
         {
             base.OnEnable();
             _photonView = PhotonView.Get(this);
-            _renderer = GetComponent<MeshRenderer>();
+            _cube.SetActive(false);
+            _originalPosition = _cube.transform.position;
             Debug.Log($"OnEnable pp={_playerPos} {PhotonNetwork.NetworkClientState} {_photonView}");
         }
 
@@ -35,7 +37,11 @@ namespace Examples2.Scripts.Connect
 
         private void ShowPlayerCube(bool isVisible)
         {
-            _renderer.enabled = isVisible;
+            Debug.Log($"ShowPlayerCube pp={_playerPos} actor={_actorNumber} {_photonView}");
+            var position = _cube.transform.position;
+            position.y = _originalPosition.y;
+            _cube.transform.position = position;
+            _cube.SetActive(isVisible);
             if (_playerHandshake != null)
             {
                 _playerHandshake.enabled = isVisible;
