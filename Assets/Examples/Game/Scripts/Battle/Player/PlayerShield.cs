@@ -42,7 +42,7 @@ namespace Examples.Game.Scripts.Battle.Player
             _photonView = PhotonView.Get(this);
             _transform = GetComponent<Transform>();
             var player = _photonView.Owner;
-            var model = PhotonBattle.getPlayerCharacterModel(player);
+            var model = PhotonBattle.GetPlayerCharacterModel(player);
             var multiplier = RuntimeGameConfig.Get().Variables.shieldDistanceMultiplier;
             sqrShieldDistance = model.Defence * multiplier * 2f;
             upperShield.SetActive(false);

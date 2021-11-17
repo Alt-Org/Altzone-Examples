@@ -91,7 +91,7 @@ namespace Examples.Game.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            PhotonBattle.setDebugPlayerProps(PhotonNetwork.LocalPlayer, _debugPlayerPos);
+            PhotonBattle.SetDebugPlayerProps(PhotonNetwork.LocalPlayer, _debugPlayerPos);
         }
 
         public override void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)

@@ -101,7 +101,7 @@ namespace Examples.Game.Scripts.Battle.SlingShot
         private static float getAttackForce(Component playerActor)
         {
             var player = PhotonView.Get(playerActor).Owner;
-            var model = PhotonBattle.getPlayerCharacterModel(player);
+            var model = PhotonBattle.GetPlayerCharacterModel(player);
             return model.Attack;
         }
 

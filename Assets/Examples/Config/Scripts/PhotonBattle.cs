@@ -1,7 +1,7 @@
-﻿using Examples.Model.Scripts.Model;
+﻿using System.Diagnostics;
+using Examples.Model.Scripts.Model;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Examples.Config.Scripts
@@ -71,14 +71,15 @@ namespace Examples.Config.Scripts
             }
         }
 
-        public static CharacterModel getPlayerCharacterModel(Player player)
+        public static CharacterModel GetPlayerCharacterModel(Player player)
         {
             var skillId = player.GetCustomProperty(PlayerMainSkillKey, -1);
-            return Models.FindById<CharacterModel>(skillId);
+            var character = Storefront.Get().GetCharacterModel(skillId);
+            return character;
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void setDebugPlayerProps(Player player, int playerPos)
+        public static void SetDebugPlayerProps(Player player, int playerPos)
         {
             player.SetCustomProperties(new Hashtable
             {

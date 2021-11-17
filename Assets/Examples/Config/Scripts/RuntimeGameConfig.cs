@@ -140,7 +140,7 @@ namespace Examples.Config.Scripts
         /// This is guaranteed to be valid reference all the time even <c>CharacterModelId</c> is invalid.
         /// </remarks>
         public CharacterModel CharacterModel =>
-            Models.FindById<CharacterModel>(_characterModelId) ??
+            Storefront.Get().GetCharacterModel(_characterModelId) ??
             new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
 
         [SerializeField] protected string _playerHandle;
@@ -240,7 +240,7 @@ namespace Examples.Config.Scripts
         private static void LoadGameConfig()
         {
             // We can use models
-            ModelLoader.LoadModels();
+            Storefront.Create();
             // Create default values
             _instance._permanentFeatures = new GameFeatures();
             _instance._permanentVariables = new GameVariables();

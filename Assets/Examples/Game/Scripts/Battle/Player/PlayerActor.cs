@@ -78,7 +78,7 @@ namespace Examples.Game.Scripts.Battle.Player
             _isValidTeam = false;
             _photonView = PhotonView.Get(this);
             var player = _photonView.Owner;
-            var model = PhotonBattle.getPlayerCharacterModel(player);
+            var model = PhotonBattle.GetPlayerCharacterModel(player);
             var multiplier = RuntimeGameConfig.Get().Variables.playerMoveSpeedMultiplier;
             _Speed = model.Speed * multiplier;
 

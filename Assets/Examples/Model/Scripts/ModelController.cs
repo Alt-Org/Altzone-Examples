@@ -38,7 +38,7 @@ namespace Examples.Model.Scripts
                 }
             });
             currentCharacterId = player.CharacterModelId;
-            var characters = Models.GetAll<CharacterModel>();
+            var characters = Storefront.Get().GetAllCharacterModels();
             characters.Sort((a, b) => string.Compare(a.sortValue(), b.sortValue(), StringComparison.Ordinal));
             for (var i = 0; i < characters.Count; ++i)
             {
