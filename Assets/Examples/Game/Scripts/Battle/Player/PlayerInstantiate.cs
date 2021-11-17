@@ -2,8 +2,10 @@ using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
 using System;
+using Altzone.Scripts.Battle;
 using Altzone.Scripts.Model;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples.Game.Scripts.Battle.Player
 {
@@ -15,29 +17,23 @@ namespace Examples.Game.Scripts.Battle.Player
         private void OnEnable()
         {
             var sceneConfig = SceneConfig.Get();
-            var playerStartPos = sceneConfig.playerStartPos;
             var player = PhotonNetwork.LocalPlayer;
-            PhotonBattle.GetPlayerProperties(PhotonNetwork.LocalPlayer, out var playerPos, out var teamIndex);
-            if (playerPos < 0 || playerPos >= playerStartPos.Length)
-            {
-                throw new UnityException($"invalid player position '{playerPos}' for player {player.GetDebugLabel()}");
-            }
-            if (teamIndex < 0 || teamIndex > 1)
-            {
-                throw new UnityException($"invalid team index '{teamIndex}' for player {player.GetDebugLabel()}");
-            }
+            Assert.IsTrue(PhotonBattle.IsRealPlayer(player), "PhotonBattle.IsRealPlayer(player)");
+            var playerPos = PhotonBattle.GetPlayerPos(player);
             var playerDataCache = RuntimeGameConfig.Get().PlayerDataCache;
             var defence = playerDataCache.CharacterModel.MainDefence;
-            var playerPrefab = getPlayerPrefab(defence);
+            var playerPrefab = GetPlayerPrefab(defence);
 
-            Debug.Log($"Instantiate pos={playerPos} team={teamIndex} prefab={playerPrefab.name} {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+            Debug.Log($"Instantiate pos={playerPos} prefab={playerPrefab.name} {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
 
-            var instantiationPosition = playerStartPos[playerPos].position;
+            var playerStartPos = sceneConfig.playerStartPos;
+            var playerIndex = PhotonBattle.GetPlayerIndex(playerPos);
+            var instantiationPosition = playerStartPos[playerIndex].position;
             PhotonNetwork.Instantiate(playerPrefab.name, instantiationPosition, Quaternion.identity);
             // ... rest of instantiation is done in PlayerActor (or elsewhere) because local and remote requirements can be different.
         }
 
-        private static GameObject getPlayerPrefab(Defence defence)
+        private static GameObject GetPlayerPrefab(Defence defence)
         {
             var prefabs = RuntimeGameConfig.Get().Prefabs;
             switch (defence)

@@ -6,6 +6,7 @@ using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity;
 using System.Collections;
 using System.Linq;
+using Altzone.Scripts.Battle;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;

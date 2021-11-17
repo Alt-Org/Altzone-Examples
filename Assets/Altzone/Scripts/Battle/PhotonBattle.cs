@@ -1,13 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Altzone.Scripts.Model;
 using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.Assertions;
 
-namespace Examples.Config.Scripts
+namespace Altzone.Scripts.Battle
 {
     public static class PhotonBattle
     {
+        private const string PlayerPrefsPlayerNameKey = "PlayerData.PlayerName";
+
         public const string PlayerPositionKey = "pp";
         public const string PlayerMainSkillKey = "mk";
 
@@ -21,6 +27,7 @@ namespace Examples.Config.Scripts
         public const string TeamBlueKey = "tb";
         public const string TeamRedKey = "tr";
 
+        public const int NoTeamValue = 0;
         public const int TeamBlueValue = 1;
         public const int TeamRedValue = 2;
 
@@ -30,6 +37,32 @@ namespace Examples.Config.Scripts
         {
             var playerPos = player.GetCustomProperty(PlayerPositionKey, -1);
             return playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4;
+        }
+
+        public static int CountRealPlayers()
+        {
+            return PhotonNetwork.CurrentRoom.Players.Values.Where(IsRealPlayer).Count();
+        }
+
+        public static int GetPlayerPos(Player player)
+        {
+            return player.GetCustomProperty(PlayerPositionKey, PlayerPositionGuest);
+        }
+
+        public static string GetLocalPlayerName()
+        {
+            if (PhotonNetwork.InRoom)
+            {
+                return PhotonNetwork.NickName;
+            }
+            // TODO: this part need to be refactored to use the store system in the game when it is implemented.
+            var playerName = PlayerPrefs.GetString(PlayerPrefsPlayerNameKey, string.Empty);
+            if (string.IsNullOrWhiteSpace(playerName))
+            {
+                playerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
+                PlayerPrefs.SetString(PlayerPrefsPlayerNameKey, playerName);
+            }
+            return playerName;
         }
 
         public static void GetPlayerProperties(Player player, out int playerPos, out int teamIndex)
@@ -46,6 +79,29 @@ namespace Examples.Config.Scripts
             else
             {
                 teamIndex = -1;
+            }
+        }
+
+        public static int GetPlayerIndex(int playerPos)
+        {
+            Assert.IsTrue(playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4,
+                "playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4");
+            return playerPos - 1;
+        }
+
+        public static int GetTeamIndex(int playerPos)
+        {
+            Assert.IsTrue(playerPos == int.MaxValue, "GetTeamIndex NOT IMPLEMENTED YET");
+            switch (playerPos)
+            {
+                case PlayerPosition1:
+                case PlayerPosition3:
+                    return TeamBlueValue;
+                case PlayerPosition2:
+                case PlayerPosition4:
+                    return TeamRedValue;
+                default:
+                    return NoTeamValue;
             }
         }
 
@@ -79,12 +135,14 @@ namespace Examples.Config.Scripts
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void SetDebugPlayerProps(Player player, int playerPos)
+        public static void SetDebugPlayerProps(Player player, int playerPos, int playerMainSkill = 1)
         {
+            Assert.IsTrue(playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4,
+                "playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4");
             player.SetCustomProperties(new Hashtable
             {
                 { PlayerPositionKey, playerPos },
-                { PlayerMainSkillKey, (int)Defence.Deflection }
+                { PlayerMainSkillKey, playerMainSkill }
             });
             Debug.LogWarning($"setDebugPlayerProps {player.GetDebugLabel()}");
         }

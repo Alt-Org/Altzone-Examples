@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
+using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;

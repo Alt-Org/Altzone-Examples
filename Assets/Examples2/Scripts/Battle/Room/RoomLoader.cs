@@ -1,9 +1,9 @@
+using System.Collections;
+using System.Linq;
+using Altzone.Scripts.Battle;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
-using System.Collections;
-using System.Linq;
-using Examples2.Scripts.Battle.Photon;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -95,7 +95,7 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            PhotonBattle.SetDebugPlayerPos(PhotonNetwork.LocalPlayer, debugPlayerPos);
+            PhotonBattle.SetDebugPlayerProps(PhotonNetwork.LocalPlayer, debugPlayerPos);
         }
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

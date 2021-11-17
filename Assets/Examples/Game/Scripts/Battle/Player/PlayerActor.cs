@@ -4,6 +4,7 @@ using Examples.Game.Scripts.Battle.Room;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
 using System.Linq;
+using Altzone.Scripts.Battle;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player

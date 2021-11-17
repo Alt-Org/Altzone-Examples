@@ -2,6 +2,7 @@ using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using System;
+using Altzone.Scripts.Battle;
 using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.Player;
 using UnityEngine;

@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using System;
+using Altzone.Scripts.Battle;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Room

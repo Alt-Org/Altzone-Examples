@@ -1,4 +1,5 @@
 using System.Collections;
+using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Examples2.Scripts.Battle.Photon;
+using Altzone.Scripts.Battle;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;

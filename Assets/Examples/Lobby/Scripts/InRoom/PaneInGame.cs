@@ -1,4 +1,5 @@
-﻿using Examples.Config.Scripts;
+﻿using Altzone.Scripts.Battle;
+using Examples.Config.Scripts;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
