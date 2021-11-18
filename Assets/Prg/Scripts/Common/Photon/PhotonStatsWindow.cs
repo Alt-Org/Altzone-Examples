@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -90,8 +91,13 @@ namespace Prg.Scripts.Common.Photon
                 keys.Sort((a, b) => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal));
                 foreach (var key in keys)
                 {
+                    if ("curScn".Equals(key))
+                    {
+                        // Skip current scene name.
+                        continue;
+                    }
                     var propValue = props[key];
-                    label += $"\r\n{key}={propValue} [{propValue.GetType().Name}]";
+                    label += $"\r\n{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
                 }
                 label += "\r\nPlayers:";
                 foreach (var player in room.GetPlayersByActorNumber())
@@ -106,7 +112,7 @@ namespace Prg.Scripts.Common.Photon
                         foreach (var key in keys)
                         {
                             var propValue = props[key];
-                            label += $"\r\n{key}={propValue} [{propValue.GetType().Name}]";
+                            label += $"\r\n{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
                         }
                     }
                 }
@@ -114,6 +120,30 @@ namespace Prg.Scripts.Common.Photon
             label += $"\r\nPhoton v='{PhotonLobby.gameVersion}'";
             label += $"\r\nSend rate={PhotonNetwork.SendRate} ser rate={PhotonNetwork.SerializationRate}";
             GUILayout.Label(label, guiLabelStyle);
+        }
+
+        private static readonly Dictionary<Type, string> TypeMap = new Dictionary<Type, string>()
+        {
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types
+            { typeof(bool), "bool" },
+            { typeof(byte), "byte" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(char), "char" },
+            { typeof(decimal), "decimal" },
+            { typeof(double), "double" },
+            { typeof(float), "float" },
+            { typeof(int), "int" },
+            { typeof(uint), "uint" },
+            { typeof(long), "long" },
+            { typeof(ulong), "ulong" },
+            { typeof(short), "short" },
+            { typeof(ushort), "ushort" },
+            { typeof(string), "str" },
+        };
+
+        private static string ShortTypeName(Type type)
+        {
+            return TypeMap.TryGetValue(type, out var name) ? name : type.Name;
         }
 
         /// <summary>
