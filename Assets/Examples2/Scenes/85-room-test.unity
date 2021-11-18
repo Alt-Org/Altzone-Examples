@@ -8151,8 +8151,8 @@ MonoBehaviour:
     type: 3}
   _playerPosition1: {x: -2.5, y: -4.25}
   _playerPosition2: {x: 2.5, y: -4.25}
-  _playerPosition3: {x: -2.5, y: 4.25}
-  _playerPosition4: {x: 2.5, y: 4.25}
+  _playerPosition3: {x: 2.5, y: 4.25}
+  _playerPosition4: {x: -2.5, y: 4.25}
 --- !u!114 &1651784410
 MonoBehaviour:
   m_ObjectHideFlags: 0

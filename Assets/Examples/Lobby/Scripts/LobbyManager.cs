@@ -8,6 +8,7 @@ using System.Collections;
 using System.Linq;
 using Altzone.Scripts.Battle;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -108,6 +109,7 @@ namespace Examples.Lobby.Scripts
 
         private static void SetPlayer(Player player, int playerPosition)
         {
+            Assert.IsTrue(PhotonBattle.IsValidGameplayPos(playerPosition));
             if (!player.HasCustomProperty(PlayerPositionKey))
             {
                 Debug.Log($"setPlayer {PlayerPositionKey}={playerPosition}");

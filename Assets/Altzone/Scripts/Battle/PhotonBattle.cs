@@ -22,12 +22,15 @@ namespace Altzone.Scripts.Battle
         //  Red team number 2
         //  - Player numbers 3 and 4
         // | ======= |
-        // |  3 |  4 |      Team number 0
+        // |  4 |  3 |      Team number 0
         // | ======= |      - Guest number is 0
         // |  1 |  2 |      - Spectator number is 10
         // | ======= |
         //  Blue team number 1
         //  - Player numbers 1 and 2
+
+        // Player should be positioned so that if camera is rotated 180 degrees,
+        // player with smaller number is always at the bottom of the left corner of the gameplay area.
 
         public const int PlayerPositionGuest = 0;
         public const int PlayerPosition1 = 1;
@@ -51,6 +54,16 @@ namespace Altzone.Scripts.Battle
         public static int CountRealPlayers()
         {
             return PhotonNetwork.CurrentRoom.Players.Values.Where(IsRealPlayer).Count();
+        }
+
+        public static bool IsValidGameplayPos(int playerPos)
+        {
+            return IsValidPlayerPos(playerPos) || playerPos == PlayerPositionGuest || playerPos == PlayerPositionSpectator;
+        }
+
+        public static bool IsValidPlayerPos(int playerPos)
+        {
+            return playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4;
         }
 
         public static int GetPlayerPos(Player player)
@@ -108,11 +121,6 @@ namespace Altzone.Scripts.Battle
             return teamNumber == TeamBlueValue ? 0 : 1;
         }
 
-        public static int GetOppositeTeamIndex(int teamIndex)
-        {
-            return teamIndex == 0 ? 1 : 0;
-        }
-
         public static int GetTeamMatePos(int playerPos)
         {
             switch (playerPos)
@@ -144,7 +152,7 @@ namespace Altzone.Scripts.Battle
                 "playerPos >= PlayerPosition1 && playerPos <= PlayerPosition4");
             if (playerMainSkill < (int)Defence.Desensitisation || playerMainSkill > (int)Defence.Confluence)
             {
-                // Fastest movement skill to have for testing.
+                // Should be fastest movement skill to have for testing.
                 playerMainSkill = (int)Defence.Deflection;
             }
             player.SetCustomProperties(new Hashtable

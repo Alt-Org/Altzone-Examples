@@ -30,10 +30,10 @@ namespace Examples.Lobby.Scripts.InRoom
 
         [Header("Settings"), SerializeField] private Text _upperTeamText;
         [SerializeField] private Text _lowerTeamText;
-        [SerializeField] private Button _buttonPlayerP0;
         [SerializeField] private Button _buttonPlayerP1;
         [SerializeField] private Button _buttonPlayerP2;
         [SerializeField] private Button _buttonPlayerP3;
+        [SerializeField] private Button _buttonPlayerP4;
         [SerializeField] private Button _buttonGuest;
         [SerializeField] private Button _buttonSpectator;
         [SerializeField] private Button _buttonStartPlay;
@@ -42,27 +42,27 @@ namespace Examples.Lobby.Scripts.InRoom
         [SerializeField] private bool _isLocalPlayerPositionUnique;
         [SerializeField] private int _masterClientPosition;
 
-        private bool _interactablePlayerP0;
         private bool _interactablePlayerP1;
         private bool _interactablePlayerP2;
         private bool _interactablePlayerP3;
+        private bool _interactablePlayerP4;
         private bool _interactableGuest;
         private bool _interactableSpectator;
         private bool _interactableStartPlay;
 
-        private string _captionPlayerP0;
         private string _captionPlayerP1;
         private string _captionPlayerP2;
         private string _captionPlayerP3;
+        private string _captionPlayerP4;
         private string _captionGuest;
         private string _captionSpectator;
 
         private void OnEnable()
         {
-            _buttonPlayerP0.interactable = false;
             _buttonPlayerP1.interactable = false;
             _buttonPlayerP2.interactable = false;
             _buttonPlayerP3.interactable = false;
+            _buttonPlayerP4.interactable = false;
             _buttonGuest.interactable = false;
             _buttonSpectator.interactable = false;
             _buttonStartPlay.interactable = false;
@@ -123,10 +123,10 @@ namespace Examples.Lobby.Scripts.InRoom
             }
             CheckLocalPlayer(localPLayer);
 
-            SetButton(_buttonPlayerP0, _interactablePlayerP0, _captionPlayerP0);
             SetButton(_buttonPlayerP1, _interactablePlayerP1, _captionPlayerP1);
             SetButton(_buttonPlayerP2, _interactablePlayerP2, _captionPlayerP2);
             SetButton(_buttonPlayerP3, _interactablePlayerP3, _captionPlayerP3);
+            SetButton(_buttonPlayerP4, _interactablePlayerP4, _captionPlayerP4);
             SetButton(_buttonGuest, _interactableGuest, _captionGuest);
             SetButton(_buttonSpectator, _interactableSpectator, _captionSpectator);
             SetButton(_buttonStartPlay, _interactableStartPlay, null);
@@ -210,20 +210,20 @@ namespace Examples.Lobby.Scripts.InRoom
             switch (curValue)
             {
                 case PlayerPosition1:
-                    _interactablePlayerP0 = false;
-                    _captionPlayerP0 = player.NickName;
-                    break;
-                case PlayerPosition2:
                     _interactablePlayerP1 = false;
                     _captionPlayerP1 = player.NickName;
                     break;
-                case PlayerPosition3:
+                case PlayerPosition2:
                     _interactablePlayerP2 = false;
                     _captionPlayerP2 = player.NickName;
                     break;
-                case PlayerPosition4:
+                case PlayerPosition3:
                     _interactablePlayerP3 = false;
                     _captionPlayerP3 = player.NickName;
+                    break;
+                case PlayerPosition4:
+                    _interactablePlayerP4 = false;
+                    _captionPlayerP4 = player.NickName;
                     break;
             }
         }
@@ -237,20 +237,20 @@ namespace Examples.Lobby.Scripts.InRoom
             switch (curValue)
             {
                 case PlayerPosition1:
-                    _interactablePlayerP0 = false;
-                    _captionPlayerP0 = $"<color=blue>{player.NickName}</color>";
-                    break;
-                case PlayerPosition2:
                     _interactablePlayerP1 = false;
                     _captionPlayerP1 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case PlayerPosition3:
+                case PlayerPosition2:
                     _interactablePlayerP2 = false;
                     _captionPlayerP2 = $"<color=blue>{player.NickName}</color>";
                     break;
-                case PlayerPosition4:
+                case PlayerPosition3:
                     _interactablePlayerP3 = false;
                     _captionPlayerP3 = $"<color=blue>{player.NickName}</color>";
+                    break;
+                case PlayerPosition4:
+                    _interactablePlayerP4 = false;
+                    _captionPlayerP4 = $"<color=blue>{player.NickName}</color>";
                     break;
                 case PlayerPositionGuest:
                     _interactableGuest = false;
@@ -265,18 +265,18 @@ namespace Examples.Lobby.Scripts.InRoom
 
         private void ResetState()
         {
-            _interactablePlayerP0 = true;
             _interactablePlayerP1 = true;
             _interactablePlayerP2 = true;
             _interactablePlayerP3 = true;
+            _interactablePlayerP4 = true;
             _interactableGuest = true;
             _interactableSpectator = true;
             _interactableStartPlay = false;
 
-            _captionPlayerP0 = "Player 1";
-            _captionPlayerP1 = "Player 2";
-            _captionPlayerP2 = "Player 3";
-            _captionPlayerP3 = "Player 4";
+            _captionPlayerP1 = $"Player {PlayerPosition1}";
+            _captionPlayerP2 = $"Player {PlayerPosition2}";
+            _captionPlayerP3 = $"Player {PlayerPosition3}";
+            _captionPlayerP4 = $"Player {PlayerPosition4}";
             _captionGuest = "Guest";
             _captionSpectator = "Spectator";
         }
