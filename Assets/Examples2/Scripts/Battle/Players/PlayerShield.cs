@@ -1,22 +1,38 @@
+using System;
 using Altzone.Scripts.Battle;
 using Photon.Pun;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Players
 {
+    [Serializable]
+    public class Shield
+    {
+        [SerializeField] private Transform _pivot;
+        [SerializeField] private SpriteRenderer _sprite;
+        [SerializeField] private Collider2D _collider;
+
+        public void Set(Color spriteColor, bool enabledState)
+        {
+            _sprite.color = spriteColor;
+            _collider.enabled = enabledState;
+        }
+
+        public void Rotate(float degrees)
+        {
+            _pivot.rotation = Quaternion.identity;
+            _pivot.Rotate(0, 0, degrees);
+        }
+    }
+
     public class PlayerShield : MonoBehaviour
     {
         [Header("Settings"), SerializeField] private Transform _shieldPivot;
-        [SerializeField] private SpriteRenderer _leftShield;
-        [SerializeField] private SpriteRenderer _rightShield;
-
-        private Collider2D _leftCollider;
-        private Collider2D _rightCollider;
+        [SerializeField] private Shield _leftShield;
+        [SerializeField] private Shield _rightShield;
 
         private void Awake()
         {
-            _leftCollider = _leftShield.GetComponent<Collider2D>();
-            _rightCollider = _rightShield.GetComponent<Collider2D>();
             var photonView = PhotonView.Get(this);
             var player = photonView.Owner;
             var playerPos = PhotonBattle.GetPlayerPos(player);
@@ -29,6 +45,7 @@ namespace Examples2.Scripts.Battle.Players
                 _shieldPivot.localPosition = localPosition;
             }
             SetShields(PlayerActor.PlayModeGhosted);
+            RotateShields(0);
         }
 
         public void SetShields(int playMode)
@@ -37,18 +54,20 @@ namespace Examples2.Scripts.Battle.Players
             {
                 case PlayerActor.PlayModeNormal:
                 case PlayerActor.PlayModeFrozen:
-                    _leftShield.color = Color.white;
-                    _rightShield.color = Color.white;
-                    _leftCollider.enabled = true;
-                    _rightCollider.enabled = true;
+                    _leftShield.Set(Color.white, true);
+                    _rightShield.Set(Color.white, true);
                     break;
                 default:
-                    _leftShield.color = Color.grey;
-                    _rightShield.color = Color.grey;
-                    _leftCollider.enabled = false;
-                    _rightCollider.enabled = false;
+                    _leftShield.Set(Color.grey, false);
+                    _rightShield.Set(Color.grey, false);
                     break;
             }
+        }
+
+        public void RotateShields(float degrees)
+        {
+            _leftShield.Rotate(degrees);
+            _rightShield.Rotate(-degrees);
         }
     }
 }

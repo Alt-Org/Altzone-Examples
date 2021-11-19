@@ -398,16 +398,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef154d24aebf46c799c72d973fa132e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiRoot: {fileID: 0}
+  _uiContentRoot: {fileID: 0}
   _highlightSprite: {fileID: 5813433697713424832}
   _stateSprite: {fileID: 5191372987036681836}
   _collider: {fileID: 6349736578825980098}
+  _playerShield: {fileID: 0}
   _state:
     _currentMode: 0
     _transform: {fileID: 0}
     _playerPos: 0
     _teamNumber: 0
     _teamMate: {fileID: 0}
+  _isReParentOnDestroy: 0
+  _alternateParent: {fileID: 0}
+  _hasPlayerShield: 0
   _playerInfo: {fileID: 8867706765776995095}
 --- !u!1 &9101303184460959390
 GameObject:
