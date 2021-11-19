@@ -3,6 +3,7 @@ using System.Linq;
 using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
@@ -27,11 +28,14 @@ namespace Examples2.Scripts.Battle.Players
             public PlayerActor _teamMate;
         }
 
-        [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
+        [Header("Settings"), SerializeField] private Transform _uiContentRoot;
+        [SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
 
         [Header("Live Data"), SerializeField] private PlayerState _state;
+        [SerializeField] private bool _isReParentOnDestroy;
+        [SerializeField] private Transform _alternateParent;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
@@ -55,6 +59,11 @@ namespace Examples2.Scripts.Battle.Players
             {
                 _highlightSprite.color = Color.yellow;
             }
+            _isReParentOnDestroy = _uiContentRoot != null;
+            if (_isReParentOnDestroy)
+            {
+                _alternateParent = PlayerInstantiate.DetachedPlayerTransform;
+            }
         }
 
         private void OnEnable()
@@ -69,8 +78,20 @@ namespace Examples2.Scripts.Battle.Players
 
         private void OnDestroy()
         {
-            Debug.Log($"OnDestroy {name}");
+            Debug.Log($"OnDestroy {name} re-parent {_isReParentOnDestroy}");
             this.Unsubscribe();
+            if (_photonView.IsMine)
+            {
+                return;
+            }
+            if (_isReParentOnDestroy)
+            {
+                // We must disable ourself because at least Ball assumes that we are alive and all components are present.
+                _collider.enabled = false;
+                _highlightSprite.enabled = false;
+                _stateSprite.color = Color.grey;
+                _uiContentRoot.transform.parent = _alternateParent;
+            }
         }
 
         #region External events

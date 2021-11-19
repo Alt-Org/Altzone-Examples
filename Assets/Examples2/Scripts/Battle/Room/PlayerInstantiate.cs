@@ -4,8 +4,19 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Room
 {
+    /// <summary>
+    /// Instantiate local Photon player in correct position.
+    /// </summary>
     public class PlayerInstantiate : MonoBehaviour
     {
+        /// <summary>
+        /// Safe heaven for players that have left or disconnected the game.
+        /// </summary>
+        /// <remarks>
+        /// This is quite hackish way to do this!
+        /// </remarks>
+        public static Transform DetachedPlayerTransform { get; private set; }
+
         private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
         private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
         private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
@@ -19,6 +30,7 @@ namespace Examples2.Scripts.Battle.Room
 
         private void OnEnable()
         {
+            DetachedPlayerTransform = transform;
             var player = PhotonNetwork.LocalPlayer;
             if (!PhotonBattle.IsRealPlayer(player))
             {
