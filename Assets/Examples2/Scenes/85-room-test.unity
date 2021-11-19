@@ -3244,7 +3244,7 @@ GameObject:
   - component: {fileID: 708762420}
   - component: {fileID: 708762421}
   m_Layer: 0
-  m_Name: Countdown
+  m_Name: CountdownUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

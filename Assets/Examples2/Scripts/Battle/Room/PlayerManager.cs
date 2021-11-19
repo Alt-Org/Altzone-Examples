@@ -5,6 +5,7 @@ using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
+using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,7 +30,6 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField] private Vector2 _playerPosition4;
 
         private PhotonEventDispatcher _photonEventDispatcher;
-        private ICountdownManager _countdownManager;
         private Action _countdownFinished;
         private IPlayerLineConnector _playerLineConnector;
         private PlayerLineResult _nearest;
@@ -83,24 +83,16 @@ namespace Examples2.Scripts.Battle.Room
             var curValue = payload[1];
             var maxValue = payload[2];
             Debug.Log($"OnCountdown {curValue}/{maxValue}");
-            if (curValue == maxValue)
+            this.Publish(new CountdownEvent(curValue, maxValue));
+            if (curValue >= 0)
             {
-                _countdownManager.StartCountdown(curValue);
+                return;
             }
-            else if (curValue >= 0)
-            {
-                _countdownManager.ShowCountdown(curValue);
-            }
-            else
-            {
-                _countdownManager.HideCountdown();
-                _countdownManager = null;
-                _nearest = _playerLineConnector.GetNearest();
-                _playerLineConnector.Hide();
-                _playerLineConnector = null;
-                _countdownFinished?.Invoke();
-                _countdownFinished = null;
-            }
+            _nearest = _playerLineConnector.GetNearest();
+            _playerLineConnector.Hide();
+            _playerLineConnector = null;
+            _countdownFinished?.Invoke();
+            _countdownFinished = null;
         }
 
         private void SendCountdown(int curValue, int maxValue)
@@ -133,7 +125,6 @@ namespace Examples2.Scripts.Battle.Room
         {
             var player = PhotonNetwork.LocalPlayer;
             Debug.Log($"StartCountdown {player.GetDebugLabel()} master {PhotonNetwork.IsMasterClient}");
-            _countdownManager = Context.GetCountdownManager;
             _countdownFinished = countdownFinished;
             if (PhotonNetwork.IsMasterClient)
             {
@@ -171,5 +162,16 @@ namespace Examples2.Scripts.Battle.Room
         }
 
         #endregion
+        internal class CountdownEvent
+        {
+            public readonly int CurValue;
+            public readonly int MaxValue;
+
+            public CountdownEvent(int curValue, int maxValue)
+            {
+                CurValue = curValue;
+                MaxValue = maxValue;
+            }
+        }
     }
 }
