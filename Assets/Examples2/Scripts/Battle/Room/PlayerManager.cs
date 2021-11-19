@@ -12,22 +12,11 @@ using UnityEngine.Assertions;
 namespace Examples2.Scripts.Battle.Room
 {
     /// <summary>
-    /// Manages players initial creation and gameplay start.
+    /// Manages local player gameplay start.
     /// </summary>
     internal class PlayerManager : MonoBehaviour, IPlayerManager
     {
         private const int MsgCountdown = PhotonEventDispatcher.eventCodeBase + 3;
-
-        private const int PlayerPosition1 = PhotonBattle.PlayerPosition1;
-        private const int PlayerPosition2 = PhotonBattle.PlayerPosition2;
-        private const int PlayerPosition3 = PhotonBattle.PlayerPosition3;
-        private const int PlayerPosition4 = PhotonBattle.PlayerPosition4;
-
-        [Header("Settings"), SerializeField] private GameObject _playerPrefab;
-        [SerializeField] private Vector2 _playerPosition1;
-        [SerializeField] private Vector2 _playerPosition2;
-        [SerializeField] private Vector2 _playerPosition3;
-        [SerializeField] private Vector2 _playerPosition4;
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private Action _countdownFinished;
@@ -39,38 +28,6 @@ namespace Examples2.Scripts.Battle.Room
             Debug.Log("Awake");
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.registerEventListener(MsgCountdown, data => { OnCountdown(data.CustomData); });
-        }
-
-        private void OnEnable()
-        {
-            var player = PhotonNetwork.LocalPlayer;
-            if (!PhotonBattle.IsRealPlayer(player))
-            {
-                Debug.Log($"OnEnable SKIP player {player.GetDebugLabel()}");
-                return;
-            }
-            var playerPos = PhotonBattle.GetPlayerPos(player);
-            Vector2 pos;
-            switch (playerPos)
-            {
-                case PlayerPosition1:
-                    pos = _playerPosition1;
-                    break;
-                case PlayerPosition2:
-                    pos = _playerPosition2;
-                    break;
-                case PlayerPosition3:
-                    pos = _playerPosition3;
-                    break;
-                case PlayerPosition4:
-                    pos = _playerPosition4;
-                    break;
-                default:
-                    throw new UnityException($"invalid playerPos: {playerPos}");
-            }
-            var instantiationPosition = new Vector3(pos.x, pos.y);
-            Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
-            PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
         }
 
         #region Photon Events
@@ -103,22 +60,6 @@ namespace Examples2.Scripts.Battle.Room
 
         #endregion
 
-        private IEnumerator DoCountdown(int startValue)
-        {
-            var curValue = startValue;
-            SendCountdown(curValue, startValue);
-            var delay = new WaitForSeconds(1f);
-            for (;;)
-            {
-                yield return delay;
-                SendCountdown(--curValue, startValue);
-                if (curValue < 0)
-                {
-                    yield break;
-                }
-            }
-        }
-
         #region IPlayerManager
 
         void IPlayerManager.StartCountdown(Action countdownFinished)
@@ -133,6 +74,22 @@ namespace Examples2.Scripts.Battle.Room
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));
             _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamNumber);
             _playerLineConnector.Connect(playerActor);
+        }
+
+        private IEnumerator DoCountdown(int startValue)
+        {
+            var curValue = startValue;
+            SendCountdown(curValue, startValue);
+            var delay = new WaitForSeconds(1f);
+            for (;;)
+            {
+                yield return delay;
+                SendCountdown(--curValue, startValue);
+                if (curValue < 0)
+                {
+                    yield break;
+                }
+            }
         }
 
         void IPlayerManager.StartGameplay()
