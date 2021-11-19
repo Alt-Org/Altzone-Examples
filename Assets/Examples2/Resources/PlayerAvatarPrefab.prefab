@@ -678,6 +678,7 @@ MonoBehaviour:
   _highlightSprite: {fileID: 5813433697713424832}
   _stateSprite: {fileID: 5191372987036681836}
   _collider: {fileID: 6349736578825980098}
+  _playerShield: {fileID: 1107281703295872973}
   _state:
     _currentMode: 0
     _transform: {fileID: 0}
@@ -686,6 +687,7 @@ MonoBehaviour:
     _teamMate: {fileID: 0}
   _isReParentOnDestroy: 0
   _alternateParent: {fileID: 0}
+  _hasPlayerShield: 0
   _playerInfo: {fileID: 8867706765776995095}
 --- !u!1 &9101303184460959390
 GameObject:

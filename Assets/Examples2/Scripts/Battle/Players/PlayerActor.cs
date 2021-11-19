@@ -8,15 +8,16 @@ using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Players
 {
     [RequireComponent(typeof(PhotonView))]
     internal class PlayerActor : MonoBehaviour, IPlayerActor
     {
-        private const int PlayModeNormal = 0;
-        private const int PlayModeFrozen = 1;
-        private const int PlayModeGhosted = 2;
+        public const int PlayModeNormal = 0;
+        public const int PlayModeFrozen = 1;
+        public const int PlayModeGhosted = 2;
 
         [Serializable]
         internal class PlayerState
@@ -32,10 +33,12 @@ namespace Examples2.Scripts.Battle.Players
         [SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
+        [SerializeField] private PlayerShield _playerShield;
 
         [Header("Live Data"), SerializeField] private PlayerState _state;
         [SerializeField] private bool _isReParentOnDestroy;
         [SerializeField] private Transform _alternateParent;
+        [SerializeField] private bool _hasPlayerShield;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
@@ -64,6 +67,7 @@ namespace Examples2.Scripts.Battle.Players
             {
                 _alternateParent = PlayerInstantiate.DetachedPlayerTransform;
             }
+            _hasPlayerShield = _playerShield != null;
         }
 
         private void OnEnable()
@@ -160,7 +164,13 @@ namespace Examples2.Scripts.Battle.Players
         [PunRPC]
         private void SetPlayerPlayModeRpc(int playMode)
         {
+            Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
+                "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;
+            if (_hasPlayerShield)
+            {
+                _playerShield.SetShields(playMode);
+            }
             switch (playMode)
             {
                 case PlayModeNormal:

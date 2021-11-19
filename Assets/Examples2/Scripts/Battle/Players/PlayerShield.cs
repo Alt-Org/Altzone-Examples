@@ -28,15 +28,27 @@ namespace Examples2.Scripts.Battle.Players
                 localPosition.y = -localPosition.y;
                 _shieldPivot.localPosition = localPosition;
             }
-            DisableShields();
+            SetShields(PlayerActor.PlayModeGhosted);
         }
 
-        private void DisableShields()
+        public void SetShields(int playMode)
         {
-            _leftShield.color = Color.grey;
-            _rightShield.color = Color.grey;
-            _leftCollider.enabled = false;
-            _rightCollider.enabled = false;
+            switch (playMode)
+            {
+                case PlayerActor.PlayModeNormal:
+                case PlayerActor.PlayModeFrozen:
+                    _leftShield.color = Color.white;
+                    _rightShield.color = Color.white;
+                    _leftCollider.enabled = true;
+                    _rightCollider.enabled = true;
+                    break;
+                default:
+                    _leftShield.color = Color.grey;
+                    _rightShield.color = Color.grey;
+                    _leftCollider.enabled = false;
+                    _rightCollider.enabled = false;
+                    break;
+            }
         }
     }
 }
