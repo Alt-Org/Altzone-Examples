@@ -68,6 +68,12 @@ namespace Examples2.Scripts.Battle.Players
                 _alternateParent = PlayerInstantiate.DetachedPlayerTransform;
             }
             _hasPlayerShield = _playerShield != null;
+            if (_hasPlayerShield)
+            {
+                _playerShield.SetShieldMode(PlayModeGhosted);
+                _playerShield.SetShieldSide(_state._teamNumber);
+                _playerShield.SetShieldRotation(0);
+            }
         }
 
         private void OnEnable()
@@ -169,7 +175,7 @@ namespace Examples2.Scripts.Battle.Players
             _state._currentMode = playMode;
             if (_hasPlayerShield)
             {
-                _playerShield.SetShields(playMode);
+                _playerShield.SetShieldMode(playMode);
             }
             switch (playMode)
             {
