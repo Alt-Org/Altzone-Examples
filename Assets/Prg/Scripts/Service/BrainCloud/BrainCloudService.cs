@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BrainCloud;
-using BrainCloud.JsonFx.Json;
+using BrainCloud.LitJson;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
+using JsonReader = BrainCloud.JsonFx.Json.JsonReader;
 
 namespace Prg.Scripts.Service.BrainCloud
 {
@@ -89,35 +90,23 @@ namespace Prg.Scripts.Service.BrainCloud
 
         public static void Authenticate(string userId, string password)
         {
-            string GetPlayerName(string jsonData)
+            Tuple<string,string> GetPlayerInfo(string jsonData)
             {
-                // Can not use UNITY JsonUtility.FromJson to get Dictionary :-(
-                var json = JsonReader.Deserialize<Dictionary<string, object>>(jsonData);
-                if (!json.TryGetValue("data", out var @object))
-                {
-                    return string.Empty;
-                }
-                if (!(@object is Dictionary<string, object> data))
-                {
-                    return string.Empty;
-                }
-                if (data.TryGetValue("playerName", out var playerName))
-                {
-                    return playerName == null ? string.Empty : playerName.ToString();
-                }
-                return string.Empty;
+                var data = JsonReader.Deserialize<Dictionary<string, object>>(jsonData)["data"] as Dictionary<string, object>;
+                var playerName = data?["playerName"].ToString();
+                var profileId = data?["profileId"].ToString();
+                return new Tuple<string, string>(playerName, profileId);
             }
 
             Debug.Log($"Authenticate '{userId}'");
             Get()._brainCloudWrapper.AuthenticateUniversal(userId, password, true,
                 (jsonData, ctx) =>
                 {
-                    var playerName = GetPlayerName(jsonData);
-                    Debug.Log($"Authenticate '{userId}' : '{playerName}' OK {jsonData}");
-                    if (string.IsNullOrEmpty(playerName))
-                    {
-                        Debug.Log("NO PLAYER NAME");
-                    }
+                    var tuple = GetPlayerInfo(jsonData);
+                    var playerName = tuple.Item1;
+                    var profileId = tuple.Item2;
+                    //Debug.Log($"Authenticate '{userId}' OK {jsonData}");
+                    Debug.Log($"Authenticate player '{playerName}' profile {profileId}");
                 },
                 (status,code,error,ctx)=> {
                     if (code == ReasonCodes.TOKEN_DOES_NOT_MATCH_USER)
