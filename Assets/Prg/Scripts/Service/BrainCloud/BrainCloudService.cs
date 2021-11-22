@@ -40,6 +40,10 @@ namespace Prg.Scripts.Service.BrainCloud
             string appId = "11589";
             string version = "1.0.0";
             _brainCloudWrapper.Init(url, secretKey, appId, version);
+            // Compress messages larger than 50Kb (default value).
+            var client = _brainCloudWrapper.Client;
+            client.EnableCompressedRequests(true);
+            client.EnableCompressedResponses(true);
             yield return null;
             var userId = "teppo";
             Authenticate(userId, Reverse(userId));
