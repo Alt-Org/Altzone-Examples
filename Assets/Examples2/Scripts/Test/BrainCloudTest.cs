@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Service.BrainCloud;
 using UnityEngine;
@@ -24,7 +23,7 @@ namespace Examples2.Scripts.Test
 
         private void OnDestroy()
         {
-            throw new NotImplementedException();
+            this.Unsubscribe();
         }
 
         private IEnumerator Start()
@@ -43,10 +42,11 @@ namespace Examples2.Scripts.Test
             }
         }
 
-        private static void SetPlayerName(string playerName)
+        private static async void SetPlayerName(string playerName)
         {
             Debug.Log($"SetPlayerName '{playerName}'");
-            Debug.Log($"BrainCloudUser {BrainCloudService.BrainCloudUser}");
+            var result = await BrainCloudService.UpdateUserName(playerName);
+            Debug.Log($"UpdateUserName success={result} {BrainCloudService.BrainCloudUser}");
         }
     }
 }
