@@ -5,6 +5,7 @@ using Altzone.Scripts.Config;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using Prg.Scripts.Common.Util;
+using Prg.Scripts.Service.BrainCloud;
 using UnityEngine;
 
 namespace Altzone.Scripts
@@ -24,6 +25,12 @@ namespace Altzone.Scripts
             LoggerConfig.createLoggerConfig(loggerConfig);
 
             SetDevelopmentStatus();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void AfterSceneLoad()
+        {
+            UnityExtensions.CreateGameObjectAndComponent<BrainCloudService>(nameof(BrainCloudService), true);
         }
 
         [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
