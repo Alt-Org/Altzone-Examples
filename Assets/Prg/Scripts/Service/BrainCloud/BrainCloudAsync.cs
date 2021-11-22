@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BrainCloud;
@@ -7,22 +6,29 @@ using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Service.BrainCloud
 {
-    [Serializable]
+    /// <summary>
+    /// Helper class to store some important <c>BrainCloud</c> user data for convenience.
+    /// </summary>
     public class BrainCloudUser
     {
-        public readonly string userId;
-        public readonly string userName;
-        public readonly string profileId;
-        public readonly int statusCode;
+        public readonly string UserId;
+        public readonly string UserName;
+        public readonly string ProfileId;
+        public readonly int StatusCode;
 
-        public bool IsValid => statusCode == 0;
+        public bool IsValid => StatusCode == 0;
 
         public BrainCloudUser(string userId, string userName, string profileId, int statusCode)
         {
-            this.userId = userId;
-            this.userName = userName;
-            this.profileId = profileId;
-            this.statusCode = statusCode;
+            UserId = userId;
+            UserName = userName;
+            ProfileId = profileId;
+            StatusCode = statusCode;
+        }
+
+        public override string ToString()
+        {
+            return $"UserName: {UserName}, ProfileId: {ProfileId}, UserId: {UserId}, StatusCode: {StatusCode}, IsValid: {IsValid}";
         }
     }
 
@@ -73,6 +79,23 @@ namespace Prg.Scripts.Service.BrainCloud
                     }
                     var user = new BrainCloudUser(userId, string.Empty, string.Empty, code);
                     taskCompletionSource.SetResult(user);
+                });
+            return taskCompletionSource.Task;
+        }
+
+        public static Task<int> UpdateUserName(string playerName)
+        {
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(playerName), "!string.IsNullOrWhiteSpace(playerName)");
+            var taskCompletionSource = new TaskCompletionSource<int>();
+            _brainCloudWrapper.PlayerStateService.UpdateName(playerName,
+                (jsonData, ctx) =>
+                {
+                    taskCompletionSource.SetResult(0);
+                },
+                (status, code, error, ctx) =>
+                {
+                    Debug.Log($"PlayerStateService.UpdateName '{playerName}' FAILED {status} : {code} {error}");
+                    taskCompletionSource.SetResult(code);
                 });
             return taskCompletionSource.Task;
         }

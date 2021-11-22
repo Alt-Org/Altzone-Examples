@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using BrainCloud.Entity;
+using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -15,6 +17,19 @@ namespace Prg.Scripts.Service.BrainCloud
         private static BrainCloudService Get() => _instance;
 
         [SerializeField] private BrainCloudWrapper _brainCloudWrapper;
+        [SerializeField] private BrainCloudUser _brainCloudUser;
+
+        public static bool IsReady => _instance._brainCloudUser != null;
+
+        public static BrainCloudUser BrainCloudUser
+        {
+            get => _instance._brainCloudUser;
+            private set
+            {
+                _instance._brainCloudUser = value;
+                _instance.Publish(_instance._brainCloudUser);
+            }
+        }
 
         private async void Awake()
         {
@@ -26,13 +41,13 @@ namespace Prg.Scripts.Service.BrainCloud
             BrainCloudAsync.SetBrainCloudWrapper(_brainCloudWrapper);
             Init();
             var (userId, password) = GetCredentials();
-            var brainCloudUser = await BrainCloudAsync.Authenticate(userId, password);
-            if (!brainCloudUser.IsValid)
+            BrainCloudUser = await BrainCloudAsync.Authenticate(userId, password);
+            if (!_brainCloudUser.IsValid)
             {
-                Debug.Log($"Authenticate failed for user {brainCloudUser.userId}: {brainCloudUser.statusCode}");
+                Debug.Log($"Authenticate failed for user {_brainCloudUser.UserId}: {_brainCloudUser.StatusCode}");
                 return;
             }
-            Debug.Log($"brainCloudUser '{brainCloudUser.userName}' OK");
+            Debug.Log($"brainCloudUser '{_brainCloudUser.UserName}' OK");
         }
 
         /// <summary>
@@ -51,6 +66,17 @@ namespace Prg.Scripts.Service.BrainCloud
             var client = _brainCloudWrapper.Client;
             client.EnableCompressedRequests(true);
             client.EnableCompressedResponses(true);
+        }
+
+        public static async Task<bool> UpdateUserName(string playerName)
+        {
+            var result = await BrainCloudAsync.UpdateUserName(playerName);
+            if (result == 0)
+            {
+                var old = _instance._brainCloudUser;
+                BrainCloudUser = new BrainCloudUser(old.UserId, playerName, old.ProfileId, 0);
+            }
+            return result == 0;
         }
 
         private static Tuple<string, string> GetCredentials()
@@ -77,5 +103,5 @@ namespace Prg.Scripts.Service.BrainCloud
             Assert.IsTrue(tokens.Length == 2, "tokens.Length == 2");
             return new Tuple<string, string>(tokens[0], tokens[1]);
         }
-   }
+    }
 }
