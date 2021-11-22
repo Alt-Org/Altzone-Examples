@@ -1,19 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using BrainCloud;
-using BrainCloud.LitJson;
+using BrainCloud.Entity;
+using BrainCloud.JsonFx.Json;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
-using JsonReader = BrainCloud.JsonFx.Json.JsonReader;
 
 namespace Prg.Scripts.Service.BrainCloud
 {
     public class BrainCloudService : MonoBehaviour
     {
         private const string PlayerPrefsPlayerNameKey = "My.BrainCloud.PlayerName";
+
+        private const  string EntityTypePlayer = "player";
 
         private static BrainCloudService _instance;
 
@@ -72,10 +73,11 @@ namespace Prg.Scripts.Service.BrainCloud
                 Array.Reverse(chars);
                 return new string(chars);
             }
+
             var playerName = PlayerPrefs.GetString(PlayerPrefsPlayerNameKey, string.Empty);
             if (string.IsNullOrWhiteSpace(playerName))
             {
-                // text format is: "(guid)(reversed_guid)"
+                // text format is: "(guid)(reversed_guid)" for username and password
                 var client = Get()._brainCloudWrapper.Client;
                 var guid = client.AuthenticationService.GenerateAnonymousId();
                 playerName = $"({guid})({Reverse(guid)})";
@@ -83,18 +85,18 @@ namespace Prg.Scripts.Service.BrainCloud
                 PlayerPrefs.SetString(PlayerPrefsPlayerNameKey, playerName);
             }
             playerName = StringSerializer.Decode(playerName);
-            var tokens = playerName.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
+            var tokens = playerName.Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.IsTrue(tokens.Length == 2, "tokens.Length == 2");
             Authenticate(tokens[0], tokens[1]);
         }
 
         public static void Authenticate(string userId, string password)
         {
-            Tuple<string,string> GetPlayerInfo(string jsonData)
+            Tuple<string, string> GetPlayerInfo(string jsonData)
             {
-                var data = JsonReader.Deserialize<Dictionary<string, object>>(jsonData)["data"] as Dictionary<string, object>;
-                var playerName = data?["playerName"].ToString();
-                var profileId = data?["profileId"].ToString();
+                var data = GetJsonData(jsonData);
+                var playerName = data["playerName"].ToString();
+                var profileId = data["profileId"].ToString();
                 return new Tuple<string, string>(playerName, profileId);
             }
 
@@ -102,13 +104,15 @@ namespace Prg.Scripts.Service.BrainCloud
             Get()._brainCloudWrapper.AuthenticateUniversal(userId, password, true,
                 (jsonData, ctx) =>
                 {
+                    Debug.Log($"Authenticate {jsonData}");
                     var tuple = GetPlayerInfo(jsonData);
                     var playerName = tuple.Item1;
                     var profileId = tuple.Item2;
-                    //Debug.Log($"Authenticate '{userId}' OK {jsonData}");
-                    Debug.Log($"Authenticate player '{playerName}' profile {profileId}");
+                    Debug.Log($"Authenticate player '{playerName}' profile {profileId} OK");
+                    ReadUserState();
                 },
-                (status,code,error,ctx)=> {
+                (status, code, error, ctx) =>
+                {
                     if (code == ReasonCodes.TOKEN_DOES_NOT_MATCH_USER)
                     {
                         Debug.Log($"Authenticate '{userId}' INCORRECT PASSWORD {status} : {code} {error}");
@@ -118,6 +122,35 @@ namespace Prg.Scripts.Service.BrainCloud
                         Debug.Log($"Authenticate '{userId}' FAILED {status} : {code} {error}");
                     }
                 });
+        }
+
+        public static void ReadUserState()
+        {
+            Debug.Log($"ReadUserState");
+            Get()._brainCloudWrapper.PlayerStateService.ReadUserState(
+                (jsonData, ctx) =>
+                {
+                    Debug.Log($"ReadUserState {jsonData}");
+                    var entities = Get()._brainCloudWrapper.EntityFactory.NewUserEntitiesFromReadPlayerState(jsonData);
+                    Debug.Log($"entities {entities.Count}");
+                    foreach (BCUserEntity entity in entities)
+                    {
+                        Debug.Log($"{entity.EntityType} {entity}");
+                        if (entity.EntityType == EntityTypePlayer)
+                        {
+                        }
+                    }
+                },
+                (status, code, error, ctx) =>
+                {
+                    Debug.Log($"PlayerStateService.ReadUserState FAILED {status} : {code} {error}");
+                });
+        }
+
+        private static Dictionary<string, object> GetJsonData(string jsonText)
+        {
+            return JsonReader.Deserialize<Dictionary<string, object>>(jsonText)["data"] as Dictionary<string, object> ??
+                   new Dictionary<string, object>();
         }
     }
 }
