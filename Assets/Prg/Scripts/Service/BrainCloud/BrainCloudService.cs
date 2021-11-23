@@ -39,7 +39,7 @@ namespace Prg.Scripts.Service.BrainCloud
             DontDestroyOnLoad(gameObject);
             _brainCloudWrapper = gameObject.AddComponent<BrainCloudWrapper>();
             BrainCloudAsync.SetBrainCloudWrapper(_brainCloudWrapper);
-            Init();
+            Init(GetAppParams());
             var (userId, password) = GetCredentials();
             BrainCloudUser = await BrainCloudAsync.Authenticate(userId, password);
             if (!_brainCloudUser.IsValid)
@@ -54,13 +54,14 @@ namespace Prg.Scripts.Service.BrainCloud
         /// Initializes BrainCLoud.<br />
         /// See: https://getbraincloud.com/apidocs/tutorials/c-sharp-tutorials/getting-started-with-c-sharp/
         /// </summary>
-        private void Init()
+        private void Init(string[] @params)
         {
             Debug.Log("Init");
-            string url = "https://sharedprod.braincloudservers.com/dispatcherv2";
-            string secretKey = "11879aa7-33a2-4423-9f2a-21c4b2218844";
-            string appId = "11589";
-            string version = "1.0.0";
+            var i = -1;
+            var url = @params[++i];
+            var secretKey = @params[++i];
+            var appId = @params[++i];
+            var version = @params[++i];
             _brainCloudWrapper.Init(url, secretKey, appId, version);
             // Compress messages larger than 50Kb (default value).
             var client = _brainCloudWrapper.Client;
@@ -79,6 +80,25 @@ namespace Prg.Scripts.Service.BrainCloud
             return result == 0;
         }
 
+        /// <summary>
+        /// Gets BrainCLoud init params: url, secretKey, appId and version.
+        /// </summary>
+        private static string[] GetAppParams()
+        {
+            // AFAIK Server URL is not publicly available because they want to obscure it by themselves
+            // - BrainCloudClient.s_defaultServerURL or BrainCloud.Plugin.Interface.DispatcherURL
+            return new[]
+            {
+                "https://sharedprod.braincloudservers.com/dispatcherv2",
+                "11879aa7-33a2-4423-9f2a-21c4b2218844",
+                "11589",
+                "1.0.0"
+            };
+
+        }
+        /// <summary>
+        /// Gets credentials for BrainCLoud universal login: username and password.
+        /// </summary>
         private static Tuple<string, string> GetCredentials()
         {
             string Reverse(string str)

@@ -29,7 +29,9 @@ namespace Examples2.Scripts.Test
         private IEnumerator Start()
         {
             yield return new WaitUntil(() => BrainCloudService.IsReady);
-            Debug.Log($"BrainCloudUser {BrainCloudService.BrainCloudUser}");
+            var user = BrainCloudService.BrainCloudUser;
+            Debug.Log($"BrainCloudUser {user}");
+            enabled = user.IsValid;
         }
 
         private void Update()

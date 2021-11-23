@@ -73,9 +73,13 @@ namespace Prg.Scripts.Service.BrainCloud
                     {
                         Debug.Log($"Authenticate '{userId}' INCORRECT PASSWORD {status} : {code} {error}");
                     }
+                    else if (code == ReasonCodes.GAME_VERSION_NOT_SUPPORTED)
+                    {
+                        Debug.LogWarning($"Authenticate '{userId}' GAME_VERSION_NOT_SUPPORTED {status} : {code} {error}");
+                    }
                     else
                     {
-                        Debug.Log($"Authenticate '{userId}' FAILED {status} : {code} {error}");
+                        Debug.LogWarning($"Authenticate '{userId}' FAILED {status} : {code} {error}");
                     }
                     var user = new BrainCloudUser(userId, string.Empty, string.Empty, code);
                     taskCompletionSource.SetResult(user);
