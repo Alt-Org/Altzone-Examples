@@ -41,13 +41,8 @@ namespace Prg.Scripts.Service.BrainCloud
             BrainCloudAsync.SetBrainCloudWrapper(_brainCloudWrapper);
             Init(GetAppParams());
             var (userId, password) = GetCredentials();
-            BrainCloudUser = await BrainCloudAsync.Authenticate(userId, password);
-            if (!_brainCloudUser.IsValid)
-            {
-                Debug.Log($"Authenticate failed for user {_brainCloudUser.UserId}: {_brainCloudUser.StatusCode}");
-                return;
-            }
-            Debug.Log($"brainCloudUser '{_brainCloudUser.UserName}' OK");
+            var success = Authenticate(userId, password);
+            Debug.Log($"brainCloudUser '{_brainCloudUser.UserName}' success {success}");
         }
 
         /// <summary>
@@ -69,8 +64,27 @@ namespace Prg.Scripts.Service.BrainCloud
             client.EnableCompressedResponses(true);
         }
 
+        /// <summary>
+        /// Authenticates a user using universal authentication.
+        /// </summary>
+        /// <remarks>
+        /// Will create a new user if none exists!
+        /// </remarks>
+        private static async Task<bool> Authenticate(string userId, string password)
+        {
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(userId), "!string.IsNullOrWhiteSpace(userId)");
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(password), "!string.IsNullOrWhiteSpace(password)");
+            BrainCloudUser = await BrainCloudAsync.Authenticate(userId, password);
+            if (!BrainCloudUser.IsValid)
+            {
+                Debug.Log($"Authenticate failed for user {BrainCloudUser.UserId}: {BrainCloudUser.StatusCode}");
+            }
+            return BrainCloudUser.IsValid;
+        }
+
         public static async Task<bool> UpdateUserName(string playerName)
         {
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(playerName), "!string.IsNullOrWhiteSpace(playerName)");
             var result = await BrainCloudAsync.UpdateUserName(playerName);
             if (result == 0)
             {

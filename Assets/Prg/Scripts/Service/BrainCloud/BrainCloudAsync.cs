@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BrainCloud;
 using BrainCloud.JsonFx.Json;
-using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Service.BrainCloud
 {
@@ -47,16 +46,8 @@ namespace Prg.Scripts.Service.BrainCloud
             _brainCloudWrapper = brainCloudWrapper;
         }
 
-        /// <summary>
-        /// Authenticates a user using universal authentication.
-        /// </summary>
-        /// <remarks>
-        /// Will create a new user if none exists!
-        /// </remarks>
         public static Task<BrainCloudUser> Authenticate(string userId, string password)
         {
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(userId), "!string.IsNullOrWhiteSpace(userId)");
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(password), "!string.IsNullOrWhiteSpace(password)");
             var taskCompletionSource = new TaskCompletionSource<BrainCloudUser>();
             _brainCloudWrapper.AuthenticateUniversal(userId, password, true,
                 (jsonData, ctx) =>
@@ -89,7 +80,6 @@ namespace Prg.Scripts.Service.BrainCloud
 
         public static Task<int> UpdateUserName(string playerName)
         {
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(playerName), "!string.IsNullOrWhiteSpace(playerName)");
             var taskCompletionSource = new TaskCompletionSource<int>();
             _brainCloudWrapper.PlayerStateService.UpdateName(playerName,
                 (jsonData, ctx) =>
