@@ -30,7 +30,7 @@ namespace Altzone.Scripts
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AfterSceneLoad()
         {
-            UnityExtensions.CreateGameObjectAndComponent<BrainCloudService>(nameof(BrainCloudService), true);
+            BrainCloudSupport.CreateService();
         }
 
         [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BrainCloud;
 using BrainCloud.JsonFx.Json;
+using Prg.Scripts.Common.PubSub;
 
 namespace Prg.Scripts.Service.BrainCloud
 {
@@ -41,24 +42,32 @@ namespace Prg.Scripts.Service.BrainCloud
     {
         private static BrainCloudWrapper _brainCloudWrapper;
 
+        private static BrainCloudUser _brainCloudUser = new BrainCloudUser(
+            string.Empty, string.Empty, string.Empty, ReasonCodes.TOKEN_DOES_NOT_MATCH_USER);
+
+        private static readonly object Publisher = new object();
+
+        public static BrainCloudUser BrainCloudUser => _brainCloudUser;
+
         public static void SetBrainCloudWrapper(BrainCloudWrapper brainCloudWrapper)
         {
             _brainCloudWrapper = brainCloudWrapper;
         }
 
-        public static Task<BrainCloudUser> Authenticate(string userId, string password)
+        public static Task<int> Authenticate(string userId, string password)
         {
-            var taskCompletionSource = new TaskCompletionSource<BrainCloudUser>();
+            var taskCompletionSource = new TaskCompletionSource<int>();
             _brainCloudWrapper.AuthenticateUniversal(userId, password, true,
-                (jsonData, ctx) =>
+                (jsonData, _) =>
                 {
+                    Debug.Log($"Authenticate {jsonData}");
                     var data = GetJsonData(jsonData);
                     var playerName = data["playerName"].ToString();
                     var profileId = data["profileId"].ToString();
-                    var user = new BrainCloudUser(userId, playerName, profileId, 0);
-                    taskCompletionSource.SetResult(user);
+                    SetBrainCloudUser(new BrainCloudUser(userId, playerName, profileId, 0));
+                    taskCompletionSource.SetResult(0);
                 },
-                (status, code, error, ctx) =>
+                (status, code, error, _) =>
                 {
                     if (code == ReasonCodes.TOKEN_DOES_NOT_MATCH_USER)
                     {
@@ -72,26 +81,36 @@ namespace Prg.Scripts.Service.BrainCloud
                     {
                         Debug.LogWarning($"Authenticate '{userId}' FAILED {status} : {code} {error}");
                     }
-                    var user = new BrainCloudUser(userId, string.Empty, string.Empty, code);
-                    taskCompletionSource.SetResult(user);
+                    SetBrainCloudUser(new BrainCloudUser(userId, string.Empty, string.Empty, code));
+                    taskCompletionSource.SetResult(code);
                 });
             return taskCompletionSource.Task;
         }
 
-        public static Task<int> UpdateUserName(string playerName)
+        public static Task<int> UpdateUserName(string playerNameIn)
         {
             var taskCompletionSource = new TaskCompletionSource<int>();
-            _brainCloudWrapper.PlayerStateService.UpdateName(playerName,
-                (jsonData, ctx) =>
+            _brainCloudWrapper.PlayerStateService.UpdateName(playerNameIn,
+                (jsonData, _) =>
                 {
+                    Debug.Log($"UpdateUserName {jsonData}");
+                    var data = GetJsonData(jsonData);
+                    var newPlayerName = data["playerName"].ToString();
+                    SetBrainCloudUser(new BrainCloudUser(_brainCloudUser.UserId, newPlayerName, _brainCloudUser.ProfileId, 0));
                     taskCompletionSource.SetResult(0);
                 },
-                (status, code, error, ctx) =>
+                (status, code, error, _) =>
                 {
-                    Debug.Log($"PlayerStateService.UpdateName '{playerName}' FAILED {status} : {code} {error}");
+                    Debug.Log($"PlayerStateService.UpdateName '{playerNameIn}' FAILED {status} : {code} {error}");
                     taskCompletionSource.SetResult(code);
                 });
             return taskCompletionSource.Task;
+        }
+
+        private static void SetBrainCloudUser(BrainCloudUser user)
+        {
+            _brainCloudUser = user;
+            Publisher.Publish(user);
         }
 
         private static Dictionary<string, object> GetJsonData(string jsonText)
