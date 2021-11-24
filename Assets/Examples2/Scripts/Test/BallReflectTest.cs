@@ -67,10 +67,10 @@ namespace Examples2.Scripts.Test
                 useLayerMask = true,
                 layerMask = settings.wallMask.value + settings.brickMask.value // Implicitly converts an integer to a LayerMask
             };
-            _topDiamond = GameObject.Find(nameof(_topDiamond));
-            _bottomDiamond = GameObject.Find(nameof(_bottomDiamond));
-            _upperStoneWall = GameObject.Find(nameof(_upperStoneWall));
-            _lowerStoneWall = GameObject.Find(nameof(_lowerStoneWall));
+            _topDiamond = GameObject.Find("TopDiamond");
+            _bottomDiamond = GameObject.Find("BottomDiamond");
+            _upperStoneWall = GameObject.Find("UpperStoneWall");
+            _lowerStoneWall = GameObject.Find("LowerStoneWall");
             upperStoneWallCount = _upperStoneWall.transform.childCount;
             lowerStoneWallCount = _lowerStoneWall.transform.childCount;
             if (upperStoneWallCount > 0)
