@@ -1,4 +1,5 @@
 using System;
+using Prg.Scripts.Common.Unity;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -17,19 +18,25 @@ namespace Prg.Scripts.Service.BrainCloud
         /// <summary>
         /// Gets BrainCLoud init params: url, secretKey, appId and version.
         /// </summary>
+        /// <remarks>
+        /// Both <c>secretKey</c> and <c>appId</c> are saved in StringProperty instances, see names in code.
+        /// </remarks>
         internal static string[] GetAppParams()
         {
+            var secretKey = Resources.Load<StringProperty>($"{nameof(StringProperty)}.para2");
+            var appId = Resources.Load<StringProperty>($"{nameof(StringProperty)}.para3");
+
             // AFAIK Server URL is not publicly available because they want to obscure it by themselves
             // - BrainCloudClient.s_defaultServerURL or BrainCloud.Plugin.Interface.DispatcherURL
             return new[]
             {
                 "https://sharedprod.braincloudservers.com/dispatcherv2",
-                "11879aa7-33a2-4423-9f2a-21c4b2218844",
-                "11589",
+                secretKey.PropertyValue,
+                appId.PropertyValue,
                 "1.0.1"
             };
-
         }
+
         /// <summary>
         /// Gets credentials for BrainCLoud universal login: username and password.
         /// </summary>

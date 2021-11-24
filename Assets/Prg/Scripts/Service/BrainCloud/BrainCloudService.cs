@@ -40,6 +40,8 @@ namespace Prg.Scripts.Service.BrainCloud
             var secretKey = @params[++i];
             var appId = @params[++i];
             var version = @params[++i];
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(secretKey), "!string.IsNullOrWhiteSpace(secretKey)");
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(appId), "!string.IsNullOrWhiteSpace(appId)");
             _brainCloudWrapper.Init(url, secretKey, appId, version);
             // Compress messages larger than 50Kb (default value).
             var client = _brainCloudWrapper.Client;
