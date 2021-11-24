@@ -9,9 +9,13 @@ namespace Prg.Scripts.Common.Unity
         private const string StartDelimiter = "{";
         private const string EndDelimiter = "}";
 
-        public string _propertyValue;
+        [SerializeField] private string _propertyValue;
 
-        public string PropertyValue => GetPropertyValue();
+        public string PropertyValue
+        {
+            get => GetPropertyValue();
+            set => _propertyValue = value;
+        }
 
         private string GetPropertyValue()
         {
@@ -23,7 +27,7 @@ namespace Prg.Scripts.Common.Unity
 
         public static bool IsCompressed(string value)
         {
-            return value.StartsWith(StartDelimiter) && value.EndsWith(EndDelimiter);
+            return value != null && value.StartsWith(StartDelimiter) && value.EndsWith(EndDelimiter);
         }
 
         public static string GetCompressedPayload(string value)
