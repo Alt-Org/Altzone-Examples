@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffe2ca0bd83d4fd8908dd7f946c0ffcb, type: 3}
-  m_Name: StringProperty
+  m_Name: StringProperty.para3
   m_EditorClassIdentifier: 
-  _propertyValue: 
+  _propertyValue: "{10\u5C40\u5310\u50D4\u5038\u500E\u6000}"
