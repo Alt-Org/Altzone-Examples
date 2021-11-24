@@ -548,6 +548,7 @@ MonoBehaviour:
   _hideBall: 0
   _showBall: 0
   _ghostBall: 0
+  _useScoreFlash: 0
 --- !u!1 &105094009
 GameObject:
   m_ObjectHideFlags: 0

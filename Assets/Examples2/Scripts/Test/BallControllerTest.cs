@@ -1,7 +1,9 @@
 using System.Collections;
+using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
+using Prg.Scripts.Common.Unity;
 using UnityEngine;
 
 namespace Examples2.Scripts.Test
@@ -14,6 +16,7 @@ namespace Examples2.Scripts.Test
         public bool _hideBall;
         public bool _showBall;
         public bool _ghostBall;
+        public bool _useScoreFlash;
 
         private IBall _ball;
 
@@ -74,6 +77,14 @@ namespace Examples2.Scripts.Test
             {
                 _ghostBall = false;
                 _ball.SetColor(BallColor.Ghosted);
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (_useScoreFlash)
+            {
+                ScoreFlash.Push($"Hit {other.gameObject.name}");
             }
         }
     }
