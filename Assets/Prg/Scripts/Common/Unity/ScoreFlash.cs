@@ -91,7 +91,7 @@ namespace Prg.Scripts.Common.Unity
             }
             else
             {
-                _rectTransform.anchoredPosition = _position * 100f;
+                _rectTransform.anchoredPosition = _position;
             }
         }
 
@@ -128,6 +128,7 @@ namespace Prg.Scripts.Common.Unity
             return _instance;
         }
 
+        [SerializeField] private Camera _camera;
         [SerializeField] private Canvas _canvas;
         [SerializeField] private MessageEntry[] _entries;
         [SerializeField] private Animator[] _animators;
@@ -135,8 +136,10 @@ namespace Prg.Scripts.Common.Unity
 
         private void Setup(ScoreFlashConfig config)
         {
+            _camera = Camera.main;
             _canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
             Assert.IsTrue(_canvas.isRootCanvas, "_canvas.isRootCanvas");
+            DontDestroyOnLoad(_canvas);
             var canvasRectTransform = _canvas.GetComponent<RectTransform>();
             Debug.Log($"Setup canvas a-pos {canvasRectTransform.anchoredPosition} pixels {_canvas.pixelRect}");
 
@@ -151,6 +154,7 @@ namespace Prg.Scripts.Common.Unity
                 _animators[i] = new Animator(config._phases);
             }
             _curIndex = -1;
+            tempPosition.z = transform.position.z;
         }
 
         private void SetText(string text, float x, float y)
@@ -181,10 +185,25 @@ namespace Prg.Scripts.Common.Unity
             }
         }
 
+        private Vector3 tempPosition;
+        private Vector3 screenPosition;
+
         void IScoreFlash.Push(string message, float x, float y)
         {
+            /*tempPosition.x = x;
+            tempPosition.y = y;
+            screenPosition = _camera.WorldToScreenPoint(tempPosition);
+            screenPosition.x -= 196f;
+            screenPosition.y -= 348f;
+            screenPosition.x *= 2f;
+            screenPosition.y *= 2f;
+            Debug.Log($"Push {message} @ x{x:F2} y{y:F2} -> x{screenPosition.x:F0} y{screenPosition.y:F0}");
+            SetText(message, screenPosition.x, screenPosition.y);*/
+            x *= 100f;
+            y *= 100f;
             Debug.Log($"Push {message} @ x{x:F2} y{y:F2}");
             SetText(message, x, y);
+
         }
 
         [Serializable]
