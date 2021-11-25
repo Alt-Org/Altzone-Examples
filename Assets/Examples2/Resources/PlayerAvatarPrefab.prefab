@@ -132,10 +132,12 @@ MonoBehaviour:
     _pivot: {fileID: 8649015687845033780}
     _sprite: {fileID: 3889792224080981396}
     _collider: {fileID: 2506509095107261722}
+    _rotationDirection: 0
   _rightShield:
     _pivot: {fileID: 2698258339066174252}
     _sprite: {fileID: 2523226494253691296}
     _collider: {fileID: 3473488989494340268}
+    _rotationDirection: 0
 --- !u!1 &4690630484032999038
 GameObject:
   m_ObjectHideFlags: 0
