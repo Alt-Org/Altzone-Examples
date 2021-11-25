@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Unity
 {
@@ -9,38 +10,65 @@ namespace Prg.Scripts.Common.Unity
     {
         public static void Push(string message)
         {
-            ScoreFlasher.Get().Push(message);
+            ScoreFlasher.Get().Push(message, 0f, 0f);
+        }
+
+        public static void Push(string message, float x, float y)
+        {
+            ScoreFlasher.Get().Push(message, x, y);
+        }
+
+        public static void Push(string message, Vector2 position)
+        {
+            ScoreFlasher.Get().Push(message, position.x, position.y);
+        }
+
+        public static void Push(string message, Vector3 position)
+        {
+            ScoreFlasher.Get().Push(message, position.x, position.y);
         }
     }
 
     public interface IScoreFlash
     {
-        void Push(string message);
+        void Push(string message, float x, float y);
     }
 
     [Serializable]
     internal class MessageEntry
     {
+        [SerializeField] private Canvas _canvas;
+        [SerializeField] private RectTransform _canvasRectTransform;
         [SerializeField] private GameObject _root;
-        [SerializeField] private Transform _transform;
+        [SerializeField] private RectTransform _rectTransform;
         [SerializeField] private TMP_Text _text;
-        [SerializeField] private Vector3 _initialPosition;
+        [SerializeField] private Vector2 _initialPosition;
+        [SerializeField] private Vector2 _position;
+        [SerializeField] private Coroutine _routine;
 
-        public MessageEntry(Transform transform, TMP_Text text)
+        public Coroutine Routine => _routine;
+
+        public MessageEntry(Canvas canvas, RectTransform canvasRectTransform, GameObject root, TMP_Text text)
         {
-            _root = transform.gameObject;
-            _transform = transform;
+            _canvas = canvas;
+            _canvasRectTransform = canvasRectTransform;
+            _root = root;
+            _rectTransform = _root.GetComponent<RectTransform>();
             _text = text;
-            _initialPosition = transform.position;
+            _initialPosition = _rectTransform.anchoredPosition;
             _text.text = string.Empty;
+        }
+
+        public void Move(float deltaX, float deltaY)
+        {
         }
 
         public void SetScale(float scale)
         {
-            var localScale = _transform.localScale;
+            var localScale = _rectTransform.localScale;
             localScale.x = scale;
             localScale.y = scale;
-            _transform.localScale = localScale;
+            _rectTransform.localScale = localScale;
         }
 
         public void SetColor(Color color)
@@ -48,19 +76,34 @@ namespace Prg.Scripts.Common.Unity
             _text.color = color;
         }
 
-        public void SetText(string text)
+        public void SetText(string text, float x, float y, Coroutine routine)
         {
             _text.text = text;
+            _position.x = x;
+            _position.y = y;
+            if (_routine != null)
+            {
+            }
+            _routine = routine;
+            if (_position == Vector2.zero)
+            {
+                _rectTransform.anchoredPosition = _initialPosition;
+            }
+            else
+            {
+                _rectTransform.anchoredPosition = _position * 100f;
+            }
         }
 
         public void Show()
         {
+            Assert.IsTrue(_root != null, "_root != null");
             _root.SetActive(true);
-            _transform.position = _initialPosition;
         }
 
         public void Hide()
         {
+            _routine = null;
             _root.SetActive(false);
         }
     }
@@ -92,30 +135,39 @@ namespace Prg.Scripts.Common.Unity
 
         private void Setup(ScoreFlashConfig config)
         {
-            var canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
-            canvas.transform.SetParent(transform);
-            _canvas = canvas;
-            var children = canvas.GetComponentsInChildren<TMP_Text>(true);
+            _canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
+            Assert.IsTrue(_canvas.isRootCanvas, "_canvas.isRootCanvas");
+            var canvasRectTransform = _canvas.GetComponent<RectTransform>();
+            Debug.Log($"Setup canvas a-pos {canvasRectTransform.anchoredPosition} pixels {_canvas.pixelRect}");
+
+            var children = _canvas.GetComponentsInChildren<TMP_Text>(true);
             Debug.Log($"Setup children {children.Length}");
             _entries = new MessageEntry[children.Length];
             _animators = new Animator[children.Length];
             for (int i = 0; i < children.Length; ++i)
             {
-                _entries[i] = new MessageEntry(children[i].transform.parent, children[i]);
+                var parent = children[i].transform.parent.gameObject;
+                _entries[i] = new MessageEntry(_canvas, canvasRectTransform, parent, children[i]);
                 _animators[i] = new Animator(config._phases);
             }
             _curIndex = -1;
         }
 
-        private void SetText(string text)
+        private void SetText(string text, float x, float y)
         {
             _curIndex += 1;
             if (_curIndex >= _entries.Length)
             {
                 _curIndex = 0;
             }
-            _entries[_curIndex].SetText(text);
-            StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex]));
+            var routine = _entries[_curIndex].Routine;
+            if (routine != null)
+            {
+                Debug.Log($"StopCoroutine {_curIndex}");
+                StopCoroutine(_entries[_curIndex].Routine);
+            }
+            routine = StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex]));
+            _entries[_curIndex].SetText(text, x, y, routine);
         }
 
         private static IEnumerator AnimateText(Animator animator, MessageEntry entry)
@@ -129,10 +181,10 @@ namespace Prg.Scripts.Common.Unity
             }
         }
 
-        void IScoreFlash.Push(string message)
+        void IScoreFlash.Push(string message, float x, float y)
         {
-            Debug.Log($"Push {message}");
-            SetText(message);
+            Debug.Log($"Push {message} @ x{x:F2} y{y:F2}");
+            SetText(message, x, y);
         }
 
         [Serializable]
@@ -188,6 +240,9 @@ namespace Prg.Scripts.Common.Unity
                 _entry.SetColor(textColor);
                 var scale = NGEasing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
                 _entry.SetScale(scale);
+                var x = NGEasing.EaseOnCurve(_phases._fadeInOffsetXCurve, NGUtil.Scale(_phases._fadeInOffsetX), 0, _fraction);
+                var y = NGEasing.EaseOnCurve(_phases._fadeInOffsetYCurve, NGUtil.Scale(_phases._fadeInOffsetY), 0, _fraction);
+                _entry.Move(x, y);
             }
 
             private void StayVisiblePhase()
@@ -216,9 +271,19 @@ namespace Prg.Scripts.Common.Unity
                     return from + curve.Evaluate(time) * distance;
                 }
 
-                public static float EaseOnCurve(AnimationCurve curve, float from, float to, float time) {
+                public static float EaseOnCurve(AnimationCurve curve, float from, float to, float time)
+                {
                     float distance = to - from;
                     return from + curve.Evaluate(time) * distance;
+                }
+            }
+
+            private static class NGUtil
+            {
+                public static float Scale(float pixels)
+                {
+                    // Remove later, used in ancient history era.
+                    return pixels;
                 }
             }
         }

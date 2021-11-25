@@ -1,5 +1,4 @@
 using System.Collections;
-using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
@@ -52,6 +51,10 @@ namespace Examples2.Scripts.Test
                 _ball.SetColor(BallColor.NoTeam);
                 var position = GetComponent<Rigidbody2D>().position;
                 _ball.StartMoving(position, _ballVelocity);
+                if (_useScoreFlash)
+                {
+                    ScoreFlash.Push("Start");
+                }
                 return;
             }
             if (_stopBallMoving)
@@ -84,7 +87,8 @@ namespace Examples2.Scripts.Test
         {
             if (_useScoreFlash)
             {
-                ScoreFlash.Push($"Hit {other.gameObject.name}");
+                var position = transform.position;
+                ScoreFlash.Push($"Hit {other.gameObject.name}", position);
             }
         }
     }

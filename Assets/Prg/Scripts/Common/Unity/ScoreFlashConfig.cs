@@ -16,9 +16,6 @@ namespace Prg.Scripts.Common.Unity
         /// <summary>
         ///     Initial color.
         /// </summary>
-        /// <remarks>
-        ///     For a <strong>tutorial</strong> on working with colors in ScoreFlash,
-        /// </remarks>
         public Color _fadeInColor = new Color(0.0F, 1.0F, 0.2F, 0.0F);
 
         /// <summary>
@@ -34,13 +31,6 @@ namespace Prg.Scripts.Common.Unity
         ///     Positive values in X make the message come from right, negative messages
         ///     make the message come from left.
         /// </summary>
-        /// <remarks>
-        ///     When using Alignment.ScreenAlign.Middle, both
-        ///     positive and negative values for Y do make sense. When using Alignment.ScreenAlign.Top,
-        ///     negative values make the message "drop" in from above (outside),
-        ///     with ScreenAlighn.Bottom and positive values, the message "rises" in
-        ///     from below (outside screen).
-        /// </remarks>
         public float _fadeInOffsetX;
 
         /// <summary>
@@ -53,13 +43,6 @@ namespace Prg.Scripts.Common.Unity
         ///     Positive values in Y make the message come from below, negative values make
         ///     the message come from above.
         /// </summary>
-        /// <remarks>
-        ///     When using Alignment.ScreenAlign.Middle, both
-        ///     positive and negative values for Y do make sense. When using Alignment.ScreenAlign.Top,
-        ///     negative values make the message "drop" in from above (outside),
-        ///     with ScreenAlighn.Bottom and positive values, the message "rises" in
-        ///     from below (outside screen).
-        /// </remarks>
         public float _fadeInOffsetY = -150.0F;
 
         /// <summary>
@@ -86,18 +69,6 @@ namespace Prg.Scripts.Common.Unity
         ///     The time the message is kept for the player to read (max to read),
         /// </summary>
         [Header("Stay")] public float _readTimeSeconds = 2.5F;
-
-        /// <summary>
-        ///     This is the maximum length in characters before readTimeAdd is added to a message.
-        /// </summary>
-        public int _readMinLengthCharsToAddTime = 10;
-
-        /// <summary>
-        ///     To be able to read long texts, the player needs more time. This defines how much
-        ///     longer long messages remain visible if the message in question has more than
-        ///     <c>minLengthCharsToAddTime</c> characters.
-        /// </summary>
-        public float _readAddTimeSeconds = 2.0F;
 
         /// <summary>
         ///     Color faded to from initial color in first phase.
@@ -208,21 +179,6 @@ namespace Prg.Scripts.Common.Unity
         ///     to this value while it is kept to be read.
         /// </summary>
         public float _fadeOutScale = 2.0F;
-
-        /// <summary>
-        ///     This is the initial rotation speed the message gets immediately
-        ///     when moving into fading out. Use rotationAccelleration to make
-        ///     this a little smoother. Set to 0 to not have the message rotate
-        ///     on fading out (rotationAccelleration must also be 0).
-        /// </summary>
-        public float _fadeOutInitialRotationSpeed;
-
-        /// <summary>
-        ///     Increases the rotation speed while the message fades out.
-        ///     Set to 0 to not have the message rotate on fading out
-        ///     (initialRotationSpeed must also be 0).
-        /// </summary>
-        public float _fadeOutRotationAcceleration = 10.0F;
 
         #endregion Parameters for the Fade Out Phase
     }
