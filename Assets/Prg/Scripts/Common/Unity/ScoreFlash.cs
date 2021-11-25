@@ -35,6 +35,19 @@ namespace Prg.Scripts.Common.Unity
             _text.text = string.Empty;
         }
 
+        public void SetScale(float scale)
+        {
+            var localScale = _transform.localScale;
+            localScale.x = scale;
+            localScale.y = scale;
+            _transform.localScale = localScale;
+        }
+
+        public void SetColor(Color color)
+        {
+            _text.color = color;
+        }
+
         public void SetText(string text)
         {
             _text.text = text;
@@ -89,7 +102,7 @@ namespace Prg.Scripts.Common.Unity
             for (int i = 0; i < children.Length; ++i)
             {
                 _entries[i] = new MessageEntry(children[i].transform.parent, children[i]);
-                _animators[i] = new Animator();
+                _animators[i] = new Animator(config._phases);
             }
             _curIndex = -1;
         }
@@ -125,11 +138,19 @@ namespace Prg.Scripts.Common.Unity
         [Serializable]
         private class Animator
         {
+            private readonly ScoreFlashPhases _phases;
+
             [SerializeField] private float _duration;
             [SerializeField] private float _expirationTime;
+            [SerializeField] private float _fraction;
             [SerializeField] private MessageEntry _entry;
 
             public bool IsWorking => _duration < _expirationTime;
+
+            public Animator(ScoreFlashPhases phases)
+            {
+                _phases = phases;
+            }
 
             internal void Animate(float elapsedTime)
             {
@@ -137,7 +158,19 @@ namespace Prg.Scripts.Common.Unity
                 if (!IsWorking)
                 {
                     _entry.Hide();
+                    return;
                 }
+                if (_duration < _phases._fadeInTimeSeconds)
+                {
+                    FadeInPhase();
+                    return;
+                }
+                if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds)
+                {
+                    StayVisiblePhase();
+                    return;
+                }
+                FadeOutPhase();
             }
 
             public void Start(MessageEntry entry)
@@ -146,6 +179,47 @@ namespace Prg.Scripts.Common.Unity
                 _expirationTime = 2f;
                 _entry = entry;
                 entry.Show();
+            }
+
+            private void FadeInPhase()
+            {
+                _fraction = _duration / _phases._fadeInTimeSeconds;
+                var textColor = NGEasing.EaseOnCurve(_phases._fadeInColorCurve, _phases._fadeInColor, _phases._readColorStart, _fraction);
+                _entry.SetColor(textColor);
+                var scale = NGEasing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
+                _entry.SetScale(scale);
+            }
+
+            private void StayVisiblePhase()
+            {
+                _fraction = (_duration - _phases._fadeInTimeSeconds) / _phases._readTimeSeconds;
+                var textColor = NGEasing.EaseOnCurve(_phases._readColorCurve, _phases._readColorStart, _phases._readColorEnd, _fraction);
+                _entry.SetColor(textColor);
+                var scale = NGEasing.EaseOnCurve(_phases._readScaleCurve, 1f, _phases._readScale, _fraction);
+                _entry.SetScale(scale);
+            }
+
+            private void FadeOutPhase()
+            {
+                _fraction = (_duration - _phases._fadeInTimeSeconds - _phases._readTimeSeconds) / _phases._fadeOutTimeSeconds;
+                var textColor = NGEasing.EaseOnCurve(_phases._fadeOutColorCurve, _phases._readColorEnd, _phases._fadeOutColor, _fraction);
+                _entry.SetColor(textColor);
+                var scale = NGEasing.EaseOnCurve(_phases._fadeOutScaleCurve, _phases._readScale, _phases._fadeOutScale, _fraction);
+                _entry.SetScale(scale);
+            }
+
+            private static class NGEasing
+            {
+                public static Color EaseOnCurve(AnimationCurve curve, Color from, Color to, float time)
+                {
+                    Color distance = to - from;
+                    return from + curve.Evaluate(time) * distance;
+                }
+
+                public static float EaseOnCurve(AnimationCurve curve, float from, float to, float time) {
+                    float distance = to - from;
+                    return from + curve.Evaluate(time) * distance;
+                }
             }
         }
     }
