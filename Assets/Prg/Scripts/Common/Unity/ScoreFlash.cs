@@ -141,11 +141,10 @@ namespace Prg.Scripts.Common.Unity
             private readonly ScoreFlashPhases _phases;
 
             [SerializeField] private float _duration;
-            [SerializeField] private float _expirationTime;
             [SerializeField] private float _fraction;
             [SerializeField] private MessageEntry _entry;
 
-            public bool IsWorking => _duration < _expirationTime;
+            public bool IsWorking { get; private set; }
 
             public Animator(ScoreFlashPhases phases)
             {
@@ -155,11 +154,6 @@ namespace Prg.Scripts.Common.Unity
             internal void Animate(float elapsedTime)
             {
                 _duration += elapsedTime;
-                if (!IsWorking)
-                {
-                    _entry.Hide();
-                    return;
-                }
                 if (_duration < _phases._fadeInTimeSeconds)
                 {
                     FadeInPhase();
@@ -170,13 +164,19 @@ namespace Prg.Scripts.Common.Unity
                     StayVisiblePhase();
                     return;
                 }
-                FadeOutPhase();
+                if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds + _phases._fadeOutTimeSeconds)
+                {
+                    FadeOutPhase();
+                    return;
+                }
+                _entry.Hide();
+                IsWorking = false;
             }
 
             public void Start(MessageEntry entry)
             {
                 _duration = 0;
-                _expirationTime = 2f;
+                IsWorking = true;
                 _entry = entry;
                 entry.Show();
             }
