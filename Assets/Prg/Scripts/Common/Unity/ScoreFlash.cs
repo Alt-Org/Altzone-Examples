@@ -6,6 +6,9 @@ using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Unity
 {
+    /// <summary>
+    /// Flash message system
+    /// </summary>
     public static class ScoreFlash
     {
         public static void Push(string message)
@@ -37,30 +40,49 @@ namespace Prg.Scripts.Common.Unity
     [Serializable]
     internal class MessageEntry
     {
-        [SerializeField] private Canvas _canvas;
-        [SerializeField] private RectTransform _canvasRectTransform;
         [SerializeField] private GameObject _root;
         [SerializeField] private RectTransform _rectTransform;
+
         [SerializeField] private TMP_Text _text;
-        [SerializeField] private Vector2 _initialPosition;
-        [SerializeField] private Vector2 _position;
-        [SerializeField] private Coroutine _routine;
+        [SerializeField] private Vector3 _position;
+        private Coroutine _routine;
 
         public Coroutine Routine => _routine;
 
-        public MessageEntry(Canvas canvas, RectTransform canvasRectTransform, GameObject root, TMP_Text text)
+        public MessageEntry(GameObject root, TMP_Text text)
         {
-            _canvas = canvas;
-            _canvasRectTransform = canvasRectTransform;
             _root = root;
             _rectTransform = _root.GetComponent<RectTransform>();
             _text = text;
-            _initialPosition = _rectTransform.anchoredPosition;
-            _text.text = string.Empty;
+            _position.z = _root.GetComponent<Transform>().position.z;
+        }
+
+        public void SetCoroutine(Coroutine routine)
+        {
+            _routine = routine;
+        }
+
+        public void SetText(string text)
+        {
+            _text.text = text;
+        }
+
+        public void SetPosition(float x, float y)
+        {
+            _position.x = x;
+            _position.y = y;
+            _rectTransform.anchoredPosition = _position;
         }
 
         public void Move(float deltaX, float deltaY)
         {
+            SetPosition(_position.x + deltaX, _position.y + deltaY);
+        }
+
+        public void SetRotation(float angleZ)
+        {
+            _rectTransform.rotation = Quaternion.identity;
+            _rectTransform.Rotate(0f, 0f, angleZ);
         }
 
         public void SetScale(float scale)
@@ -74,25 +96,6 @@ namespace Prg.Scripts.Common.Unity
         public void SetColor(Color color)
         {
             _text.color = color;
-        }
-
-        public void SetText(string text, float x, float y, Coroutine routine)
-        {
-            _text.text = text;
-            _position.x = x;
-            _position.y = y;
-            if (_routine != null)
-            {
-            }
-            _routine = routine;
-            if (_position == Vector2.zero)
-            {
-                _rectTransform.anchoredPosition = _initialPosition;
-            }
-            else
-            {
-                _rectTransform.anchoredPosition = _position;
-            }
         }
 
         public void Show()
@@ -119,10 +122,10 @@ namespace Prg.Scripts.Common.Unity
                 _instance = FindObjectOfType<ScoreFlasher>();
                 if (_instance == null)
                 {
-                    var instance = UnityExtensions.CreateGameObjectAndComponent<ScoreFlasher>(nameof(ScoreFlasher), true);
+                    var instance = UnityExtensions.CreateGameObjectAndComponent<ScoreFlasher>(nameof(ScoreFlasher), false);
                     _instance = instance;
                     var config = Resources.Load<ScoreFlashConfig>(nameof(ScoreFlashConfig));
-                    instance.Setup(config);
+                    instance.Setup(config, Camera.main);
                 }
             }
             return _instance;
@@ -130,18 +133,20 @@ namespace Prg.Scripts.Common.Unity
 
         [SerializeField] private Camera _camera;
         [SerializeField] private Canvas _canvas;
+        [SerializeField] private RectTransform _canvasRectTransform;
         [SerializeField] private MessageEntry[] _entries;
         [SerializeField] private Animator[] _animators;
         [SerializeField] private int _curIndex;
 
-        private void Setup(ScoreFlashConfig config)
+        private Vector3 _worldPos;
+        private Vector3 _screenPos;
+
+        private void Setup(ScoreFlashConfig config, Camera screenCamera)
         {
-            _camera = Camera.main;
+            _camera = screenCamera;
             _canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
             Assert.IsTrue(_canvas.isRootCanvas, "_canvas.isRootCanvas");
-            DontDestroyOnLoad(_canvas);
-            var canvasRectTransform = _canvas.GetComponent<RectTransform>();
-            Debug.Log($"Setup canvas a-pos {canvasRectTransform.anchoredPosition} pixels {_canvas.pixelRect}");
+            _canvasRectTransform = _canvas.GetComponent<RectTransform>();
 
             var children = _canvas.GetComponentsInChildren<TMP_Text>(true);
             Debug.Log($"Setup children {children.Length}");
@@ -149,12 +154,22 @@ namespace Prg.Scripts.Common.Unity
             _animators = new Animator[children.Length];
             for (int i = 0; i < children.Length; ++i)
             {
-                var parent = children[i].transform.parent.gameObject;
-                _entries[i] = new MessageEntry(_canvas, canvasRectTransform, parent, children[i]);
+                var parent = children[i].gameObject;
+                _entries[i] = new MessageEntry(parent, children[i]);
+                _entries[i].Hide();
                 _animators[i] = new Animator(config._phases);
             }
             _curIndex = -1;
-            tempPosition.z = transform.position.z;
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log($"OnDestroy");
+            _instance = null;
+            for (var i = 0; i < _entries.Length; ++i)
+            {
+                StopCoroutine(i);
+            }
         }
 
         private void SetText(string text, float x, float y)
@@ -164,20 +179,27 @@ namespace Prg.Scripts.Common.Unity
             {
                 _curIndex = 0;
             }
-            var routine = _entries[_curIndex].Routine;
-            if (routine != null)
-            {
-                Debug.Log($"StopCoroutine {_curIndex}");
-                StopCoroutine(_entries[_curIndex].Routine);
-            }
-            routine = StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex]));
-            _entries[_curIndex].SetText(text, x, y, routine);
+            StopCoroutine(_curIndex);
+            var routine = StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex], text, x, y));
+            _entries[_curIndex].SetCoroutine(routine);
         }
 
-        private static IEnumerator AnimateText(Animator animator, MessageEntry entry)
+        private void StopCoroutine(int index)
+        {
+            var routine = _entries[index].Routine;
+            if (routine != null)
+            {
+                Debug.Log($"StopCoroutine {index}");
+                StopCoroutine(routine);
+            }
+        }
+
+        private static IEnumerator AnimateText(Animator animator, MessageEntry entry, string text, float x, float y)
         {
             yield return null;
-            animator.Start(entry);
+            animator.Start(entry, x, y);
+            yield return null;
+            entry.SetText(text);
             while (animator.IsWorking)
             {
                 yield return null;
@@ -185,25 +207,17 @@ namespace Prg.Scripts.Common.Unity
             }
         }
 
-        private Vector3 tempPosition;
-        private Vector3 screenPosition;
-
-        void IScoreFlash.Push(string message, float x, float y)
+        void IScoreFlash.Push(string message, float worldX, float worldY)
         {
-            /*tempPosition.x = x;
-            tempPosition.y = y;
-            screenPosition = _camera.WorldToScreenPoint(tempPosition);
-            screenPosition.x -= 196f;
-            screenPosition.y -= 348f;
-            screenPosition.x *= 2f;
-            screenPosition.y *= 2f;
-            Debug.Log($"Push {message} @ x{x:F2} y{y:F2} -> x{screenPosition.x:F0} y{screenPosition.y:F0}");
-            SetText(message, screenPosition.x, screenPosition.y);*/
-            x *= 100f;
-            y *= 100f;
-            Debug.Log($"Push {message} @ x{x:F2} y{y:F2}");
-            SetText(message, x, y);
+            _worldPos.x = worldX;
+            _worldPos.y = worldY;
+            _screenPos = _camera.WorldToScreenPoint(_worldPos);
+            var hit = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _canvasRectTransform, _screenPos, null, out var localPos);
+            Assert.IsTrue(hit, "RectTransformUtility.ScreenPointToLocalPointInRectangle was hit");
+            Debug.Log($"Push {message} @ WorldToScreenPoint {(Vector2)_worldPos} -> {(Vector2)_screenPos} -> rect {localPos}");
 
+            SetText(message, localPos.x, localPos.y);
         }
 
         [Serializable]
@@ -214,6 +228,9 @@ namespace Prg.Scripts.Common.Unity
             [SerializeField] private float _duration;
             [SerializeField] private float _fraction;
             [SerializeField] private MessageEntry _entry;
+
+            private float _fadeOutRotationAngle;
+            private float _fadeOutRotationSpeed;
 
             public bool IsWorking { get; private set; }
 
@@ -227,62 +244,80 @@ namespace Prg.Scripts.Common.Unity
                 _duration += elapsedTime;
                 if (_duration < _phases._fadeInTimeSeconds)
                 {
-                    FadeInPhase();
+                    FadeInPhase(elapsedTime);
                     return;
                 }
                 if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds)
                 {
-                    StayVisiblePhase();
+                    StayVisiblePhase(elapsedTime);
                     return;
                 }
                 if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds + _phases._fadeOutTimeSeconds)
                 {
-                    FadeOutPhase();
+                    FadeOutPhase(elapsedTime);
                     return;
                 }
                 _entry.Hide();
                 IsWorking = false;
             }
 
-            public void Start(MessageEntry entry)
+            public void Start(MessageEntry entry, float x, float y)
             {
                 _duration = 0;
+                _fadeOutRotationAngle = 0;
+                _fadeOutRotationSpeed = _phases._fadeOutInitialRotationSpeed;
                 IsWorking = true;
                 _entry = entry;
-                entry.Show();
+                _entry.SetColor(_phases._fadeInColor);
+                _entry.SetScale(_phases._fadeInScale);
+                _entry.SetText(string.Empty);
+                _entry.SetPosition(x, y);
+                _entry.SetRotation(0);
+                _entry.Show();
             }
 
-            private void FadeInPhase()
+            private void FadeInPhase(float elapsedTime)
             {
                 _fraction = _duration / _phases._fadeInTimeSeconds;
-                var textColor = NGEasing.EaseOnCurve(_phases._fadeInColorCurve, _phases._fadeInColor, _phases._readColorStart, _fraction);
+                var textColor = NgEasing.EaseOnCurve(_phases._fadeInColorCurve, _phases._fadeInColor, _phases._readColorStart, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NGEasing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
+                var scale = NgEasing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
                 _entry.SetScale(scale);
-                var x = NGEasing.EaseOnCurve(_phases._fadeInOffsetXCurve, NGUtil.Scale(_phases._fadeInOffsetX), 0, _fraction);
-                var y = NGEasing.EaseOnCurve(_phases._fadeInOffsetYCurve, NGUtil.Scale(_phases._fadeInOffsetY), 0, _fraction);
-                _entry.Move(x, y);
+                var x = NgEasing.EaseOnCurve(_phases._fadeInOffsetXCurve, _phases._fadeInOffsetX, 0, _fraction);
+                var y = NgEasing.EaseOnCurve(_phases._fadeInOffsetYCurve, _phases._fadeInOffsetY, 0, _fraction);
+                _entry.Move(x * elapsedTime, y * elapsedTime);
             }
 
-            private void StayVisiblePhase()
+            private void StayVisiblePhase(float elapsedTime)
             {
                 _fraction = (_duration - _phases._fadeInTimeSeconds) / _phases._readTimeSeconds;
-                var textColor = NGEasing.EaseOnCurve(_phases._readColorCurve, _phases._readColorStart, _phases._readColorEnd, _fraction);
+                var textColor = NgEasing.EaseOnCurve(_phases._readColorCurve, _phases._readColorStart, _phases._readColorEnd, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NGEasing.EaseOnCurve(_phases._readScaleCurve, 1f, _phases._readScale, _fraction);
+                var scale = NgEasing.EaseOnCurve(_phases._readScaleCurve, 1f, _phases._readScale, _fraction);
                 _entry.SetScale(scale);
+                var x = NgEasing.EaseOnCurve(_phases._readVelocityXCurve, 0, _phases._readFloatRightVelocity, _fraction);
+                var y = NgEasing.EaseOnCurve(_phases._readVelocityCurve, 0, _phases._readFloatUpVelocity, _fraction);
+                _entry.Move(x * elapsedTime, -y * elapsedTime);
             }
 
-            private void FadeOutPhase()
+            private void FadeOutPhase(float elapsedTime)
             {
                 _fraction = (_duration - _phases._fadeInTimeSeconds - _phases._readTimeSeconds) / _phases._fadeOutTimeSeconds;
-                var textColor = NGEasing.EaseOnCurve(_phases._fadeOutColorCurve, _phases._readColorEnd, _phases._fadeOutColor, _fraction);
+                var textColor = NgEasing.EaseOnCurve(_phases._fadeOutColorCurve, _phases._readColorEnd, _phases._fadeOutColor, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NGEasing.EaseOnCurve(_phases._fadeOutScaleCurve, _phases._readScale, _phases._fadeOutScale, _fraction);
+                var scale = NgEasing.EaseOnCurve(_phases._fadeOutScaleCurve, _phases._readScale, _phases._fadeOutScale, _fraction);
                 _entry.SetScale(scale);
+                var x = NgEasing.EaseOnCurve(
+                    _phases._fadeOutVelocityXCurve, _phases._readFloatRightVelocity, _phases._fadeOutFloatRightVelocity, _fraction);
+                var y = NgEasing.EaseOnCurve(
+                    _phases._fadeOutVelocityCurve, _phases._readFloatUpVelocity, _phases._fadeOutFloatUpVelocity, _fraction);
+                _entry.Move(x * elapsedTime, -y * elapsedTime);
+                _fadeOutRotationSpeed += _phases._fadeOutRotationAcceleration * elapsedTime;
+                _fadeOutRotationAngle += _fadeOutRotationSpeed * elapsedTime;
+                _entry.SetRotation(_fadeOutRotationAngle);
             }
 
-            private static class NGEasing
+            private static class NgEasing
             {
                 public static Color EaseOnCurve(AnimationCurve curve, Color from, Color to, float time)
                 {
@@ -294,15 +329,6 @@ namespace Prg.Scripts.Common.Unity
                 {
                     float distance = to - from;
                     return from + curve.Evaluate(time) * distance;
-                }
-            }
-
-            private static class NGUtil
-            {
-                public static float Scale(float pixels)
-                {
-                    // Remove later, used in ancient history era.
-                    return pixels;
                 }
             }
         }
