@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Assertions;
+using Object = UnityEngine.Object;
 
 namespace Prg.Scripts.Common.Unity
 {
@@ -11,24 +12,42 @@ namespace Prg.Scripts.Common.Unity
     /// </summary>
     public static class ScoreFlash
     {
+        private static IScoreFlash _instance;
+
+        private static IScoreFlash Get()
+        {
+            if (_instance == null)
+            {
+                _instance = Object.FindObjectOfType<ScoreFlasher>();
+                if (_instance == null)
+                {
+                    var instance = UnityExtensions.CreateGameObjectAndComponent<ScoreFlasher>(nameof(ScoreFlasher), false);
+                    _instance = instance;
+                    var config = Resources.Load<ScoreFlashConfig>(nameof(ScoreFlashConfig));
+                    instance.Setup(config, Camera.main, () => { _instance = null; });
+                }
+            }
+            return _instance;
+        }
+
         public static void Push(string message)
         {
-            ScoreFlasher.Get().Push(message, 0f, 0f);
+            Get().Push(message, 0f, 0f);
         }
 
         public static void Push(string message, float x, float y)
         {
-            ScoreFlasher.Get().Push(message, x, y);
+            Get().Push(message, x, y);
         }
 
         public static void Push(string message, Vector2 position)
         {
-            ScoreFlasher.Get().Push(message, position.x, position.y);
+            Get().Push(message, position.x, position.y);
         }
 
         public static void Push(string message, Vector3 position)
         {
-            ScoreFlasher.Get().Push(message, position.x, position.y);
+            Get().Push(message, position.x, position.y);
         }
     }
 
@@ -44,23 +63,32 @@ namespace Prg.Scripts.Common.Unity
         [SerializeField] private RectTransform _rectTransform;
 
         [SerializeField] private TMP_Text _text;
+        [SerializeField] private RectTransform _textRectTransform;
         [SerializeField] private Vector3 _position;
-        private Coroutine _routine;
+        [SerializeField] private Rect _rect;
 
-        public Coroutine Routine => _routine;
+        public int Index { get; private set; }
 
-        public MessageEntry(GameObject root, TMP_Text text)
+        public MessageEntry(int index, GameObject root, TMP_Text text)
         {
+            Index = index;
             _root = root;
             _rectTransform = _root.GetComponent<RectTransform>();
             _text = text;
+            _textRectTransform = _text.GetComponent<RectTransform>();
             _position.z = _root.GetComponent<Transform>().position.z;
         }
 
-        public void SetCoroutine(Coroutine routine)
+        private Rect GetTextRect()
         {
-            _routine = routine;
+            _rect = _textRectTransform.rect;
+            var localPosition = _rectTransform.localPosition;
+            _rect.x = localPosition.x;
+            _rect.y = localPosition.y;
+            return _rect;
         }
+
+        public float TextHeight => GetTextRect().height;
 
         public void SetText(string text)
         {
@@ -106,42 +134,35 @@ namespace Prg.Scripts.Common.Unity
 
         public void Hide()
         {
-            _routine = null;
             _root.SetActive(false);
+        }
+
+        public bool Overlaps(MessageEntry other)
+        {
+            var textRect = GetTextRect();
+            var otherRect = other.GetTextRect();
+            Debug.Log($"Overlaps index {Index} {textRect} <-> index {other.Index} {otherRect}");
+            return textRect.Overlaps(otherRect);
         }
     }
 
     internal class ScoreFlasher : MonoBehaviour, IScoreFlash
     {
-        private static IScoreFlash _instance;
-
-        public static IScoreFlash Get()
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<ScoreFlasher>();
-                if (_instance == null)
-                {
-                    var instance = UnityExtensions.CreateGameObjectAndComponent<ScoreFlasher>(nameof(ScoreFlasher), false);
-                    _instance = instance;
-                    var config = Resources.Load<ScoreFlashConfig>(nameof(ScoreFlashConfig));
-                    instance.Setup(config, Camera.main);
-                }
-            }
-            return _instance;
-        }
-
         [SerializeField] private Camera _camera;
         [SerializeField] private Canvas _canvas;
         [SerializeField] private RectTransform _canvasRectTransform;
+
         [SerializeField] private MessageEntry[] _entries;
         [SerializeField] private Animator[] _animators;
         [SerializeField] private int _curIndex;
+        private Coroutine[] _routines;
 
+        private Action _destroyedCallback;
         private Vector3 _worldPos;
         private Vector3 _screenPos;
+        private Vector2 _localPos;
 
-        private void Setup(ScoreFlashConfig config, Camera screenCamera)
+        public void Setup(ScoreFlashConfig config, Camera screenCamera, Action destroyed)
         {
             _camera = screenCamera;
             _canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
@@ -152,24 +173,27 @@ namespace Prg.Scripts.Common.Unity
             Debug.Log($"Setup children {children.Length}");
             _entries = new MessageEntry[children.Length];
             _animators = new Animator[children.Length];
-            for (int i = 0; i < children.Length; ++i)
+            _routines = new Coroutine[children.Length];
+            for (var i = 0; i < children.Length; ++i)
             {
                 var parent = children[i].gameObject;
-                _entries[i] = new MessageEntry(parent, children[i]);
+                _entries[i] = new MessageEntry(i, parent, children[i]);
                 _entries[i].Hide();
                 _animators[i] = new Animator(config._phases);
+                _routines[i] = null;
             }
             _curIndex = -1;
+            _destroyedCallback = destroyed;
         }
 
         private void OnDestroy()
         {
             Debug.Log($"OnDestroy");
-            _instance = null;
             for (var i = 0; i < _entries.Length; ++i)
             {
                 StopCoroutine(i);
             }
+            _destroyedCallback?.Invoke();
         }
 
         private void SetText(string text, float x, float y)
@@ -180,31 +204,66 @@ namespace Prg.Scripts.Common.Unity
                 _curIndex = 0;
             }
             StopCoroutine(_curIndex);
-            var routine = StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex], text, x, y));
-            _entries[_curIndex].SetCoroutine(routine);
+            _routines[_curIndex] = StartCoroutine(AnimateText(_animators[_curIndex], _entries[_curIndex], text, x, y));
         }
 
         private void StopCoroutine(int index)
         {
-            var routine = _entries[index].Routine;
+            var routine = _routines[index];
             if (routine != null)
             {
                 Debug.Log($"StopCoroutine {index}");
                 StopCoroutine(routine);
             }
+            var animator = _animators[index];
+            if (animator.IsWorking)
+            {
+                animator.Release();
+            }
         }
 
-        private static IEnumerator AnimateText(Animator animator, MessageEntry entry, string text, float x, float y)
+        private MessageEntry Previous(MessageEntry entry)
         {
+            if (_entries.Length == 1)
+            {
+                return null;
+            }
+            var index = entry.Index == 0 ? _entries.Length - 1 : entry.Index - 1;
+            return _animators[index].IsWorking ? _entries[index] : null;
+        }
+
+        private IEnumerator AnimateText(Animator animator, MessageEntry entry, string text, float x, float y)
+        {
+            animator.Reserve(entry);
             yield return null;
-            animator.Start(entry, x, y);
+            animator.Start(x, y);
+            CheckOverlapping(entry);
             yield return null;
             entry.SetText(text);
-            while (animator.IsWorking)
+            while (animator.Animate(Time.deltaTime))
             {
                 yield return null;
-                animator.Animate(Time.deltaTime);
             }
+            animator.Release();
+            _routines[entry.Index] = null;
+        }
+
+        private void CheckOverlapping(MessageEntry current)
+        {
+            var previous = Previous(current);
+            while (previous != null && previous.Overlaps(current))
+            {
+                MoveAway(current, previous);
+                current = previous;
+                previous = Previous(current);
+            }
+        }
+
+        private void MoveAway(MessageEntry current, MessageEntry previous)
+        {
+            Debug.Log($"MoveAway current {current.Index} previous {previous.Index}");
+            var animator = _animators[previous.Index];
+            animator.MoveAway();
         }
 
         void IScoreFlash.Push(string message, float worldX, float worldY)
@@ -213,11 +272,11 @@ namespace Prg.Scripts.Common.Unity
             _worldPos.y = worldY;
             _screenPos = _camera.WorldToScreenPoint(_worldPos);
             var hit = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _canvasRectTransform, _screenPos, null, out var localPos);
+                _canvasRectTransform, _screenPos, null, out _localPos);
             Assert.IsTrue(hit, "RectTransformUtility.ScreenPointToLocalPointInRectangle was hit");
-            Debug.Log($"Push {message} @ WorldToScreenPoint {(Vector2)_worldPos} -> {(Vector2)_screenPos} -> rect {localPos}");
+            Debug.Log($"Push {message} @ WorldToScreenPoint {(Vector2)_worldPos} -> {(Vector2)_screenPos} -> rect {_localPos}");
 
-            SetText(message, localPos.x, localPos.y);
+            SetText(message, _localPos.x, _localPos.y);
         }
 
         [Serializable]
@@ -239,35 +298,52 @@ namespace Prg.Scripts.Common.Unity
                 _phases = phases;
             }
 
-            internal void Animate(float elapsedTime)
+            public bool Animate(float elapsedTime)
             {
                 _duration += elapsedTime;
                 if (_duration < _phases._fadeInTimeSeconds)
                 {
                     FadeInPhase(elapsedTime);
-                    return;
+                    return true;
                 }
                 if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds)
                 {
                     StayVisiblePhase(elapsedTime);
-                    return;
+                    return true;
                 }
                 if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds + _phases._fadeOutTimeSeconds)
                 {
                     FadeOutPhase(elapsedTime);
-                    return;
+                    return true;
                 }
                 _entry.Hide();
+                return false;
+            }
+
+            public void Reserve(MessageEntry entry)
+            {
+                _entry = entry;
+                Assert.IsFalse(IsWorking, $"IsWorking index {_entry.Index}");
+                IsWorking = true;
+            }
+
+            public void Release()
+            {
+                Assert.IsTrue(IsWorking, $"IsWorking index {_entry.Index}");
+                _entry = null;
                 IsWorking = false;
             }
 
-            public void Start(MessageEntry entry, float x, float y)
+            public void MoveAway()
+            {
+                _entry.Move(0f, _entry.TextHeight);
+            }
+
+            public void Start(float x, float y)
             {
                 _duration = 0;
                 _fadeOutRotationAngle = 0;
                 _fadeOutRotationSpeed = _phases._fadeOutInitialRotationSpeed;
-                IsWorking = true;
-                _entry = entry;
                 _entry.SetColor(_phases._fadeInColor);
                 _entry.SetScale(_phases._fadeInScale);
                 _entry.SetText(string.Empty);
@@ -321,13 +397,13 @@ namespace Prg.Scripts.Common.Unity
             {
                 public static Color EaseOnCurve(AnimationCurve curve, Color from, Color to, float time)
                 {
-                    Color distance = to - from;
+                    var distance = to - from;
                     return from + curve.Evaluate(time) * distance;
                 }
 
                 public static float EaseOnCurve(AnimationCurve curve, float from, float to, float time)
                 {
-                    float distance = to - from;
+                    var distance = to - from;
                     return from + curve.Evaluate(time) * distance;
                 }
             }
