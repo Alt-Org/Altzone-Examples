@@ -284,12 +284,18 @@ namespace Prg.Scripts.Common.Unity
         {
             private readonly ScoreFlashPhases _phases;
 
+            [SerializeField] private float _elapsedTime;
             [SerializeField] private float _duration;
             [SerializeField] private float _fraction;
             [SerializeField] private MessageEntry _entry;
 
             private float _fadeOutRotationAngle;
             private float _fadeOutRotationSpeed;
+
+            private bool _isOverlapped;
+            private float _overlappedDistance;
+            private float _overlappedPercent;
+            private float _overlappedTimeTravelled;
 
             public bool IsWorking { get; private set; }
 
@@ -300,20 +306,21 @@ namespace Prg.Scripts.Common.Unity
 
             public bool Animate(float elapsedTime)
             {
+                _elapsedTime = elapsedTime;
                 _duration += elapsedTime;
                 if (_duration < _phases._fadeInTimeSeconds)
                 {
-                    FadeInPhase(elapsedTime);
+                    FadeInPhase();
                     return true;
                 }
-                if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds)
+                if (_duration < _phases._fadeInTimeSeconds + _phases._stayTimeSeconds)
                 {
-                    StayVisiblePhase(elapsedTime);
+                    StayVisiblePhase();
                     return true;
                 }
-                if (_duration < _phases._fadeInTimeSeconds + _phases._readTimeSeconds + _phases._fadeOutTimeSeconds)
+                if (_duration < _phases._fadeInTimeSeconds + _phases._stayTimeSeconds + _phases._fadeOutTimeSeconds)
                 {
-                    FadeOutPhase(elapsedTime);
+                    FadeOutPhase();
                     return true;
                 }
                 _entry.Hide();
@@ -336,14 +343,17 @@ namespace Prg.Scripts.Common.Unity
 
             public void MoveAway()
             {
-                _entry.Move(0f, _entry.TextHeight);
+                _isOverlapped = true;
+                _overlappedPercent = 0;
+                _overlappedTimeTravelled = 0;
+                _overlappedDistance = _entry.TextHeight * _phases._overlappingHeightMultiplier;
             }
 
             public void Start(float x, float y)
             {
                 _duration = 0;
                 _fadeOutRotationAngle = 0;
-                _fadeOutRotationSpeed = _phases._fadeOutInitialRotationSpeed;
+                _fadeOutRotationSpeed = _phases._fadeOutRotationInitialSpeed;
                 _entry.SetColor(_phases._fadeInColor);
                 _entry.SetScale(_phases._fadeInScale);
                 _entry.SetText(string.Empty);
@@ -352,48 +362,70 @@ namespace Prg.Scripts.Common.Unity
                 _entry.Show();
             }
 
-            private void FadeInPhase(float elapsedTime)
+            private void FadeInPhase()
             {
                 _fraction = _duration / _phases._fadeInTimeSeconds;
-                var textColor = NgEasing.EaseOnCurve(_phases._fadeInColorCurve, _phases._fadeInColor, _phases._readColorStart, _fraction);
+                var textColor = Easing.EaseOnCurve(_phases._fadeInColorCurve, _phases._fadeInColor, _phases._stayColorStart, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NgEasing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
+                var scale = Easing.EaseOnCurve(_phases._fadeInScaleCurve, _phases._fadeInScale, 1f, _fraction);
                 _entry.SetScale(scale);
-                var x = NgEasing.EaseOnCurve(_phases._fadeInOffsetXCurve, _phases._fadeInOffsetX, 0, _fraction);
-                var y = NgEasing.EaseOnCurve(_phases._fadeInOffsetYCurve, _phases._fadeInOffsetY, 0, _fraction);
-                _entry.Move(x * elapsedTime, y * elapsedTime);
+                var x = Easing.EaseOnCurve(_phases._fadeInOffsetXCurve, _phases._fadeInOffsetX, 0, _fraction);
+                var y = Easing.EaseOnCurve(_phases._fadeInOffsetYCurve, _phases._fadeInOffsetY, 0, _fraction);
+                Move(x * _elapsedTime, y * _elapsedTime);
             }
 
-            private void StayVisiblePhase(float elapsedTime)
+            private void StayVisiblePhase()
             {
-                _fraction = (_duration - _phases._fadeInTimeSeconds) / _phases._readTimeSeconds;
-                var textColor = NgEasing.EaseOnCurve(_phases._readColorCurve, _phases._readColorStart, _phases._readColorEnd, _fraction);
+                _fraction = (_duration - _phases._fadeInTimeSeconds) / _phases._stayTimeSeconds;
+                var textColor = Easing.EaseOnCurve(_phases._readColorCurve, _phases._stayColorStart, _phases._stayColorEnd, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NgEasing.EaseOnCurve(_phases._readScaleCurve, 1f, _phases._readScale, _fraction);
+                var scale = Easing.EaseOnCurve(_phases._stayScaleCurve, 1f, _phases._stayScale, _fraction);
                 _entry.SetScale(scale);
-                var x = NgEasing.EaseOnCurve(_phases._readVelocityXCurve, 0, _phases._readFloatRightVelocity, _fraction);
-                var y = NgEasing.EaseOnCurve(_phases._readVelocityCurve, 0, _phases._readFloatUpVelocity, _fraction);
-                _entry.Move(x * elapsedTime, -y * elapsedTime);
+                var x = Easing.EaseOnCurve(_phases._stayVelocityXCurve, 0, _phases._stayVelocityFloatRight, _fraction);
+                var y = Easing.EaseOnCurve(_phases._stayVelocityYCurve, 0, _phases._stayVelocityFloatUp, _fraction);
+                Move(x * _elapsedTime, -y * _elapsedTime);
             }
 
-            private void FadeOutPhase(float elapsedTime)
+            private void FadeOutPhase()
             {
-                _fraction = (_duration - _phases._fadeInTimeSeconds - _phases._readTimeSeconds) / _phases._fadeOutTimeSeconds;
-                var textColor = NgEasing.EaseOnCurve(_phases._fadeOutColorCurve, _phases._readColorEnd, _phases._fadeOutColor, _fraction);
+                _fraction = (_duration - _phases._fadeInTimeSeconds - _phases._stayTimeSeconds) / _phases._fadeOutTimeSeconds;
+                var textColor = Easing.EaseOnCurve(_phases._fadeOutColorCurve, _phases._stayColorEnd, _phases._fadeOutColor, _fraction);
                 _entry.SetColor(textColor);
-                var scale = NgEasing.EaseOnCurve(_phases._fadeOutScaleCurve, _phases._readScale, _phases._fadeOutScale, _fraction);
+                var scale = Easing.EaseOnCurve(_phases._fadeOutScaleCurve, _phases._stayScale, _phases._fadeOutScale, _fraction);
                 _entry.SetScale(scale);
-                var x = NgEasing.EaseOnCurve(
-                    _phases._fadeOutVelocityXCurve, _phases._readFloatRightVelocity, _phases._fadeOutFloatRightVelocity, _fraction);
-                var y = NgEasing.EaseOnCurve(
-                    _phases._fadeOutVelocityCurve, _phases._readFloatUpVelocity, _phases._fadeOutFloatUpVelocity, _fraction);
-                _entry.Move(x * elapsedTime, -y * elapsedTime);
-                _fadeOutRotationSpeed += _phases._fadeOutRotationAcceleration * elapsedTime;
-                _fadeOutRotationAngle += _fadeOutRotationSpeed * elapsedTime;
+                var x = Easing.EaseOnCurve(
+                    _phases._fadeOutVelocityXCurve, _phases._stayVelocityFloatRight, _phases._fadeOutVelocityFloatRight, _fraction);
+                var y = Easing.EaseOnCurve(
+                    _phases._fadeOutVelocityYCurve, _phases._stayVelocityFloatUp, _phases._fadeOutVelocityFloatUp, _fraction);
+                Move(x * _elapsedTime, -y * _elapsedTime);
+                _fadeOutRotationSpeed += _phases._fadeOutRotationAcceleration * _elapsedTime;
+                _fadeOutRotationAngle += _fadeOutRotationSpeed * _elapsedTime;
                 _entry.SetRotation(_fadeOutRotationAngle);
             }
 
-            private static class NgEasing
+            private void Move(float deltaX, float deltaY)
+            {
+                if (_isOverlapped)
+                {
+                    _overlappedTimeTravelled += _elapsedTime;
+                    var fraction = _overlappedTimeTravelled / _phases._overlappingTimeSeconds;
+                    var newPercent = Easing.EaseOnCurve(_phases._overlappingCurve, 0, 1, fraction);
+                    var sign = Mathf.Sign(deltaY);
+                    var deltaDistance = (newPercent - _overlappedPercent) * _overlappedDistance * 100f;
+                    deltaY += sign * deltaDistance * _elapsedTime;
+                    if (_overlappedTimeTravelled < _phases._overlappingTimeSeconds)
+                    {
+                        _overlappedPercent = newPercent;
+                    }
+                    else
+                    {
+                        _isOverlapped = false;
+                    }
+                }
+                _entry.Move(deltaX, deltaY);
+            }
+
+            private static class Easing
             {
                 public static Color EaseOnCurve(AnimationCurve curve, Color from, Color to, float time)
                 {

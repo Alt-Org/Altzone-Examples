@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace Prg.Scripts.Common.Unity
 {
+    [CreateAssetMenu(menuName = "ALT-Zone/ScoreFlashConfig", fileName = "ScoreFlashConfig")]
+    public class ScoreFlashConfig : ScriptableObject
+    {
+        public Canvas _canvasPrefab;
+        public ScoreFlashPhases _phases;
+    }
+
     /// <summary>
     /// Configuration for <c>ScoreFlash</c>.
     /// </summary>
@@ -71,12 +78,17 @@ namespace Prg.Scripts.Common.Unity
         /// <summary>
         ///     The time the message is kept for the player to read (max to read),
         /// </summary>
-        [Header("Stay")] public float _readTimeSeconds = 2.5f;
+        [Header("Stay")] public float _stayTimeSeconds = 2.5f;
 
         /// <summary>
         ///     Color faded to from initial color in first phase.
         /// </summary>
-        public Color _readColorStart = new Color(1.0f, 1.0f, 0.0f, 1.0f);
+        public Color _stayColorStart = new Color(1.0f, 1.0f, 0.0f, 1.0f);
+
+        /// <summary>
+        ///     Color faded to from max color in "read phase".
+        /// </summary>
+        public Color _stayColorEnd = new Color(0.0f, 0.7f, 0.7f, 0.3f);
 
         /// <summary>
         ///     The animation curve used to drive the color from colorReadStart to colorReadEnd.
@@ -84,46 +96,41 @@ namespace Prg.Scripts.Common.Unity
         public AnimationCurve _readColorCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         /// <summary>
-        ///     Color faded to from max color in "read phase".
+        ///     Speed with which the message floats right while it fades out. Use negative
+        ///     values to make it float left.
+        ///     WARNING: Values between than -15 and 15 (but not 0) may generate stuttering!
         /// </summary>
-        public Color _readColorEnd = new Color(0.0f, 0.7f, 0.7f, 0.3f);
+        public float _stayVelocityFloatRight;
 
         /// <summary>
         ///     The animation curve used to drive the velocity on the x-axis from <c>0</c>
         ///     to it's read end value <c>readTimeFloatUpVelocity</c>.
         /// </summary>
-        public AnimationCurve _readVelocityXCurve = AnimationCurve.Linear(0, 0, 1, 1);
-
-        /// <summary>
-        ///     Speed with which the message floats right while it fades out. Use negative
-        ///     values to make it float left.
-        ///     WARNING: Values between than -15 and 15 (but not 0) may generate stuttering!
-        /// </summary>
-        public float _readFloatRightVelocity;
-
-        /// <summary>
-        ///     The animation curve used to drive the velocity on the y-axis from <c>0</c>
-        ///     to it's read end value <c>readTimeFloatUpVelocity</c>.
-        /// </summary>
-        public AnimationCurve _readVelocityCurve = AnimationCurve.Linear(0, 0, 1, 1);
+        public AnimationCurve _stayVelocityXCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         /// <summary>
         ///     Speed with which the message floats up while it fades out. Use negative
         ///     values to make it float down.
         /// </summary>
-        public float _readFloatUpVelocity = -40.0f;
+        public float _stayVelocityFloatUp = -40.0f;
 
         /// <summary>
-        ///     The animation curve used to drive the scale from <c>1</c>
-        ///     to it's read end value <c>readTimeScale</c>.
+        ///     The animation curve used to drive the velocity on the y-axis from <c>0</c>
+        ///     to it's read end value <c>readTimeFloatUpVelocity</c>.
         /// </summary>
-        public AnimationCurve _readScaleCurve = AnimationCurve.Linear(0, 0, 1, 1);
+        public AnimationCurve _stayVelocityYCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         /// <summary>
         ///     Scale at the end of the read time. The message scales from 1
         ///     to this value while it is kept to be read.
         /// </summary>
-        public float _readScale = 1.5f;
+        public float _stayScale = 1.5f;
+
+        /// <summary>
+        ///     The animation curve used to drive the scale from <c>1</c>
+        ///     to it's read end value <c>readTimeScale</c>.
+        /// </summary>
+        public AnimationCurve _stayScaleCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         #endregion Parameters for the Reading Phase
 
@@ -147,29 +154,29 @@ namespace Prg.Scripts.Common.Unity
         public Color _fadeOutColor = new Color(1.0f, 0.0f, 0.8f, 0.0f);
 
         /// <summary>
+        ///     Speed with which the message floats right while it fades out. Use negative
+        ///     values to make it float left.
+        ///     WARNING: Values between -15 and 15 (but not 0) may generate stuttering!
+        /// </summary>
+        public float _fadeOutVelocityFloatRight;
+
+        /// <summary>
         ///     The animation curve used to drive the velocity on x from <c>readTimeFloatUpVelocity</c>
         ///     to it's fade out end value <c>fadeOutTimeFloatUpVelocity</c>.
         /// </summary>
         public AnimationCurve _fadeOutVelocityXCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         /// <summary>
-        ///     Speed with which the message floats right while it fades out. Use negative
-        ///     values to make it float left.
-        ///     WARNING: Values between -15 and 15 (but not 0) may generate stuttering!
+        ///     Speed with which the message floats up while it fades out. Use negative
+        ///     values to make it float down.
         /// </summary>
-        public float _fadeOutFloatRightVelocity;
+        public float _fadeOutVelocityFloatUp = -80.0f;
 
         /// <summary>
         ///     The animation curve used to drive the velocity on y from <c>readTimeFloatUpVelocity</c>
         ///     to it's fade out end value <c>fadeOutTimeFloatUpVelocity</c>.
         /// </summary>
-        public AnimationCurve _fadeOutVelocityCurve = AnimationCurve.Linear(0, 0, 1, 1);
-
-        /// <summary>
-        ///     Speed with which the message floats up while it fades out. Use negative
-        ///     values to make it float down.
-        /// </summary>
-        public float _fadeOutFloatUpVelocity = -80.0f;
+        public AnimationCurve _fadeOutVelocityYCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         /// <summary>
         ///     The animation curve used to drive the scale from <c>readTimeScale</c>
@@ -189,7 +196,7 @@ namespace Prg.Scripts.Common.Unity
         ///     this a little smoother. Set to 0 to not have the message rotate
         ///     on fading out (rotationAcceleration must also be 0).
         /// </summary>
-        public float _fadeOutInitialRotationSpeed;
+        public float _fadeOutRotationInitialSpeed;
 
         /// <summary>
         ///     Increases the rotation speed while the message fades out.
@@ -199,12 +206,24 @@ namespace Prg.Scripts.Common.Unity
         public float _fadeOutRotationAcceleration = 30.0f;
 
         #endregion Parameters for the Fade Out Phase
-    }
 
-    [CreateAssetMenu(menuName = "ALT-Zone/ScoreFlashConfig", fileName = "ScoreFlashConfig")]
-    public class ScoreFlashConfig : ScriptableObject
-    {
-        public Canvas _canvasPrefab;
-        public ScoreFlashPhases _phases;
+        #region Overlapping Messages
+
+        /// <summary>
+        /// The time to move overlapping text messages away from each other.
+        /// </summary>
+        [Header("Overlapping Messages")] public float _overlappingTimeSeconds = 0.25f;
+
+        /// <summary>
+        /// Adjust overlapping height to be less than 100% of text message height.
+        /// </summary>
+        public float _overlappingHeightMultiplier = 1.0f;
+
+        /// <summary>
+        /// The animation curve used to drive the speed while moving overlapped text messages.
+        /// </summary>
+        public AnimationCurve _overlappingCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+        #endregion
     }
 }
