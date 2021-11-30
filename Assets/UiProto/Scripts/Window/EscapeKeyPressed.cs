@@ -9,33 +9,12 @@ namespace UiProto.Scripts.Window
     /// </summary>
     public class EscapeKeyPressed : MonoBehaviour
     {
-        private static EscapeKeyPressed _instance;
-
         private bool _isEscapePressedDown;
         private bool _isEscapePressedUp;
         private string _activeScenePathDown;
         private string _activeScenePathUp;
 
         private Action _clickListener;
-
-        protected void Awake()
-        {
-            if (_instance == null)
-            {
-                // Register us as the singleton!
-                _instance = this;
-                return;
-            }
-            throw new UnityException($"Component added more than once: {nameof(EscapeKeyPressed)}");
-        }
-
-        protected void OnDestroy()
-        {
-            if (_instance == this)
-            {
-                _instance = null;
-            }
-        }
 
         private void Update()
         {
