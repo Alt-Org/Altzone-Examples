@@ -19,7 +19,7 @@ namespace GameUi.Scripts.UiLoader
             Debug.Log($"PlayerName '{playerData.PlayerName}'");
             if (_isSkipValidName && !string.IsNullOrWhiteSpace(playerData.PlayerName))
             {
-                WindowManager.LoadWindow(_nextWindow);
+                WindowManager.Get().LoadWindow(_nextWindow);
                 return;
             }
             _window.SetActive(true);
@@ -27,7 +27,7 @@ namespace GameUi.Scripts.UiLoader
             _button.onClick.AddListener(() =>
             {
                 Debug.Log("continueButton");
-                WindowManager.LoadWindow(_nextWindow);
+                WindowManager.Get().LoadWindow(_nextWindow);
             });
         }
     }
