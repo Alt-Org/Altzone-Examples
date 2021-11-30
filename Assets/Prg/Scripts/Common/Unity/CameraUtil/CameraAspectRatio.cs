@@ -9,10 +9,13 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
     [RequireComponent(typeof(Camera))]
     public class CameraAspectRatio : MonoBehaviour
     {
+        private static readonly Rect FixedRect = new Rect(0, 0, 1, 1);
+
         // Set this to your target aspect ratio, eg. (16, 9) or (4, 3).
-        public Vector2 targetAspectRatio = new Vector2(9, 16);
+        [SerializeField] private Vector2 _targetAspectRatio = new Vector2(9, 16);
 
         private Camera _camera;
+        private Rect _tempRect;
 
         private void Awake()
         {
@@ -29,20 +32,20 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
         private void OnEnable()
         {
             _camera = GetComponent<Camera>();
-            updateCrop();
+            UpdateCrop();
         }
 
 #if UNITY_EDITOR
-        private int width;
-        private int height;
+        private int _width;
+        private int _height;
 
         private void Update()
         {
-            if (height != Screen.height || width != Screen.width)
+            if (_height != Screen.height || _width != Screen.width)
             {
-                height = Screen.height;
-                width = Screen.width;
-                updateCrop();
+                _height = Screen.height;
+                _width = Screen.width;
+                UpdateCrop();
             }
         }
 
@@ -51,19 +54,17 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
         private void OnPreCull()
         {
             // https://forum.unity.com/threads/force-camera-aspect-ratio-16-9-in-viewport.385541/
-            var wp = _camera.rect;
-            var nr = new Rect(0, 0, 1, 1);
-
-            _camera.rect = nr;
+            _tempRect = _camera.rect;
+            _camera.rect = FixedRect;
             GL.Clear(true, true, Color.black);
-            _camera.rect = wp;
+            _camera.rect = _tempRect;
         }
 
-        private void updateCrop()
+        private void UpdateCrop()
         {
             // Determine ratios of screen/window & target, respectively.
             var screenRatio = Screen.width / (float) Screen.height;
-            var targetRatio = targetAspectRatio.x / targetAspectRatio.y;
+            var targetRatio = _targetAspectRatio.x / _targetAspectRatio.y;
 
             if (Mathf.Approximately(screenRatio, targetRatio))
             {
