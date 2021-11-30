@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.Window
 {
-    public static class SceneLoader
+    internal static class SceneLoader
     {
         public static void LoadScene(WindowDef windowDef)
         {
