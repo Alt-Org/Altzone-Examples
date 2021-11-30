@@ -247,9 +247,9 @@ namespace Altzone.Scripts.Config
             _instance._permanentPrefabs = new GamePrefabs();
             // Set persistent values
             var gameSettings = Resources.Load<PersistentGameSettings>(nameof(PersistentGameSettings));
-            _instance.Features = gameSettings.features;
-            _instance.Variables = gameSettings.variables;
-            _instance.Prefabs = gameSettings.prefabs;
+            _instance.Features = gameSettings._features;
+            _instance.Variables = gameSettings._variables;
+            _instance.Prefabs = gameSettings._prefabs;
             _instance._playerDataCache = LoadPlayerDataCache();
         }
 

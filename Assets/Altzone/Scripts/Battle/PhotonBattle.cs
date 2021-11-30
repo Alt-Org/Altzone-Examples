@@ -1,6 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -77,14 +77,8 @@ namespace Altzone.Scripts.Battle
             {
                 return PhotonNetwork.NickName;
             }
-            // TODO: this part need to be refactored to use the store system in the game when it is implemented.
-            var playerName = PlayerPrefs.GetString(PlayerPrefsPlayerNameKey, string.Empty);
-            if (string.IsNullOrWhiteSpace(playerName))
-            {
-                playerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
-                PlayerPrefs.SetString(PlayerPrefsPlayerNameKey, playerName);
-            }
-            return playerName;
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            return playerData.PlayerName;
         }
 
         public static int GetPlayerIndex(int playerPos)

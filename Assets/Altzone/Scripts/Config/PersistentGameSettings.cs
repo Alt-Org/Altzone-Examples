@@ -11,8 +11,8 @@ namespace Altzone.Scripts.Config
     [CreateAssetMenu(menuName = "ALT-Zone/PersistentGameSettings")]
     public class PersistentGameSettings : ScriptableObject
     {
-        [Header("Game Features")] public GameFeatures features;
-        [Header("Game Variables")] public GameVariables variables;
-        [Header("Game Prefabs")] public GamePrefabs prefabs;
+        [Header("Game Features")] public GameFeatures _features;
+        [Header("Game Variables")] public GameVariables _variables;
+        [Header("Game Prefabs")] public GamePrefabs _prefabs;
     }
 }

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2ce41b7311042719470d4e9089a74c2, type: 3}
   m_Name: PersistentGameSettings
   m_EditorClassIdentifier: 
-  features:
+  _features:
     isRotateGameCamera: 1
     isLocalPLayerOnTeamBlue: 1
     isSPawnMiniBall: 0
     isSinglePlayerShieldOn: 1
-  variables:
+  _variables:
     roomStartDelay: 3
     ballMoveSpeedMultiplier: 1
     ballLerpSmoothingFactor: 4
@@ -29,7 +29,7 @@ MonoBehaviour:
     playerSqrMinRotationDistance: 5
     playerSqrMaxRotationDistance: 5
     shieldDistanceMultiplier: 1
-  prefabs:
+  _prefabs:
     playerForDes: {fileID: 626154037994138417, guid: 15cab2234cc49ef448d4e8057a198fa3,
       type: 3}
     playerForDef: {fileID: 626154037994138417, guid: 7140c4913f4d2f54794ae10968276765,
