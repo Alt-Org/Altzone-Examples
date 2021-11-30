@@ -13,33 +13,23 @@ MonoBehaviour:
   m_Name: LevelNames
   m_EditorClassIdentifier: 
   levels:
-  - levelName: Lobby
-    unityName: 40-lobby
-    isNetwork: 0
-    isExcluded: 1
-    levelId: 1040
-  - levelName: Lobby Loader
-    unityName: 20-loader
-    isNetwork: 0
-    isExcluded: 1
-    levelId: 1020
-  - levelName: Lobby Spectator
-    unityName: 42-lobby-spectator
-    isNetwork: 0
-    isExcluded: 1
-    levelId: 1042
-  - levelName: Nelinpeli
-    unityName: 40-Battle
-    isNetwork: 0
-    isExcluded: 0
-    levelId: 1080
-  - levelName: Ping Pong Game
-    unityName: 96-pingpong-rot2
-    isNetwork: 0
-    isExcluded: 1
-    levelId: 1096
   - levelName: UI Proto
     unityName: 10-uiProto
     isNetwork: 0
     isExcluded: 0
-    levelId: 1010
+    levelId: 1000
+  - levelName: Lobby
+    unityName: 70-Example-Lobby
+    isNetwork: 0
+    isExcluded: 0
+    levelId: 2000
+  - levelName: Battle
+    unityName: 72-Example-Game-gameplay
+    isNetwork: 0
+    isExcluded: 0
+    levelId: 3000
+  - levelName: Battle Game Over
+    unityName: 74-Example-Game-gameover
+    isNetwork: 0
+    isExcluded: 0
+    levelId: 3500

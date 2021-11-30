@@ -5,16 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/UiProto/Scenes/10-uiProto.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
     path: Assets/Examples/Lobby/Scenes/70-Example-Lobby.unity
     guid: b06517c9de41d774f8d7769cd74dc14e
-  - enabled: 0
+  - enabled: 1
     path: Assets/Examples/Game/Scenes/72-Example-Game-gameplay.unity
     guid: fcb04207b1ef84d44ba7218cf9d7c0b7
-  - enabled: 0
+  - enabled: 1
     path: Assets/Examples/Game/Scenes/74-Example-Game-gameover.unity
     guid: 89ff076f90bd9d84ba2bda3e0773603a
   - enabled: 0
@@ -26,7 +26,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Examples2/Scenes/87-ball-test.unity
     guid: 37a0e84ee812c7146b715ac8eec70b6c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Examples2/Scenes/85-room-test-avatar.unity
     guid: dc89caebf072e164b9031f8237062275
   m_configObjects: {}

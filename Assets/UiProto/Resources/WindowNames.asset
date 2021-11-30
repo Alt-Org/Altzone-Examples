@@ -55,8 +55,8 @@ MonoBehaviour:
     windowId: 11300
   - windowName: LIITY liittoumaan
     windowId: 5200
-  - windowName: LoaderUi
-    windowId: 11000
+  - windowName: Lobby Level
+    windowId: 19100
   - windowName: LUO liittouma
     windowId: 5100
   - windowName: LUO&LIITY liittoumaan
@@ -67,8 +67,6 @@ MonoBehaviour:
     windowId: 11200
   - windowName: "MATSIN voitto/h\xE4vi\xF6"
     windowId: 11100
-  - windowName: Nelinpeli
-    windowId: 19100
   - windowName: PELIN VALINTA
     windowId: 3000
   - windowName: PROFIILI ikkuna
@@ -85,3 +83,5 @@ MonoBehaviour:
     windowId: 7000
   - windowName: "\xC4\xC4NESTYKSET ikkuna"
     windowId: 16000
+  - windowName: "\xF6\xF6\xF6 poisto merkki"
+    windowId: 987654
