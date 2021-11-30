@@ -1,4 +1,4 @@
-using Prg.Scripts.Common.PubSub;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,19 +9,21 @@ namespace UiProto.Scripts.Window
     /// </summary>
     public class EscapeKeyPressed : MonoBehaviour
     {
-        private static EscapeKeyPressed _Instance;
+        private static EscapeKeyPressed _instance;
 
-        private bool isEscapePressedDown;
-        private bool isEscapePressedUp;
-        private string activeScenePathDown;
-        private string activeScenePathUp;
+        private bool _isEscapePressedDown;
+        private bool _isEscapePressedUp;
+        private string _activeScenePathDown;
+        private string _activeScenePathUp;
+
+        private Action _clickListener;
 
         protected void Awake()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
                 // Register us as the singleton!
-                _Instance = this;
+                _instance = this;
                 return;
             }
             throw new UnityException($"Component added more than once: {nameof(EscapeKeyPressed)}");
@@ -29,9 +31,9 @@ namespace UiProto.Scripts.Window
 
         protected void OnDestroy()
         {
-            if (_Instance == this)
+            if (_instance == this)
             {
-                _Instance = null;
+                _instance = null;
             }
         }
 
@@ -39,36 +41,33 @@ namespace UiProto.Scripts.Window
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                activeScenePathDown = SceneManager.GetActiveScene().path;
-                //Debug.Log($"ESCAPE DOWN level={activeScenePathDown}");
-                isEscapePressedDown = true;
-                isEscapePressedUp = false;
+                _activeScenePathDown = SceneManager.GetActiveScene().path;
+                _isEscapePressedDown = true;
+                _isEscapePressedUp = false;
                 return;
             }
             if (Input.GetKeyUp(KeyCode.Escape))
             {
-                activeScenePathUp = SceneManager.GetActiveScene().path;
-                //Debug.Log($"ESCAPE UP level={activeScenePathUp}");
-                isEscapePressedUp = true;
+                _activeScenePathUp = SceneManager.GetActiveScene().path;
+                _isEscapePressedUp = true;
                 return;
             }
-            if (isEscapePressedDown && isEscapePressedUp)
+            if (_isEscapePressedDown && _isEscapePressedUp)
             {
-                isEscapePressedDown = false;
-                isEscapePressedUp = false;
-                if (activeScenePathDown != activeScenePathUp)
+                _isEscapePressedDown = false;
+                _isEscapePressedUp = false;
+                if (_activeScenePathDown != _activeScenePathUp)
                 {
-                    Debug.LogWarning($"ESCAPE SKIPPED down={activeScenePathDown} up={activeScenePathUp}");
+                    Debug.LogWarning($"ESCAPE SKIPPED down={_activeScenePathDown} up={_activeScenePathUp}");
                     return;
                 }
-                //Debug.Log($"ESCAPE SENT level={activeScenePathDown}");
-                this.Publish(new Event());
+                _clickListener?.Invoke();
             }
         }
 
-        public class Event
+        public void AddListener(Action clickListener)
         {
-            // Event pattern for EscapeKeyPressed
+            _clickListener += clickListener;
         }
     }
 }

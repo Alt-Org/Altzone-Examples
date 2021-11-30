@@ -1,4 +1,3 @@
-using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 
 namespace UiProto.Scripts.Window
@@ -8,16 +7,16 @@ namespace UiProto.Scripts.Window
     /// </summary>
     public class EscapeHandler : MonoBehaviour
     {
-        private static EscapeHandler _Instance;
+        private static EscapeHandler _instance;
 
         protected void Awake()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
                 // Register us as the singleton!
-                _Instance = this;
-                gameObject.GetOrAddComponent<EscapeKeyPressed>();
-                this.Subscribe<EscapeKeyPressed.Event>(OnEscapeKeyPressed);
+                _instance = this;
+                var instance = gameObject.GetOrAddComponent<EscapeKeyPressed>();
+                instance.AddListener(OnEscapeKeyPressed);
                 return;
             }
             throw new UnityException($"Component added more than once: {nameof(EscapeHandler)}");
@@ -25,14 +24,13 @@ namespace UiProto.Scripts.Window
 
         protected void OnDestroy()
         {
-            if (_Instance == this)
+            if (_instance == this)
             {
-                this.Unsubscribe<EscapeKeyPressed.Event>(OnEscapeKeyPressed);
-                _Instance = null;
+                _instance = null;
             }
         }
 
-        private static void OnEscapeKeyPressed(EscapeKeyPressed.Event data)
+        private static void OnEscapeKeyPressed()
         {
             WindowManager.SafeGoBack();
         }
