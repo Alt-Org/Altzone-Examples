@@ -1,4 +1,5 @@
 using Altzone.Scripts.ScriptableObjects;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
@@ -8,8 +9,19 @@ namespace Altzone.Scripts.Window
     {
         public static void LoadScene(WindowDef windowDef)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(windowDef.SceneName), "string.IsNullOrEmpty(windowDef.SceneName)");
-            SceneManager.LoadScene(windowDef.SceneName);
+            var scene = windowDef.Scene;
+            Assert.IsNotNull(scene, "scene != null");
+            Assert.IsFalse(string.IsNullOrEmpty(scene.SceneName), "string.IsNullOrEmpty(scene.SceneName)");
+            if (scene.IsNetworkScene)
+            {
+                Debug.Log($"LoadScene NETWORK {scene.SceneName}");
+                throw new UnityException("NOT IMPLEMENTED");
+            }
+            else
+            {
+                Debug.Log($"LoadScene LOCAL {scene.SceneName}");
+                SceneManager.LoadScene(scene.SceneName);
+            }
         }
     }
 }

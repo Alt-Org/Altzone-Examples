@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
   m_Name: window-main-menu
   m_EditorClassIdentifier: 
-  _windowName: main menu name
+  _windowPrefab: {fileID: 121395008508881596, guid: 28d093b5d45313e489a5c8e2fd5e5c33,
+    type: 3}
   _scene: {fileID: 11400000, guid: e5640ed6c9da771499540f30a3f0932a, type: 2}

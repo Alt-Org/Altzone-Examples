@@ -7,7 +7,9 @@ namespace Altzone.Scripts.ScriptableObjects
     public class SceneDef : ScriptableObject
     {
         [SerializeField] private UnitySceneName _sceneName;
+        [SerializeField] private bool _isNetworkScene;
 
         public string SceneName => _sceneName.sceneName;
+        public bool IsNetworkScene => _isNetworkScene;
     }
 }
