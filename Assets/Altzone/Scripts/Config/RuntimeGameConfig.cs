@@ -1,9 +1,9 @@
-using Prg.Scripts.Common.Util;
 using System;
 using Altzone.Scripts.Model;
+using Prg.Scripts.Common.Util;
 using UnityEngine;
 
-namespace Examples.Config.Scripts
+namespace Altzone.Scripts.Config
 {
     /// <summary>
     /// Game features that can be toggled on and off.

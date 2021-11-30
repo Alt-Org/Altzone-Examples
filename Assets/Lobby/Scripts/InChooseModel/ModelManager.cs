@@ -3,7 +3,7 @@ using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Examples.Model.Scripts
+namespace Lobby.Scripts.InChooseModel
 {
     /// <summary>
     /// Manager for model UI.

@@ -3,7 +3,7 @@ using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Lobby.Scripts.InRoom
+namespace Lobby.Scripts.InRoom
 {
     /// <summary>
     /// Top most pane in lobby while in room to manage player position in the game.

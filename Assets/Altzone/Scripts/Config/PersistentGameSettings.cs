@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Examples.Config.Scripts
+namespace Altzone.Scripts.Config
 {
     /// <summary>
     /// Editable persistent settings for the game.

@@ -1,9 +1,9 @@
-﻿using Examples.Config.Scripts;
+﻿using Altzone.Scripts.Config;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
-namespace Examples.Lobby.Scripts
+namespace Lobby.Scripts
 {
     /// <summary>
     /// Helper class to enter Photon lobby.

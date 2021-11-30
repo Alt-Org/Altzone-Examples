@@ -3,7 +3,7 @@ using Prg.Scripts.Common.Photon;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Lobby.Scripts.InLobby
+namespace Lobby.Scripts.InLobby
 {
     public class PaneLobby : MonoBehaviour
     {

@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using Altzone.Scripts.Battle;
-using Examples.Config.Scripts;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Lobby.Scripts.InRoom
+namespace Lobby.Scripts.InRoom
 {
     /// <summary>
     /// Lowest pane in lobby while in room to show current players list that have joined this room.

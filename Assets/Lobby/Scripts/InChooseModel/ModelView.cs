@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Model.Scripts
+namespace Lobby.Scripts.InChooseModel
 {
     /// <summary>
     /// Model view.

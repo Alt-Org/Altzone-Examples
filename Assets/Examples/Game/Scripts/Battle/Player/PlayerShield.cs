@@ -1,4 +1,5 @@
 using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.interfaces;
 using Photon.Pun;

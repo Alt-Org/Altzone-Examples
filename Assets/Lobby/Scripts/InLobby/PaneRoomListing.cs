@@ -1,14 +1,12 @@
-﻿using Photon.Pun;
+﻿using System;
+using System.Linq;
+using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
-using Prg.Scripts.Common.Unity;
-using System;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Examples.Lobby.Scripts.InLobby
+namespace Lobby.Scripts.InLobby
 {
     /// <summary>
     /// Shows list of (open/closed) rooms and buttons for creating a new room or joining existing one.

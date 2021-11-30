@@ -1,13 +1,13 @@
-using Prg.Scripts.Common.Photon;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Examples.Config.Scripts
+namespace Altzone.Scripts.Config
 {
     [Flags] public enum What
     {

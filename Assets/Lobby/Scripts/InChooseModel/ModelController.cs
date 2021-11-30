@@ -1,10 +1,10 @@
 ﻿using System;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
-using Examples.Config.Scripts;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
-namespace Examples.Model.Scripts
+namespace Lobby.Scripts.InChooseModel
 {
     /// <summary>
     /// UI controller for model view.

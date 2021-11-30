@@ -1,18 +1,17 @@
-using Examples.Config.Scripts;
+using System.Collections;
+using System.Linq;
+using Altzone.Scripts.Battle;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity;
-using System.Collections;
-using System.Linq;
-using Altzone.Scripts.Battle;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-namespace Examples.Lobby.Scripts
+namespace Lobby.Scripts
 {
     /// <summary>
     /// Manages local player position and setup in a room and controls which level is loaded next.

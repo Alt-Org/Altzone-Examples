@@ -2,7 +2,7 @@ using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
-namespace Examples.Lobby.Scripts
+namespace Lobby.Scripts
 {
     /// <summary>
     /// Helper class to switch UI to room view from lobby view.

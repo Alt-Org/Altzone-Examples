@@ -1,12 +1,12 @@
 using Altzone.Scripts.Battle;
-using Examples.Config.Scripts;
+using Altzone.Scripts.Config;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Lobby.Scripts.InRoom
+namespace Lobby.Scripts.InRoom
 {
     /// <summary>
     /// Prepares players in a room for the game play.
