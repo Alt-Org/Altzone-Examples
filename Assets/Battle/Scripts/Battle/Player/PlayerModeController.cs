@@ -1,10 +1,10 @@
-using Examples.Game.Scripts.Battle.Ball;
+using Battle.Scripts.Battle.Ball;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Keep all players synchronized: play mode and color.

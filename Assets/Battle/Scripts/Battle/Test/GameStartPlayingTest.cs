@@ -1,11 +1,11 @@
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.SlingShot;
+using Battle.Scripts.Battle.SlingShot;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Test
+namespace Battle.Scripts.Battle.Test
 {
     /// <summary>
     /// Test script to start room using <c>BallSlingShotTest</c> when countdown reaches zero.

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Altzone.Scripts.Battle;
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Helper to collect essential player data before all players can be enabled for the game play.

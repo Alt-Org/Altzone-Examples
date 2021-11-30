@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     /// <summary>
     /// Interface to restrict player movement to given area.

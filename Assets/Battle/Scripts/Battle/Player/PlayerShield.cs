@@ -1,10 +1,10 @@
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     public interface IPlayerShield
     {

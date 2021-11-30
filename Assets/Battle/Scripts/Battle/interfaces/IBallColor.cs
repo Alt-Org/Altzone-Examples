@@ -1,4 +1,4 @@
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     /// <summary>
     /// Interface to manage ball color with conflicting/challenging requirements.

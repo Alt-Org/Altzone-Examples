@@ -1,10 +1,10 @@
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Scene;
 using System;
 using Altzone.Scripts.Battle;
+using Battle.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.Scene;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Ball
+namespace Battle.Scripts.Battle.Ball
 {
     /// <summary>
     /// Collision manager for the ball.

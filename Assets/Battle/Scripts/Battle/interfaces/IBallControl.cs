@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     /// <summary>
     /// Interface for external ball control, for example for <c>Game Manager</c> to use.

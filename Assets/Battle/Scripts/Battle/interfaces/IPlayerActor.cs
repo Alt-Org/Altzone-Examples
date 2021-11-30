@@ -1,4 +1,4 @@
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     public interface IPlayerActor
     {

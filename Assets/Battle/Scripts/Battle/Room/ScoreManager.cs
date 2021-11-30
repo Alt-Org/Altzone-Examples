@@ -1,13 +1,13 @@
 using System;
 using Altzone.Scripts.Battle;
-using Examples.Game.Scripts.Battle.Player;
+using Battle.Scripts.Battle.Player;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using UnityConstants;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Data holder class for team score.

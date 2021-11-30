@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Game.Scripts.Battle.UI
+namespace Battle.Scripts.Battle.UI
 {
     /// <summary>
     /// Countdown helper script to create animated countdown text.

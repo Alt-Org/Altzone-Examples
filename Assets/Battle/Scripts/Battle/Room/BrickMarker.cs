@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Unique marker for a brick so it can be identified over network and destroyed with proper effects.

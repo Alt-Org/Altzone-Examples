@@ -1,8 +1,8 @@
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.Unity;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Scene
+namespace Battle.Scripts.Battle.Scene
 {
     /// <summary>
     /// Creates reversed box collider around given template <c>Sprite</c> that provides the area to be "boxed" by colliders.

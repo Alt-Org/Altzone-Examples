@@ -1,7 +1,7 @@
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Polls joystick "Horizontal" and "Vertical" movements and forwards them to <c>IMovablePlayer</c> for processing.

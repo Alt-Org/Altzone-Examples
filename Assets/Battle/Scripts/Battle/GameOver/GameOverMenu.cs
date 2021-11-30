@@ -1,4 +1,4 @@
-using Examples.Game.Scripts.Battle.Room;
+using Battle.Scripts.Battle.Room;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Examples.Game.Scripts.Battle.GameOver
+namespace Battle.Scripts.Battle.GameOver
 {
     /// <summary>
     /// Utility to close this room properly before allowing to exit to main menu!

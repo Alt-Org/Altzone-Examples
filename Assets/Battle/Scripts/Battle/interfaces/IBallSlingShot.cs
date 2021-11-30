@@ -1,4 +1,4 @@
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     /// <summary>
     /// Interface to start the ball aka put the ball into play by sling shot.

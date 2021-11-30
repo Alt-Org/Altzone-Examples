@@ -1,12 +1,8 @@
-using Examples.Game.Scripts.Battle.Ball;
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Player;
-using Examples.Game.Scripts.Battle.SlingShot;
+using Battle.Scripts.Battle.SlingShot;
 using Photon.Pun;
-using System.Linq;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Test
+namespace Battle.Scripts.Battle.Test
 {
     public class BallSlingShotTest : MonoBehaviour
     {

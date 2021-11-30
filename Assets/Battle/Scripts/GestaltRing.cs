@@ -1,11 +1,11 @@
-﻿using Prg.Scripts.Common.Photon;
-using Prg.Scripts.Common.PubSub;
-using System;
+﻿using System;
 using Altzone.Scripts.Model;
+using Prg.Scripts.Common.Photon;
+using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Examples.Game.Scripts
+namespace Battle.Scripts
 {
     /// <summary>
     /// <c>GestaltRing</c> class manages global Gestalt <c>Defence</c> state.

@@ -1,12 +1,12 @@
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Player;
-using Examples.Game.Scripts.Battle.Scene;
+using Battle.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.Player;
+using Battle.Scripts.Battle.Scene;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.SlingShot
+namespace Battle.Scripts.Battle.SlingShot
 {
     /// <summary>
     ///  Puts the ball on the game using "slingshot" method between two team mates in positions A and B.

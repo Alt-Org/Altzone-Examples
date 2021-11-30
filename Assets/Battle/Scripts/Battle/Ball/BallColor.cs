@@ -1,11 +1,11 @@
 using Altzone.Scripts.Battle;
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Ball
+namespace Battle.Scripts.Battle.Ball
 {
     public class BallColor : MonoBehaviour, IBallColor
     {

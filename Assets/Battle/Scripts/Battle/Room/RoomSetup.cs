@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Player;
-using Examples.Game.Scripts.Battle.Scene;
+using Battle.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.Player;
+using Battle.Scripts.Battle.Scene;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Setup arena for Battle gameplay.

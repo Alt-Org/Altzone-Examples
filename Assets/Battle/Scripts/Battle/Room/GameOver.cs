@@ -5,7 +5,7 @@ using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Helper class to load game over screen.

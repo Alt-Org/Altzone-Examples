@@ -1,8 +1,8 @@
 using Altzone.Scripts.Battle;
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Scene
+namespace Battle.Scripts.Battle.Scene
 {
     /// <summary>
     /// General scene setup that was hard to organize in a better way.

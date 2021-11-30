@@ -1,9 +1,9 @@
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity.Input;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Listens <c>InputManager</c> click down and up events and forwards them to <c>IMovablePlayer</c> for processing.

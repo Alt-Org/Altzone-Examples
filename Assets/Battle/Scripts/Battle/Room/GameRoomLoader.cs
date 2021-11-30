@@ -1,14 +1,14 @@
 using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.Scene;
+using Battle.Scripts.Battle.Scene;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Game room loader to establish a well known state if level is loaded directly from Editor.

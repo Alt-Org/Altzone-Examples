@@ -1,14 +1,14 @@
 ﻿using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Player;
-using Examples.Game.Scripts.Battle.Room;
-using Examples.Game.Scripts.Battle.SlingShot;
+using Battle.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.Player;
+using Battle.Scripts.Battle.Room;
+using Battle.Scripts.Battle.SlingShot;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Ball
+namespace Battle.Scripts.Battle.Ball
 {
     /// <summary>
     /// Simple ball with <c>Rigidbody2D</c> that synchronizes its movement across network using <c>PhotonView</c> and <c>RPC</c>.

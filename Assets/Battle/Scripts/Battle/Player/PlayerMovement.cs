@@ -1,8 +1,8 @@
-using Examples.Game.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.interfaces;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Simple player movement using external controller for movement and synchronized across network using <c>RPC</c>.

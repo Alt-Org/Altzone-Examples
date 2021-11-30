@@ -1,13 +1,13 @@
 ﻿using System.Linq;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Game.Scripts.Battle.interfaces;
-using Examples.Game.Scripts.Battle.Room;
-using Examples.Game.Scripts.Battle.Scene;
+using Battle.Scripts.Battle.interfaces;
+using Battle.Scripts.Battle.Room;
+using Battle.Scripts.Battle.Scene;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Player
+namespace Battle.Scripts.Battle.Player
 {
     /// <summary>
     /// Player base class for common player data.

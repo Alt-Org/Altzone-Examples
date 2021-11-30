@@ -1,8 +1,8 @@
-using Prg.Scripts.Common.Photon;
 using System.Collections.Generic;
+using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.Room
+namespace Battle.Scripts.Battle.Room
 {
     /// <summary>
     /// Optional brick manager for the room that synchronizes brick state over network.

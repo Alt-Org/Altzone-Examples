@@ -1,11 +1,11 @@
-﻿using Examples.Game.Scripts.Battle.Player;
-using Examples.Game.Scripts.Battle.Room;
-using Examples.Game.Scripts.Battle.Test;
+﻿using Battle.Scripts.Battle.Player;
+using Battle.Scripts.Battle.Room;
+using Battle.Scripts.Battle.Test;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Examples.Game.Scripts.Battle.UI
+namespace Battle.Scripts.Battle.UI
 {
     /// <summary>
     /// Simple temporary UI for debugging.

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Examples.Game.Scripts.Battle.interfaces
+namespace Battle.Scripts.Battle.interfaces
 {
     /// <summary>
     /// Interface to provide data about ball collisions.
