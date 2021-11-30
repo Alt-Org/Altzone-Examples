@@ -62,8 +62,13 @@ namespace UiProto.Scripts.Window
             WindowStack.dumpWindowStack();
             if (stackManager.hasPendingWindow)
             {
-                showWindow(stackManager.popPending());
-                return;
+                var pendingWindow = stackManager.popPending();
+                if (pendingWindow.windowName != "Lobby Level")
+                {
+                    showWindow(pendingWindow);
+                    return;
+                }
+                Debug.LogWarning("SKIPPED LOBBY because it does not have WindowManager :-(");
             }
             if (initialWindow.window.windowId == 0)
             {
