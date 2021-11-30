@@ -13,12 +13,6 @@ public class PrintScreen : MonoBehaviour
     public string _imageFolder;
     public int _imageIndex;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void BeforeSceneLoad()
-    {
-        UnityExtensions.CreateGameObjectAndComponent<PrintScreen>(nameof(PrintScreen), true);
-    }
-
     private void Awake()
     {
         var allowedPlatform = Application.platform == RuntimePlatform.WindowsEditor
