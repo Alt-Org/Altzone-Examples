@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameUi.Scripts.ScriptableObjects
+namespace Altzone.Scripts.ScriptableObjects
 {
     [CreateAssetMenu(menuName = "ALT-Zone/WindowDef", fileName = "window-")]
     public class WindowDef : ScriptableObject

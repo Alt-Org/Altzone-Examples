@@ -1,7 +1,7 @@
 ﻿using Prg.Scripts.Common.Unity;
 using UnityEngine;
 
-namespace GameUi.Scripts.ScriptableObjects
+namespace Altzone.Scripts.ScriptableObjects
 {
     [CreateAssetMenu(menuName = "ALT-Zone/SceneDef", fileName = "scene-")]
     public class SceneDef : ScriptableObject
