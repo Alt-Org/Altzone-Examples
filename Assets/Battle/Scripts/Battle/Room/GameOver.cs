@@ -1,9 +1,7 @@
-﻿using Examples.Config.Scripts;
+﻿using Altzone.Scripts.Battle;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
-using System;
-using Altzone.Scripts.Battle;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

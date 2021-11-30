@@ -1,13 +1,12 @@
-﻿using Examples.Config.Scripts;
+﻿using System.Linq;
+using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Examples.Game.Scripts.Battle.Ball;
 using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Scene;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
-using System.Linq;
-using Altzone.Scripts.Battle;
-using Altzone.Scripts.Config;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.SlingShot

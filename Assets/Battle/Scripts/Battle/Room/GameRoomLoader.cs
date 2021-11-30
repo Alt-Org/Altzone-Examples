@@ -1,12 +1,11 @@
-using Examples.Config.Scripts;
+using System;
+using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Examples.Game.Scripts.Battle.Scene;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
-using System;
-using Altzone.Scripts.Battle;
-using Altzone.Scripts.Config;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Room

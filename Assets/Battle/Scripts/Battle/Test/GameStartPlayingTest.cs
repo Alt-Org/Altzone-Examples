@@ -1,5 +1,4 @@
 using Altzone.Scripts.Config;
-using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.SlingShot;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;

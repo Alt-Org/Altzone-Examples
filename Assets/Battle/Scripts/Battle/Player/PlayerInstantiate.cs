@@ -1,10 +1,9 @@
-using Examples.Config.Scripts;
-using Examples.Game.Scripts.Battle.Scene;
-using Photon.Pun;
 using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
+using Examples.Game.Scripts.Battle.Scene;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Assertions;
 

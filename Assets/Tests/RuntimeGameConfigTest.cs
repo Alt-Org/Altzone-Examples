@@ -1,7 +1,7 @@
 using Altzone.Scripts.Config;
 using UnityEngine;
 
-namespace Examples.Config.Scripts.Test
+namespace Tests
 {
     public class RuntimeGameConfigTest : MonoBehaviour
     {

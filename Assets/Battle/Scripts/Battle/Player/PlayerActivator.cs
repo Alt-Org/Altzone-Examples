@@ -1,8 +1,7 @@
-using Examples.Config.Scripts;
-using Examples.Game.Scripts.Battle.interfaces;
-using Photon.Pun;
 using System.Collections.Generic;
 using Altzone.Scripts.Battle;
+using Examples.Game.Scripts.Battle.interfaces;
+using Photon.Pun;
 using UnityEngine;
 
 namespace Examples.Game.Scripts.Battle.Player

@@ -1,6 +1,5 @@
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
-using Examples.Config.Scripts;
 using Examples.Game.Scripts.Battle.interfaces;
 using Examples.Game.Scripts.Battle.Player;
 using Examples.Game.Scripts.Battle.Scene;
