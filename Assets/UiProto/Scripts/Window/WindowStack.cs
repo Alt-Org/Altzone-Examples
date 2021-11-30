@@ -69,7 +69,6 @@ namespace UiProto.Scripts.Window
             {
                 // Register us as the singleton!
                 _Instance = this;
-                gameObject.GetOrAddComponent<EscapeHandler>();
             }
             windowStack = new List<StackEntry>();
             pendingWindow = empty;
