@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Altzone.Scripts.ScriptableObjects;
+using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.Window
 {
-    public class WindowManager : MonoBehaviour
+    public class WindowManager : MonoBehaviour, IWindowManager
     {
         [Serializable]
         private class MyWindow
@@ -23,7 +24,7 @@ namespace Altzone.Scripts.Window
             }
         }
 
-        public static WindowManager Get() => FindObjectOfType<WindowManager>();
+        public static IWindowManager Get() => FindObjectOfType<WindowManager>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
@@ -48,7 +49,8 @@ namespace Altzone.Scripts.Window
             _knownWindows = new List<MyWindow>();
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
-            gameObject.AddComponent<EscapeKeyHandler>();
+            var handler = gameObject.AddComponent<EscapeKeyHandler>();
+            handler.SetCallback(EscapeKeyPressed);
         }
 
 #if UNITY_EDITOR
@@ -63,7 +65,7 @@ namespace Altzone.Scripts.Window
             Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) pending {_pendingWindow}");
             if (_pendingWindow != null)
             {
-                ShowWindow(_pendingWindow);
+                ((IWindowManager)this).ShowWindow(_pendingWindow);
                 _pendingWindow = null;
             }
         }
@@ -75,21 +77,23 @@ namespace Altzone.Scripts.Window
             _windowsParent = null;
         }
 
-        public void SetWindowsParent(GameObject windowsParent)
+        void IWindowManager.SetWindowsParent(GameObject windowsParent)
         {
             _windowsParent = windowsParent;
         }
 
-        public void EscapeKeyPressed()
+        private void EscapeKeyPressed()
         {
             Debug.Log($"EscapeKeyPressed {_currentWindows.Count}");
+            ((IWindowManager)this).GoBack();
         }
 
-        public void GoBack()
+        void IWindowManager.GoBack()
         {
             Debug.Log($"GoBack {_currentWindows.Count}");
             if (_currentWindows.Count == 1)
             {
+                ExitApplication.ExitGracefully();
                 return;
             }
             var firstWindow = _currentWindows[0];
@@ -103,7 +107,7 @@ namespace Altzone.Scripts.Window
             Show(currentWindow);
         }
 
-        public void ShowWindow(WindowDef windowDef)
+        void IWindowManager.ShowWindow(WindowDef windowDef)
         {
             Debug.Log($"LoadWindow {windowDef} count {_currentWindows.Count}");
             if (windowDef.NeedsSceneLoad)

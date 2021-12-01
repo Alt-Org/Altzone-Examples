@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,8 @@ namespace Altzone.Scripts.Window
         private bool _isEscapePressedUp;
         private string _activeScenePathDown;
         private string _activeScenePathUp;
+
+        private Action _callback;
 
         private void Update()
         {
@@ -38,8 +41,13 @@ namespace Altzone.Scripts.Window
                     Debug.LogWarning($"ESCAPE SKIPPED down={_activeScenePathDown} up={_activeScenePathUp}");
                     return;
                 }
-                WindowManager.Get().EscapeKeyPressed();
+                _callback?.Invoke();
             }
+        }
+
+        public void SetCallback(Action callback)
+        {
+            _callback = callback;
         }
     }
 }
