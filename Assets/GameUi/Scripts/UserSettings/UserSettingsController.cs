@@ -13,6 +13,7 @@ namespace GameUi.Scripts.UserSettings
             _view.SaveButton.onClick.AddListener(CheckButton);
             WindowManager.Get().RegisterGoBackHandlerOnce(CheckIfSaveSettings);
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            _view.ShieldName.text = playerData.CharacterModel.Name;
             _view.PlayerNameInput.text = playerData.PlayerName;
         }
 
