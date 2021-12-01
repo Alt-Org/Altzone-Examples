@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Altzone.Scripts.ScriptableObjects;
 using UnityEngine;
@@ -8,6 +9,19 @@ namespace Altzone.Scripts.Window
 {
     public class WindowManager : MonoBehaviour
     {
+        [Serializable]
+        private class MyWindow
+        {
+            public WindowDef _windowDef;
+            public GameObject _window;
+
+            public MyWindow(WindowDef windowDef, GameObject window)
+            {
+                _windowDef = windowDef;
+                _window = window;
+            }
+        }
+
         public static WindowManager Get() => FindObjectOfType<WindowManager>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -20,7 +34,7 @@ namespace Altzone.Scripts.Window
             }
         }
 
-        [SerializeField] private List<WindowDef> _currentWindows;
+        [SerializeField] private List<MyWindow> _currentWindows;
 
         private GameObject _windowsParent;
         private WindowDef _pendingWindow;
@@ -29,7 +43,7 @@ namespace Altzone.Scripts.Window
         private void Awake()
         {
             Debug.Log("Awake");
-            _currentWindows = new List<WindowDef>();
+            _currentWindows = new List<MyWindow>();
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
         }
@@ -107,13 +121,26 @@ namespace Altzone.Scripts.Window
                 }
             }
             // Protocol to "show window"
-            _currentWindows.Insert(0, windowDef);
+            _currentWindows.Insert(0, new MyWindow(windowDef, prefab));
             if (_currentWindows.Count > 1)
             {
-                Assert.IsFalse(_currentWindows[0].Equals(_currentWindows[1]), "_currentWindows[0].Equals(_currentWindows[1])");
+                var previous = _currentWindows[1];
+                Assert.IsFalse(windowDef.Equals(previous._windowDef));
+                Hide(_currentWindows[1]);
             }
-            Debug.Log($"_LoadWindow show [{windowName}] {windowDef} count {_currentWindows.Count}");
-            prefab.SetActive(true);
+            Show(_currentWindows[0]);
+        }
+
+        private void Show(MyWindow window)
+        {
+            Debug.Log($"Show {window._windowDef}");
+            window._window.SetActive(true);
+        }
+
+        private void Hide(MyWindow window)
+        {
+            Debug.Log($"Hide {window._windowDef}");
+            window._window.SetActive(false);
         }
 
         private bool IsVisible(WindowDef windowDef)
