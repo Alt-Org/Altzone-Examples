@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2088793802051842145}
   - component: {fileID: 5039757492588594330}
   m_Layer: 5
-  m_Name: CanvasMainMenu
+  m_Name: UserSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -251,4 +251,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Main Menu
+  m_Text: User Settings

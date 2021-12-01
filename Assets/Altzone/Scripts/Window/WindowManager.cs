@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Altzone.Scripts.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.Window
@@ -21,7 +22,7 @@ namespace Altzone.Scripts.Window
 
         [SerializeField] private List<WindowDef> _currentWindows;
 
-        private WindowDef _windowDef;
+        private WindowDef _pendingWindow;
         private readonly Dictionary<string, GameObject> _knownWindows = new Dictionary<string, GameObject>();
 
         private void Awake()
@@ -39,11 +40,11 @@ namespace Altzone.Scripts.Window
 #endif
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) {_windowDef}");
-            if (_windowDef != null)
+            Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) {_pendingWindow}");
+            if (_pendingWindow != null)
             {
-                _LoadWindow(_windowDef);
-                _windowDef = null;
+                LoadWindow(_pendingWindow);
+                _pendingWindow = null;
             }
         }
 
@@ -51,16 +52,26 @@ namespace Altzone.Scripts.Window
         {
             var prefabCount = _knownWindows.Count;
             _knownWindows.Clear();
-            Debug.Log($"sceneUnloaded {scene.name} ({scene.buildIndex}) prefabCount {prefabCount} {_windowDef}");
+            Debug.Log($"sceneUnloaded {scene.name} ({scene.buildIndex}) prefabCount {prefabCount} {_pendingWindow}");
         }
 
         public void LoadWindow(WindowDef windowDef)
         {
-            if (windowDef.HasScene)
+            Debug.Log($"LoadWindow {windowDef} count {_currentWindows.Count}");
+            if (windowDef.NeedsSceneLoad)
             {
-                Debug.Log($"LoadWindow {windowDef}");
-                _windowDef = windowDef;
+                _pendingWindow = windowDef;
                 SceneLoader.LoadScene(windowDef);
+                return;
+            }
+            if (_pendingWindow != null && !_pendingWindow.Equals(windowDef))
+            {
+                Debug.Log($"LoadWindow IGNORE {windowDef} PENDING {_pendingWindow}");
+                return;
+            }
+            if (IsVisible(windowDef))
+            {
+                Debug.Log($"LoadWindow IGNORE {windowDef} IsVisible");
                 return;
             }
             _LoadWindow(windowDef);
@@ -69,7 +80,7 @@ namespace Altzone.Scripts.Window
         private void _LoadWindow(WindowDef windowDef)
         {
             var windowName = windowDef.name;
-            Debug.Log($"LoadWindow [{windowName}] {windowDef}");
+            Debug.Log($"_LoadWindow start [{windowName}] {windowDef} count {_currentWindows.Count}");
             if (!_knownWindows.TryGetValue(windowName, out var prefab))
             {
                 prefab = windowDef.WindowPrefab;
@@ -86,7 +97,23 @@ namespace Altzone.Scripts.Window
             }
             // Protocol to "show window"
             _currentWindows.Insert(0, windowDef);
+            if (_currentWindows.Count > 1)
+            {
+                Assert.IsFalse(_currentWindows[0].Equals(_currentWindows[1]), "_currentWindows[0].Equals(_currentWindows[1])");
+            }
+            Debug.Log($"_LoadWindow show [{windowName}] {windowDef} count {_currentWindows.Count}");
             prefab.SetActive(true);
+        }
+
+        private bool IsVisible(WindowDef windowDef)
+        {
+            if (_currentWindows.Count == 0)
+            {
+                return false;
+            }
+            var firstWindow = _currentWindows[0];
+            Debug.Log($"IsVisible new {windowDef} first {firstWindow} {firstWindow.Equals(windowDef)}");
+            return firstWindow.Equals(windowDef);
         }
     }
 }

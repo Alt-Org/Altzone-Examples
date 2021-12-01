@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.ScriptableObjects
 {
@@ -9,10 +10,22 @@ namespace Altzone.Scripts.ScriptableObjects
         [SerializeField] private SceneDef _scene;
 
         public bool HasScene => _scene != null;
+        public bool NeedsSceneLoad => _NeedsSceneLoad();
         public GameObject WindowPrefab => _windowPrefab;
         public string WindowName => _windowPrefab != null ? _windowPrefab.name : string.Empty;
         public string SceneName => _scene != null ? _scene.SceneName : string.Empty;
         public SceneDef Scene => _scene;
+
+        private bool _NeedsSceneLoad()
+        {
+            if (_scene == null)
+            {
+                return false;
+            }
+            var currentSceneName = SceneManager.GetActiveScene().name;
+            Debug.Log($"_NeedsSceneLoad {currentSceneName} <-> {_scene} : {currentSceneName != _scene.SceneName}");
+            return currentSceneName != _scene.SceneName;
+        }
 
         public override string ToString()
         {

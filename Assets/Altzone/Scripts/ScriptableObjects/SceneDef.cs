@@ -11,5 +11,10 @@ namespace Altzone.Scripts.ScriptableObjects
 
         public string SceneName => _sceneName.sceneName;
         public bool IsNetworkScene => _isNetworkScene;
+
+        public override string ToString()
+        {
+            return $"SceneDef: {SceneName}, network: {_isNetworkScene}";
+        }
     }
 }
