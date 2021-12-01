@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Altzone.Scripts.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -35,23 +36,26 @@ namespace Altzone.Scripts.Window
         }
 
         [SerializeField] private List<MyWindow> _currentWindows;
+        [SerializeField] private List<MyWindow> _knownWindows;
 
         private GameObject _windowsParent;
         private WindowDef _pendingWindow;
-        private readonly Dictionary<string, GameObject> _knownWindows = new Dictionary<string, GameObject>();
 
         private void Awake()
         {
             Debug.Log("Awake");
             _currentWindows = new List<MyWindow>();
+            _knownWindows = new List<MyWindow>();
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
+            gameObject.AddComponent<EscapeKeyHandler>();
         }
 
 #if UNITY_EDITOR
         private void OnApplicationQuit()
         {
             _currentWindows.Clear();
+            _knownWindows.Clear();
         }
 #endif
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
@@ -59,7 +63,7 @@ namespace Altzone.Scripts.Window
             Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) pending {_pendingWindow}");
             if (_pendingWindow != null)
             {
-                LoadWindow(_pendingWindow);
+                ShowWindow(_pendingWindow);
                 _pendingWindow = null;
             }
         }
@@ -76,7 +80,30 @@ namespace Altzone.Scripts.Window
             _windowsParent = windowsParent;
         }
 
-        public void LoadWindow(WindowDef windowDef)
+        public void EscapeKeyPressed()
+        {
+            Debug.Log($"EscapeKeyPressed {_currentWindows.Count}");
+        }
+
+        public void GoBack()
+        {
+            Debug.Log($"GoBack {_currentWindows.Count}");
+            if (_currentWindows.Count == 1)
+            {
+                return;
+            }
+            var firstWindow = _currentWindows[0];
+            _currentWindows.RemoveAt(0);
+            Hide(firstWindow);
+            if (_currentWindows.Count == 0)
+            {
+                return;
+            }
+            var currentWindow = _currentWindows[0];
+            Show(currentWindow);
+        }
+
+        public void ShowWindow(WindowDef windowDef)
         {
             Debug.Log($"LoadWindow {windowDef} count {_currentWindows.Count}");
             if (windowDef.NeedsSceneLoad)
@@ -95,41 +122,39 @@ namespace Altzone.Scripts.Window
                 Debug.Log($"LoadWindow IGNORE {windowDef} IsVisible");
                 return;
             }
-            _LoadWindow(windowDef);
+            var currentWindow = _knownWindows.FirstOrDefault(x => windowDef.Equals(x._windowDef));
+            if (currentWindow == null)
+            {
+                currentWindow = CreateWindow(windowDef);
+            }
+            if (_currentWindows.Count > 0)
+            {
+                var previousWindow = _currentWindows[0];
+                Assert.IsFalse(currentWindow._windowDef.Equals(previousWindow._windowDef));
+                Hide(previousWindow);
+            }
+            _currentWindows.Insert(0, currentWindow);
+            Show(currentWindow);
         }
 
-        private void _LoadWindow(WindowDef windowDef)
+        private MyWindow CreateWindow(WindowDef windowDef)
         {
             var windowName = windowDef.name;
-            Debug.Log($"_LoadWindow start [{windowName}] {windowDef} count {_currentWindows.Count}");
-            if (!_knownWindows.TryGetValue(windowName, out var prefab))
+            Debug.Log($"CreateWindow [{windowName}] {windowDef} count {_currentWindows.Count}");
+            var prefab = windowDef.WindowPrefab;
+            var isSceneObject = prefab.scene.handle != 0;
+            if (!isSceneObject)
             {
-                prefab = windowDef.WindowPrefab;
-                var isSceneObject = prefab.scene.handle != 0;
-                if (!isSceneObject)
+                prefab = Instantiate(prefab);
+                if (_windowsParent != null)
                 {
-                    prefab = Instantiate(prefab);
-                    if (_windowsParent != null)
-                    {
-                        prefab.transform.SetParent(_windowsParent.transform);
-                    }
-                    prefab.name = prefab.name.Replace("(Clone)", "");
-                    if (!_knownWindows.ContainsKey(prefab.name))
-                    {
-                        _knownWindows.Add(prefab.name, prefab);
-                    }
+                    prefab.transform.SetParent(_windowsParent.transform);
                 }
+                prefab.name = prefab.name.Replace("(Clone)", "");
             }
-            // Protocol to "show window"
-            var current = new MyWindow(windowDef, prefab);
-            _currentWindows.Insert(0, current);
-            if (_currentWindows.Count > 1)
-            {
-                var previous = _currentWindows[1];
-                Assert.IsFalse(current._windowDef.Equals(previous._windowDef));
-                Hide(previous);
-            }
-            Show(current);
+            var currentWindow = new MyWindow(windowDef, prefab);
+            _knownWindows.Add(currentWindow);
+            return currentWindow;
         }
 
         private static void Show(MyWindow window)

@@ -12,7 +12,7 @@ namespace Altzone.Scripts.Window
             Debug.Log($"OnEnable {_window}");
             var windowManager = WindowManager.Get();
             windowManager.SetWindowsParent(gameObject);
-            windowManager.LoadWindow(_window);
+            windowManager.ShowWindow(_window);
         }
     }
 }

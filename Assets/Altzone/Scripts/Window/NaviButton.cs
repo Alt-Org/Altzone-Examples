@@ -17,7 +17,7 @@ namespace Altzone.Scripts.Window
             button.onClick.AddListener(() =>
             {
                 Debug.Log($"Click {_naviTarget}");
-                WindowManager.Get().LoadWindow(_naviTarget);
+                WindowManager.Get().ShowWindow(_naviTarget);
             });
         }
     }
