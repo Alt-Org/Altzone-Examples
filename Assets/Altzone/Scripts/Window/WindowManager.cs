@@ -121,23 +121,24 @@ namespace Altzone.Scripts.Window
                 }
             }
             // Protocol to "show window"
-            _currentWindows.Insert(0, new MyWindow(windowDef, prefab));
+            var current = new MyWindow(windowDef, prefab);
+            _currentWindows.Insert(0, current);
             if (_currentWindows.Count > 1)
             {
                 var previous = _currentWindows[1];
-                Assert.IsFalse(windowDef.Equals(previous._windowDef));
-                Hide(_currentWindows[1]);
+                Assert.IsFalse(current._windowDef.Equals(previous._windowDef));
+                Hide(previous);
             }
-            Show(_currentWindows[0]);
+            Show(current);
         }
 
-        private void Show(MyWindow window)
+        private static void Show(MyWindow window)
         {
             Debug.Log($"Show {window._windowDef}");
             window._window.SetActive(true);
         }
 
-        private void Hide(MyWindow window)
+        private static void Hide(MyWindow window)
         {
             Debug.Log($"Hide {window._windowDef}");
             window._window.SetActive(false);
@@ -150,8 +151,8 @@ namespace Altzone.Scripts.Window
                 return false;
             }
             var firstWindow = _currentWindows[0];
-            Debug.Log($"IsVisible new {windowDef} first {firstWindow} {firstWindow.Equals(windowDef)}");
-            return firstWindow.Equals(windowDef);
+            Debug.Log($"IsVisible new {windowDef} first {firstWindow} {windowDef.Equals(firstWindow._windowDef)}");
+            return windowDef.Equals(firstWindow._windowDef);
         }
     }
 }
