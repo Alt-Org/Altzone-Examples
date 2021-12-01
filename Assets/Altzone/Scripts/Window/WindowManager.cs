@@ -11,6 +11,12 @@ namespace Altzone.Scripts.Window
 {
     public class WindowManager : MonoBehaviour, IWindowManager
     {
+        public enum GoBackAction
+        {
+            Continue,
+            Abort
+        }
+
         [Serializable]
         private class MyWindow
         {
@@ -41,6 +47,7 @@ namespace Altzone.Scripts.Window
 
         private GameObject _windowsParent;
         private WindowDef _pendingWindow;
+        private Func<GoBackAction> _goBackOnceHandler;
 
         private void Awake()
         {
@@ -51,13 +58,21 @@ namespace Altzone.Scripts.Window
             SceneManager.sceneUnloaded += SceneUnloaded;
             var handler = gameObject.AddComponent<EscapeKeyHandler>();
             handler.SetCallback(EscapeKeyPressed);
+            ResetState();
+        }
+
+        private void ResetState()
+        {
+            _currentWindows.Clear();
+            _knownWindows.Clear();
+            _pendingWindow = null;
+            _goBackOnceHandler = null;
         }
 
 #if UNITY_EDITOR
         private void OnApplicationQuit()
         {
-            _currentWindows.Clear();
-            _knownWindows.Clear();
+            ResetState();
         }
 #endif
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
@@ -75,6 +90,7 @@ namespace Altzone.Scripts.Window
             Debug.Log($"sceneUnloaded {scene.name} ({scene.buildIndex}) prefabCount {_knownWindows.Count} pending {_pendingWindow}");
             _knownWindows.Clear();
             _windowsParent = null;
+            _goBackOnceHandler = null;
         }
 
         void IWindowManager.SetWindowsParent(GameObject windowsParent)
@@ -84,13 +100,26 @@ namespace Altzone.Scripts.Window
 
         private void EscapeKeyPressed()
         {
-            Debug.Log($"EscapeKeyPressed {_currentWindows.Count}");
             ((IWindowManager)this).GoBack();
+        }
+
+        void IWindowManager.RegisterGoBackHandlerOnce(Func<GoBackAction> handler)
+        {
+            _goBackOnceHandler += handler;
         }
 
         void IWindowManager.GoBack()
         {
-            Debug.Log($"GoBack {_currentWindows.Count}");
+            Debug.Log($"GoBack {_currentWindows.Count} _escapeOnceHandler {_goBackOnceHandler}");
+            if (_goBackOnceHandler != null)
+            {
+                var goBackResult = InvokeCallbacks(_goBackOnceHandler);
+                _goBackOnceHandler = null;
+                if (goBackResult == GoBackAction.Abort)
+                {
+                    Debug.Log($"GoBack interrupted by handler");
+                }
+            }
             if (_currentWindows.Count == 1)
             {
                 ExitApplication.ExitGracefully();
@@ -182,6 +211,20 @@ namespace Altzone.Scripts.Window
             var firstWindow = _currentWindows[0];
             Debug.Log($"IsVisible new {windowDef} first {firstWindow} {windowDef.Equals(firstWindow._windowDef)}");
             return windowDef.Equals(firstWindow._windowDef);
+        }
+
+        private static GoBackAction InvokeCallbacks(Func<GoBackAction> func)
+        {
+            var goBackResult = GoBackAction.Continue;
+            var invocationList = func.GetInvocationList();
+            foreach (var handler in invocationList)
+            {
+                if (handler.DynamicInvoke() is GoBackAction result && result == GoBackAction.Abort)
+                {
+                    goBackResult = GoBackAction.Abort;
+                }
+            }
+            return goBackResult;
         }
     }
 }
