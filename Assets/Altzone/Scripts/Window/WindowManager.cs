@@ -22,11 +22,13 @@ namespace Altzone.Scripts.Window
 
         [SerializeField] private List<WindowDef> _currentWindows;
 
+        private GameObject _windowsParent;
         private WindowDef _pendingWindow;
         private readonly Dictionary<string, GameObject> _knownWindows = new Dictionary<string, GameObject>();
 
         private void Awake()
         {
+            Debug.Log("Awake");
             _currentWindows = new List<WindowDef>();
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
@@ -40,7 +42,7 @@ namespace Altzone.Scripts.Window
 #endif
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) {_pendingWindow}");
+            Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) pending {_pendingWindow}");
             if (_pendingWindow != null)
             {
                 LoadWindow(_pendingWindow);
@@ -50,9 +52,14 @@ namespace Altzone.Scripts.Window
 
         private void SceneUnloaded(Scene scene)
         {
-            var prefabCount = _knownWindows.Count;
+            Debug.Log($"sceneUnloaded {scene.name} ({scene.buildIndex}) prefabCount {_knownWindows.Count} pending {_pendingWindow}");
             _knownWindows.Clear();
-            Debug.Log($"sceneUnloaded {scene.name} ({scene.buildIndex}) prefabCount {prefabCount} {_pendingWindow}");
+            _windowsParent = null;
+        }
+
+        public void SetWindowsParent(GameObject windowsParent)
+        {
+            _windowsParent = windowsParent;
         }
 
         public void LoadWindow(WindowDef windowDef)
@@ -88,6 +95,10 @@ namespace Altzone.Scripts.Window
                 if (!isSceneObject)
                 {
                     prefab = Instantiate(prefab);
+                    if (_windowsParent != null)
+                    {
+                        prefab.transform.SetParent(_windowsParent.transform);
+                    }
                     prefab.name = prefab.name.Replace("(Clone)", "");
                     if (!_knownWindows.ContainsKey(prefab.name))
                     {
