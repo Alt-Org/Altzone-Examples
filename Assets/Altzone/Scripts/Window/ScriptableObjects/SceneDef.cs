@@ -1,8 +1,12 @@
 ﻿using Prg.Scripts.Common.Unity;
 using UnityEngine;
 
-namespace Altzone.Scripts.ScriptableObjects
+namespace Altzone.Scripts.Window.ScriptableObjects
 {
+    /// <summary>
+    /// Scene definition for <c>WindowManager</c> and <c>SceneLoader</c>.<br />
+    /// It contains UNITY scene name and flag to indicate if it is a networked game scene.
+    /// </summary>
     [CreateAssetMenu(menuName = "ALT-Zone/SceneDef", fileName = "scene-")]
     public class SceneDef : ScriptableObject
     {

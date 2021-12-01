@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Altzone.Scripts.ScriptableObjects
+namespace Altzone.Scripts.Window.ScriptableObjects
 {
+    /// <summary>
+    /// Window definition for <c>WindowManager</c>.<br />
+    /// It consists of window prefab (what to show) and optional scene  definition (where to show).
+    /// </summary>
     [CreateAssetMenu(menuName = "ALT-Zone/WindowDef", fileName = "window-")]
     public class WindowDef : ScriptableObject
     {

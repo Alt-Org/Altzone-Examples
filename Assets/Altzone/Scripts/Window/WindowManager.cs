@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Altzone.Scripts.ScriptableObjects;
+using Altzone.Scripts.Window.ScriptableObjects;
 using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.Assertions;

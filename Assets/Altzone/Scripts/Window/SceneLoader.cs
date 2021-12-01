@@ -1,4 +1,4 @@
-using Altzone.Scripts.ScriptableObjects;
+using Altzone.Scripts.Window.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;

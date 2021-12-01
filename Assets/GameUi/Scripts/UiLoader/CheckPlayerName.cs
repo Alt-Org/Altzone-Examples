@@ -1,6 +1,6 @@
 using Altzone.Scripts.Config;
-using Altzone.Scripts.ScriptableObjects;
 using Altzone.Scripts.Window;
+using Altzone.Scripts.Window.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.UI;
 
