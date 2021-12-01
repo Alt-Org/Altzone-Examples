@@ -26,6 +26,13 @@ namespace Altzone.Scripts.Window
             public WindowDef _windowDef;
             public GameObject _window;
 
+            public bool IsValid => _window != null;
+
+            public void Invalidate()
+            {
+                _window = null;
+            }
+
             public MyWindow(WindowDef windowDef, GameObject window)
             {
                 _windowDef = windowDef;
@@ -136,7 +143,14 @@ namespace Altzone.Scripts.Window
                 return;
             }
             var currentWindow = _currentWindows[0];
-            Show(currentWindow);
+            if (currentWindow.IsValid)
+            {
+                Show(currentWindow);
+                return;
+            }
+            // Re-create the window
+            _currentWindows.RemoveAt(0);
+            ((IWindowManager)this).ShowWindow(currentWindow._windowDef);
         }
 
         void IWindowManager.ShowWindow(WindowDef windowDef)
@@ -145,6 +159,7 @@ namespace Altzone.Scripts.Window
             if (windowDef.NeedsSceneLoad)
             {
                 _pendingWindow = windowDef;
+                InvalidateWindows(_currentWindows);
                 SceneLoader.LoadScene(windowDef);
                 return;
             }
@@ -202,7 +217,10 @@ namespace Altzone.Scripts.Window
         private static void Hide(MyWindow window)
         {
             Debug.Log($"Hide {window._windowDef}");
-            window._window.SetActive(false);
+            if (window.IsValid)
+            {
+                window._window.SetActive(false);
+            }
         }
 
         private bool IsVisible(WindowDef windowDef)
@@ -212,8 +230,17 @@ namespace Altzone.Scripts.Window
                 return false;
             }
             var firstWindow = _currentWindows[0];
-            Debug.Log($"IsVisible new {windowDef} first {firstWindow} {windowDef.Equals(firstWindow._windowDef)}");
-            return windowDef.Equals(firstWindow._windowDef);
+            var isVisible = windowDef.Equals(firstWindow._windowDef) && firstWindow.IsValid;
+            Debug.Log($"IsVisible new {windowDef} first {firstWindow} : {isVisible}");
+            return isVisible;
+        }
+
+        private static void InvalidateWindows(List<MyWindow> windowList)
+        {
+            foreach (var window in windowList)
+            {
+                window.Invalidate();
+            }
         }
 
         private static GoBackAction InvokeCallbacks(Func<GoBackAction> func)

@@ -20,6 +20,11 @@ namespace Altzone.Scripts.Window.ScriptableObjects
         public string SceneName => _scene != null ? _scene.SceneName : string.Empty;
         public SceneDef Scene => _scene;
 
+        public void SetWindowPrefab(GameObject sceneWindow)
+        {
+            _windowPrefab = sceneWindow;
+        }
+
         private bool _NeedsSceneLoad()
         {
             if (_scene == null)

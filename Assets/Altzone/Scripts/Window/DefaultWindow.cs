@@ -9,12 +9,17 @@ namespace Altzone.Scripts.Window
     public class DefaultWindow : MonoBehaviour
     {
         [SerializeField] private WindowDef _window;
+        [SerializeField] private GameObject _sceneWindow;
 
         private void OnEnable()
         {
             Debug.Log($"OnEnable {_window}");
             var windowManager = WindowManager.Get();
             windowManager.SetWindowsParent(gameObject);
+            if (_window.WindowPrefab == null)
+            {
+                _window.SetWindowPrefab(_sceneWindow);
+            }
             windowManager.ShowWindow(_window);
         }
     }
