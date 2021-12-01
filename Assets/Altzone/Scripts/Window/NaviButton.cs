@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace Altzone.Scripts.Window
 {
+    /// <summary>
+    /// Default navigation button for <c>WindowManager</c>.
+    /// </summary>
     [RequireComponent(typeof(Button))]
     public class NaviButton : MonoBehaviour
     {

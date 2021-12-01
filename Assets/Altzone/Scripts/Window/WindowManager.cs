@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.Window
 {
+    /// <summary>
+    /// Simple <c>WindowManager</c> with bread crumbs.
+    /// </summary>
     public class WindowManager : MonoBehaviour, IWindowManager
     {
         public enum GoBackAction

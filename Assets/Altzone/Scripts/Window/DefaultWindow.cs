@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Altzone.Scripts.Window
 {
+    /// <summary>
+    /// Default window loader for any level that uses <c>WindowManager</c>.
+    /// </summary>
     public class DefaultWindow : MonoBehaviour
     {
         [SerializeField] private WindowDef _window;

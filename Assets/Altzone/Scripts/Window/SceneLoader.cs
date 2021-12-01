@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 namespace Altzone.Scripts.Window
 {
+    /// <summary>
+    /// Simple scene loader for <c>WindowManager</c>.
+    /// </summary>
     internal static class SceneLoader
     {
         public static void LoadScene(WindowDef windowDef)

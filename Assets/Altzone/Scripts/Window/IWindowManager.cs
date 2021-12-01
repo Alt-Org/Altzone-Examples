@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Altzone.Scripts.Window
 {
+    /// <summary>
+    /// Interface for simple <c>WindowManager</c>.
+    /// </summary>
     public interface IWindowManager
     {
         void RegisterGoBackHandlerOnce(Func<WindowManager.GoBackAction> handler);
