@@ -9,8 +9,17 @@ namespace GameUi.Scripts.UserSettings
         [SerializeField] private InputField _playerNameInput;
         [SerializeField] private Button _saveButton;
 
-        public Text ShieldName => _shieldName;
-        public InputField PlayerNameInput => _playerNameInput;
+        public string ShieldName
+        {
+            set => _shieldName.text = value;
+        }
+
+        public string PlayerName
+        {
+            set => _playerNameInput.text = value;
+            get => _playerNameInput.text;
+        }
+
         public Button SaveButton => _saveButton;
     }
 }

@@ -13,8 +13,8 @@ namespace GameUi.Scripts.UserSettings
             _view.SaveButton.onClick.AddListener(CheckButton);
             WindowManager.Get().RegisterGoBackHandlerOnce(CheckIfSaveSettings);
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            _view.ShieldName.text = playerData.CharacterModel.Name;
-            _view.PlayerNameInput.text = playerData.PlayerName;
+            _view.ShieldName = playerData.CharacterModel.Name;
+            _view.PlayerName = playerData.PlayerName;
         }
 
         private void CheckButton()
@@ -27,7 +27,7 @@ namespace GameUi.Scripts.UserSettings
         {
             Debug.Log("CheckIfSaveSettings");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            var playerName = _view.PlayerNameInput.text;
+            var playerName = _view.PlayerName;
             if (playerData.PlayerName != playerName)
             {
                 Debug.Log($"PlayerName changed '{playerData.PlayerName}' <- '{playerName}'");
