@@ -120,7 +120,7 @@ namespace Altzone.Scripts.Window
 
         void IWindowManager.GoBack()
         {
-            Debug.Log($"GoBack {_currentWindows.Count} _escapeOnceHandler {_goBackOnceHandler}");
+            Debug.Log($"GoBack {_currentWindows.Count} _escapeOnceHandler {_goBackOnceHandler?.GetInvocationList().Length}");
             if (_goBackOnceHandler != null)
             {
                 var goBackResult = InvokeCallbacks(_goBackOnceHandler);
@@ -169,7 +169,7 @@ namespace Altzone.Scripts.Window
             }
             if (IsVisible(windowDef))
             {
-                Debug.Log($"LoadWindow IGNORE {windowDef} IsVisible");
+                Debug.Log($"LoadWindow ALREADY IsVisible {windowDef}");
                 return;
             }
             var currentWindow = _knownWindows.FirstOrDefault(x => windowDef.Equals(x._windowDef));
@@ -187,8 +187,9 @@ namespace Altzone.Scripts.Window
             Show(currentWindow);
         }
 
-        void IWindowManager.PopWindow()
+        void IWindowManager.PopCurrentWindow()
         {
+            Debug.Log($"PopCurrentWindow count {_currentWindows.Count}");
             PopAndHide();
         }
 
@@ -266,11 +267,14 @@ namespace Altzone.Scripts.Window
             var invocationList = func.GetInvocationList();
             foreach (var handler in invocationList)
             {
-                if (handler.DynamicInvoke() is GoBackAction result && result == GoBackAction.Abort)
+                var invokeResult = handler.DynamicInvoke();
+                Debug.Log($"invokeResult {handler} = {invokeResult}");
+                if (invokeResult is GoBackAction result && result == GoBackAction.Abort)
                 {
                     goBackResult = GoBackAction.Abort;
                 }
             }
+            Debug.Log($"InvokeCallbacks : {goBackResult}");
             return goBackResult;
         }
     }

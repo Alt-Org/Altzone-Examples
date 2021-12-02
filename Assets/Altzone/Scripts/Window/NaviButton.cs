@@ -11,7 +11,10 @@ namespace Altzone.Scripts.Window
     [RequireComponent(typeof(Button))]
     public class NaviButton : MonoBehaviour
     {
-        [SerializeField] private WindowDef _naviTarget;
+        private const string Tooltip = "Pop out and hide current window before showing target window";
+
+        [Header("Settings"), SerializeField] private WindowDef _naviTarget;
+        [Tooltip(Tooltip), SerializeField] private bool _popOutCurrent;
 
         private void Awake()
         {
@@ -20,7 +23,12 @@ namespace Altzone.Scripts.Window
             button.onClick.AddListener(() =>
             {
                 Debug.Log($"Click {_naviTarget}");
-                WindowManager.Get().ShowWindow(_naviTarget);
+                var windowManager = WindowManager.Get();
+                if (_popOutCurrent)
+                {
+                    windowManager.PopCurrentWindow();
+                }
+                windowManager.ShowWindow(_naviTarget);
             });
         }
     }

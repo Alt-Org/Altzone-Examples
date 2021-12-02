@@ -18,7 +18,7 @@ namespace Altzone.Scripts.Window
         private WindowManager.GoBackAction DoRedirect()
         {
             var windowManager= WindowManager.Get();
-            windowManager.PopWindow();
+            windowManager.PopCurrentWindow();
             windowManager.ShowWindow(_redirectWindow);
             return WindowManager.GoBackAction.Abort;
         }
