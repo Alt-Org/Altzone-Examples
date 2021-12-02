@@ -128,6 +128,7 @@ namespace Altzone.Scripts.Window
                 if (goBackResult == GoBackAction.Abort)
                 {
                     Debug.Log($"GoBack interrupted by handler");
+                    return;
                 }
             }
             if (_currentWindows.Count == 1)
