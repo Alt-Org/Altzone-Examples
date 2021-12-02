@@ -14,7 +14,7 @@ namespace Altzone.Scripts.Window
         private const string Tooltip = "Pop out and hide current window before showing target window";
 
         [Header("Settings"), SerializeField] private WindowDef _naviTarget;
-        [Tooltip(Tooltip), SerializeField] private bool _popOutCurrent;
+        [Tooltip(Tooltip), SerializeField] private bool _isCurrentPopOutWindow;
 
         private void Awake()
         {
@@ -24,7 +24,7 @@ namespace Altzone.Scripts.Window
             {
                 Debug.Log($"Click {_naviTarget}");
                 var windowManager = WindowManager.Get();
-                if (_popOutCurrent)
+                if (_isCurrentPopOutWindow)
                 {
                     windowManager.PopCurrentWindow();
                 }

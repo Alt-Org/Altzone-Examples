@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 namespace Altzone.Scripts.Window
 {
     /// <summary>
-    /// Simple <c>WindowManager</c> with bread crumbs.
+    /// Simple <c>WindowManager</c> with managed window bread crumbs list.
     /// </summary>
     public class WindowManager : MonoBehaviour, IWindowManager
     {
@@ -182,7 +182,14 @@ namespace Altzone.Scripts.Window
             {
                 var previousWindow = _currentWindows[0];
                 Assert.IsFalse(currentWindow._windowDef.Equals(previousWindow._windowDef));
-                Hide(previousWindow);
+                if (previousWindow._windowDef.IsPopOutWindow)
+                {
+                    PopAndHide();
+                }
+                else
+                {
+                    Hide(previousWindow);
+                }
             }
             _currentWindows.Insert(0, currentWindow);
             Show(currentWindow);

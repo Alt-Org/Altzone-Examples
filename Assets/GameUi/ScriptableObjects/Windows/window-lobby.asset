@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _windowPrefab: {fileID: 121395008508881596, guid: 0f625c3e713052a4ab703c9e89da4f96,
     type: 3}
+  _isPopOutWindow: 1
   _scene: {fileID: 11400000, guid: 880ef6d5dad14d04a9be35987738040e, type: 2}
