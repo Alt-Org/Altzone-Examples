@@ -135,11 +135,10 @@ namespace Altzone.Scripts.Window
                 ExitApplication.ExitGracefully();
                 return;
             }
-            var firstWindow = _currentWindows[0];
-            _currentWindows.RemoveAt(0);
-            Hide(firstWindow);
+            PopAndHide();
             if (_currentWindows.Count == 0)
             {
+                Debug.Log($"NOTE! GoBack has no windows to show");
                 return;
             }
             var currentWindow = _currentWindows[0];
@@ -188,6 +187,11 @@ namespace Altzone.Scripts.Window
             Show(currentWindow);
         }
 
+        void IWindowManager.PopWindow()
+        {
+            PopAndHide();
+        }
+
         private MyWindow CreateWindow(WindowDef windowDef)
         {
             var windowName = windowDef.name;
@@ -211,6 +215,14 @@ namespace Altzone.Scripts.Window
             var currentWindow = new MyWindow(windowDef, prefab);
             _knownWindows.Add(currentWindow);
             return currentWindow;
+        }
+
+        private void PopAndHide()
+        {
+            Assert.IsTrue(_currentWindows.Count > 0, "_currentWindows.Count > 0");
+            var firstWindow = _currentWindows[0];
+            _currentWindows.RemoveAt(0);
+            Hide(firstWindow);
         }
 
         private static void Show(MyWindow window)

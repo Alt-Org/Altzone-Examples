@@ -29,6 +29,11 @@ namespace Altzone.Scripts.Window
         void ShowWindow(WindowDef windowDef);
 
         /// <summary>
+        /// Pops current window out from window chain and hides it.
+        /// </summary>
+        void PopWindow();
+
+        /// <summary>
         /// Sets parent <c>GameObject</c> for windows so that Editor hierarchy stays clean.
         /// </summary>
         void SetWindowsParent(GameObject windowsParent);
