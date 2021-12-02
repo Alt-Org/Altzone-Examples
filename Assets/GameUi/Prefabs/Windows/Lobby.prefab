@@ -448,7 +448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _naviTarget: {fileID: 11400000, guid: d398c6b4f88a00745b4af823e20604d8, type: 2}
-  _popOutCurrent: 0
+  _popOutCurrent: 1
 --- !u!1 &4551616395964904773
 GameObject:
   m_ObjectHideFlags: 0
