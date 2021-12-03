@@ -69,7 +69,7 @@ namespace Prg.Scripts.Common.Util
 #endif
         }
 
-        [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD")]
+        [Conditional("FORCE_LOG"), Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         private static void CreateLogWriter()
         {
             string FilterPhotonLogMessage(string message)

@@ -345,7 +345,7 @@ namespace Editor.UiProto
                     }
                     catch (Exception e)
                     {
-                        UnityEngine.Debug.LogException(e);
+                        Debug.LogException(e);
                     }
                 }
                 return _assetContent;
