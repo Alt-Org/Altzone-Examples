@@ -120,7 +120,7 @@ namespace Altzone.Scripts.Window
 
         void IWindowManager.GoBack()
         {
-            Debug.Log($"GoBack {_currentWindows.Count} _escapeOnceHandler {_goBackOnceHandler?.GetInvocationList().Length}");
+            Debug.Log($"GoBack {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
             if (_goBackOnceHandler != null)
             {
                 var goBackResult = InvokeCallbacks(_goBackOnceHandler);
@@ -156,6 +156,7 @@ namespace Altzone.Scripts.Window
         void IWindowManager.ShowWindow(WindowDef windowDef)
         {
             Debug.Log($"LoadWindow {windowDef} count {_currentWindows.Count}");
+            Assert.IsNotNull(windowDef, "windowDef != null");
             if (windowDef.NeedsSceneLoad)
             {
                 _pendingWindow = windowDef;
@@ -206,11 +207,6 @@ namespace Altzone.Scripts.Window
             var windowName = windowDef.name;
             Debug.Log($"CreateWindow [{windowName}] {windowDef} count {_currentWindows.Count}");
             var prefab = windowDef.WindowPrefab;
-            if (prefab == null)
-            {
-                // Prevent NRE but show nothing!
-                prefab = new GameObject(windowName);
-            }
             var isSceneObject = prefab.scene.handle != 0;
             if (!isSceneObject)
             {
