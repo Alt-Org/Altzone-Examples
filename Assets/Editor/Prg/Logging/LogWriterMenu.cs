@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Editor.Prg.Logging
 {
-    public class LogWriterMenu : MonoBehaviour
+    public static class LogWriterMenu
     {
         [MenuItem("Window/ALT-Zone/Debug Logging/Add 'FORCE_LOG' define")]
         private static void AddDefine()
