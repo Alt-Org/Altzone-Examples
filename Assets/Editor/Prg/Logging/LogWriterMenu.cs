@@ -1,18 +1,19 @@
-﻿using Prg.Scripts.Common.Util;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Prg.Scripts.Common.Util;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Editor.Prg.Util
+namespace Editor.Prg.Logging
 {
     public class LogWriterMenu : MonoBehaviour
     {
-        [MenuItem("Window/ALT-Zone/Util/Editor Log/Add 'FORCE_LOG' define")]
+        [MenuItem("Window/ALT-Zone/Debug Logging/Add 'FORCE_LOG' define")]
         private static void AddDefine()
         {
+            Debug.Log("*");
             var knownTargets = new[] { BuildTarget.Android, BuildTarget.StandaloneWindows64, BuildTarget.WebGL };
             var count = AddScriptingDefineSymbolToAllBuildTargetGroups("FORCE_LOG", knownTargets);
             if (count == 0)
@@ -29,9 +30,10 @@ namespace Editor.Prg.Util
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Util/Editor Log/Remove 'FORCE_LOG' define")]
+        [MenuItem("Window/ALT-Zone/Debug Logging/Remove 'FORCE_LOG' define")]
         private static void RemoveDefine()
         {
+            Debug.Log("*");
             var knownTargets = new[] { BuildTarget.Android, BuildTarget.StandaloneWindows64, BuildTarget.WebGL };
             var count = RemoveScriptingDefineSymbolToAllBuildTargetGroups("FORCE_LOG", knownTargets);
             if (count == 0)
@@ -48,20 +50,30 @@ namespace Editor.Prg.Util
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Util/Editor Log/Show location")]
-        private static void Show()
+        [MenuItem("Window/ALT-Zone/Debug Logging/Highlight Settings")]
+        private static void HighlightSettings()
         {
-            GetLogFilePath();
+            LoggerConfig loggerConfig = (LoggerConfig)Resources.Load(nameof(LoggerConfig), typeof(LoggerConfig));
+            Selection.objects = new UnityEngine.Object[] { loggerConfig };
+            EditorGUIUtility.PingObject(loggerConfig);
         }
 
-        [MenuItem("Window/ALT-Zone/Util/Editor Log/Open in text editor")]
+        [MenuItem("Window/ALT-Zone/Debug Logging/Open file in text editor")]
         private static void Load()
         {
+            Debug.Log("*");
             var path = GetLogFilePath();
             if (File.Exists(path))
             {
                 InternalEditorUtility.OpenFileAtLineExternal(path, 1);
             }
+        }
+
+        [MenuItem("Window/ALT-Zone/Debug Logging/Show log file location")]
+        private static void Show()
+        {
+            Debug.Log("*");
+            GetLogFilePath();
         }
 
         private static string GetLogFilePath()
@@ -71,7 +83,7 @@ namespace Editor.Prg.Util
             {
                 path = path.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
             }
-            Debug.Log($"Editor log {(File.Exists(path) ? "is" : "NOT")} found in: {path}");
+            Debug.Log($"Editor log {(File.Exists(path) ? "is in" : RichText.Brown("NOT found"))}: {path}");
             return path;
         }
 
