@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-loader
+  m_Name: window-language-selection
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 1639751647383498152, guid: c1cd6d8fd1141ff42bba57a59dd205e6,
+  _windowPrefab: {fileID: 1639751647383498152, guid: 8c3be7f5b78fef14d9df96a2393898e7,
     type: 3}
   _isPopOutWindow: 0
   _scene: {fileID: 0}
