@@ -102,19 +102,19 @@ public static class UnityExtensions
 
     public static string GetFullPath(this Transform transform)
     {
-        return transform == null ? "" : GetFullPath(transform.gameObject);
+        return transform == null ? string.Empty : GetFullPath(transform.gameObject);
     }
 
     public static string GetFullPath(this Component component)
     {
-        return component == null ? "" : GetFullPath(component.gameObject);
+        return component == null ? string.Empty : GetFullPath(component.gameObject);
     }
 
     public static string GetFullPath(this GameObject gameObject)
     {
         if (gameObject == null)
         {
-            return "";
+            return string.Empty;
         }
         var path = new StringBuilder("\\").Append(gameObject.name);
         while (gameObject.transform.parent != null)

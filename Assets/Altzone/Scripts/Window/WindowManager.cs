@@ -215,7 +215,7 @@ namespace Altzone.Scripts.Window
                 {
                     prefab.transform.SetParent(_windowsParent.transform);
                 }
-                prefab.name = prefab.name.Replace("(Clone)", "");
+                prefab.name = prefab.name.Replace("(Clone)", string.Empty);
             }
             var currentWindow = new MyWindow(windowDef, prefab);
             _knownWindows.Add(currentWindow);

@@ -15,7 +15,7 @@ namespace Editor.Prg.Util
             void printProperty(SerializedObject anObject, string propName)
             {
                 var _serializedProp = anObject.FindProperty(propName);
-                var propValue = "";
+                var propValue = string.Empty;
                 switch (_serializedProp.propertyType)
                 {
                     case SerializedPropertyType.String:
@@ -28,7 +28,7 @@ namespace Editor.Prg.Util
                         propValue = _serializedProp.floatValue.ToString(CultureInfo.InvariantCulture);
                         break;
                     default:
-                        propValue = "<unsopported property type>";
+                        propValue = "<unsupported property type>";
                         break;
                 }
                 Debug.Log($"{_serializedProp.displayName}={propValue} [{_serializedProp.propertyType}]");

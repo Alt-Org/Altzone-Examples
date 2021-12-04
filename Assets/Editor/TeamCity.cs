@@ -391,7 +391,7 @@ namespace Editor
             {
                 var projectPath = "./";
                 var buildTarget = BuildTarget.StandaloneWindows64;
-                var keystore = "";
+                var keystore = string.Empty;
                 var isDevelopmentBuild = false;
                 var isAndroidFull = false;
                 for (var i = 0; i < args.Length; ++i)

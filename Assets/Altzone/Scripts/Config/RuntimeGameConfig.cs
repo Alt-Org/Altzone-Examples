@@ -109,7 +109,7 @@ namespace Altzone.Scripts.Config
             {
                 if (_playerName != value)
                 {
-                    _playerName = value ?? "";
+                    _playerName = value ?? string.Empty;
                     Save();
                 }
             }
@@ -158,7 +158,7 @@ namespace Altzone.Scripts.Config
             {
                 if (_playerHandle != value)
                 {
-                    _playerHandle = value ?? "";
+                    _playerHandle = value ?? string.Empty;
                     Save();
                 }
             }
