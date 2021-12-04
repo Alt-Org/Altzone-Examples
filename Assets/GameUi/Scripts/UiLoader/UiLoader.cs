@@ -11,17 +11,18 @@ namespace GameUi.Scripts.UiLoader
         [SerializeField] private WindowDef _windowMainMenu;
         [SerializeField] private WindowDef _windowFirstTime;
         [SerializeField] private float _demoLoadDelay;
+
         private IEnumerator Start()
         {
             var wait = new WaitForSeconds(_demoLoadDelay);
             yield return wait;
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            if (string.IsNullOrEmpty(playerData.PlayerName))
+            if (playerData.IsValid)
             {
-                WindowManager.Get().ShowWindow(_windowFirstTime);
+                WindowManager.Get().ShowWindow(_windowMainMenu);
                 yield break;
             }
-            WindowManager.Get().ShowWindow(_windowMainMenu);
+            WindowManager.Get().ShowWindow(_windowFirstTime);
         }
     }
 }

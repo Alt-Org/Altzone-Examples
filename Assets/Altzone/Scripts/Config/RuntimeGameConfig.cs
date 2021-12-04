@@ -165,6 +165,11 @@ namespace Altzone.Scripts.Config
         }
 
         /// <summary>
+        /// Player is considered to be valid when it has non-empty name and valid character model id.
+        /// </summary>
+        public bool IsValid => !string.IsNullOrEmpty(_playerName) && _characterModelId != -1;
+
+        /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
         /// </summary>
         protected virtual void Save()
@@ -183,8 +188,8 @@ namespace Altzone.Scripts.Config
 
         public override string ToString()
         {
-            // This is required for actual implementation to detect changes in our properties!
-            return $"Name:{PlayerName}, C-ModelId:{CharacterModelId}, GUID:{PlayerHandle}";
+            // This is required for actual implementation to detect changes in our changeable properties!
+            return $"Name:{PlayerName}, ModelId:{CharacterModelId}, GUID:{PlayerHandle}, Valid {IsValid}";
         }
     }
 
@@ -198,19 +203,18 @@ namespace Altzone.Scripts.Config
     {
         public static RuntimeGameConfig Get()
         {
-            if (_instance == null)
+            var instance = FindObjectOfType<RuntimeGameConfig>();
+            if (instance == null)
             {
-                _instance = FindObjectOfType<RuntimeGameConfig>();
-                if (_instance == null)
-                {
-                    _instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), true);
-                    LoadGameConfig();
-                }
+                instance = UnityExtensions.CreateGameObjectAndComponent<RuntimeGameConfig>(nameof(RuntimeGameConfig), true);
+                LoadGameConfig(instance);
             }
-            return _instance;
+            return instance;
         }
 
-        private static RuntimeGameConfig _instance;
+#if UNITY_EDITOR
+        public static PlayerDataCache GetPlayerDataCacheInEditor() => LoadPlayerDataCache();
+#endif
 
         [SerializeField] private GameFeatures _permanentFeatures;
         [SerializeField] private GameVariables _permanentVariables;
@@ -237,20 +241,20 @@ namespace Altzone.Scripts.Config
 
         public PlayerDataCache PlayerDataCache => _playerDataCache;
 
-        private static void LoadGameConfig()
+        private static void LoadGameConfig(RuntimeGameConfig instance)
         {
             // We can use models
             Storefront.Create();
             // Create default values
-            _instance._permanentFeatures = new GameFeatures();
-            _instance._permanentVariables = new GameVariables();
-            _instance._permanentPrefabs = new GamePrefabs();
+            instance._permanentFeatures = new GameFeatures();
+            instance._permanentVariables = new GameVariables();
+            instance._permanentPrefabs = new GamePrefabs();
             // Set persistent values
             var gameSettings = Resources.Load<PersistentGameSettings>(nameof(PersistentGameSettings));
-            _instance.Features = gameSettings._features;
-            _instance.Variables = gameSettings._variables;
-            _instance.Prefabs = gameSettings._prefabs;
-            _instance._playerDataCache = LoadPlayerDataCache();
+            instance.Features = gameSettings._features;
+            instance.Variables = gameSettings._variables;
+            instance.Prefabs = gameSettings._prefabs;
+            instance._playerDataCache = LoadPlayerDataCache();
         }
 
         private static PlayerDataCache LoadPlayerDataCache()
@@ -270,11 +274,6 @@ namespace Altzone.Scripts.Config
             public PlayerDataCacheLocal()
             {
                 _playerName = PlayerPrefs.GetString(PlayerNameKey, string.Empty);
-                if (string.IsNullOrWhiteSpace(_playerName))
-                {
-                    _playerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
-                    PlayerPrefs.SetString(PlayerNameKey, _playerName);
-                }
                 _characterModelId = PlayerPrefs.GetInt(CharacterModelIdKey, -1);
                 _playerHandle = PlayerPrefs.GetString(PlayerHandleKey, string.Empty);
                 if (string.IsNullOrWhiteSpace(PlayerHandle))
