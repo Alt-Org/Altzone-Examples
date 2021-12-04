@@ -741,6 +741,7 @@ GameObject:
   - component: {fileID: 833794404733728629}
   - component: {fileID: 5953206539179361166}
   - component: {fileID: 94564054942127998}
+  - component: {fileID: 44605889287922121}
   m_Layer: 5
   m_Name: Loader
   m_TagString: Untagged
@@ -842,6 +843,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _landscapeMatch: 0
   _portraitMatch: 1
+--- !u!114 &44605889287922121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639751647383498152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19cfb54222a25a446b3cc7172b25f1ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _window: {fileID: 11400000, guid: 69e9f27591e39564c99ebf02e61cb974, type: 2}
+  _demoLoadDelay: 2
 --- !u!1 &8580154883602906954
 GameObject:
   m_ObjectHideFlags: 0

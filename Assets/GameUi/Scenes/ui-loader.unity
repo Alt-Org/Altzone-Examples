@@ -210,7 +210,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 394345115}
-  - component: {fileID: 394345114}
   m_Layer: 0
   m_Name: UiLoader
   m_TagString: Untagged
@@ -218,20 +217,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &394345114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 394345113}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19cfb54222a25a446b3cc7172b25f1ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _window: {fileID: 11400000, guid: 69e9f27591e39564c99ebf02e61cb974, type: 2}
-  _demoLoadDelay: 2
 --- !u!4 &394345115
 Transform:
   m_ObjectHideFlags: 0
