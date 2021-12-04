@@ -8,9 +8,10 @@ namespace GameUi.Scripts.UiLoader
     public class UiLoader : MonoBehaviour
     {
         [SerializeField] private WindowDef _window;
+        [SerializeField] private float _demoLoadDelay;
         private IEnumerator Start()
         {
-            var wait = new WaitForSeconds(1f);
+            var wait = new WaitForSeconds(_demoLoadDelay);
             yield return wait;
             WindowManager.Get().ShowWindow(_window);
         }
