@@ -1088,6 +1088,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8453213902445988561, guid: c49412dc5e340684a8ce36530d043788,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c49412dc5e340684a8ce36530d043788, type: 3}
 --- !u!224 &2600499309132639558 stripped
@@ -1216,7 +1221,7 @@ PrefabInstance:
     - target: {fileID: 8275379305090125927, guid: b2572df3981969b4a84eef4519fdd2a4,
         type: 3}
       propertyPath: m_Text
-      value: Wait for application to load ...
+      value: Wait for application to load
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2572df3981969b4a84eef4519fdd2a4, type: 3}

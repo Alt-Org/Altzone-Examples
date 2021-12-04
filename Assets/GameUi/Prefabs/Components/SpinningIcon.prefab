@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3699032076483610677}
   - component: {fileID: 8453213902445988561}
   - component: {fileID: 5224829115729563616}
+  - component: {fileID: 5538951246029780909}
   m_Layer: 5
   m_Name: SpinningIcon
   m_TagString: Untagged
@@ -94,3 +95,17 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5538951246029780909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2915001226858085849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32371b9c1a33ce7408a014ed567b21a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _image: {fileID: 8453213902445988561}
+  _alphaTime: 0.75

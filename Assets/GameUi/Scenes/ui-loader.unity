@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _window: {fileID: 11400000, guid: 69e9f27591e39564c99ebf02e61cb974, type: 2}
-  _demoLoadDelay: 2
+  _demoLoadDelay: 22
 --- !u!4 &394345115
 Transform:
   m_ObjectHideFlags: 0
