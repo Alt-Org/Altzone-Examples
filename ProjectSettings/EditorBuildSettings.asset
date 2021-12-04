@@ -29,16 +29,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Examples2/Scenes/85-room-test-avatar.unity
     guid: dc89caebf072e164b9031f8237062275
-  - enabled: 1
+  - enabled: 0
     path: Assets/GameUi/Scenes/ui-loader.unity
     guid: 65fba5b33ca05ef46b2f0e659872ba36
-  - enabled: 1
+  - enabled: 0
     path: Assets/GameUi/Scenes/ui-main-menu.unity
     guid: 4a35c4ff38feede45ab8c4dbfa340b50
-  - enabled: 1
+  - enabled: 0
     path: Assets/GameUi/Scenes/ui-lobby.unity
     guid: 374d13f054f63244f90f1d2f3a76c98b
-  - enabled: 1
+  - enabled: 0
     path: Assets/GameUi/Scenes/ui-game-battle.unity
     guid: 668ba6cefe977994a80617667f56854c
   m_configObjects: {}
