@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ce41b7311042719470d4e9089a74c2, type: 3}
+  m_Name: PersistentGameSettings
+  m_EditorClassIdentifier: 
+  _features:
+    isRotateGameCamera: 0
+    isLocalPLayerOnTeamBlue: 0
+    isSPawnMiniBall: 0
+    isSinglePlayerShieldOn: 0
+  _variables:
+    roomStartDelay: 0
+    ballMoveSpeedMultiplier: 0
+    ballLerpSmoothingFactor: 0
+    ballTeleportDistance: 0
+    minSlingShotDistance: 0
+    maxSlingShotDistance: 0
+    ballRestartDelay: 0
+    playerMoveSpeedMultiplier: 0
+    playerSqrMinRotationDistance: 0
+    playerSqrMaxRotationDistance: 0
+    shieldDistanceMultiplier: 0
+  _prefabs:
+    playerForDes: {fileID: 0}
+    playerForDef: {fileID: 0}
+    playerForInt: {fileID: 0}
+    playerForPro: {fileID: 0}
+    playerForRet: {fileID: 0}
+    playerForEgo: {fileID: 0}
+    playerForCon: {fileID: 0}
