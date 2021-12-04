@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-game-over-battle
+  m_Name: window-55-game-over-battle
   m_EditorClassIdentifier: 
   _windowPrefab: {fileID: 121395008508881596, guid: 4f0063a0c93279845b465072d47d7432,
     type: 3}

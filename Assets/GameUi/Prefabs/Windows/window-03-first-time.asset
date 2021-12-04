@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-game-battle
+  m_Name: window-03-first-time
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 121395008508881596, guid: 8861cf0632250974b98f906609082f65,
+  _windowPrefab: {fileID: 1639751647383498152, guid: 0041dc80fd5b90148906674fcb986c77,
     type: 3}
-  _scene: {fileID: 11400000, guid: f8eb29cc7d9cc93499c2971bb9357049, type: 2}
+  _isPopOutWindow: 0
+  _scene: {fileID: 0}

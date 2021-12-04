@@ -10,9 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-loader
+  m_Name: window-10-main-menu
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 1639751647383498152, guid: c1cd6d8fd1141ff42bba57a59dd205e6,
+  _windowPrefab: {fileID: 121395008508881596, guid: 28d093b5d45313e489a5c8e2fd5e5c33,
     type: 3}
-  _isPopOutWindow: 0
-  _scene: {fileID: 0}
+  _scene: {fileID: 11400000, guid: e5640ed6c9da771499540f30a3f0932a, type: 2}
