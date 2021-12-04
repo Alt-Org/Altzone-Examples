@@ -3,11 +3,11 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 
-namespace Editor.Prg.Util
+namespace Editor.Prg
 {
     public static class CheckDependencies
     {
-        [MenuItem("Window/ALT-Zone/Util/Check Dependencies")]
+        [MenuItem("Window/ALT-Zone/Check Dependencies")]
         private static void _CheckDependencies()
         {
             Debug.Log("*");
@@ -44,7 +44,7 @@ namespace Editor.Prg.Util
             foreach (var assetFilter in assetFilters)
             {
                 string[] foundAssets = AssetDatabase.FindAssets(assetFilter, new[] { assetRoot });
-                var searchCount = checkForGuidInAssets(selectedGuids, ref foundCount, foundAssets);
+                var searchCount = CheckForGuidInAssets(selectedGuids, ref foundCount, foundAssets);
                 totalCount += searchCount;
                 Debug.Log($"search {assetFilter}:{foundAssets.Length} found={searchCount}");
             }
@@ -77,7 +77,7 @@ namespace Editor.Prg.Util
             }
         }
 
-        private static int checkForGuidInAssets(string[] selectedGuids, ref int[] foundCount, string[] assetGuids)
+        private static int CheckForGuidInAssets(string[] selectedGuids, ref int[] foundCount, string[] assetGuids)
         {
             var count = 0;
             foreach (var assetGuid in assetGuids)
