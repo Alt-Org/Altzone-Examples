@@ -67,7 +67,7 @@ namespace Editor.Prg
                 if (foundCount[i] == 0)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(selectedGuids[i]);
-                    Debug.Log($"{path} has NO dependencies in this search");
+                    Debug.Log($"{path} has <b>{RichText.Brown("NO dependencies")}</b> in this search");
                     noDepCount += 1;
                 }
             }
