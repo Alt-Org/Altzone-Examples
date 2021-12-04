@@ -164,10 +164,30 @@ namespace Altzone.Scripts.Config
             }
         }
 
+        [SerializeField] protected string _languageCode;
+
         /// <summary>
-        /// Player is considered to be valid when it has non-empty name and valid character model id.
+        /// Player's ISO 639-1 language code.
         /// </summary>
-        public bool IsValid => !string.IsNullOrEmpty(_playerName) && _characterModelId != -1;
+        public string LanguageCode
+        {
+            get => _languageCode;
+            set
+            {
+                if (_languageCode != value)
+                {
+                    _languageCode = value ?? string.Empty;
+                    Save();
+                }
+            }
+        }
+
+        public bool HasLanguageCode => !string.IsNullOrEmpty(_languageCode);
+
+        /// <summary>
+        /// Player is considered to be valid when it has non-empty name and valid character model id and language code.
+        /// </summary>
+        public bool IsValid => !string.IsNullOrEmpty(_playerName) && _characterModelId != -1 && HasLanguageCode;
 
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
@@ -189,7 +209,7 @@ namespace Altzone.Scripts.Config
         public override string ToString()
         {
             // This is required for actual implementation to detect changes in our changeable properties!
-            return $"Name:{PlayerName}, ModelId:{CharacterModelId}, GUID:{PlayerHandle}, Valid {IsValid}";
+            return $"Name:{PlayerName}, ModelId:{CharacterModelId}, GUID:{PlayerHandle}, Lang {LanguageCode} (Valid {IsValid})";
         }
     }
 
@@ -267,6 +287,7 @@ namespace Altzone.Scripts.Config
             private const string PlayerNameKey = "PlayerData.PlayerName";
             private const string PlayerHandleKey = "PlayerData.PlayerHandle";
             private const string CharacterModelIdKey = "PlayerData.CharacterModelId";
+            private const string LanguageCodeKey = "PlayerData.LanguageCode";
 
             private bool _isBatchSave;
             private string _currentState;
@@ -281,6 +302,7 @@ namespace Altzone.Scripts.Config
                     _playerHandle = Guid.NewGuid().ToString();
                     PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
                 }
+                _languageCode = PlayerPrefs.GetString(LanguageCodeKey, string.Empty);
                 _currentState = ToString();
             }
 
@@ -316,6 +338,7 @@ namespace Altzone.Scripts.Config
                 PlayerPrefs.SetString(PlayerNameKey, PlayerName);
                 PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
                 PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
+                PlayerPrefs.SetString(LanguageCodeKey, LanguageCode);
                 _currentState = ToString();
             }
         }
