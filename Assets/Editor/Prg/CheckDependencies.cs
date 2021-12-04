@@ -21,6 +21,7 @@ namespace Editor.Prg
             // Keep extensions lowercase!
             var validExtensions = new[]
             {
+                ".asset",
                 ".cs",
                 ".gif",
                 ".mat",
