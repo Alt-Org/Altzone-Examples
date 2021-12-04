@@ -19,13 +19,13 @@ namespace Editor.Prg
             }
             var selectedGuids = Selection.assetGUIDs;
             // Keep extensions lowercase!
-            var validExtensions = new[] { ".cs", ".prefab", ".physicMaterial", ".physicsmaterial2d", ".mat" };
+            var validExtensions = new[] { ".cs", ".prefab", ".physicMaterial", ".physicsmaterial2d", ".mat", ".png", ".gif" };
             foreach (var guid in selectedGuids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 if (AssetDatabase.Contains(activeObject))
                 {
-                    var extension = Path.HasExtension(path) ? Path.GetExtension(path).ToLower() : "";
+                    var extension = Path.HasExtension(path) ? Path.GetExtension(path).ToLower() : string.Empty;
                     if (validExtensions.Contains(extension))
                     {
                         continue;
