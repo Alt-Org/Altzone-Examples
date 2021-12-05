@@ -1,16 +1,14 @@
 ﻿using System;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
-using NUnit.Framework.Internal.Filters;
 using UnityEditor;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Editor.Prg.Local
 {
-    public static class LocalDebugMenu
+    public static class DebugMenu
     {
-        [MenuItem("Window/ALT-Zone/Local/Show Player Data")]
+        [MenuItem("Window/ALT-Zone/Debug/Show Player Data", false, 1)]
         private static void ShowLocalPlayerData()
         {
             Debug.Log("*");
@@ -18,7 +16,7 @@ namespace Editor.Prg.Local
             Debug.Log(playerData.ToString());
         }
 
-        [MenuItem("Window/ALT-Zone/Local/Create Dummy Player Data")]
+        [MenuItem("Window/ALT-Zone/Debug/Create Dummy Player Data", false, 2)]
         private static void CreateDummyPlayerData()
         {
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
@@ -30,7 +28,7 @@ namespace Editor.Prg.Local
             Debug.Log(playerData.ToString());
         }
 
-        [MenuItem("Window/ALT-Zone/Local/Delete Player Data")]
+        [MenuItem("Window/ALT-Zone/Debug/Delete Player Data", false, 3)]
         private static void DeleteLocalPlayerData()
         {
             Debug.Log("*");
@@ -44,11 +42,11 @@ namespace Editor.Prg.Local
             Debug.Log(playerData.ToString());
         }
 
-        [MenuItem("Window/ALT-Zone/Local/Delete Local All Data")]
+        [MenuItem("Window/ALT-Zone/Debug/Delete All Local Data", false, 10)]
         private static void DeleteLocalAllData()
         {
             Debug.Log("*");
+            Debug.Log(RichText.Brown("NOT IMPLEMENTED YET"));
         }
-
     }
 }

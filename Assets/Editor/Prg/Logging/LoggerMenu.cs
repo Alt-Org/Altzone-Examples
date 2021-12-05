@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace Editor.Prg.Logging
 {
-    public static class LogWriterMenu
+    public static class LoggerMenu
     {
-        [MenuItem("Window/ALT-Zone/Debug Logging/Add 'FORCE_LOG' define")]
+        [MenuItem("Window/ALT-Zone/Logging/Add 'FORCE_LOG' define")]
         private static void AddDefine()
         {
             Debug.Log("*");
@@ -30,7 +30,7 @@ namespace Editor.Prg.Logging
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Debug Logging/Remove 'FORCE_LOG' define")]
+        [MenuItem("Window/ALT-Zone/Logging/Remove 'FORCE_LOG' define")]
         private static void RemoveDefine()
         {
             Debug.Log("*");
@@ -50,7 +50,7 @@ namespace Editor.Prg.Logging
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Debug Logging/Highlight Settings")]
+        [MenuItem("Window/ALT-Zone/Logging/Highlight Settings")]
         private static void HighlightSettings()
         {
             LoggerConfig loggerConfig = (LoggerConfig)Resources.Load(nameof(LoggerConfig), typeof(LoggerConfig));
@@ -58,7 +58,7 @@ namespace Editor.Prg.Logging
             EditorGUIUtility.PingObject(loggerConfig);
         }
 
-        [MenuItem("Window/ALT-Zone/Debug Logging/Open file in text editor")]
+        [MenuItem("Window/ALT-Zone/Logging/Open file in text editor")]
         private static void Load()
         {
             Debug.Log("*");
@@ -69,7 +69,7 @@ namespace Editor.Prg.Logging
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Debug Logging/Show log file location")]
+        [MenuItem("Window/ALT-Zone/Logging/Show log file location")]
         private static void Show()
         {
             Debug.Log("*");
