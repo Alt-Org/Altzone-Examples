@@ -6,44 +6,39 @@ using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Unity.Localization
 {
-    [Serializable]
     public class Language
     {
-        [SerializeField] private SystemLanguage _language;
-        [SerializeField] private string _localeName;
+        private readonly SystemLanguage _language;
+        private readonly string _localeName;
 
-        private Dictionary<string, string> _words;
+        private readonly Dictionary<string, string> _words;
+        private readonly Dictionary<string, string> _altWords;
 
         public SystemLanguage LanguageName => _language;
         public string Locale => _localeName;
 
-        public string Word(string key) => _words.TryGetValue(key, out var value) ? value : $"[{key}]";
+        public string Word(string key) =>
+            _words.TryGetValue(key, out var value) ? value
+            : _altWords.TryGetValue(key, out var altValue) ? altValue
+            : $"[{key}]";
 
-        public Language(SystemLanguage language, string localeName, Dictionary<string, string> words)
+        public Language(SystemLanguage language, string localeName, Dictionary<string, string> words, Dictionary<string, string> altWords)
         {
             _language = language;
             _localeName = localeName;
             _words = words;
+            _altWords = altWords;
         }
     }
 
-    [Serializable]
     public class Languages
     {
-        [SerializeField] private List<Language> _languages;
-
-        public void Clear()
-        {
-            _languages.Clear();
-        }
+        private readonly List<Language> _languages = new List<Language>();
 
         public void Add(Language language)
         {
-            var index = _languages.FindIndex(x => x.Locale == language.Locale);
-            if (index != -1)
-            {
-                _languages.RemoveAt(index);
-            }
+            Assert.IsTrue(_languages.FindIndex(x => x.Locale == language.Locale) == -1,
+                "_languages.FindIndex(x => x.Locale == language.Locale) == -1");
             _languages.Add(language);
         }
     }
@@ -54,21 +49,23 @@ namespace Prg.Scripts.Common.Unity.Localization
         private const string DefaultLocale = "en";
 
         // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-        private static readonly string[] SupportedLocales = {
+        private static readonly string[] SupportedLocales =
+        {
             "key",
             "en",
             "fi",
             "sv"
         };
 
-        private static readonly SystemLanguage[] SupportedLanguages = {
+        private static readonly SystemLanguage[] SupportedLanguages =
+        {
             SystemLanguage.Unknown,
             SystemLanguage.English,
             SystemLanguage.Finnish,
             SystemLanguage.Swedish
         };
 
-        public static SystemLanguage DefaultLanguage => SystemLanguage.Finnish;
+        public const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
 
         public static void SetLanguage(SystemLanguage language)
         {
@@ -79,21 +76,17 @@ namespace Prg.Scripts.Common.Unity.Localization
         {
             var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
             Assert.IsNotNull(config, "config != null");
-            var text = config.TranslationsFile;
-            Debug.Log($"TranslationsFileName {config.TranslationsFile.name} data len {text.text.Length}");
-            if (_languages == null)
-            {
-                _languages = new Languages();
-            }
-            else
-            {
-                _languages.Clear();
-            }
-            LoadTranslations(text.text);
+            var textAsset = config.TranslationsTsvFile;
+            Debug.Log($"Translations tsv {textAsset.name} text len {textAsset.text.Length}");
+            _languages = new Languages();
+            LoadTranslations(textAsset.text);
+            var binAsset = config.LanguagesBinFile;
+            Debug.Log($"Languages bin {binAsset.name} bytes len {binAsset.bytes.Length}");
         }
 
         private static void LoadTranslations(string lines)
         {
+            var languages = new Languages();
             var maxIndex = SupportedLocales.Length;
             var dictionaries = new Dictionary<string, string>[maxIndex];
             var lineCount = 0;
@@ -135,17 +128,19 @@ namespace Prg.Scripts.Common.Unity.Localization
                 }
             }
             Debug.Log($"lineCount {lineCount}");
+            Dictionary<string, string> altDictionary = null;
             for (var i = 1; i < maxIndex; ++i)
             {
                 var lang = SupportedLanguages[i];
                 var locale = SupportedLocales[i];
                 var dictionary = dictionaries[i];
-                var language = new Language(lang, locale, dictionary);
-                _languages.Add(language);
                 if (i == 1)
                 {
                     Debug.Log($"wordCount {dictionary.Count} in  {locale} {lang}");
+                    altDictionary = dictionary;
                 }
+                var language = new Language(lang, locale, dictionary, altDictionary);
+                _languages.Add(language);
             }
         }
 
