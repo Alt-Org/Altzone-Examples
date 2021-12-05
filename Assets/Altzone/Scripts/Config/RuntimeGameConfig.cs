@@ -164,25 +164,25 @@ namespace Altzone.Scripts.Config
             }
         }
 
-        [SerializeField] protected string _languageCode;
+        [SerializeField] protected SystemLanguage _language;
 
         /// <summary>
-        /// Player's ISO 639-1 language code.
+        /// Player's UNITY language.
         /// </summary>
-        public string LanguageCode
+        public SystemLanguage Language
         {
-            get => _languageCode;
+            get => _language;
             set
             {
-                if (_languageCode != value)
+                if (_language != value)
                 {
-                    _languageCode = value ?? string.Empty;
+                    _language = value;
                     Save();
                 }
             }
         }
 
-        public bool HasLanguageCode => !string.IsNullOrEmpty(_languageCode);
+        public bool HasLanguageCode => _language != SystemLanguage.Unknown;
 
         /// <summary>
         /// Player is considered to be valid when it has non-empty name and valid character model id and language code.
@@ -209,7 +209,7 @@ namespace Altzone.Scripts.Config
         public override string ToString()
         {
             // This is required for actual implementation to detect changes in our changeable properties!
-            return $"Name:{PlayerName}, ModelId:{CharacterModelId}, GUID:{PlayerHandle}, Lang {LanguageCode} (Valid {IsValid})";
+            return $"Name:{PlayerName}, ModelId:{CharacterModelId}, Lang {Language}, Valid {IsValid}, GUID:{PlayerHandle}";
         }
     }
 
@@ -301,7 +301,7 @@ namespace Altzone.Scripts.Config
                     _playerHandle = Guid.NewGuid().ToString();
                     PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
                 }
-                _languageCode = PlayerPrefs.GetString(LanguageCodeKey, string.Empty);
+                _language = (SystemLanguage)PlayerPrefs.GetInt(LanguageCodeKey, (int)SystemLanguage.Unknown);
             }
 
             protected override void Save()
@@ -329,7 +329,7 @@ namespace Altzone.Scripts.Config
                 PlayerPrefs.SetString(PlayerNameKey, PlayerName);
                 PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
                 PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
-                PlayerPrefs.SetString(LanguageCodeKey, LanguageCode);
+                PlayerPrefs.SetInt(LanguageCodeKey, (int)Language);
             }
         }
     }

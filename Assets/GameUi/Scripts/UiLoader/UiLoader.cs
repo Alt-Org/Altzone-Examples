@@ -14,15 +14,21 @@ namespace GameUi.Scripts.UiLoader
 
         private IEnumerator Start()
         {
-            var wait = new WaitForSeconds(_demoLoadDelay);
-            yield return wait;
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (playerData.IsValid)
             {
-                WindowManager.Get().ShowWindow(_windowMainMenu);
+                StartCoroutine(LoadNextWindow());
                 yield break;
             }
+            var wait = new WaitForSeconds(_demoLoadDelay);
+            yield return wait;
             WindowManager.Get().ShowWindow(_windowFirstTime);
+        }
+
+        private IEnumerator LoadNextWindow()
+        {
+            yield return null;
+            WindowManager.Get().ShowWindow(_windowMainMenu);
         }
     }
 }

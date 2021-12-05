@@ -1,6 +1,8 @@
-﻿using Altzone.Scripts.Config;
+﻿using System.Collections;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Window;
 using Altzone.Scripts.Window.ScriptableObjects;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
 namespace GameUi.Scripts.LanguageSelection
@@ -17,30 +19,32 @@ namespace GameUi.Scripts.LanguageSelection
             Debug.Log(playerData.ToString());
             if (playerData.HasLanguageCode)
             {
-                WindowManager.Get().ShowWindow(_nextWindow);
+                StartCoroutine(LoadNextWindow(playerData.Language));
                 return;
             }
-            if (Application.systemLanguage == SystemLanguage.English
-                || Application.systemLanguage == SystemLanguage.Finnish
-                || Application.systemLanguage == SystemLanguage.Swedish)
-            {
-                Debug.LogWarning($"We should have a localization for {Application.systemLanguage}");
-            }
-            // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-            _view.LangButtonFi.onClick.AddListener(() => SetLanguage("fi"));
-            _view.LangButtonSe.onClick.AddListener(() => SetLanguage("sv"));
-            _view.LangButtonEn.onClick.AddListener(() => SetLanguage("en"));
+            Localizer.SetLanguage(Application.systemLanguage);
+            _view.LangButtonFi.onClick.AddListener(() => SetLanguage(SystemLanguage.Finnish));
+            _view.LangButtonSe.onClick.AddListener(() => SetLanguage(SystemLanguage.Swedish));
+            _view.LangButtonEn.onClick.AddListener(() => SetLanguage(SystemLanguage.English));
         }
 
-        private static void SetLanguage(string language)
+        private IEnumerator LoadNextWindow(SystemLanguage language)
+        {
+            yield return null;
+            Localizer.SetLanguage(language);
+            WindowManager.Get().ShowWindow(_nextWindow);
+        }
+
+        private static void SetLanguage(SystemLanguage language)
         {
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            Debug.Log($"SetLanguage {playerData.Language} <- {language}");
             playerData.BatchSave(() =>
             {
-                Debug.Log($"SetLanguage {playerData.LanguageCode} <- {language}");
-                playerData.LanguageCode = language;
+                playerData.Language = language;
             });
             Debug.Log(playerData.ToString());
+            Localizer.SetLanguage(language);
         }
     }
 }
