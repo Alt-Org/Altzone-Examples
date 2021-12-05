@@ -290,7 +290,6 @@ namespace Altzone.Scripts.Config
             private const string LanguageCodeKey = "PlayerData.LanguageCode";
 
             private bool _isBatchSave;
-            private string _currentState;
 
             public PlayerDataCacheLocal()
             {
@@ -303,13 +302,6 @@ namespace Altzone.Scripts.Config
                     PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
                 }
                 _languageCode = PlayerPrefs.GetString(LanguageCodeKey, string.Empty);
-                _currentState = ToString();
-            }
-
-            public sealed override string ToString()
-            {
-                // https://www.jetbrains.com/help/rider/VirtualMemberCallInConstructor.html
-                return base.ToString();
             }
 
             protected override void Save()
@@ -323,6 +315,8 @@ namespace Altzone.Scripts.Config
                 saveSettings?.Invoke();
                 _isBatchSave = false;
                 InternalSave();
+                // Writes all modified preferences to disk.
+                PlayerPrefs.Save();
             }
 
             private void InternalSave()
@@ -331,15 +325,11 @@ namespace Altzone.Scripts.Config
                 {
                     return; // Defer saving until later
                 }
-                if (_currentState == ToString())
-                {
-                    return; // Skip saving when nothing has changed
-                }
+                // By default Unity writes preferences to disk during OnApplicationQuit().
                 PlayerPrefs.SetString(PlayerNameKey, PlayerName);
                 PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
                 PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
                 PlayerPrefs.SetString(LanguageCodeKey, LanguageCode);
-                _currentState = ToString();
             }
         }
     }
