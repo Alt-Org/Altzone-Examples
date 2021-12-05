@@ -14,6 +14,7 @@ namespace GameUi.Scripts.PlayerName
             set => _playerName.text = value;
         }
 
+        public InputField PlayerNameInput => _playerName;
         public Button ContinueButton => _continueButton;
     }
 }
