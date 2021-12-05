@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 5178237406544437681}
   - component: {fileID: 2088793802051842145}
   - component: {fileID: 5039757492588594330}
+  - component: {fileID: 5483046965400123026}
+  - component: {fileID: 7154048489661939842}
   m_Layer: 5
   m_Name: MainMenu
   m_TagString: Untagged
@@ -99,6 +101,31 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &5483046965400123026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121395008508881596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e59d611c9c45db8b672867638df92e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7154048489661939842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121395008508881596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 328f1f5beb9943089e219b0fbbe76280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _view: {fileID: 5483046965400123026}
 --- !u!1 &786245932202660344
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,6 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _naviTarget: {fileID: 11400000, guid: 21396f574c64e5f4b9c79971a919f124, type: 2}
+  _isCurrentPopOutWindow: 0
 --- !u!1 &1609485164781472728
 GameObject:
   m_ObjectHideFlags: 0
@@ -656,6 +684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _naviTarget: {fileID: 11400000, guid: bd4694fa1b754dc49b25fd8d3276f949, type: 2}
+  _isCurrentPopOutWindow: 0
 --- !u!1 &6952445233706645598
 GameObject:
   m_ObjectHideFlags: 0

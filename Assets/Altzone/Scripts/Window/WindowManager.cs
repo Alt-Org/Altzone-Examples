@@ -121,7 +121,7 @@ namespace Altzone.Scripts.Window
 
         void IWindowManager.GoBack()
         {
-            Debug.Log($"GoBack {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
+            Debug.Log($"GoBack count {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
             if (_goBackOnceHandler != null)
             {
                 var goBackResult = InvokeCallbacks(_goBackOnceHandler);
