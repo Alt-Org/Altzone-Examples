@@ -11,5 +11,12 @@ namespace Editor.Prg.Localization
             Debug.Log("*");
             Localizer.LoadTranslations();
         }
+
+        [MenuItem("Window/ALT-Zone/Localization/Save Localization", false, 2)]
+        private static void SaveLocalPlayerData()
+        {
+            Debug.Log("*");
+            Localizer.SaveTranslations();
+        }
     }
 }

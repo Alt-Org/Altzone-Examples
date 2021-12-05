@@ -1,21 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Unity.Localization
 {
-    public class Language
+    internal class Language
     {
-        private readonly SystemLanguage _language;
-        private readonly string _localeName;
-
         private readonly Dictionary<string, string> _words;
         private readonly Dictionary<string, string> _altWords;
 
-        public SystemLanguage LanguageName => _language;
-        public string Locale => _localeName;
+        public SystemLanguage LanguageName { get; }
+
+        public string Locale { get; }
+
+        internal Dictionary<string, string> Words => _words;
 
         public string Word(string key) =>
             _words.TryGetValue(key, out var value) ? value
@@ -24,28 +28,86 @@ namespace Prg.Scripts.Common.Unity.Localization
 
         public Language(SystemLanguage language, string localeName, Dictionary<string, string> words, Dictionary<string, string> altWords)
         {
-            _language = language;
-            _localeName = localeName;
+            LanguageName = language;
+            Locale = localeName;
             _words = words;
             _altWords = altWords;
         }
     }
 
-    public class Languages
+    internal class Languages
     {
         private readonly List<Language> _languages = new List<Language>();
 
-        public void Add(Language language)
+        internal ReadOnlyCollection<Language> GetLanguages => _languages.AsReadOnly();
+
+        internal void Add(Language language)
         {
             Assert.IsTrue(_languages.FindIndex(x => x.Locale == language.Locale) == -1,
                 "_languages.FindIndex(x => x.Locale == language.Locale) == -1");
             _languages.Add(language);
         }
+
+        internal Language GetLanguage(SystemLanguage language)
+        {
+            var index = _languages.FindIndex(x => x.LanguageName == language);
+            if (index == -1)
+            {
+                if (_languages.Count > 0)
+                {
+                    return _languages[0];
+                }
+                return new Language(language, "xx", new Dictionary<string, string>(), new Dictionary<string, string>());
+            }
+            return _languages[index];
+        }
     }
 
+    /// <summary>
+    /// Simple <c>I18N</c> implementation to localize words and phrases.
+    /// </summary>
     public static class Localizer
     {
         private static Languages _languages;
+        private static Language _curLanguage;
+
+        private const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
+
+        public static string Localize(string key) => _curLanguage.Word(key);
+
+        public static void SetLanguage(SystemLanguage language)
+        {
+            Debug.Log($"SetLanguage {language}");
+            _curLanguage = _languages.GetLanguage(language);
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void LoadTranslations()
+        {
+            var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
+            Assert.IsNotNull(config, "config != null");
+            _languages = BinAsset.Load(config.LanguagesBinFile);
+            SetLanguage(DefaultLanguage);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        public static void SaveTranslations()
+        {
+            var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
+            Assert.IsNotNull(config, "config != null");
+            var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
+            BinAsset.Save(languages, config.LanguagesBinFile);
+        }
+    }
+
+    /// <summary>
+    /// Tab Separated Values (.tsv) content loader for localized words and phrases.
+    /// </summary>
+    /// <remarks>
+    /// File format is documented elsewhere!
+    /// </remarks>
+    internal static class TsvLoader
+    {
         private const string DefaultLocale = "en";
 
         // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
@@ -65,27 +127,18 @@ namespace Prg.Scripts.Common.Unity.Localization
             SystemLanguage.Swedish
         };
 
-        public const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
-
-        public static void SetLanguage(SystemLanguage language)
+        internal static SystemLanguage GetLanguageFor(string locale)
         {
-            Debug.Log($"SetLanguage {language}");
+            var index = Array.FindIndex(SupportedLocales, x => x == locale);
+            Assert.IsTrue(index >= 0);
+            return SupportedLanguages[index];
         }
 
-        public static void LoadTranslations()
+        internal static Languages LoadTranslations(TextAsset textAsset)
         {
-            var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
-            Assert.IsNotNull(config, "config != null");
-            var textAsset = config.TranslationsTsvFile;
+            var stopwatch = new Stopwatch();
             Debug.Log($"Translations tsv {textAsset.name} text len {textAsset.text.Length}");
-            _languages = new Languages();
-            LoadTranslations(textAsset.text);
-            var binAsset = config.LanguagesBinFile;
-            Debug.Log($"Languages bin {binAsset.name} bytes len {binAsset.bytes.Length}");
-        }
-
-        private static void LoadTranslations(string lines)
-        {
+            var lines = textAsset.text;
             var languages = new Languages();
             var maxIndex = SupportedLocales.Length;
             var dictionaries = new Dictionary<string, string>[maxIndex];
@@ -112,6 +165,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                     }
                     dictionaries[i] = new Dictionary<string, string>();
                 }
+                stopwatch.Start();
                 for (;;)
                 {
                     line = reader.ReadLine();
@@ -126,8 +180,9 @@ namespace Prg.Scripts.Common.Unity.Localization
                     }
                     ParseLine(line, maxIndex, ref dictionaries);
                 }
+                stopwatch.Stop();
             }
-            Debug.Log($"lineCount {lineCount}");
+            Debug.Log($"lineCount {lineCount} in {stopwatch.ElapsedMilliseconds} ms");
             Dictionary<string, string> altDictionary = null;
             for (var i = 1; i < maxIndex; ++i)
             {
@@ -136,12 +191,13 @@ namespace Prg.Scripts.Common.Unity.Localization
                 var dictionary = dictionaries[i];
                 if (i == 1)
                 {
-                    Debug.Log($"wordCount {dictionary.Count} in  {locale} {lang}");
                     altDictionary = dictionary;
                 }
                 var language = new Language(lang, locale, dictionary, altDictionary);
-                _languages.Add(language);
+                languages.Add(language);
+                Debug.Log($"dictionary for {locale} {lang} has {dictionary.Count} words");
             }
+            return languages;
         }
 
         private static void ParseLine(string line, int maxIndex, ref Dictionary<string, string>[] dictionaries)
@@ -153,10 +209,146 @@ namespace Prg.Scripts.Common.Unity.Localization
             Assert.IsFalse(string.IsNullOrEmpty(defaultValue), "string.IsNullOrEmpty(defaultValue)");
             for (var i = 1; i < maxIndex; ++i)
             {
-                var colValue = string.IsNullOrEmpty(tokens[i]) ? defaultValue : tokens[i];
+                var colValue = tokens[i];
+                if (string.IsNullOrEmpty(colValue))
+                {
+                    continue;
+                }
                 var dictionary = dictionaries[i];
                 dictionary.Add(key, colValue);
             }
+        }
+    }
+
+    /// <summary>
+    /// Binary formatted <c>TextAsset</c> for localized words and phrases.
+    /// </summary>
+    /// <remarks>
+    /// File format is proprietary and contained in this file!
+    /// </remarks>
+    internal static class BinAsset
+    {
+        private const string AssetRoot = "Assets";
+
+        private const byte FileMark = 0xAA;
+        private const byte LocaleStart = 0xBB;
+        private const byte LocaleEnd = 0xCC;
+
+        private const int FileVersion = 100;
+
+        [Conditional("UNITY_EDITOR")]
+        internal static void Save(Languages languages, TextAsset binAsset)
+        {
+#if UNITY_EDITOR
+            var path = GetAssetPath(binAsset);
+            Debug.Log($"Save Languages bin {binAsset.name} path {path}");
+            int byteCount;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var languageList = languages.GetLanguages;
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    writer.Write(FileMark);
+                    writer.Write(FileVersion);
+                    writer.Write(languageList.Count);
+                    foreach (var language in languageList)
+                    {
+                        var locale = language.Locale;
+                        var words = language.Words;
+                        writer.Write(LocaleStart);
+                        writer.Write(locale);
+                        writer.Write(words.Count);
+                        foreach (var entry in words)
+                        {
+                            writer.Write(entry.Key);
+                            writer.Write(entry.Value);
+                        }
+                        writer.Write(LocaleEnd);
+                    }
+                }
+                var bytes = stream.ToArray();
+                byteCount = bytes.Length;
+                File.WriteAllBytes(path, bytes);
+                AssetDatabase.SaveAssets();
+            }
+            stopwatch.Stop();
+            Debug.Log($"Save Languages bin {binAsset.name} bytes len {byteCount} in {stopwatch.ElapsedMilliseconds} ms");
+            foreach (var language in languageList)
+            {
+                DumpLanguage(language);
+            }
+#endif
+        }
+
+        internal static Languages Load(TextAsset binAsset)
+        {
+            var bytes = binAsset.bytes;
+            Debug.Log($"Load Languages bin {binAsset.name} bytes len {bytes.Length}");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var languages = new Languages();
+            using (var stream = new MemoryStream(bytes))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    var fileMark = reader.ReadByte();
+                    Assert.IsTrue(fileMark == FileMark, "fileMark == FileMark");
+                    var fileVersion = reader.ReadInt32();
+                    Assert.IsTrue(fileVersion == FileVersion, "fileVersion == FileVersion");
+                    var localeCount = reader.ReadInt32();
+                    Assert.IsTrue(localeCount > 0, "localeCount > 0");
+                    Dictionary<string, string> altDictionary = null;
+                    for (var i = 0; i < localeCount; ++i)
+                    {
+                        var localeStart = reader.ReadByte();
+                        Assert.IsTrue(localeStart == LocaleStart, "localeStart == LocaleStart");
+                        var locale = reader.ReadString();
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(locale), "string.IsNullOrWhiteSpace(locale)");
+                        var lang = TsvLoader.GetLanguageFor(locale);
+                        var wordCount = reader.ReadInt32();
+                        Assert.IsTrue(wordCount >= 0, "wordCount >= 0");
+                        var words = new Dictionary<string, string>();
+                        for (var counter = 0; counter < wordCount; ++counter)
+                        {
+                            var key = reader.ReadString();
+                            var value = reader.ReadString();
+                            words.Add(key, value);
+                        }
+                        var localeEnd = reader.ReadByte();
+                        Assert.IsTrue(localeEnd == LocaleEnd, "localeEnd == LocaleEnd");
+                        if (i == 0)
+                        {
+                            altDictionary = words;
+                        }
+                        var language = new Language(lang, locale, words, altDictionary);
+                        languages.Add(language);
+                    }
+                }
+            }
+            stopwatch.Stop();
+            Debug.Log($"Load Languages bin {binAsset.name} bytes len {bytes.Length} in {stopwatch.ElapsedMilliseconds} ms");
+            foreach (var language in languages.GetLanguages)
+            {
+                DumpLanguage(language);
+            }
+            return languages;
+        }
+
+        private static string GetAssetPath(TextAsset binAsset)
+        {
+            var assetFilter = $"{binAsset.name} t:TextAsset";
+            var foundAssets = AssetDatabase.FindAssets(assetFilter, new[] { AssetRoot });
+            Assert.IsTrue(foundAssets.Length == 1, "foundAssets.Length == 1");
+            var path = AssetDatabase.GUIDToAssetPath(foundAssets[0]);
+            return path;
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private static void DumpLanguage(Language language)
+        {
+            Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count}");
         }
     }
 }
