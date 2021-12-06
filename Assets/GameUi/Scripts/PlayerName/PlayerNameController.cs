@@ -11,7 +11,7 @@ namespace GameUi.Scripts.PlayerName
 
         private void Awake()
         {
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
             _view.PlayerName = playerData.PlayerName;
 
@@ -60,7 +60,7 @@ namespace GameUi.Scripts.PlayerName
 
         private void ContinueButton()
         {
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (_view.PlayerName != playerData.PlayerName)
             {
                 playerData.BatchSave(() => { playerData.PlayerName = _view.PlayerName; });

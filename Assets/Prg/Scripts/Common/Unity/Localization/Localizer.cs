@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -250,7 +249,15 @@ namespace Prg.Scripts.Common.Unity.Localization
         internal static void Save(Languages languages, TextAsset binAsset)
         {
 #if UNITY_EDITOR
-            var path = GetAssetPath(binAsset);
+            string GetAssetPath(string name)
+            {
+                var assetFilter = $"{name} t:TextAsset";
+                var foundAssets = AssetDatabase.FindAssets(assetFilter, new[] { AssetRoot });
+                Assert.IsTrue(foundAssets.Length == 1, "foundAssets.Length == 1");
+                return AssetDatabase.GUIDToAssetPath(foundAssets[0]);
+            }
+
+            var path = GetAssetPath(binAsset.name);
             Debug.Log($"Save Languages bin {binAsset.name} path {path}");
             int byteCount;
             var stopwatch = new Stopwatch();
@@ -344,15 +351,6 @@ namespace Prg.Scripts.Common.Unity.Localization
                 DumpLanguage(language);
             }
             return languages;
-        }
-
-        private static string GetAssetPath(TextAsset binAsset)
-        {
-            var assetFilter = $"{binAsset.name} t:TextAsset";
-            var foundAssets = AssetDatabase.FindAssets(assetFilter, new[] { AssetRoot });
-            Assert.IsTrue(foundAssets.Length == 1, "foundAssets.Length == 1");
-            var path = AssetDatabase.GUIDToAssetPath(foundAssets[0]);
-            return path;
         }
 
         [Conditional("UNITY_EDITOR")]

@@ -11,7 +11,7 @@ namespace GameUi.Scripts.MainMenu
         private void Awake()
         {
             Assert.IsNotNull(_view, "_view != null");
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
         }
     }

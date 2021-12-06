@@ -15,7 +15,7 @@ namespace GameUi.Scripts.LanguageSelection
 
         private void Awake()
         {
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"Awake {playerData}");
             if (playerData.HasLanguageCode)
             {
@@ -65,7 +65,7 @@ namespace GameUi.Scripts.LanguageSelection
         {
             SelectLanguage(language);
 
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"SetLanguage {playerData.Language} <- {language}");
             playerData.BatchSave(() => { playerData.Language = language; });
             Localizer.SetLanguage(language);
