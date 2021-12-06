@@ -107,6 +107,21 @@ namespace Prg.Scripts.Common.Unity.Localization
             var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
             BinAsset.Save(languages, config.LanguagesBinFile);
         }
+
+        [Conditional("UNITY_EDITOR")]
+        public static void ShowTranslations()
+        {
+            if (_languages == null)
+            {
+                Debug.Log("No languages loaded");
+                return;
+            }
+            Debug.Log($"Current language is {(_curLanguage != null ? _curLanguage.LanguageName.ToString() : "NOT SELECTED")}");
+            foreach (var language in _languages.GetLanguages)
+            {
+                Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count}");
+            }
+        }
     }
 
     /// <summary>
@@ -288,9 +303,9 @@ namespace Prg.Scripts.Common.Unity.Localization
                 var bytes = stream.ToArray();
                 byteCount = bytes.Length;
                 File.WriteAllBytes(path, bytes);
-                AssetDatabase.SaveAssets();
             }
             stopwatch.Stop();
+            AssetDatabase.Refresh();
             Debug.Log($"Save Languages bin {binAsset.name} bytes len {byteCount} in {stopwatch.ElapsedMilliseconds} ms");
             foreach (var language in languageList)
             {
