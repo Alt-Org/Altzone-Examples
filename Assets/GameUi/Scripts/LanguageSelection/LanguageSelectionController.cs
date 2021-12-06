@@ -22,7 +22,7 @@ namespace GameUi.Scripts.LanguageSelection
                 StartCoroutine(LoadNextWindow(playerData.Language));
                 return;
             }
-            _view.ContinueButton.interactable = false;
+            WindowManager.Get().RegisterGoBackHandlerOnce(AbortForEver);
             foreach (var button in _buttons)
             {
                 button.SetLanguageCallback += SetLanguage;
@@ -34,11 +34,23 @@ namespace GameUi.Scripts.LanguageSelection
             SelectLanguage(language);
         }
 
+        private static WindowManager.GoBackAction AbortForEver()
+        {
+            WindowManager.Get().RegisterGoBackHandlerOnce(AbortForEver);
+            return WindowManager.GoBackAction.Abort;
+        }
+
         private void SelectLanguage(SystemLanguage language)
         {
+            _view.ContinueButton.interactable = false;
             foreach (var button in _buttons)
             {
-                button.SetSelected(language == button.Language);
+                var isSelected = language == button.Language;
+                button.SetSelected(isSelected);
+                if (isSelected)
+                {
+                    _view.ContinueButton.interactable = true;
+                }
             }
         }
 
@@ -52,7 +64,6 @@ namespace GameUi.Scripts.LanguageSelection
         private void SetLanguage(SystemLanguage language)
         {
             SelectLanguage(language);
-            _view.ContinueButton.interactable = true;
 
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
             Debug.Log($"SetLanguage {playerData.Language} <- {language}");

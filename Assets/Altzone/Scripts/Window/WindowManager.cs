@@ -124,8 +124,10 @@ namespace Altzone.Scripts.Window
             Debug.Log($"GoBack count {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
             if (_goBackOnceHandler != null)
             {
-                var goBackResult = InvokeCallbacks(_goBackOnceHandler);
+                // Callbacks can register again!
+                var tempHandler = _goBackOnceHandler;
                 _goBackOnceHandler = null;
+                var goBackResult = InvokeCallbacks(tempHandler);
                 if (goBackResult == GoBackAction.Abort)
                 {
                     Debug.Log($"GoBack interrupted by handler");
