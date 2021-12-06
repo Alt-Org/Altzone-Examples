@@ -48,6 +48,11 @@ namespace Prg.Scripts.Common.Unity.Localization
             _languages.Add(language);
         }
 
+        internal bool HasLanguage(SystemLanguage language)
+        {
+            return _languages.FindIndex(x => x.LanguageName == language) != -1;
+        }
+
         internal Language GetLanguage(SystemLanguage language)
         {
             var index = _languages.FindIndex(x => x.LanguageName == language);
@@ -71,9 +76,14 @@ namespace Prg.Scripts.Common.Unity.Localization
         private static Languages _languages;
         private static Language _curLanguage;
 
-        private const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
+        public const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
 
         public static string Localize(string key) => _curLanguage.Word(key);
+
+        public static bool HasLanguage(SystemLanguage language)
+        {
+            return _languages.HasLanguage(language);
+        }
 
         public static void SetLanguage(SystemLanguage language)
         {

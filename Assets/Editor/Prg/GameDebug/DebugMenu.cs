@@ -24,6 +24,7 @@ namespace Editor.Prg.GameDebug
             playerData.BatchSave(() =>
             {
                 playerData.PlayerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
+                playerData.Language = Application.systemLanguage;
                 playerData.CharacterModelId = Random.Range((int)Defence.Desensitisation, (int)Defence.Confluence + 1);
             });
             Debug.Log(playerData.ToString());
@@ -38,6 +39,7 @@ namespace Editor.Prg.GameDebug
             {
                 // Actually can not delete!
                 playerData.PlayerName = string.Empty;
+                playerData.Language = SystemLanguage.Unknown;
                 playerData.CharacterModelId = -1;
             });
             Debug.Log(playerData.ToString());

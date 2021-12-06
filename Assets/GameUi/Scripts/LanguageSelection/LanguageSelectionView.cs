@@ -5,12 +5,8 @@ namespace GameUi.Scripts.LanguageSelection
 {
     public class LanguageSelectionView : MonoBehaviour
     {
-        [SerializeField] private Button _langButtonFi;
-        [SerializeField] private Button _langButtonSe;
-        [SerializeField] private Button _langButtonEn;
+        [SerializeField] private Button _continueButton;
 
-        public Button LangButtonFi => _langButtonFi;
-        public Button LangButtonSe => _langButtonSe;
-        public Button LangButtonEn => _langButtonEn;
+        public Button ContinueButton => _continueButton;
     }
 }

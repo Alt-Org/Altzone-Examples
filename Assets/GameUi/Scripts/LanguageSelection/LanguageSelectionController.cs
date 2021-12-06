@@ -11,21 +11,35 @@ namespace GameUi.Scripts.LanguageSelection
     {
         [SerializeField] private LanguageSelectionView _view;
         [SerializeField] private WindowDef _nextWindow;
+        [SerializeField] private LanguageButtonController[] _buttons;
 
         private void Awake()
         {
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            Debug.Log($"UNITY systemLanguage is {Application.systemLanguage}");
-            Debug.Log(playerData.ToString());
+            Debug.Log($"Awake {playerData}");
             if (playerData.HasLanguageCode)
             {
                 StartCoroutine(LoadNextWindow(playerData.Language));
                 return;
             }
-            Localizer.SetLanguage(Application.systemLanguage);
-            _view.LangButtonFi.onClick.AddListener(() => SetLanguage(SystemLanguage.Finnish));
-            _view.LangButtonSe.onClick.AddListener(() => SetLanguage(SystemLanguage.Swedish));
-            _view.LangButtonEn.onClick.AddListener(() => SetLanguage(SystemLanguage.English));
+            _view.ContinueButton.interactable = false;
+            foreach (var button in _buttons)
+            {
+                button.SetLanguageCallback += SetLanguage;
+            }
+            var language = Localizer.HasLanguage(Application.systemLanguage)
+                ? Application.systemLanguage
+                : Localizer.DefaultLanguage;
+            Debug.Log($"language {language}");
+            SelectLanguage(language);
+        }
+
+        private void SelectLanguage(SystemLanguage language)
+        {
+            foreach (var button in _buttons)
+            {
+                button.SetSelected(language == button.Language);
+            }
         }
 
         private IEnumerator LoadNextWindow(SystemLanguage language)
@@ -35,15 +49,14 @@ namespace GameUi.Scripts.LanguageSelection
             WindowManager.Get().ShowWindow(_nextWindow);
         }
 
-        private static void SetLanguage(SystemLanguage language)
+        private void SetLanguage(SystemLanguage language)
         {
+            SelectLanguage(language);
+            _view.ContinueButton.interactable = true;
+
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
             Debug.Log($"SetLanguage {playerData.Language} <- {language}");
-            playerData.BatchSave(() =>
-            {
-                playerData.Language = language;
-            });
-            Debug.Log(playerData.ToString());
+            playerData.BatchSave(() => { playerData.Language = language; });
             Localizer.SetLanguage(language);
         }
     }
