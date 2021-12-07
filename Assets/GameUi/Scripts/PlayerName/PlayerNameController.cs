@@ -1,6 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Altzone.Scripts.Config;
+using Altzone.Scripts.Window;
 using UnityEngine;
 
 namespace GameUi.Scripts.PlayerName
@@ -8,6 +8,7 @@ namespace GameUi.Scripts.PlayerName
     public class PlayerNameController : MonoBehaviour
     {
         [SerializeField] private PlayerNameView _view;
+        [SerializeField] private bool _isFirstTimeLoader;
 
         private void Awake()
         {
@@ -20,6 +21,10 @@ namespace GameUi.Scripts.PlayerName
             _view.PlayerNameInput.onEndEdit.AddListener(OnEndEdit);
             OnValueChanged(_view.PlayerName);
             _view.ContinueButton.onClick.AddListener(ContinueButton);
+            if (_isFirstTimeLoader)
+            {
+                _view.BackButton.gameObject.SetActive(false);
+            }
         }
 
         private static char OnValidateInput(string input, int charIndex, char addedChar)
@@ -65,6 +70,10 @@ namespace GameUi.Scripts.PlayerName
             {
                 playerData.BatchSave(() => { playerData.PlayerName = _view.PlayerName; });
                 Debug.Log(playerData.ToString());
+            }
+            if (_isFirstTimeLoader)
+            {
+                WindowManager.Get().Unwind(null);
             }
         }
     }

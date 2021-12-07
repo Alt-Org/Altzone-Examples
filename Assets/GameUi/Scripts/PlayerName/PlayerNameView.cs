@@ -6,6 +6,7 @@ namespace GameUi.Scripts.PlayerName
     public class PlayerNameView : MonoBehaviour
     {
         [SerializeField] private InputField _playerName;
+        [SerializeField] private Button _backButton;
         [SerializeField] private Button _continueButton;
 
         public string PlayerName
@@ -15,6 +16,7 @@ namespace GameUi.Scripts.PlayerName
         }
 
         public InputField PlayerNameInput => _playerName;
+        public Button BackButton => _backButton;
         public Button ContinueButton => _continueButton;
     }
 }

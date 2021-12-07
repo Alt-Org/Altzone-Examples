@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-20-user-settings
+  m_Name: window-24-player-name
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 1639751647383498152, guid: b3835343912d58b49b6e965b9f0aa5da,
+  _windowPrefab: {fileID: 1639751647383498152, guid: ee9c39fcd340494438e732d3cde7d673,
     type: 3}
   _isPopOutWindow: 0
   _scene: {fileID: 0}

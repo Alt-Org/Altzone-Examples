@@ -5,21 +5,11 @@ namespace GameUi.Scripts.UserSettings
 {
     public class UserSettingsView : MonoBehaviour
     {
-        [SerializeField] private Text _shieldName;
-        [SerializeField] private InputField _playerNameInput;
-        [SerializeField] private Button _saveButton;
+        [SerializeField] private Text _playerInfo;
 
-        public string ShieldName
+        public string PlayerInfo
         {
-            set => _shieldName.text = value;
+            set => _playerInfo.text = value;
         }
-
-        public string PlayerName
-        {
-            set => _playerNameInput.text = value;
-            get => _playerNameInput.text;
-        }
-
-        public Button SaveButton => _saveButton;
     }
 }

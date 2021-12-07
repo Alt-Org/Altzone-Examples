@@ -10,30 +10,8 @@ namespace GameUi.Scripts.UserSettings
 
         private void Awake()
         {
-            _view.SaveButton.onClick.AddListener(CheckButton);
-            WindowManager.Get().RegisterGoBackHandlerOnce(CheckIfSaveSettings);
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            _view.ShieldName = playerData.CharacterModel.Name;
-            _view.PlayerName = playerData.PlayerName;
-        }
-
-        private void CheckButton()
-        {
-            Debug.Log("CheckButton");
-            CheckIfSaveSettings();
-        }
-
-        private WindowManager.GoBackAction CheckIfSaveSettings()
-        {
-            Debug.Log("CheckIfSaveSettings");
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            var playerName = _view.PlayerName;
-            if (playerData.PlayerName != playerName)
-            {
-                Debug.Log($"PlayerName changed '{playerData.PlayerName}' <- '{playerName}'");
-                playerData.PlayerName = playerName;
-            }
-            return WindowManager.GoBackAction.Continue;
+            _view.PlayerInfo = $"{playerData.PlayerName} - {playerData.CharacterModel.Name}";
         }
     }
 }
