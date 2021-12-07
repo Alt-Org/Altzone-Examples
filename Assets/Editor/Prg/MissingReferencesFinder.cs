@@ -40,6 +40,7 @@ namespace Editor.Prg
             Debug.Log("*");
             foreach (var scene in EditorBuildSettings.scenes.Where(s => s.enabled))
             {
+                Debug.Log($"OpenScene {scene.path}");
                 EditorSceneManager.OpenScene(scene.path);
                 FindMissingReferencesInCurrentScene();
             }
@@ -73,8 +74,7 @@ namespace Editor.Prg
                     // Missing components will be null, we can't find their type, etc.
                     if (!component)
                     {
-                        UnityEngine.Debug.LogErrorFormat(go,
-                            "Missing Component {0} in GameObject: {1}", component.GetType().FullName, GetFullPath(go));
+                        UnityEngine.Debug.LogErrorFormat(go, "Missing Component ? in GameObject: {0}", GetFullPath(go));
                         continue;
                     }
                     var so = new SerializedObject(component);
