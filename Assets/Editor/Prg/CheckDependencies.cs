@@ -48,7 +48,7 @@ namespace Editor.Prg
                 Debug.Log($"Selected object is not supported asset: {path}");
                 return;
             }
-            Debug.Log($"Search dependencies for {selectedGuids.Length} assets (in scenes, prefabs, ScriptableObjects)");
+            Debug.Log($"Search dependencies for {selectedGuids.Length} assets in {string.Join(", ", validExtensions)}");
             const string assetRoot = "Assets";
             var foundCount = new int[selectedGuids.Length];
             Array.Clear(foundCount, 0, foundCount.Length);
