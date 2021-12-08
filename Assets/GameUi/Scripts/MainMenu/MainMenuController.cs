@@ -11,7 +11,6 @@ namespace GameUi.Scripts.MainMenu
     {
         [SerializeField] private MainMenuView _view;
 
-        private readonly DemoServiceAsync _service = new DemoServiceAsync();
         private int _responseCounter;
 
         private void Awake()
@@ -33,7 +32,7 @@ namespace GameUi.Scripts.MainMenu
         {
             _view.TestButtonA.interactable = true;
             Debug.Log("TestButtonA click start");
-            var task = _service.GetVersionInfo();
+            var task = DemoServiceAsync.GetTimeInfo();
             StartCoroutine(WaitForResponse(task));
             Debug.Log("TestButtonA click end");
             _view.TestButtonA.interactable = true;
@@ -51,7 +50,7 @@ namespace GameUi.Scripts.MainMenu
         {
             _view.TestButtonB.interactable = false;
             Debug.Log("TestButtonB click start");
-            var response = await _service.GetVersionInfo();
+            var response = await DemoServiceAsync.GetVersionInfo();
             Debug.Log($"TestButtonB click end response {response}");
             SetResponse(response);
             _view.TestButtonB.interactable = true;
