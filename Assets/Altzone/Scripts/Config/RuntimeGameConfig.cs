@@ -15,26 +15,41 @@ namespace Altzone.Scripts.Config
         /// <summary>
         /// Rotate game camera for upper team so they see their own game area in lower part of the screen.
         /// </summary>
-        public bool isRotateGameCamera;
+        public bool _isRotateGameCamera;
 
         /// <summary>
         /// Is local player team color always "blue" team color.
         /// </summary>
-        public bool isLocalPLayerOnTeamBlue;
+        public bool _isLocalPLayerOnTeamBlue;
 
         /// <summary>
         /// Spawn mini ball aka diamonds.
         /// </summary>
-        public bool isSPawnMiniBall;
+        public bool _isSPawnMiniBall;
 
         /// <summary>
         /// Is shield always on when team has only one player (for testing).
         /// </summary>
-        public bool isSinglePlayerShieldOn;
+        public bool _isSinglePlayerShieldOn;
 
         public void CopyFrom(GameFeatures other)
         {
             PropertyCopier<GameFeatures, GameFeatures>.CopyFields(other, this);
+        }
+    }
+
+    /// <summary>
+    /// Game constraints that that control workings of the game.
+    /// </summary>
+    [Serializable]
+    public class GameConstraints
+    {
+        [Header("UI"), Min(2)] public int _minPlayerNameLength = 2;
+        [Min(3)] public int _maxPlayerNameLength = 16;
+
+        public void CopyFrom(GameConstraints other)
+        {
+            PropertyCopier<GameConstraints, GameConstraints>.CopyFields(other, this);
         }
     }
 
@@ -44,20 +59,20 @@ namespace Altzone.Scripts.Config
     [Serializable]
     public class GameVariables
     {
-        [Header("Battle"), Min(1)] public int roomStartDelay;
+        [Header("Battle"), Min(1)] public int _roomStartDelay;
 
-        [Header("Ball")] public float ballMoveSpeedMultiplier;
-        public float ballLerpSmoothingFactor;
-        public float ballTeleportDistance;
-        public float minSlingShotDistance;
-        public float maxSlingShotDistance;
-        [Min(1)] public int ballRestartDelay;
+        [Header("Ball")] public float _ballMoveSpeedMultiplier;
+        public float _ballLerpSmoothingFactor;
+        public float _ballTeleportDistance;
+        public float _minSlingShotDistance;
+        public float _maxSlingShotDistance;
+        [Min(1)] public int _ballRestartDelay;
 
-        [Header("Player")] public float playerMoveSpeedMultiplier;
-        public float playerSqrMinRotationDistance;
-        public float playerSqrMaxRotationDistance;
+        [Header("Player")] public float _playerMoveSpeedMultiplier;
+        public float _playerSqrMinRotationDistance;
+        public float _playerSqrMaxRotationDistance;
 
-        [Header("Shield")] public float shieldDistanceMultiplier;
+        [Header("Shield")] public float _shieldDistanceMultiplier;
 
         public void CopyFrom(GameVariables other)
         {
@@ -71,13 +86,13 @@ namespace Altzone.Scripts.Config
     [Serializable]
     public class GamePrefabs
     {
-        [Header("Battle")] public GameObject playerForDes;
-        public GameObject playerForDef;
-        public GameObject playerForInt;
-        public GameObject playerForPro;
-        public GameObject playerForRet;
-        public GameObject playerForEgo;
-        public GameObject playerForCon;
+        [Header("Battle")] public GameObject _playerForDes;
+        public GameObject _playerForDef;
+        public GameObject _playerForInt;
+        public GameObject _playerForPro;
+        public GameObject _playerForRet;
+        public GameObject _playerForEgo;
+        public GameObject _playerForCon;
 
         public void CopyFrom(GamePrefabs other)
         {
@@ -256,6 +271,7 @@ namespace Altzone.Scripts.Config
 #endif
 
         [SerializeField] private GameFeatures _permanentFeatures;
+        [SerializeField] private GameConstraints _permanentConstraints;
         [SerializeField] private GameVariables _permanentVariables;
         [SerializeField] private GamePrefabs _permanentPrefabs;
         [SerializeField] private PlayerDataCache _playerDataCache;
@@ -264,6 +280,12 @@ namespace Altzone.Scripts.Config
         {
             get => _permanentFeatures;
             set => _permanentFeatures.CopyFrom(value);
+        }
+
+        public GameConstraints GameConstraints
+        {
+            get => _permanentConstraints;
+            set => _permanentConstraints.CopyFrom(value);
         }
 
         public GameVariables Variables
@@ -286,11 +308,13 @@ namespace Altzone.Scripts.Config
             Storefront.Create();
             // Create default values
             instance._permanentFeatures = new GameFeatures();
+            instance._permanentConstraints = new GameConstraints();
             instance._permanentVariables = new GameVariables();
             instance._permanentPrefabs = new GamePrefabs();
             // Set persistent values
             var gameSettings = Resources.Load<PersistentGameSettings>(nameof(PersistentGameSettings));
             instance.Features = gameSettings._features;
+            instance._permanentConstraints = gameSettings._constraints;
             instance.Variables = gameSettings._variables;
             instance.Prefabs = gameSettings._prefabs;
             instance._playerDataCache = LoadPlayerDataCache();

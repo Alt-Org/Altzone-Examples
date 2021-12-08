@@ -10,11 +10,16 @@ namespace GameUi.Scripts.PlayerName
         [SerializeField] private PlayerNameView _view;
         [SerializeField] private bool _isFirstTimeLoader;
 
+        private int minPlayerNameLength;
         private void Awake()
         {
-            _view.PlayerNameInput.onValueChanged.AddListener(OnValueChanged);
-            _view.PlayerNameInput.onValidateInput += OnValidateInput;
-            _view.PlayerNameInput.onEndEdit.AddListener(OnEndEdit);
+            var gameConstraints = RuntimeGameConfig.Get().GameConstraints;
+            minPlayerNameLength = gameConstraints._minPlayerNameLength;
+            var playerNameInput = _view.PlayerNameInput;
+            playerNameInput.characterLimit = gameConstraints._maxPlayerNameLength;
+            playerNameInput.onValueChanged.AddListener(OnValueChanged);
+            playerNameInput.onValidateInput += OnValidateInput;
+            playerNameInput.onEndEdit.AddListener(OnEndEdit);
             OnValueChanged(_view.PlayerName);
             _view.ContinueButton.onClick.AddListener(ContinueButton);
         }
@@ -54,7 +59,7 @@ namespace GameUi.Scripts.PlayerName
         private void OnValueChanged(string newValue)
         {
             Debug.Log($"OnValueChanged '{newValue}' len {newValue.Length}");
-            _view.ContinueButton.interactable = !string.IsNullOrWhiteSpace(newValue);
+            _view.ContinueButton.interactable = !string.IsNullOrWhiteSpace(newValue) && newValue.Length >= minPlayerNameLength;
         }
 
         private void OnEndEdit(string curValue)
@@ -63,6 +68,19 @@ namespace GameUi.Scripts.PlayerName
             {
                 curValue = curValue.Substring(0, curValue.Length - 1);
                 _view.PlayerName = curValue;
+                return;
+            }
+            if (curValue.Contains("-"))
+            {
+                var tokens = curValue.Split('-');
+                if (tokens.Length == 2)
+                {
+                    if (tokens[0].Length < minPlayerNameLength || tokens[1].Length < minPlayerNameLength)
+                    {
+                        curValue = curValue.Replace("-", string.Empty);
+                        _view.PlayerName = curValue;
+                    }
+                }
             }
         }
 
