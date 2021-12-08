@@ -857,7 +857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _windowMainMenu: {fileID: 11400000, guid: 084050a49b8307048bf91949d0f3c57e, type: 2}
   _windowFirstTime: {fileID: 11400000, guid: 6dbab5b3fd39e204990d6584feea2ceb, type: 2}
-  _demoLoadDelay: 2
+  _demoLoadDelay: 1
 --- !u!1 &8580154883602906954
 GameObject:
   m_ObjectHideFlags: 0

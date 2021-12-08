@@ -35,13 +35,7 @@ namespace Editor.Prg.GameDebug
         {
             Debug.Log("*");
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            playerData.BatchSave(() =>
-            {
-                // Actually can not delete!
-                playerData.PlayerName = string.Empty;
-                playerData.Language = SystemLanguage.Unknown;
-                playerData.CharacterModelId = -1;
-            });
+            playerData.DebugResetPlayer();
             Debug.Log(playerData.ToString());
         }
 

@@ -548,8 +548,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 681520170033782722}
   - {fileID: 3996674359591718168}
+  - {fileID: 681520170033782722}
   m_Father: {fileID: 8993969083299009757}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -607,7 +607,7 @@ GameObject:
   - component: {fileID: 681520170033782726}
   - component: {fileID: 681520170033782727}
   - component: {fileID: 681520170033782724}
-  - component: {fileID: 6638268663534339713}
+  - component: {fileID: 1734428515414294628}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -628,7 +628,7 @@ RectTransform:
   m_Children:
   - {fileID: 681520169437801057}
   m_Father: {fileID: 681520169464170949}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -715,7 +715,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6638268663534339713
+--- !u!114 &1734428515414294628
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -724,9 +724,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 681520170033782723}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33659b0b1c0242c3b28bc17acb0079e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 337dca1768bd6a44a9fe3bfb30afa666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _naviTarget: {fileID: 11400000, guid: 69e9f27591e39564c99ebf02e61cb974, type: 2}
+  _isCurrentPopOutWindow: 0
 --- !u!1 &1639751647383498152
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,7 +905,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 681520169464170949}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
