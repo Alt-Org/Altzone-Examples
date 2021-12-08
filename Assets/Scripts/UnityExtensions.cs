@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Text;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -41,7 +43,18 @@ public static class UnityExtensions
     public static void SetCaption(this Button button, string caption)
     {
         var text = button.GetComponentInChildren<Text>();
-        text.text = caption;
+        if (text != null)
+        {
+            text.text = caption;
+            return;
+        }
+        var tmpText = button.GetComponentInChildren<TMP_Text>();
+        if (tmpText != null)
+        {
+            tmpText.text = caption;
+            return;
+        }
+        Assert.IsTrue(false, "button does not have a text component");
     }
 
     #endregion
