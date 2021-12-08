@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Altzone.Scripts.Config;
@@ -26,6 +27,11 @@ namespace GameUi.Scripts.MainMenu
             Debug.Log(playerData.ToString());
             _view.PlayerInfo = $"{playerData.PlayerName} : {playerData.CharacterModel.Name}";
             _view.TestText = string.Empty;
+        }
+
+        private void OnDisable()
+        {
+            StopAllCoroutines();
         }
 
         private void TestButtonA()
