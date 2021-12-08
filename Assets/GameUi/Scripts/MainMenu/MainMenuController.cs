@@ -1,4 +1,5 @@
 using Altzone.Scripts.Config;
+using GameUi.Scripts.ServiceTest;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -20,9 +21,14 @@ namespace GameUi.Scripts.MainMenu
             Debug.Log(playerData.ToString());
         }
 
-        private static void TestButton()
+        private static async void TestButton()
         {
+            // This is blocking call!
             Debug.Log("TestButton");
+            const string serviceUrl = "https://jsonplaceholder.typicode.com/";
+            var service = new DemoServiceAsync(serviceUrl);
+            var response = await service.GetVersionInfo("todos/1") ?? string.Empty;
+            Debug.Log($"response {response.Replace("\r", "").Replace("\n", "")}");
         }
     }
 }
