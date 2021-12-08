@@ -1,9 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameUi.Scripts.MainMenu
 {
     public class MainMenuView : MonoBehaviour
     {
-        // Just placeholder for now.
+        [SerializeField] private Button _testButton;
+
+        public Button TestButton => _testButton;
     }
 }
