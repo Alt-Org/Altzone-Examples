@@ -5,8 +5,10 @@ namespace GameUi.Scripts.MainMenu
 {
     public class MainMenuView : MonoBehaviour
     {
-        [SerializeField] private Button _testButton;
+        [SerializeField] private Button _testButtonA;
+        [SerializeField] private Button _testButtonB;
 
-        public Button TestButton => _testButton;
+        public Button TestButtonA => _testButtonA;
+        public Button TestButtonB => _testButtonB;
     }
 }

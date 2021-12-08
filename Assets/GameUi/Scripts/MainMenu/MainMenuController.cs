@@ -11,7 +11,8 @@ namespace GameUi.Scripts.MainMenu
 
         private void Awake()
         {
-            _view.TestButton.onClick.AddListener(TestButton);
+            _view.TestButtonA.onClick.AddListener(TestButtonA);
+            _view.TestButtonB.onClick.AddListener(TestButtonB);
         }
 
         private void OnEnable()
@@ -21,14 +22,23 @@ namespace GameUi.Scripts.MainMenu
             Debug.Log(playerData.ToString());
         }
 
-        private static async void TestButton()
+        private void TestButtonA()
         {
-            // This is blocking call!
-            Debug.Log("TestButton");
+            _view.TestButtonA.interactable = true;
+            Debug.Log("TestButtonA click");
+            _view.TestButtonA.interactable = true;
+        }
+
+        private async void TestButtonB()
+        {
+            // This is a blocking call - UNITY main thread is blocked by this call!
+            _view.TestButtonB.interactable = false;
+            Debug.Log("TestButtonB click");
             const string serviceUrl = "https://jsonplaceholder.typicode.com/";
             var service = new DemoServiceAsync(serviceUrl);
             var response = await service.GetVersionInfo("todos/1") ?? string.Empty;
-            Debug.Log($"response {response.Replace("\r", "").Replace("\n", "")}");
+            Debug.Log($"TestButtonB response {response.Replace("\r", "").Replace("\n", "")}");
+            _view.TestButtonB.interactable = true;
         }
     }
 }
