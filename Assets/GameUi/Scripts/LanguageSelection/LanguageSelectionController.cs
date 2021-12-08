@@ -13,15 +13,28 @@ namespace GameUi.Scripts.LanguageSelection
         [SerializeField] private WindowDef _nextWindow;
         [SerializeField] private LanguageButtonController[] _buttons;
 
+        private bool _isSkippingFirstTime;
+
         private void Awake()
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"Awake {playerData}");
             if (playerData.HasLanguageCode)
             {
+                _isSkippingFirstTime = true;
                 StartCoroutine(LoadNextWindow(playerData.Language));
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (_isSkippingFirstTime)
+            {
+                _isSkippingFirstTime = false;
                 return;
             }
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Debug.Log($"OnEnable {playerData}");
             WindowManager.Get().RegisterGoBackHandlerOnce(AbortForEver);
             foreach (var button in _buttons)
             {

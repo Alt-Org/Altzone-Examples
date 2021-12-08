@@ -15,20 +15,24 @@ namespace GameUi.Scripts.FirstTime
 
         private void Awake()
         {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(_companyUrl.URL), "string.IsNullOrWhiteSpace(_companyUrl.URL)");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(_companyUrl.Text), "string.IsNullOrWhiteSpace(_companyUrl.Text)");
+            var linkText = $"{_companyUrl.Text}";
+            _view.SetCompanyUrlText(linkText);
+            _view.AcceptToS.onValueChanged.AddListener(AcceptToS);
+            _view.LinkButton.onClick.AddListener(LinkButton);
+            _view.ContinueButton.onClick.AddListener(ContinueButton);
+        }
+
+        private void OnEnable()
+        {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (playerData.IsTosAccepted)
             {
                 StartCoroutine(LoadNextWindow(playerData.Language));
                 return;
             }
-            Assert.IsFalse(string.IsNullOrWhiteSpace(_companyUrl.URL), "string.IsNullOrWhiteSpace(_companyUrl.URL)");
-            Assert.IsFalse(string.IsNullOrWhiteSpace(_companyUrl.Text), "string.IsNullOrWhiteSpace(_companyUrl.Text)");
             _view.SetCanContinue(false);
-            var linkText = $"{_companyUrl.Text}";
-            _view.SetCompanyUrlText(linkText);
-            _view.AcceptToS.onValueChanged.AddListener(AcceptToS);
-            _view.LinkButton.onClick.AddListener(LinkButton);
-            _view.ContinueButton.onClick.AddListener(ContinueButton);
         }
 
         private void AcceptToS(bool state)

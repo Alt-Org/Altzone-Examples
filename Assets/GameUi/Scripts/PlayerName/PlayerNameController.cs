@@ -12,15 +12,18 @@ namespace GameUi.Scripts.PlayerName
 
         private void Awake()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log(playerData.ToString());
-            _view.PlayerName = playerData.PlayerName;
-
             _view.PlayerNameInput.onValueChanged.AddListener(OnValueChanged);
             _view.PlayerNameInput.onValidateInput += OnValidateInput;
             _view.PlayerNameInput.onEndEdit.AddListener(OnEndEdit);
             OnValueChanged(_view.PlayerName);
             _view.ContinueButton.onClick.AddListener(ContinueButton);
+        }
+
+        private void OnEnable()
+        {
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Debug.Log(playerData.ToString());
+            _view.PlayerName = playerData.PlayerName;
             if (_isFirstTimeLoader)
             {
                 _view.BackButton.gameObject.SetActive(false);

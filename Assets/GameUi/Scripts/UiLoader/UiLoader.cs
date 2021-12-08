@@ -12,23 +12,46 @@ namespace GameUi.Scripts.UiLoader
         [SerializeField] private WindowDef _windowFirstTime;
         [SerializeField] private float _demoLoadDelay;
 
-        private IEnumerator Start()
+        private bool _isServicesLoaded;
+
+        private void OnEnable()
         {
+            // Simulate that we load some services before can continue to the game main menu (or first time process).
+            Debug.Log($"OnEnable _isServicesLoaded {_isServicesLoaded}");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (playerData.IsValid)
             {
-                StartCoroutine(LoadNextWindow());
-                yield break;
+                if (!_isServicesLoaded)
+                {
+                    _isServicesLoaded = true;
+                    StartCoroutine(SpinAndWait(_demoLoadDelay, _windowMainMenu));
+                }
+                else
+                {
+                    StartCoroutine(LoadNextWindow(_windowMainMenu));
+                }
+                return;
             }
-            var wait = new WaitForSeconds(_demoLoadDelay);
-            yield return wait;
-            WindowManager.Get().ShowWindow(_windowFirstTime);
+            if (!_isServicesLoaded)
+            {
+                _isServicesLoaded = true;
+                StartCoroutine(SpinAndWait(_demoLoadDelay, _windowFirstTime));
+                return;
+            }
+            StartCoroutine(LoadNextWindow(_windowFirstTime));
         }
 
-        private IEnumerator LoadNextWindow()
+        private static IEnumerator SpinAndWait(float delay, WindowDef windowDef)
+        {
+            var wait = new WaitForSeconds(delay);
+            yield return wait;
+            WindowManager.Get().ShowWindow(windowDef);
+        }
+
+        private static IEnumerator LoadNextWindow(WindowDef windowDef)
         {
             yield return null;
-            WindowManager.Get().ShowWindow(_windowMainMenu);
+            WindowManager.Get().ShowWindow(windowDef);
         }
     }
 }

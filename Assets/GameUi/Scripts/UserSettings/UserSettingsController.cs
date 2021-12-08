@@ -8,7 +8,7 @@ namespace GameUi.Scripts.UserSettings
     {
         [SerializeField] private UserSettingsView _view;
 
-        private void Awake()
+        private void OnEnable()
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             _view.PlayerInfo = $"{playerData.PlayerName} - {playerData.CharacterModel.Name}";

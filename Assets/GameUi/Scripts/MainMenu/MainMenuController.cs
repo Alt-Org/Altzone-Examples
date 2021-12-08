@@ -8,7 +8,7 @@ namespace GameUi.Scripts.MainMenu
     {
         [SerializeField] private MainMenuView _view;
 
-        private void Awake()
+        private void OnEnable()
         {
             Assert.IsNotNull(_view, "_view != null");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
