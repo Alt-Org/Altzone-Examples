@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
-  m_Name: window-01-language-selection
+  m_Script: {fileID: 11500000, guid: d56ce020323e6db4292950b06cd8e978, type: 3}
+  m_Name: link-altzone-web
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 1639751647383498152, guid: 8c3be7f5b78fef14d9df96a2393898e7,
-    type: 3}
-  _isPopOutWindow: 1
-  _scene: {fileID: 0}
+  _theUrlToUse: https://gamingpsyche.eu/
+  _theTextToShow: Psyche's Royale Gaming

@@ -189,9 +189,9 @@ namespace Altzone.Scripts.Config
         }
 
         /// <summary>
-        /// Player is considered to be valid when it has non-empty name and valid character model id and language code.
+        /// Player is considered to be valid when it has non-empty name, valid language code and ToS accepted.
         /// </summary>
-        public bool IsValid => !string.IsNullOrEmpty(_playerName) && _characterModelId != -1 && HasLanguageCode;
+        public bool IsValid => !string.IsNullOrEmpty(PlayerName) && HasLanguageCode && IsTosAccepted;
 
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
