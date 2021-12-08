@@ -39,17 +39,12 @@ namespace GameUi.Scripts.MainMenu
             _view.TestButtonA.interactable = true;
         }
 
-        private IEnumerator WaitForResponse(Task<string> task)
+        private IEnumerator WaitForResponse(Task<DemoServiceAsync.Response> task)
         {
             yield return new WaitUntil(() => task.IsCompleted);
             var response = task.Result;
             Debug.Log($"TestButtonA click response {response}");
-            _responseCounter += 1;
-            if (response.Length > 20)
-            {
-                response = response.Substring(0, 20);
-            }
-            _view.TestText = $"{_responseCounter}: {response}";
+            SetResponse(response);
         }
 
         private async void TestButtonB()
@@ -58,13 +53,15 @@ namespace GameUi.Scripts.MainMenu
             Debug.Log("TestButtonB click start");
             var response = await _service.GetVersionInfo();
             Debug.Log($"TestButtonB click end response {response}");
+            SetResponse(response);
             _view.TestButtonB.interactable = true;
+        }
+
+        private void SetResponse(DemoServiceAsync.Response response)
+        {
             _responseCounter += 1;
-            if (response.Length > 20)
-            {
-                response = response.Substring(0, 20);
-            }
-            _view.TestText = $"{_responseCounter}: {response}";
+            var responseText = response.Success ? response.Payload : response.Message;
+            _view.TestText = $"{_responseCounter}: {responseText}";
         }
     }
 }
