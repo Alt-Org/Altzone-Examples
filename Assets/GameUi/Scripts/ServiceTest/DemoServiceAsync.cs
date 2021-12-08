@@ -1,36 +1,24 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameUi.Scripts.ServiceTest
 {
     public class DemoServiceAsync
     {
-        private readonly string _serviceUrl;
+        private const string ServiceUrl = "https://jsonplaceholder.typicode.com/todos/1";
 
-        public DemoServiceAsync(string serviceUrl)
-        {
-            if (serviceUrl.EndsWith("/"))
-            {
-                serviceUrl = serviceUrl.Substring(0, serviceUrl.Length - 1);
-            }
-            Debug.Log($"ctor({serviceUrl})");
-            _serviceUrl = serviceUrl;
-        }
+        private string _lastResponse = string.Empty;
 
-        public async Task<string> GetVersionInfo(string path)
+        public async Task<string> GetVersionInfo()
         {
-            if (path.StartsWith("/"))
-            {
-                path = path.Substring(1);
-            }
-            var url = $"{_serviceUrl}/{path}";
-            Debug.Log($"GetVersionInfo {url}");
+            Debug.Log($"GetVersionInfo start");
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
-            var request = WebRequest.Create(url);
+            var request = WebRequest.Create(ServiceUrl);
             if (!(await request.GetResponseAsync() is HttpWebResponse response))
             {
                 return $"Request failed (NULL response)";
@@ -40,7 +28,7 @@ namespace GameUi.Scripts.ServiceTest
             {
                 return $"Request failed with code {response.StatusCode}";
             }
-            var jsonResponse = string.Empty;
+            _lastResponse = string.Empty;
             using (var dataStream = response.GetResponseStream())
             {
                 // Open the stream using a StreamReader for easy access.
@@ -48,19 +36,23 @@ namespace GameUi.Scripts.ServiceTest
                 {
                     var reader = new StreamReader(dataStream);
                     // Read the content.
-                    jsonResponse = await reader.ReadToEndAsync() ?? string.Empty;
+                    _lastResponse = await reader.ReadToEndAsync() ?? string.Empty;
                 }
             }
-            Debug.Log($"response len {jsonResponse.Length} in {stopWatch.ElapsedMilliseconds} ms");
-            while (stopWatch.ElapsedMilliseconds < 5000)
+            Debug.Log($"response len {_lastResponse.Length} in {stopWatch.ElapsedMilliseconds} ms");
+            _lastResponse = _lastResponse.Replace("\r", "").Replace("\n", "");
+            Debug.Log($"json {_lastResponse}");
+            await Task.Run(() =>
             {
-                //
-            }
+                while (stopWatch.ElapsedMilliseconds < 3000)
+                {
+                    Thread.Yield();
+                }
+            });
             stopWatch.Stop();
-            Debug.Log($"GetVersionInfo {url} in {stopWatch.ElapsedMilliseconds} ms");
+            Debug.Log($"GetVersionInfo done in {stopWatch.ElapsedMilliseconds} ms");
 
-            //var map = JsonUtility.FromJson<Dictionary<string, object>>(jsonResponse);
-            return jsonResponse;
+            return _lastResponse;
         }
     }
 }
