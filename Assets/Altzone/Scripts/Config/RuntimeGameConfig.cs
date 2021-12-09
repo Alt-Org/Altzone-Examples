@@ -151,7 +151,7 @@ namespace Altzone.Scripts.Config
         /// </remarks>
         public CharacterModel CharacterModel =>
             Storefront.Get().GetCharacterModel(_characterModelId) ??
-            new CharacterModel(-1, "Dummy", Defence.Desensitisation, 0, 0, 0, 0);
+            new CharacterModel(-1, "Ö", Defence.Desensitisation, 0, 0, 0, 0);
 
         [SerializeField] protected string _playerHandle;
 
