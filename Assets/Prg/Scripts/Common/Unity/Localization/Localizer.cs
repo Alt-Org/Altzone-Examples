@@ -9,6 +9,9 @@ using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Unity.Localization
 {
+    /// <summary>
+    /// Dictionary for single localized language.
+    /// </summary>
     internal class Language
     {
         private readonly Dictionary<string, string> _words;
@@ -34,6 +37,9 @@ namespace Prg.Scripts.Common.Unity.Localization
         }
     }
 
+    /// <summary>
+    /// Container for all installed languages.
+    /// </summary>
     internal class Languages
     {
         private readonly List<Language> _languages = new List<Language>();
@@ -130,10 +136,10 @@ namespace Prg.Scripts.Common.Unity.Localization
     }
 
     /// <summary>
-    /// Tab Separated Values (.tsv) content loader for localized words and phrases.
+    /// Content loader for localized words and phrases in Tab Separated Values (.tsv) format.
     /// </summary>
     /// <remarks>
-    /// File format is documented elsewhere!
+    /// File column and row format is documented elsewhere!
     /// </remarks>
     internal static class TsvLoader
     {
@@ -250,7 +256,7 @@ namespace Prg.Scripts.Common.Unity.Localization
     }
 
     /// <summary>
-    /// Binary formatted <c>TextAsset</c> for localized words and phrases.
+    /// Binary formatted <c>TextAsset</c> storage for localized words and phrases.
     /// </summary>
     /// <remarks>
     /// File format is proprietary and contained in this file!
