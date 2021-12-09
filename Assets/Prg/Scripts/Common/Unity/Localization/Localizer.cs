@@ -94,7 +94,12 @@ namespace Prg.Scripts.Common.Unity.Localization
         public static void LoadTranslations()
         {
             var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
-            Assert.IsNotNull(config, "config != null");
+            if (config == null)
+            {
+                Debug.LogWarning($"{nameof(LocalizationConfig)} is missing");
+                _languages = new Languages();
+                return;
+            }
             _languages = BinAsset.Load(config.LanguagesBinFile);
             SetLanguage(DefaultLanguage);
         }
