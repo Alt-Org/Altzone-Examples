@@ -22,7 +22,6 @@ namespace GameUi.Scripts.MainMenu
 
         private void OnEnable()
         {
-            Assert.IsNotNull(_view, "_view != null");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
             _view.PlayerInfo = $"{playerData.PlayerName} : {playerData.CharacterModel.Name}";
