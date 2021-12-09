@@ -40,8 +40,8 @@ namespace Examples2.Scripts.Battle.Room
             var state = PhotonNetwork.NetworkClientState;
             if (state == ClientState.PeerCreated || state == ClientState.Disconnected)
             {
-                Debug.Log($"connect {PhotonNetwork.NetworkClientState}");
                 var playerName = PhotonBattle.GetLocalPlayerName();
+                Debug.Log($"connect {PhotonNetwork.NetworkClientState} isOfflineMode {_isOfflineMode} player {playerName}");
                 PhotonNetwork.OfflineMode = _isOfflineMode;
                 if (_isOfflineMode)
                 {
