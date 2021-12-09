@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using Altzone.Scripts.Model;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
@@ -342,11 +344,30 @@ namespace Altzone.Scripts.Config
                 _playerHandle = PlayerPrefs.GetString(PlayerHandleKey, string.Empty);
                 if (string.IsNullOrWhiteSpace(PlayerHandle))
                 {
-                    _playerHandle = Guid.NewGuid().ToString();
+                    _playerHandle = CreatePlayerHandle();
                     PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
+                    // Writes all modified preferences to disk.
+                    PlayerPrefs.Save();
                 }
                 _language = (SystemLanguage)PlayerPrefs.GetInt(LanguageCodeKey, (int)SystemLanguage.Unknown);
                 _isTosAccepted = PlayerPrefs.GetInt(TermsOfServiceKey, 0) == 1;
+            }
+
+            private static string CreatePlayerHandle()
+            {
+                // Create same GUID for same device if possible
+                // - guid can be used to identify third party cloud game services
+                // - we want to keep it constant for single device even this data is wiped e.g. during testing
+                var deviceId = SystemInfo.deviceUniqueIdentifier;
+                if (deviceId == SystemInfo.unsupportedIdentifier)
+                {
+                    return Guid.NewGuid().ToString();
+                }
+                using (var md5 = MD5.Create())
+                {
+                    var hash = md5.ComputeHash(Encoding.Unicode.GetBytes(deviceId));
+                    return new Guid(hash).ToString();
+                }
             }
 
             protected override void Save()
