@@ -12,13 +12,13 @@ namespace Editor.Prg.Localization
     {
         private const string MenuRoot = LocalizerMenu.MenuRoot;
 
-        [MenuItem(MenuRoot + "Search Localization keys")]
-        private static void Init()
+        [MenuItem(MenuRoot + "Search Localization Keys")]
+        private static void SearchLocalizationKeys()
         {
             GetWindow<SmartTextSearchWindow>("Search Localization keys").Show();
         }
 
-        [SerializeField] private AutocompleteSearch _autocompleteSearchField;
+        private AutocompleteSearch _autocompleteSearchField;
 
         private void OnEnable()
         {
