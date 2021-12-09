@@ -73,7 +73,8 @@ namespace Editor.Prg.Logging
         private static void Show()
         {
             Debug.Log("*");
-            GetLogFilePath();
+            var path = GetLogFilePath();
+            Debug.Log($"Editor log {(File.Exists(path) ? "is in" : RichText.Brown("NOT found"))}: {path}");
         }
 
         private static string GetLogFilePath()
@@ -83,7 +84,6 @@ namespace Editor.Prg.Logging
             {
                 path = path.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
             }
-            Debug.Log($"Editor log {(File.Exists(path) ? "is in" : RichText.Brown("NOT found"))}: {path}");
             return path;
         }
 

@@ -15,7 +15,12 @@ namespace Prg.Scripts.Common.Util
         /// </summary>
         private static bool _isNiceCleanup;
 
-        public static Func<string, string> LogLineContentFilter;
+        private static Func<string, string> _logLineContentFilter;
+
+        public static void AddLogLineContentFilter(Func<string, string> filter)
+        {
+            _logLineContentFilter += filter;
+        }
 
         private static readonly UTF8Encoding FileEncoding = new UTF8Encoding(false, false);
         private static LogWriter _instance;
@@ -65,14 +70,22 @@ namespace Prg.Scripts.Common.Util
                 {
                     _fileName = _fileName.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
                 }
-                Debug.LogFormat("Logfile {0}", _fileName);
-                // Capture UNITY Console Logs in separate thread.
-                Application.logMessageReceivedThreaded += UnityLogCallback;
+                _registrationCount += 1;
+                if (_registrationCount > 1)
+                {
+                    UnityEngine.Debug.Log($"Logfile CONTINUE {_fileName} #{_registrationCount}");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"Logfile START {_fileName} #{_registrationCount}");
+                    // Capture UNITY Console Logs in separate thread.
+                    Application.logMessageReceivedThreaded += UnityLogCallback;
+                }
             }
             catch (Exception x)
             {
                 _file = null;
-                UnityEngine.Debug.LogFormat("unable to create log file '{0}'", _fileName);
+                UnityEngine.Debug.LogWarning($"unable to create log file '{_fileName}'");
                 UnityEngine.Debug.LogException(x);
             }
         }
@@ -81,6 +94,8 @@ namespace Prg.Scripts.Common.Util
         {
             if (_isNiceCleanup)
             {
+                UnityEngine.Debug.Log($"Logfile STOP {_fileName} #{_registrationCount}");
+                _registrationCount -= 1;
                 Application.logMessageReceivedThreaded -= UnityLogCallback;
                 Close();
             }
@@ -116,6 +131,7 @@ namespace Prg.Scripts.Common.Util
 
         private static string _prevLogString = string.Empty;
         private static int _prevLogLineCount;
+        private static int _registrationCount;
 
         /* Threaded callback for listening Unity logging */
 
@@ -138,10 +154,10 @@ namespace Prg.Scripts.Common.Util
                     _prevLogLineCount = 0;
                 }
                 _prevLogString = logString;
-                if (LogLineContentFilter != null)
+                if (_logLineContentFilter != null)
                 {
                     // As we can modify the input parameter on the fly we must call each delegate separately with correct input.
-                    var invocationList = LogLineContentFilter.GetInvocationList();
+                    var invocationList = _logLineContentFilter.GetInvocationList();
                     foreach (var callback in invocationList)
                     {
                         logString = callback.DynamicInvoke(logString) as string;
@@ -206,5 +222,5 @@ namespace Prg.Scripts.Common.Util
             var baseName = Application.productName.ToLower();
             return $"{prefix}_{baseName}_{LogFileSuffix}";
         }
-   }
+    }
 }
