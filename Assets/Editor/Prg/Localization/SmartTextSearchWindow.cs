@@ -1,9 +1,13 @@
 using Editor.Prg.Util;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEditor;
 using UnityEngine;
 
 namespace Editor.Prg.Localization
 {
+    /// <summary>
+    /// Search window implementation to find localization keys in UNITY Editor.
+    /// </summary>
     public class SmartTextSearchWindow : EditorWindow
     {
         private const string MenuRoot = LocalizerMenu.MenuRoot;
@@ -18,6 +22,10 @@ namespace Editor.Prg.Localization
 
         private void OnEnable()
         {
+            if (!Localizer.HasLanguage(Localizer.DefaultLanguage))
+            {
+                Localizer.LoadTranslations();
+            }
             if (_autocompleteSearchField == null)
             {
                 _autocompleteSearchField = new AutocompleteSearch();
@@ -35,19 +43,28 @@ namespace Editor.Prg.Localization
         private void OnInputChanged(string searchString)
         {
             _autocompleteSearchField.ClearResults();
-            if (!string.IsNullOrEmpty(searchString))
+            var found = 0;
+            var results = Localizer.GetTranslationKeys();
+            if (string.IsNullOrEmpty(searchString))
             {
-                const string assetRoot = "Assets";
-                var searchFolders = new[] { assetRoot };
-                foreach (var assetGuid in AssetDatabase.FindAssets(searchString, searchFolders))
+                foreach (var result in results)
                 {
-                    var result = AssetDatabase.GUIDToAssetPath(assetGuid);
-                    if (result != _autocompleteSearchField._searchString)
+                    found += 1;
+                    _autocompleteSearchField.AddResult(result);
+                }
+            }
+            else
+            {
+                foreach (var result in results)
+                {
+                    if (result.Contains(searchString))
                     {
+                        found += 1;
                         _autocompleteSearchField.AddResult(result);
                     }
                 }
             }
+            Debug.Log($"searchString /{searchString}/ found : {found}/{results.Count}");
         }
 
         private void OnConfirm(string result)

@@ -6,7 +6,12 @@ using UnityEngine;
 
 namespace Editor.Prg.Util
 {
-    [Serializable]
+    /// <summary>
+    /// Base class to handle search tools windows in UNITY Editor.
+    /// </summary>
+    /// <remarks>
+    /// See: https://github.com/marijnz/unity-autocomplete-search-field
+    /// </remarks>
     public class AutocompleteSearch
     {
         private static class Styles
@@ -26,7 +31,6 @@ namespace Editor.Prg.Util
                 EntryOdd = new GUIStyle("CN EntryBackOdd");
                 EntryEven = new GUIStyle("CN EntryBackEven");
                 ResultsBorderStyle = new GUIStyle("hostview");
-
                 LabelStyle = new GUIStyle(EditorStyles.label)
                 {
                     alignment = TextAnchor.MiddleLeft,
@@ -38,7 +42,7 @@ namespace Editor.Prg.Util
         public Action<string> OnInputChangedCallback;
         public Action<string> OnConfirmCallback;
         public string _searchString;
-        public int _maxResults = 15;
+        public int _maxResults = 50;
 
         [SerializeField] private List<string> _results = new List<string>();
 
@@ -157,7 +161,6 @@ namespace Editor.Prg.Util
             elementRect.height = Styles.ResultHeight;
 
             var didJustSelectIndex = false;
-
             for (var i = 0; i < _results.Count && i < _maxResults; i++)
             {
                 if (current.type == EventType.Repaint)
@@ -211,8 +214,8 @@ namespace Editor.Prg.Util
         private void OnConfirm(string result)
         {
             _searchString = result;
-            if (OnConfirmCallback != null) OnConfirmCallback(result);
-            if (OnInputChangedCallback != null) OnInputChangedCallback(result);
+            OnConfirmCallback?.Invoke(result);
+            OnInputChangedCallback?.Invoke(result);
             RepaintFocusedWindow();
             GUIUtility.keyboardControl = 0; // To avoid Unity sometimes not updating the search field text
         }

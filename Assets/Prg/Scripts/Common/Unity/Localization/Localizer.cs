@@ -22,6 +22,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         public string Locale { get; }
 
         internal Dictionary<string, string> Words => _words;
+        internal Dictionary<string, string> AltWords => _altWords;
 
         public string Word(string key) =>
             _words.TryGetValue(key, out var value) ? value
@@ -87,7 +88,7 @@ namespace Prg.Scripts.Common.Unity.Localization
 
         public static bool HasLanguage(SystemLanguage language)
         {
-            return _languages.HasLanguage(language);
+            return _languages?.HasLanguage(language) ?? false;
         }
 
         public static void SetLanguage(SystemLanguage language)
@@ -108,6 +109,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             _languages = BinAsset.Load(config.LanguagesBinFile);
             SetLanguage(DefaultLanguage);
+            LocalizerHelper.Reset();
         }
 
         [Conditional("UNITY_EDITOR")]
@@ -117,6 +119,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             Assert.IsNotNull(config, "config != null");
             var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
             BinAsset.Save(languages, config.LanguagesBinFile);
+            LocalizerHelper.Reset();
         }
 
         [Conditional("UNITY_EDITOR")]
@@ -131,6 +134,41 @@ namespace Prg.Scripts.Common.Unity.Localization
             foreach (var language in _languages.GetLanguages)
             {
                 Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count}");
+            }
+            LocalizerHelper.Reset();
+        }
+
+        public static List<string> GetTranslationKeys()
+        {
+            return LocalizerHelper.GetTranslationKeys();
+        }
+
+        private static class LocalizerHelper
+        {
+            private static List<string> _keys;
+
+            public static List<string> GetTranslationKeys()
+            {
+                List<string> result = null;
+#if UNITY_EDITOR
+                if (_curLanguage != null)
+                {
+                    if (_keys == null)
+                    {
+                        _keys = new List<string>();
+                        _keys.AddRange(_curLanguage.Words.Keys);
+                        _keys.AddRange(_curLanguage.AltWords.Keys);
+                        _keys.Sort();
+                    }
+                    result = _keys;
+                }
+#endif
+                return result;
+            }
+
+            public static void Reset()
+            {
+                _keys = null;
             }
         }
     }
