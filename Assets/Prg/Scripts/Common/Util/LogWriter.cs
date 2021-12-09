@@ -116,12 +116,6 @@ namespace Prg.Scripts.Common.Util
         /// </summary>
         private static void UnityLogCallback(string logString, string stackTrace, LogType type)
         {
-#if UNITY_EDITOR
-            if (!EditorApplication.isPlaying)
-            {
-                return;
-            }
-#endif
             lock (Lock)
             {
                 if (logString == _prevLogString && type != LogType.Error)
