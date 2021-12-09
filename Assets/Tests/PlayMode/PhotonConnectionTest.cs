@@ -19,27 +19,27 @@ namespace Tests.PlayMode
         {
             Debug.Log($"test start {PhotonWrapper.NetworkClientState}");
 
-            PhotonLobby.connect(PlayerName);
+            PhotonLobby.Connect(PlayerName);
             yield return null;
 
             var canJoinLobbyTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.CanJoinLobby, canJoinLobbyTimeout));
             Assert.That(PhotonWrapper.CanJoinLobby, Is.True, "Can not join lobby");
 
-            PhotonLobby.joinLobby();
+            PhotonLobby.JoinLobby();
             yield return null;
 
             var inLobbyTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InLobby, inLobbyTimeout));
             Assert.That(PhotonNetwork.InLobby, Is.True, "Not in lobby");
 
-            PhotonLobby.joinOrCreateRoom(RoomName, null, null);
+            PhotonLobby.JoinOrCreateRoom(RoomName, null, null);
 
             var inRoomTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InRoom, inRoomTimeout));
             Assert.That(PhotonNetwork.InRoom, Is.True, "Not in room");
 
-            PhotonLobby.disconnect();
+            PhotonLobby.Disconnect();
             yield return null;
 
             var isPhotonReadyTimeout = Time.time + Timeout;

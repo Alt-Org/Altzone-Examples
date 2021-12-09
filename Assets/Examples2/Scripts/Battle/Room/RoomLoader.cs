@@ -50,7 +50,7 @@ namespace Examples2.Scripts.Battle.Room
                 }
                 else
                 {
-                    PhotonLobby.connect(playerName);
+                    PhotonLobby.Connect(playerName);
                 }
                 return;
             }
@@ -62,7 +62,7 @@ namespace Examples2.Scripts.Battle.Room
             if (PhotonNetwork.IsMasterClient)
             {
                 // Mark room "closed"
-                PhotonLobby.closeRoom(true);
+                PhotonLobby.CloseRoom(true);
             }
             // Enable game objects when this room stage is ready to play
             StartCoroutine(ActivateObjects(_objectsToActivate));
@@ -83,14 +83,14 @@ namespace Examples2.Scripts.Battle.Room
             if (!_isOfflineMode)
             {
                 Debug.Log($"joinLobby {PhotonNetwork.NetworkClientState}");
-                PhotonLobby.joinLobby();
+                PhotonLobby.JoinLobby();
             }
         }
 
         public override void OnJoinedLobby()
         {
             Debug.Log($"createRoom {PhotonNetwork.NetworkClientState}");
-            PhotonLobby.createRoom("testing");
+            PhotonLobby.CreateRoom("testing");
         }
 
         public override void OnJoinedRoom()
