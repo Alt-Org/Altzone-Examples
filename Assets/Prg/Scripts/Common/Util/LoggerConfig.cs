@@ -109,7 +109,7 @@ namespace Prg.Scripts.Common.Util
             // - lines can start and end with "'" if content has something that needs to be "protected" during JSON parsing
             // - JSON multiline separator is LF "\n"
             var list = new List<RegExpFilter>();
-            var lines = _loggerRules;
+            var lines = _loggerRules ?? string.Empty;
             if (lines.StartsWith("'") && lines.EndsWith("'"))
             {
                 lines = lines.Substring(1, lines.Length - 2);
