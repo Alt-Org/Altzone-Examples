@@ -10,7 +10,9 @@ namespace Editor.Prg.Logging
 {
     public static class LoggerMenu
     {
-        [MenuItem("Window/ALT-Zone/Logging/Add 'FORCE_LOG' define")]
+        private const string MenuRoot = "Window/ALT-Zone/Logging/";
+
+        [MenuItem(MenuRoot + "Add 'FORCE_LOG' define", false, 10)]
         private static void AddDefine()
         {
             Debug.Log("*");
@@ -30,7 +32,7 @@ namespace Editor.Prg.Logging
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Logging/Remove 'FORCE_LOG' define")]
+        [MenuItem(MenuRoot + "Remove 'FORCE_LOG' define", false, 11)]
         private static void RemoveDefine()
         {
             Debug.Log("*");
@@ -50,7 +52,7 @@ namespace Editor.Prg.Logging
             }
         }
 
-        [MenuItem("Window/ALT-Zone/Logging/Highlight Settings")]
+        [MenuItem(MenuRoot + "Highlight Settings", false, 12)]
         private static void HighlightSettings()
         {
             LoggerConfig loggerConfig = (LoggerConfig)Resources.Load(nameof(LoggerConfig), typeof(LoggerConfig));
@@ -58,7 +60,15 @@ namespace Editor.Prg.Logging
             EditorGUIUtility.PingObject(loggerConfig);
         }
 
-        [MenuItem("Window/ALT-Zone/Logging/Open file in text editor")]
+        [MenuItem(MenuRoot + "Show log file location", false, 13)]
+        private static void Show()
+        {
+            Debug.Log("*");
+            var path = GetLogFilePath();
+            Debug.Log($"Editor log {(File.Exists(path) ? "is in" : RichText.Brown("NOT found"))}: {path}");
+        }
+
+        [MenuItem(MenuRoot + "Open file in text editor", false, 14)]
         private static void Load()
         {
             Debug.Log("*");
@@ -67,14 +77,6 @@ namespace Editor.Prg.Logging
             {
                 InternalEditorUtility.OpenFileAtLineExternal(path, 1);
             }
-        }
-
-        [MenuItem("Window/ALT-Zone/Logging/Show log file location")]
-        private static void Show()
-        {
-            Debug.Log("*");
-            var path = GetLogFilePath();
-            Debug.Log($"Editor log {(File.Exists(path) ? "is in" : RichText.Brown("NOT found"))}: {path}");
         }
 
         private static string GetLogFilePath()
