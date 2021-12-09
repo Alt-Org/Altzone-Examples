@@ -17,9 +17,10 @@ namespace Prg.Scripts.Common.Photon
 
         private static bool _isApplicationQuitting;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void AfterSceneLoad()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void BeforeSceneLoad()
         {
+            _isApplicationQuitting = false;
             Application.quitting += () => _isApplicationQuitting = true;
         }
 
