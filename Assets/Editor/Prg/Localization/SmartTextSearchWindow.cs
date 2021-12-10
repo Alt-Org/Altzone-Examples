@@ -101,10 +101,13 @@ namespace Editor.Prg.Localization
                 if (smartText != null)
                 {
                     var key = smartText.LocalizationKey;
-                    infoText = $"<b>SMART {infoText}</b>\r\nKEY {key}";
-                    _infoTextStyle = string.IsNullOrEmpty(key)
-                        ? Styles.InfoStyleMagenta
-                        : Styles.InfoStyleBlue;
+                    var hasKey = string.IsNullOrEmpty(key);
+                    var value = hasKey ? Localizer.Localize(key) : string.Empty;
+                    var hasValue = !string.IsNullOrEmpty(value) && !(value.StartsWith("[") && value.EndsWith("]"));
+                    infoText = $"<b>SMART {infoText}</b>\r\nKEY {key}\r\nTXT {value}";
+                    _infoTextStyle = hasKey && hasValue
+                        ? Styles.InfoStyleBlue
+                        : Styles.InfoStyleMagenta;
                 }
                 else
                 {

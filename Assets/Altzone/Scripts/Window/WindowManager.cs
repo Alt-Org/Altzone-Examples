@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Window.ScriptableObjects;
 using Prg.Scripts.Common.Unity;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -63,6 +65,8 @@ namespace Altzone.Scripts.Window
         private void Awake()
         {
             Debug.Log("Awake");
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Localizer.SetLanguage(playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage);
             _currentWindows = new List<MyWindow>();
             _knownWindows = new List<MyWindow>();
             SceneManager.sceneLoaded += SceneLoaded;

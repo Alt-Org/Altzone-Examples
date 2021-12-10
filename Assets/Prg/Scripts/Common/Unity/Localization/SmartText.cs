@@ -49,6 +49,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         {
             string[] excludedNames =
             {
+                "panel",
                 "window",
                 "canvas",
                 "environment",

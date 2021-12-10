@@ -43,7 +43,7 @@ namespace Prg.Scripts.Common.Unity.Localization
 #if UNITY_EDITOR
         private readonly string[] _reasonTexts = { "NO_KEY", "MISSING", "ALT_WORD" };
 
-        private Dictionary<string, Tuple<string, string>> _debugWords;
+        private Dictionary<string, Tuple<string, int>> _debugWords;
 
         internal void TrackWords(string key, string word, SmartText component)
         {
@@ -69,21 +69,24 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             if (_debugWords == null)
             {
-                _debugWords = new Dictionary<string, Tuple<string, string>>();
+                _debugWords = new Dictionary<string, Tuple<string, int>>();
             }
             if (!_debugWords.TryGetValue(key, out var tuple))
             {
-                _debugWords.Add(key, new Tuple<string, string>(word, reason));
+                _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
                 return;
             }
             if (tuple.Item1 != word)
             {
-                // Same key with different text!
-                key += _debugWords.Count;
-                _debugWords.Add(key, new Tuple<string, string>(word, reason));
+                // Duplicate key with different text!
+                key = $"{component.GetFullPath()}_{_debugWords.Count}";
+                _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
             }
         }
 
+        /// <summary>
+        /// Save current words and new words found during app execution.
+        /// </summary>
         internal void SaveIfDirty()
         {
             if (_debugWords == null)
@@ -92,11 +95,25 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             var builder = new StringBuilder();
             {
-                foreach (var entry in _debugWords)
+                // Add current words "as is".
+                foreach (var entry in _words)
                 {
                     builder.Append(entry.Key).Append('\t')
-                        .Append(entry.Value.Item1).Append('\t')
-                        .Append(entry.Value.Item2).AppendLine();
+                        .Append(entry.Value).AppendLine();
+                }
+                // Sort "new" words by category.
+                foreach (var item2 in new[] { 0, 1, 2 })
+                {
+                    foreach (var entry in _debugWords)
+                    {
+                        if (entry.Value.Item2 != item2)
+                        {
+                            continue;
+                        }
+                        builder.Append(entry.Key).Append('\t')
+                            .Append(entry.Value.Item1).Append('\t')
+                            .Append(_reasonTexts[entry.Value.Item2]).AppendLine();
+                    }
                 }
             }
             var text = builder.ToString();
@@ -105,7 +122,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 path = path.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
             }
-            Debug.Log($"Save {_debugWords.Count} words to {path}");
+            Debug.Log($"Save {_debugWords.Count} NEW words to {path}");
             File.WriteAllText(path, text);
         }
 #endif
@@ -225,7 +242,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         private static void SetEditorStatus()
         {
 #if UNITY_EDITOR
-            EditorApplication.playModeStateChanged += change =>
+            void PlayModeStateChangeCallback(PlayModeStateChange change)
             {
                 if (_languages != null && change == PlayModeStateChange.ExitingPlayMode)
                 {
@@ -234,7 +251,11 @@ namespace Prg.Scripts.Common.Unity.Localization
                         language.SaveIfDirty();
                     }
                 }
-            };
+            }
+
+            // Trying to keep at most one callback alive at a time.
+            EditorApplication.playModeStateChanged -= PlayModeStateChangeCallback;
+            EditorApplication.playModeStateChanged += PlayModeStateChangeCallback;
 #endif
         }
 
