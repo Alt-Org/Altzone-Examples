@@ -206,7 +206,6 @@ namespace Prg.Scripts.Common.Unity.Localization
                 return;
             }
             _languages = BinAsset.Load(config.LanguagesBinFile);
-            SetLanguage(DefaultLanguage);
             LocalizerHelper.Reset();
             SetEditorStatus();
         }
