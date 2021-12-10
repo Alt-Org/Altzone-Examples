@@ -1,4 +1,5 @@
 using System.Linq;
+using Altzone.Scripts.Config;
 using Editor.Prg.Util;
 using Prg.Scripts.Common.Unity.Localization;
 using UnityEditor;
@@ -51,7 +52,7 @@ namespace Editor.Prg.Localization
 
         private const string MenuRoot = LocalizerMenu.MenuRoot;
 
-        [MenuItem(MenuRoot + "Search Localization Keys")]
+        //[MenuItem(MenuRoot + "Search Localization Keys")]
         private static void SearchLocalizationKeys()
         {
             GetWindow<SmartTextSearchWindow>("Search Localization keys").Show();
