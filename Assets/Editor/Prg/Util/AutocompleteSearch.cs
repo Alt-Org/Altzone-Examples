@@ -39,21 +39,27 @@ namespace Editor.Prg.Util
             }
         }
 
+        private const int MAXResults = 50;
+
+        public Action OnFirstTime;
         public Action<string> OnInputChangedCallback;
         public Action<string> OnConfirmCallback;
-        public string _searchString;
-        public int _maxResults = 50;
 
-        [SerializeField] private List<string> _results = new List<string>();
-
-        [SerializeField] private int _selectedIndex = -1;
+        private List<string> _results = new List<string>();
+        private int _selectedIndex = -1;
 
         private SearchField _searchField;
+        private string _searchString;
 
         private Vector2 _previousMousePosition;
         private bool _selectedIndexByMouse;
 
         private bool _showResults;
+
+        public void SetResults(List<string> results)
+        {
+            _results = results;
+        }
 
         public void AddResult(string result)
         {
@@ -91,21 +97,25 @@ namespace Editor.Prg.Util
             {
                 _searchField = new SearchField();
                 _searchField.downOrUpArrowKeyPressed += OnDownOrUpArrowKeyPressed;
+                // Short-circuit here to show initial search
+                OnFirstTime?.Invoke();
+                _selectedIndex = -1;
+                _showResults = true;
+                return;
             }
 
             var result = asToolbar
                 ? _searchField.OnToolbarGUI(rect, _searchString)
                 : _searchField.OnGUI(rect, _searchString);
 
-            if (result != _searchString && OnInputChangedCallback != null)
+            if (result != _searchString)
             {
-                OnInputChangedCallback(result);
+                Debug.Log($"DoSearchField {_searchString} <- {result} sel index {_selectedIndex} <- {-1}");
+                OnInputChangedCallback?.Invoke(result);
+                _searchString = result;
                 _selectedIndex = -1;
                 _showResults = true;
             }
-
-            _searchString = result;
-
             if (HasSearchbarFocused())
             {
                 RepaintFocusedWindow();
@@ -129,16 +139,24 @@ namespace Editor.Prg.Util
                 _selectedIndexByMouse = false;
             }
 
-            if (_selectedIndex >= _results.Count) _selectedIndex = _results.Count - 1;
-            else if (_selectedIndex < 0) _selectedIndex = -1;
+            if (_selectedIndex >= _results.Count)
+            {
+                _selectedIndex = _results.Count - 1;
+            }
+            else if (_selectedIndex < 0)
+            {
+                _selectedIndex = -1;
+            }
         }
 
         private void DoResults(Rect rect)
         {
-            if (_results.Count <= 0 || !_showResults) return;
-
+            if (_results.Count <= 0 || !_showResults)
+            {
+                return;
+            }
             var current = Event.current;
-            rect.height = Styles.ResultHeight * Mathf.Min(_maxResults, _results.Count);
+            rect.height = Styles.ResultHeight * Mathf.Min(MAXResults, _results.Count);
             rect.x = Styles.ResultsMargin;
             rect.width -= Styles.ResultsMargin * 2;
 
@@ -148,12 +166,10 @@ namespace Editor.Prg.Util
             GUI.Label(rect, "", Styles.ResultsBorderStyle);
 
             var mouseIsInResultsRect = rect.Contains(current.mousePosition);
-
             if (mouseIsInResultsRect)
             {
                 RepaintFocusedWindow();
             }
-
             var movedMouseInRect = _previousMousePosition != current.mousePosition;
 
             elementRect.x += Styles.ResultsBorderWidth;
@@ -161,7 +177,7 @@ namespace Editor.Prg.Util
             elementRect.height = Styles.ResultHeight;
 
             var didJustSelectIndex = false;
-            for (var i = 0; i < _results.Count && i < _maxResults; i++)
+            for (var i = 0; i < _results.Count && i < MAXResults; i++)
             {
                 if (current.type == EventType.Repaint)
                 {
@@ -215,7 +231,7 @@ namespace Editor.Prg.Util
         {
             _searchString = result;
             OnConfirmCallback?.Invoke(result);
-            OnInputChangedCallback?.Invoke(result);
+            //OnInputChangedCallback?.Invoke(result);
             RepaintFocusedWindow();
             GUIUtility.keyboardControl = 0; // To avoid Unity sometimes not updating the search field text
         }

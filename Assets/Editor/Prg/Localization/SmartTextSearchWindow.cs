@@ -1,3 +1,4 @@
+using System.Linq;
 using Editor.Prg.Util;
 using Prg.Scripts.Common.Unity.Localization;
 using UnityEditor;
@@ -30,48 +31,35 @@ namespace Editor.Prg.Localization
             {
                 _autocompleteSearchField = new AutocompleteSearch();
             }
+            _autocompleteSearchField.OnFirstTime = () =>
+            {
+                OnInputChanged(string.Empty);
+            };
             _autocompleteSearchField.OnInputChangedCallback = OnInputChanged;
             _autocompleteSearchField.OnConfirmCallback = OnConfirm;
         }
 
         private void OnGUI()
         {
-            GUILayout.Label("Search localization keys", EditorStyles.boldLabel);
+            GUILayout.Label("Search Localization Keys", EditorStyles.boldLabel);
             _autocompleteSearchField.OnGUI();
         }
 
         private void OnInputChanged(string searchString)
         {
-            _autocompleteSearchField.ClearResults();
-            var found = 0;
             var results = Localizer.GetTranslationKeys();
-            if (string.IsNullOrEmpty(searchString))
-            {
-                foreach (var result in results)
-                {
-                    found += 1;
-                    _autocompleteSearchField.AddResult(result);
-                }
-            }
-            else
-            {
-                foreach (var result in results)
-                {
-                    if (result.Contains(searchString))
-                    {
-                        found += 1;
-                        _autocompleteSearchField.AddResult(result);
-                    }
-                }
-            }
-            Debug.Log($"searchString /{searchString}/ found : {found}/{results.Count}");
+            var search = string.IsNullOrEmpty(searchString)
+                ? results
+                : results.Where(x => x.Contains(searchString)).ToList();
+            _autocompleteSearchField.SetResults(search);
+            Debug.Log($"OnInputChanged /{searchString}/ found : {search.Count}/{results.Count}");
         }
 
         private void OnConfirm(string result)
         {
-            var obj = AssetDatabase.LoadMainAssetAtPath(_autocompleteSearchField._searchString);
-            Selection.activeObject = obj;
-            EditorGUIUtility.PingObject(obj);
+            Debug.Log($"OnConfirm /{result}/");
+            //Selection.activeObject = obj;
+            //EditorGUIUtility.PingObject(obj);
         }
     }
 }
