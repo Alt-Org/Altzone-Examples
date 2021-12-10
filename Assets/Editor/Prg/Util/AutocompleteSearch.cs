@@ -12,7 +12,7 @@ namespace Editor.Prg.Util
     /// <remarks>
     /// See: https://github.com/marijnz/unity-autocomplete-search-field
     /// </remarks>
-    public class AutocompleteSearch
+    internal class AutocompleteSearch
     {
         private static class Styles
         {
@@ -34,9 +34,9 @@ namespace Editor.Prg.Util
                 LabelStyle = new GUIStyle(EditorStyles.label)
                 {
                     alignment = TextAnchor.MiddleLeft,
-                    richText = true
+                    richText = false
                 };
-            }
+          }
         }
 
         private const int MAXResults = 50;
@@ -44,6 +44,15 @@ namespace Editor.Prg.Util
         public Action OnFirstTime;
         public Action<string> OnInputChangedCallback;
         public Action<string> OnConfirmCallback;
+
+        public void SetInfoText(string infoText, GUIStyle style = null)
+        {
+            _infoText = infoText;
+            _infoTextStyle = style ?? Styles.LabelStyle;
+        }
+
+        private string _infoText;
+        private GUIStyle _infoTextStyle = Styles.LabelStyle;
 
         private List<string> _results = new List<string>();
         private int _selectedIndex = -1;
@@ -78,13 +87,25 @@ namespace Editor.Prg.Util
 
         private void Draw(bool asToolbar)
         {
-            var rect = GUILayoutUtility.GetRect(1, 1, 18, 18, GUILayout.ExpandWidth(true));
+            var rect = GUILayoutUtility.GetRect(1, 1, 1, 1, GUILayout.ExpandWidth(true));
             GUILayout.BeginHorizontal();
+            DoTitleLabel(rect);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            rect = GUILayoutUtility.GetRect(1, 1, 18, 18, GUILayout.ExpandWidth(true));
             DoSearchField(rect, asToolbar);
             GUILayout.EndHorizontal();
             rect.y += 18;
             DoResults(rect);
         }
+
+        private void DoTitleLabel(Rect rect)
+        {
+            var label = string.IsNullOrWhiteSpace(_infoText)
+                ? $"selected index {_selectedIndex} of {_results.Count} results"
+                : _infoText;
+            GUILayout.Label(label, _infoTextStyle);
+       }
 
         private void DoSearchField(Rect rect, bool asToolbar)
         {
