@@ -87,19 +87,18 @@ namespace Editor.Prg.Util
 
         private void Draw(bool asToolbar)
         {
-            var rect = GUILayoutUtility.GetRect(1, 1, 1, 1, GUILayout.ExpandWidth(true));
             GUILayout.BeginHorizontal();
-            DoTitleLabel(rect);
+            DoTitleLabel();
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            rect = GUILayoutUtility.GetRect(1, 1, 18, 18, GUILayout.ExpandWidth(true));
+            var rect = GUILayoutUtility.GetRect(1, 1, 1, 1, GUILayout.ExpandWidth(true));
             DoSearchField(rect, asToolbar);
             GUILayout.EndHorizontal();
             rect.y += 18;
             DoResults(rect);
         }
 
-        private void DoTitleLabel(Rect rect)
+        private void DoTitleLabel()
         {
             var label = string.IsNullOrWhiteSpace(_infoText)
                 ? $"selected index {_selectedIndex} of {_results.Count} results"
@@ -124,7 +123,6 @@ namespace Editor.Prg.Util
 
             if (result != _searchString)
             {
-                Debug.Log($"DoSearchField {_searchString} <- {result} sel index {_selectedIndex} <- {-1}");
                 _searchString = result;
                 _selectedIndex = -1;
                 OnInputChangedCallback?.Invoke(result);

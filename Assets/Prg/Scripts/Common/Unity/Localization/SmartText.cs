@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,10 +47,18 @@ namespace Prg.Scripts.Common.Unity.Localization
 
         private string GetComponentName()
         {
-            // Get path without top most gameObject (that is window root).
-            var isSceneObject = gameObject.scene.handle != 0;
+            string[] excludedNames =
+            {
+                "window",
+                "canvas",
+                "environment",
+            };
+            // For example buttons have text component with name "Text" that is redundant.
+            const string trailingText = "/text";
+
+            // Get path without top most gameObject(s) (filtered by name).
             var followTransform = transform;
-            var path = new StringBuilder(followTransform.name);
+            var builder = new StringBuilder(followTransform.name);
             for (;;)
             {
                 followTransform = followTransform.parent;
@@ -57,14 +66,26 @@ namespace Prg.Scripts.Common.Unity.Localization
                 {
                     break;
                 }
-                var pathName = followTransform.name;
-                if (pathName.ToLower().Contains("window"))
+                var transformName = followTransform.name;
+                var lowerName = transformName.ToLower();
+                var found = excludedNames.FirstOrDefault(x => lowerName.Contains(x));
+                if (found != null)
                 {
                     continue;
                 }
-                path.Insert(0, "/").Insert(0, followTransform.name);
+                builder.Insert(0, "/").Insert(0, transformName);
             }
-            return path.ToString();
+            var path = builder.ToString();
+            if (path.ToLower().EndsWith(trailingText))
+            {
+                var pos1 = path.IndexOf('/');
+                var pos2 = path.LastIndexOf('/');
+                if (pos1 != pos2 && pos2 != -1)
+                {
+                    path = path.Substring(0, path.Length - trailingText.Length);
+                }
+            }
+            return path;
         }
     }
 }

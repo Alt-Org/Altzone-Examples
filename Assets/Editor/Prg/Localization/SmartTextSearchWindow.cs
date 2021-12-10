@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Editor.Prg.Util;
 using Prg.Scripts.Common.Unity.Localization;
@@ -124,14 +123,14 @@ namespace Editor.Prg.Localization
         private void OnInputChanged(string searchString)
         {
             var results = Localizer.GetTranslationKeys();
+            searchString = searchString?.ToLower() ?? string.Empty;
             var search = string.IsNullOrEmpty(searchString)
                 ? results
-                : results.Where(x => x.Contains(searchString)).ToList();
+                : results.Where(x => x.ToLower().Contains(searchString)).ToList();
             _autocompleteSearchField.SetResults(search);
-            Debug.Log($"OnInputChanged /{searchString}/ found : {search.Count}/{results.Count}");
         }
 
-        private void OnConfirm(string result)
+        private static void OnConfirm(string result)
         {
             if (EditorApplication.isPlaying)
             {

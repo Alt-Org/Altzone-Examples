@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 3763927455204090493}
   - component: {fileID: 7516699076508977000}
   - component: {fileID: 3575075066564636251}
+  - component: {fileID: 1344693900755622451}
   m_Layer: 5
   m_Name: TitleText
   m_TagString: Untagged
@@ -170,6 +171,34 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &1344693900755622451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4879206240816835452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a5702b5eba140009036598614059259, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizationKey: HeaderPanel/TitleText
+  _text: {fileID: 0}
+--- !u!114 &1691792896551824807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6285968393325267871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a5702b5eba140009036598614059259, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizationKey: HeaderPanel/ButtonBackMini
+  _text: {fileID: 0}
 --- !u!1001 &8014243308604592883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -303,6 +332,12 @@ PrefabInstance:
 --- !u!224 &6285968395142069811 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4036475550920600768, guid: f807569afafcf2144b175e7db225c516,
+    type: 3}
+  m_PrefabInstance: {fileID: 8014243308604592883}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6285968393325267871 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4036475552336566636, guid: f807569afafcf2144b175e7db225c516,
     type: 3}
   m_PrefabInstance: {fileID: 8014243308604592883}
   m_PrefabAsset: {fileID: 0}

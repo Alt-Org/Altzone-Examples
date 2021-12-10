@@ -386,7 +386,11 @@ namespace Prg.Scripts.Common.Unity.Localization
             Assert.IsTrue(tokens.Length >= maxIndex, "tokens.Length >= maxIndex");
             var key = tokens[0];
             var defaultValue = tokens[1];
-            Assert.IsFalse(string.IsNullOrEmpty(defaultValue), "string.IsNullOrEmpty(defaultValue)");
+            if (string.IsNullOrEmpty(defaultValue))
+            {
+                Debug.LogWarning($"SKIP EMPTY column 1 in line {line}");
+                return;
+            }
             for (var i = 1; i < maxIndex; ++i)
             {
                 var colValue = tokens[i];
@@ -395,6 +399,11 @@ namespace Prg.Scripts.Common.Unity.Localization
                     continue;
                 }
                 var dictionary = dictionaries[i];
+                if (dictionary.ContainsKey(key))
+                {
+                    Debug.LogWarning($"SKIP DUPLICATE key '{key}' in line {line}");
+                    continue;
+                }
                 dictionary.Add(key, colValue);
             }
         }
