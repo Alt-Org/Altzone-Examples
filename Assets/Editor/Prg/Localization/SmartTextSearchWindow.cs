@@ -57,9 +57,19 @@ namespace Editor.Prg.Localization
 
         private void OnConfirm(string result)
         {
-            Debug.Log($"OnConfirm /{result}/");
-            //Selection.activeObject = obj;
-            //EditorGUIUtility.PingObject(obj);
+            var activeObject = Selection.activeGameObject;
+            if (activeObject == null)
+            {
+                return;
+            }
+            Debug.Log($"OnConfirm /{result}/ => {activeObject.name}");
+            var smartText = activeObject.GetComponent<SmartText>();
+            if (smartText == null)
+            {
+                return;
+            }
+            Debug.Log($"LocalizationKey {smartText.LocalizationKey} <- {result}");
+            smartText.LocalizationKey = result;
         }
     }
 }

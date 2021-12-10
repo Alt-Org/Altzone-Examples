@@ -51,11 +51,6 @@ namespace Editor.Prg.Util
         private SearchField _searchField;
         private string _searchString;
 
-        private Vector2 _previousMousePosition;
-        private bool _selectedIndexByMouse;
-
-        private bool _showResults;
-
         public void SetResults(List<string> results)
         {
             _results = results;
@@ -96,11 +91,9 @@ namespace Editor.Prg.Util
             if (_searchField == null)
             {
                 _searchField = new SearchField();
-                _searchField.downOrUpArrowKeyPressed += OnDownOrUpArrowKeyPressed;
                 // Short-circuit here to show initial search
-                OnFirstTime?.Invoke();
                 _selectedIndex = -1;
-                _showResults = true;
+                OnFirstTime?.Invoke();
                 return;
             }
 
@@ -111,10 +104,9 @@ namespace Editor.Prg.Util
             if (result != _searchString)
             {
                 Debug.Log($"DoSearchField {_searchString} <- {result} sel index {_selectedIndex} <- {-1}");
-                OnInputChangedCallback?.Invoke(result);
                 _searchString = result;
                 _selectedIndex = -1;
-                _showResults = true;
+                OnInputChangedCallback?.Invoke(result);
             }
             if (HasSearchbarFocused())
             {
@@ -122,36 +114,9 @@ namespace Editor.Prg.Util
             }
         }
 
-        private void OnDownOrUpArrowKeyPressed()
-        {
-            var current = Event.current;
-
-            if (current.keyCode == KeyCode.UpArrow)
-            {
-                current.Use();
-                _selectedIndex--;
-                _selectedIndexByMouse = false;
-            }
-            else
-            {
-                current.Use();
-                _selectedIndex++;
-                _selectedIndexByMouse = false;
-            }
-
-            if (_selectedIndex >= _results.Count)
-            {
-                _selectedIndex = _results.Count - 1;
-            }
-            else if (_selectedIndex < 0)
-            {
-                _selectedIndex = -1;
-            }
-        }
-
         private void DoResults(Rect rect)
         {
-            if (_results.Count <= 0 || !_showResults)
+            if (_results.Count <= 0)
             {
                 return;
             }
@@ -170,15 +135,21 @@ namespace Editor.Prg.Util
             {
                 RepaintFocusedWindow();
             }
-            var movedMouseInRect = _previousMousePosition != current.mousePosition;
 
             elementRect.x += Styles.ResultsBorderWidth;
             elementRect.width -= Styles.ResultsBorderWidth * 2;
             elementRect.height = Styles.ResultHeight;
 
-            var didJustSelectIndex = false;
-            for (var i = 0; i < _results.Count && i < MAXResults; i++)
+            for (var i = 0; i < _results.Count && i < MAXResults; ++i)
             {
+                if (elementRect.Contains(current.mousePosition))
+                {
+                    if (current.type == EventType.MouseDown)
+                    {
+                        _selectedIndex = i;
+                        OnConfirm(_results[i]);
+                    }
+                }
                 if (current.type == EventType.Repaint)
                 {
                     var style = i % 2 == 0 ? Styles.EntryOdd : Styles.EntryEven;
@@ -189,41 +160,7 @@ namespace Editor.Prg.Util
                     labelRect.x += Styles.ResultsLabelOffset;
                     GUI.Label(labelRect, _results[i], Styles.LabelStyle);
                 }
-                if (elementRect.Contains(current.mousePosition))
-                {
-                    if (movedMouseInRect)
-                    {
-                        _selectedIndex = i;
-                        _selectedIndexByMouse = true;
-                        didJustSelectIndex = true;
-                    }
-                    if (current.type == EventType.MouseDown)
-                    {
-                        OnConfirm(_results[i]);
-                    }
-                }
                 elementRect.y += Styles.ResultHeight;
-            }
-
-            /*if (current.type == EventType.Repaint && !didJustSelectIndex && !mouseIsInResultsRect && _selectedIndexByMouse)
-            {
-                _selectedIndex = -1;
-            }*/
-
-            /*if ((GUIUtility.hotControl != _searchField.searchFieldControlID && GUIUtility.hotControl > 0)
-                || (current.rawType == EventType.MouseDown && !mouseIsInResultsRect))
-            {
-                _showResults = false;
-            }*/
-
-            if (current.type == EventType.KeyUp && current.keyCode == KeyCode.Return && _selectedIndex >= 0)
-            {
-                OnConfirm(_results[_selectedIndex]);
-            }
-
-            if (current.type == EventType.Repaint)
-            {
-                _previousMousePosition = current.mousePosition;
             }
         }
 

@@ -14,7 +14,11 @@ namespace Prg.Scripts.Common.Unity.Localization
         [Header("Live Data"), SerializeField] private Text _text;
         private string _localizationValue;
 
-        public string LocalizationKey => _localizationKey;
+        public string LocalizationKey
+        {
+            get => _localizationKey;
+            set => _localizationKey = value;
+        }
 
         private void Awake()
         {
