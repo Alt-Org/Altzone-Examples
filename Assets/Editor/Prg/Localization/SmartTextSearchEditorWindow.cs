@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Altzone.Scripts.Config;
@@ -16,21 +15,28 @@ namespace Editor.Prg.Localization
         [MenuItem(MenuRoot + "Show Localization Window")]
         private static void SearchLocalizationKeys()
         {
+            _searchButtonStyle = new GUIStyle(EditorStyles.toolbarButton)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                richText = false
+            };
             Debug.Log("SearchLocalizationKeys");
-            GetWindow<SmartTextSearchEditorWindow>("Localization Helper")
+            GetWindow<SmartTextSearchEditorWindow>("Localization Key Utility")
                 .Show();
         }
 
+        private static GUIStyle _searchButtonStyle;
         private SearchField _searchField;
         private string _searchText;
         private string _usedSearchText;
 
         private Vector2 _scrollPosition;
-        private Vector2 _mousePosition;
-        private int _hotControlId;
 
         private List<string> _fullResults;
         private List<string> _searchResults = new List<string>();
+
+        private GameObject _activeGameObject;
+        private SmartText _smartText;
 
         private string _label1;
         private string _label2;
@@ -38,12 +44,12 @@ namespace Editor.Prg.Localization
 
         private void OnEnable()
         {
+            Debug.Log($"OnEnable");
             _searchField = new SearchField();
             _searchText = string.Empty;
             _label1 = string.Empty;
             _label2 = string.Empty;
             _label3 = string.Empty;
-            Debug.Log($"OnEnable");
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
             playerData.Language = SystemLanguage.English;
             var language = playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage;
@@ -52,7 +58,10 @@ namespace Editor.Prg.Localization
                 Localizer.LoadTranslations();
             }
             Localizer.SetLanguage(language);
-            _fullResults = Localizer.GetTranslationKeys();
+            _fullResults = Localizer.GetTranslationKeys().Where(x => !x.StartsWith("lang.")).ToList();
+            // Prevent double registration
+            Selection.selectionChanged -= SelectionChanged;
+            Selection.selectionChanged += SelectionChanged;
         }
 
         private void OnGUI()
@@ -70,33 +79,27 @@ namespace Editor.Prg.Localization
                 using (var scrollView = new EditorGUILayout.ScrollViewScope(_scrollPosition, false, false))
                 {
                     _scrollPosition = scrollView.scrollPosition;
-                    var rowCount = 0;
                     foreach (var searchResult in _searchResults)
                     {
-                        EditorGUILayout.LabelField($"{++rowCount}", searchResult);
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            if (GUILayout.Button($"{searchResult}", _searchButtonStyle))
+                            {
+                                if (_smartText == null)
+                                {
+                                    continue;
+                                }
+                                if (EditorApplication.isPlaying)
+                                {
+                                    Debug.Log(RichText.Yellow("NO change when game is playing!"));
+                                    continue;
+                                }
+                                Debug.Log($"Set localization key: {searchResult}");
+                                _smartText.LocalizationKey = searchResult;
+                            }
+                        }
                     }
                 }
-            }
-            if(Event.current.type == EventType.Layout) return;
-            var e = Event.current;
-            if (e.isMouse || e.isKey)
-            {
-                if (e.commandName == "Used")
-                {
-                    return;
-                }
-                e.commandName = "Used";
-            }
-            if (e.type == EventType.MouseDown)
-            {
-                _mousePosition = e.mousePosition;
-                Debug.Log($"Mouse Down {_mousePosition.x:F0}/{_mousePosition.y:F0}");
-                return;
-            }
-            if (e.type == EventType.MouseUp)
-            {
-                _mousePosition = e.mousePosition;
-                Debug.Log($"Mouse Up {_mousePosition.x:F0}/{_mousePosition.y:F0}");
             }
         }
 
@@ -109,9 +112,32 @@ namespace Editor.Prg.Localization
                     ? _fullResults
                     : _fullResults.Where(x => x.ToLower().Contains(_usedSearchText)).ToList();
             }
-            _label1 = $"mouse {_mousePosition.x:F0}/{_mousePosition.y:F0}";
-            _label2 = $"scroll {_scrollPosition.x:F0}/{_scrollPosition.y:F0}";
-            //_label3 = $"hot {_hotControlId}";
+        }
+
+        private void SelectionChanged()
+        {
+            _activeGameObject = Selection.activeGameObject;
+            if (_activeGameObject == null || Selection.objects.Length != 1)
+            {
+                _smartText = null;
+            }
+            else
+            {
+                _smartText = _activeGameObject.GetComponent<SmartText>();
+            }
+            if (_smartText != null)
+            {
+                _label1 = _activeGameObject.GetFullPath();
+                _label2 = _smartText.LocalizationKey;
+                _label3 = Localizer.Localize(_smartText.LocalizationKey);
+            }
+            else
+            {
+                _label1 = string.Empty;
+                _label2 = string.Empty;
+                _label3 = string.Empty;
+            }
+            Repaint();
         }
     }
 }
