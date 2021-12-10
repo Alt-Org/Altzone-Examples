@@ -4,20 +4,24 @@ using UnityEngine;
 
 namespace Editor.Prg.Editors
 {
-    [CustomEditor(typeof(SmartText))]
+    [CustomEditor(typeof(SmartText)), CanEditMultipleObjects]
     public class SmartTextEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
-            if (serializedObject.isEditingMultipleObjects)
+            if (!serializedObject.isEditingMultipleObjects)
             {
-                DrawDefaultInspector();
-                return;
+                if (GUILayout.Button("Create Localization Key"))
+                {
+                    serializedObject.Update();
+                    UpdateState(serializedObject);
+                    serializedObject.ApplyModifiedProperties();
+                }
             }
-            if (GUILayout.Button("Create Default Config"))
+            if (GUILayout.Button("Reset"))
             {
                 serializedObject.Update();
-                UpdateState(serializedObject);
+                ResetState(serializedObject);
                 serializedObject.ApplyModifiedProperties();
             }
             GUILayout.Space(20);
@@ -26,15 +30,20 @@ namespace Editor.Prg.Editors
 
         private static void UpdateState(SerializedObject serializedObject)
         {
-            var _localizationKey = serializedObject.FindProperty("_localizationKey");
-            var curValue = _localizationKey.stringValue;
+            var localizationKey = serializedObject.FindProperty("_localizationKey");
+            var curValue = localizationKey.stringValue;
             if (string.IsNullOrWhiteSpace(curValue))
             {
                 if (serializedObject.targetObject is SmartText smartText)
                 {
-                    _localizationKey.stringValue = smartText.ComponentName;
+                    localizationKey.stringValue = smartText.ComponentName;
                 }
             }
+        }
+        private static void ResetState(SerializedObject serializedObject)
+        {
+            var localizationKey = serializedObject.FindProperty("_localizationKey");
+            localizationKey.stringValue = string.Empty;
         }
     }
 }

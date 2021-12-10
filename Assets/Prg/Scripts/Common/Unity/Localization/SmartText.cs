@@ -47,12 +47,21 @@ namespace Prg.Scripts.Common.Unity.Localization
         private string GetComponentName()
         {
             // Get path without top most gameObject (that is window root).
-            var parent = gameObject;
-            var path = new StringBuilder(parent.name);
-            var followTransform = parent.transform.parent;
-            while (followTransform.parent != null)
+            var isSceneObject = gameObject.scene.handle != 0;
+            var followTransform = transform;
+            var path = new StringBuilder(followTransform.name);
+            for (;;)
             {
                 followTransform = followTransform.parent;
+                if (followTransform == null)
+                {
+                    break;
+                }
+                var pathName = followTransform.name;
+                if (pathName.ToLower().Contains("window"))
+                {
+                    continue;
+                }
                 path.Insert(0, "/").Insert(0, followTransform.name);
             }
             return path.ToString();
