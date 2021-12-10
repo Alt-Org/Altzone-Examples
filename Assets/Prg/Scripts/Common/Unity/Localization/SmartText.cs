@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,8 +8,6 @@ namespace Prg.Scripts.Common.Unity.Localization
     [RequireComponent(typeof(Text))]
     public class SmartText : MonoBehaviour
     {
-        private const string MissingMarker = "=";
-
         [SerializeField] private string _localizationKey;
 
         [Header("Live Data"), SerializeField] private Text _text;
@@ -19,6 +18,8 @@ namespace Prg.Scripts.Common.Unity.Localization
             get => _localizationKey;
             set => _localizationKey = value;
         }
+
+        public string ComponentName => GetComponentName();
 
         private void Awake()
         {
@@ -41,6 +42,20 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 _text.text = _localizationValue;
             }
+        }
+
+        private string GetComponentName()
+        {
+            // Get path without top most gameObject (that is window root).
+            var parent = gameObject;
+            var path = new StringBuilder(parent.name);
+            var followTransform = parent.transform.parent;
+            while (followTransform.parent != null)
+            {
+                followTransform = followTransform.parent;
+                path.Insert(0, "/").Insert(0, followTransform.name);
+            }
+            return path.ToString();
         }
     }
 }

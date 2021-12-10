@@ -57,8 +57,8 @@ namespace Prg.Scripts.Common.Unity.Localization
             var reasonIndex = isNoKey ? 0 : isMissing ? 1 : 2;
             var reason = _reasonTexts[reasonIndex];
             var text = component.GetComponent<Text>().text;
-            var componentName = component.GetFullPath();
-            Debug.Log($"{reason} {componentName} key={key} word={word} text={text}");
+            var componentName = component.ComponentName;
+            Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
             if (isNoKey)
             {
                 key = componentName;
@@ -71,8 +71,15 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 _debugWords = new Dictionary<string, Tuple<string, string>>();
             }
-            if (!_debugWords.ContainsKey(key))
+            if (!_debugWords.TryGetValue(key, out var tuple))
             {
+                _debugWords.Add(key, new Tuple<string, string>(word, reason));
+                return;
+            }
+            if (tuple.Item1 != word)
+            {
+                // Same key with different text!
+                key += _debugWords.Count;
                 _debugWords.Add(key, new Tuple<string, string>(word, reason));
             }
         }
@@ -208,7 +215,8 @@ namespace Prg.Scripts.Common.Unity.Localization
             Debug.Log($"Current language is {(_curLanguage != null ? _curLanguage.LanguageName.ToString() : "NOT SELECTED")}");
             foreach (var language in _languages.GetLanguages)
             {
-                Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count}");
+                Debug.Log(
+                    $"Language {language.Locale} {language.LanguageName} words {language.Words.Count} alt words {language.AltWords.Count}");
             }
             LocalizerHelper.Reset();
         }
@@ -519,7 +527,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         [Conditional("UNITY_EDITOR")]
         private static void DumpLanguage(Language language)
         {
-            Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count}");
+            Debug.Log($"Language {language.Locale} {language.LanguageName} words {language.Words.Count} alt words {language.AltWords.Count}");
         }
     }
 }
