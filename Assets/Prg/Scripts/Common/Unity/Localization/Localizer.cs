@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -38,6 +40,11 @@ namespace Prg.Scripts.Common.Unity.Localization
             _altWords = altWords;
         }
 
+#if UNITY_EDITOR
+        private readonly string[] _reasonTexts = { "NO_KEY", "MISSING", "ALT_WORD" };
+
+        private Dictionary<string, Tuple<string, string>> _debugWords;
+
         internal void TrackWords(string key, string word, SmartText component)
         {
             var hasWord = _words.ContainsKey(key);
@@ -47,13 +54,54 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             var isNoKey = string.IsNullOrWhiteSpace(key);
             var isMissing = word.StartsWith("[") && word.EndsWith("]");
-            var reason =
-                isNoKey ? "NO_KEY"
-                : isMissing ? "MISSING"
-                : "ALT_WORD";
+            var reasonIndex = isNoKey ? 0 : isMissing ? 1 : 2;
+            var reason = _reasonTexts[reasonIndex];
             var text = component.GetComponent<Text>().text;
-            Debug.Log($"{reason} {component.GetFullPath()} key={key} word={word} text={text}");
+            var componentName = component.GetFullPath();
+            Debug.Log($"{reason} {componentName} key={key} word={word} text={text}");
+            if (isNoKey)
+            {
+                key = componentName;
+            }
+            if (isMissing)
+            {
+                word = text;
+            }
+            if (_debugWords == null)
+            {
+                _debugWords = new Dictionary<string, Tuple<string, string>>();
+            }
+            if (!_debugWords.ContainsKey(key))
+            {
+                _debugWords.Add(key, new Tuple<string, string>(word, reason));
+            }
         }
+
+        internal void SaveIfDirty()
+        {
+            if (_debugWords == null)
+            {
+                return;
+            }
+            var builder = new StringBuilder();
+            {
+                foreach (var entry in _debugWords)
+                {
+                    builder.Append(entry.Key).Append('\t')
+                        .Append(entry.Value.Item1).Append('\t')
+                        .Append(entry.Value.Item2).AppendLine();
+                }
+            }
+            var text = builder.ToString();
+            var path = Path.Combine(Application.dataPath, $"_words_{Locale}.tsv");
+            if (Application.platform.ToString().ToLower().Contains("windows"))
+            {
+                path = path.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
+            }
+            Debug.Log($"Save {_debugWords.Count} words to {path}");
+            File.WriteAllText(path, text);
+        }
+#endif
     }
 
     /// <summary>
@@ -118,7 +166,9 @@ namespace Prg.Scripts.Common.Unity.Localization
         [Conditional("UNITY_EDITOR")]
         public static void TrackWords(string key, string word, SmartText component)
         {
+#if UNITY_EDITOR
             _curLanguage.TrackWords(key, word, component);
+#endif
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -134,6 +184,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             _languages = BinAsset.Load(config.LanguagesBinFile);
             SetLanguage(DefaultLanguage);
             LocalizerHelper.Reset();
+            SetEditorStatus();
         }
 
         [Conditional("UNITY_EDITOR")]
@@ -162,37 +213,61 @@ namespace Prg.Scripts.Common.Unity.Localization
             LocalizerHelper.Reset();
         }
 
-        public static List<string> GetTranslationKeys()
+        [Conditional("UNITY_EDITOR")]
+        private static void SetEditorStatus()
         {
-            return LocalizerHelper.GetTranslationKeys();
+#if UNITY_EDITOR
+            EditorApplication.playModeStateChanged += change =>
+            {
+                if (_languages != null && change == PlayModeStateChange.ExitingPlayMode)
+                {
+                    foreach (var language in _languages.GetLanguages)
+                    {
+                        language.SaveIfDirty();
+                    }
+                }
+            };
+#endif
         }
 
+        public static List<string> GetTranslationKeys()
+        {
+            return LocalizerHelper._GetTranslationKeys();
+        }
+
+        /// <summary>
+        /// Helper to provide access to selected internal data for Editor utilities to use.
+        /// </summary>
         private static class LocalizerHelper
         {
+#if UNITY_EDITOR
             private static List<string> _keys;
+#endif
 
-            public static List<string> GetTranslationKeys()
+            public static List<string> _GetTranslationKeys()
             {
-                List<string> result = null;
 #if UNITY_EDITOR
                 if (_curLanguage != null)
                 {
                     if (_keys == null)
                     {
-                        _keys = new List<string>();
-                        _keys.AddRange(_curLanguage.Words.Keys);
-                        _keys.AddRange(_curLanguage.AltWords.Keys);
+                        var set = new HashSet<string>();
+                        // AltWords should be "more complete" than Words.
+                        set.UnionWith(_curLanguage.AltWords.Keys);
+                        set.UnionWith(_curLanguage.Words.Keys);
+                        _keys = set.ToList();
                         _keys.Sort();
                     }
-                    result = _keys;
                 }
 #endif
-                return result;
+                return _keys;
             }
 
             public static void Reset()
             {
+#if UNITY_EDITOR
                 _keys = null;
+#endif
             }
         }
     }
