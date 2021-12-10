@@ -26,13 +26,23 @@ namespace Editor.Prg.Localization
         private string _usedSearchText;
 
         private Vector2 _scrollPosition;
+        private Vector2 _mousePosition;
+        private int _hotControlId;
+
         private List<string> _fullResults;
         private List<string> _searchResults = new List<string>();
+
+        private string _label1;
+        private string _label2;
+        private string _label3;
 
         private void OnEnable()
         {
             _searchField = new SearchField();
             _searchText = string.Empty;
+            _label1 = string.Empty;
+            _label2 = string.Empty;
+            _label3 = string.Empty;
             Debug.Log($"OnEnable");
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
             playerData.Language = SystemLanguage.English;
@@ -49,22 +59,44 @@ namespace Editor.Prg.Localization
         {
             using (new EditorGUILayout.VerticalScope())
             {
-                GUILayout.Label("Line 1");
-                GUILayout.Label("Line 2");
-                GUILayout.Label("Line 3");
+                EditorGUILayout.LabelField(_label1);
+                EditorGUILayout.LabelField(_label2);
+                EditorGUILayout.LabelField(_label3);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    GUILayout.Label($"Search {_searchResults.Count}:");
+                    EditorGUILayout.LabelField($"Search {_searchResults.Count}/{_fullResults.Count}:");
                     _searchText = _searchField.OnGUI(_searchText);
                 }
                 using (var scrollView = new EditorGUILayout.ScrollViewScope(_scrollPosition, false, false))
                 {
                     _scrollPosition = scrollView.scrollPosition;
+                    var rowCount = 0;
                     foreach (var searchResult in _searchResults)
                     {
-                        GUILayout.Label(searchResult);
+                        EditorGUILayout.LabelField($"{++rowCount}", searchResult);
                     }
                 }
+            }
+            if(Event.current.type == EventType.Layout) return;
+            var e = Event.current;
+            if (e.isMouse || e.isKey)
+            {
+                if (e.commandName == "Used")
+                {
+                    return;
+                }
+                e.commandName = "Used";
+            }
+            if (e.type == EventType.MouseDown)
+            {
+                _mousePosition = e.mousePosition;
+                Debug.Log($"Mouse Down {_mousePosition.x:F0}/{_mousePosition.y:F0}");
+                return;
+            }
+            if (e.type == EventType.MouseUp)
+            {
+                _mousePosition = e.mousePosition;
+                Debug.Log($"Mouse Up {_mousePosition.x:F0}/{_mousePosition.y:F0}");
             }
         }
 
@@ -77,6 +109,9 @@ namespace Editor.Prg.Localization
                     ? _fullResults
                     : _fullResults.Where(x => x.ToLower().Contains(_usedSearchText)).ToList();
             }
+            _label1 = $"mouse {_mousePosition.x:F0}/{_mousePosition.y:F0}";
+            _label2 = $"scroll {_scrollPosition.x:F0}/{_scrollPosition.y:F0}";
+            //_label3 = $"hot {_hotControlId}";
         }
     }
 }
