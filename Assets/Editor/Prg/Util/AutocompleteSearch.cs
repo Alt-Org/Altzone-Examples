@@ -205,16 +205,16 @@ namespace Editor.Prg.Util
                 elementRect.y += Styles.ResultHeight;
             }
 
-            if (current.type == EventType.Repaint && !didJustSelectIndex && !mouseIsInResultsRect && _selectedIndexByMouse)
+            /*if (current.type == EventType.Repaint && !didJustSelectIndex && !mouseIsInResultsRect && _selectedIndexByMouse)
             {
                 _selectedIndex = -1;
-            }
+            }*/
 
-            if ((GUIUtility.hotControl != _searchField.searchFieldControlID && GUIUtility.hotControl > 0)
+            /*if ((GUIUtility.hotControl != _searchField.searchFieldControlID && GUIUtility.hotControl > 0)
                 || (current.rawType == EventType.MouseDown && !mouseIsInResultsRect))
             {
                 _showResults = false;
-            }
+            }*/
 
             if (current.type == EventType.KeyUp && current.keyCode == KeyCode.Return && _selectedIndex >= 0)
             {
@@ -229,7 +229,7 @@ namespace Editor.Prg.Util
 
         private void OnConfirm(string result)
         {
-            _searchString = result;
+            //_searchString = result;
             OnConfirmCallback?.Invoke(result);
             //OnInputChangedCallback?.Invoke(result);
             RepaintFocusedWindow();
