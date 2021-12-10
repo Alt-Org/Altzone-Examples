@@ -35,25 +35,12 @@ namespace Prg.Scripts.Common.Unity.Localization
         private IEnumerator OnEnableDelayed()
         {
             yield return null;
-            if (string.IsNullOrWhiteSpace(_localizationKey))
-            {
-                _text.text = $"{MissingMarker}{_text.text}{MissingMarker}";
-                _localizationValue = "?";
-                Debug.Log($"OnEnable {gameObject.GetFullPath()} ({_localizationValue}) {_text.text}");
-                yield break;
-            }
             _localizationValue = Localizer.Localize(_localizationKey);
-            if (_localizationValue.StartsWith("[") && _localizationValue.EndsWith("]"))
-            {
-                _text.text = $"{MissingMarker}{_text.text}{MissingMarker}";
-                _localizationValue = "MIS";
-            }
-            else
+            Localizer.TrackWords(_localizationKey, _localizationValue, this);
+            if (string.IsNullOrWhiteSpace(_localizationValue))
             {
                 _text.text = _localizationValue;
-                _localizationValue = "ok";
             }
-            Debug.Log($"OnEnable {_localizationKey} ({_localizationValue}) {_text.text}");
         }
     }
 }

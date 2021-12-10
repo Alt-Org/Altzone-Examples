@@ -6,6 +6,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 namespace Prg.Scripts.Common.Unity.Localization
 {
@@ -35,6 +36,23 @@ namespace Prg.Scripts.Common.Unity.Localization
             Locale = localeName;
             _words = words;
             _altWords = altWords;
+        }
+
+        internal void TrackWords(string key, string word, SmartText component)
+        {
+            var hasWord = _words.ContainsKey(key);
+            if (hasWord)
+            {
+                return;
+            }
+            var isNoKey = string.IsNullOrWhiteSpace(key);
+            var isMissing = word.StartsWith("[") && word.EndsWith("]");
+            var reason =
+                isNoKey ? "NO_KEY"
+                : isMissing ? "MISSING"
+                : "ALT_WORD";
+            var text = component.GetComponent<Text>().text;
+            Debug.Log($"{reason} {component.GetFullPath()} key={key} word={word} text={text}");
         }
     }
 
@@ -95,6 +113,12 @@ namespace Prg.Scripts.Common.Unity.Localization
         {
             Debug.Log($"SetLanguage {language}");
             _curLanguage = _languages.GetLanguage(language);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        public static void TrackWords(string key, string word, SmartText component)
+        {
+            _curLanguage.TrackWords(key, word, component);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
