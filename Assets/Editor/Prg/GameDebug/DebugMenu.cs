@@ -9,7 +9,7 @@ namespace Editor.Prg.GameDebug
 {
     public static class DebugMenu
     {
-        public const string MenuRoot = "Window/ALT-Zone/Game Debug/";
+        private const string MenuRoot = "Window/ALT-Zone/Game Debug/";
 
         [MenuItem(MenuRoot +"Show Player Data", false, 1)]
         private static void ShowLocalPlayerData()
@@ -32,7 +32,7 @@ namespace Editor.Prg.GameDebug
             Debug.Log(playerData.ToString());
         }
 
-        [MenuItem(MenuRoot +"Set Language to EN", false, 3)]
+        [MenuItem(MenuRoot +"Set Player Language to EN", false, 3)]
         private static void SetLanguageToEn()
         {
             Debug.Log("*");
