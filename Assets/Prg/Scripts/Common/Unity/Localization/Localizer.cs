@@ -43,7 +43,11 @@ namespace Prg.Scripts.Common.Unity.Localization
         #region Localization process in Editor
 
 #if UNITY_EDITOR
-        private readonly string[] _reasonTexts = { "NO_KEY", "MISSING", "ALT_WORD" };
+        private const int NoKey = 0;
+        private const int NoText = 1;
+        private const int AltText = 2;
+
+        private readonly string[] _reasonTexts = { "NO_KEY", "NO_TEXT", "ALT_TEXT" };
 
         private Dictionary<string, Tuple<string, int>> _debugWords;
 
@@ -56,7 +60,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             var isNoKey = string.IsNullOrWhiteSpace(key);
             var isMissing = word.StartsWith("[") && word.EndsWith("]");
-            var reasonIndex = isNoKey ? 0 : isMissing ? 1 : 2;
+            var reasonIndex = isNoKey ? NoKey : isMissing ? NoText : AltText;
             var reason = _reasonTexts[reasonIndex];
             var text = component.GetComponent<Text>().text;
             var componentName = component.ComponentName;
@@ -104,7 +108,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                         .Append(entry.Value).AppendLine();
                 }
                 // Sort "new" words by category.
-                foreach (var item2 in new[] { 0, 1, 2 })
+                foreach (var item2 in new[] { NoKey, NoText, AltText })
                 {
                     foreach (var entry in _debugWords)
                     {
@@ -202,7 +206,6 @@ namespace Prg.Scripts.Common.Unity.Localization
                 return;
             }
             _languages = BinAsset.Load(config.LanguagesBinFile);
-            LocalizerHelper.Reset();
             LocalizerHelper.SetEditorStatus();
         }
 
@@ -214,7 +217,8 @@ namespace Prg.Scripts.Common.Unity.Localization
         /// </remarks>
         public static class LocalizerHelper
         {
-            private static List<string> _keys;
+            private static List<string> _cachedKeys;
+            private static string _localeForKeys;
 
             [Conditional("UNITY_EDITOR")]
             internal static void SetEditorStatus()
@@ -253,7 +257,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 Assert.IsNotNull(config, "config != null");
                 var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
                 BinAsset.Save(languages, config.LanguagesBinFile);
-                Reset();
+                ResetKeys();
             }
 
             /// <summary>
@@ -273,33 +277,36 @@ namespace Prg.Scripts.Common.Unity.Localization
                     Debug.Log(
                         $"Language {language.Locale} {language.LanguageName} words {language.Words.Count} alt words {language.AltWords.Count}");
                 }
-                Reset();
             }
 
             /// <summary>
             /// Gets sorted list of all localization keys found in current language.
             /// </summary>
-            /// <returns></returns>
+            /// <remarks>
+            /// We cache this because UI might ask it frequently.
+            /// </remarks>
             public static List<string> GetTranslationKeys()
             {
                 if (_curLanguage != null)
                 {
-                    if (_keys == null)
+                    if (_cachedKeys == null || _curLanguage.Locale != _localeForKeys)
                     {
                         var set = new HashSet<string>();
                         // AltWords should be "more complete" than Words.
                         set.UnionWith(_curLanguage.AltWords.Keys);
                         set.UnionWith(_curLanguage.Words.Keys);
-                        _keys = set.ToList();
-                        _keys.Sort();
+                        _cachedKeys = set.ToList();
+                        _cachedKeys.Sort();
+                        _localeForKeys = _curLanguage.Locale;
                     }
                 }
-                return _keys;
+                return _cachedKeys;
             }
 
-            internal static void Reset()
+            private static void ResetKeys()
             {
-                _keys = null;
+                _cachedKeys = null;
+                _localeForKeys = null;
             }
         }
     }
