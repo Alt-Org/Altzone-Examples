@@ -70,7 +70,6 @@ namespace Editor.Prg.Localization
             _label2 = string.Empty;
             _label3 = string.Empty;
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            playerData.Language = SystemLanguage.English;
             var language = playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage;
             if (!Localizer.HasLanguage(language))
             {
