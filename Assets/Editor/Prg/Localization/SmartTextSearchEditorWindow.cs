@@ -5,6 +5,7 @@ using Prg.Scripts.Common.Unity.Localization;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Editor.Prg.Localization
 {
@@ -15,22 +16,35 @@ namespace Editor.Prg.Localization
         [MenuItem(MenuRoot + "Show Localization Window")]
         private static void SearchLocalizationKeys()
         {
-            _searchButtonStyle = new GUIStyle(EditorStyles.toolbarButton)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                richText = false
-            };
             Debug.Log("SearchLocalizationKeys");
             GetWindow<SmartTextSearchEditorWindow>("Localization Key Utility")
                 .Show();
         }
 
-        private static GUIStyle _searchButtonStyle;
+        private void CreateStyles()
+        {
+            _searchButtonStyle = new GUIStyle(EditorStyles.toolbarButton)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                richText = false
+            };
+            _label1Style = new GUIStyle(EditorStyles.label)
+            {
+                normal = new GUIStyleState
+                {
+                    textColor = Color.blue
+                },
+                alignment = TextAnchor.MiddleLeft,
+                richText = false
+            };
+        }
+
+        private GUIStyle _searchButtonStyle;
+        private GUIStyle _label1Style;
+
         private SearchField _searchField;
         private string _searchText;
         private string _usedSearchText;
-
-        private Vector2 _scrollPosition;
 
         private List<string> _fullResults;
         private List<string> _searchResults = new List<string>();
@@ -41,10 +55,12 @@ namespace Editor.Prg.Localization
         private string _label1;
         private string _label2;
         private string _label3;
+        private Vector2 _scrollPosition;
 
         private void OnEnable()
         {
             Debug.Log($"OnEnable");
+            CreateStyles();
             _searchField = new SearchField();
             _searchText = string.Empty;
             _label1 = string.Empty;
@@ -64,11 +80,16 @@ namespace Editor.Prg.Localization
             Selection.selectionChanged += SelectionChanged;
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log($"OnDestroy");
+        }
+
         private void OnGUI()
         {
             using (new EditorGUILayout.VerticalScope())
             {
-                EditorGUILayout.LabelField(_label1);
+                EditorGUILayout.LabelField(_label1, _label1Style);
                 EditorGUILayout.LabelField(_label2);
                 EditorGUILayout.LabelField(_label3);
                 using (new EditorGUILayout.HorizontalScope())
@@ -87,6 +108,7 @@ namespace Editor.Prg.Localization
                             {
                                 if (_smartText == null)
                                 {
+                                    Debug.Log($"Nothing selected to set localization key");
                                     continue;
                                 }
                                 if (EditorApplication.isPlaying)
@@ -120,16 +142,23 @@ namespace Editor.Prg.Localization
             if (_activeGameObject == null || Selection.objects.Length != 1)
             {
                 _smartText = null;
+                _label1 = string.Empty;
+                _label2 = string.Empty;
+                _label3 = string.Empty;
+                return;
             }
-            else
-            {
-                _smartText = _activeGameObject.GetComponent<SmartText>();
-            }
+            _smartText = _activeGameObject.GetComponent<SmartText>();
             if (_smartText != null)
             {
                 _label1 = _activeGameObject.GetFullPath();
                 _label2 = _smartText.LocalizationKey;
                 _label3 = Localizer.Localize(_smartText.LocalizationKey);
+            }
+            else if (_activeGameObject.GetComponent<Text>() != null)
+            {
+                _label1 = _activeGameObject.GetFullPath();
+                _label2 = "Text is NOT localized!";
+                _label3 = string.Empty;
             }
             else
             {
