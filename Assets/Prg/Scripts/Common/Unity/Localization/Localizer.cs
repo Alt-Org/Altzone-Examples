@@ -40,6 +40,8 @@ namespace Prg.Scripts.Common.Unity.Localization
             _altWords = altWords;
         }
 
+        #region Localization process in Editor
+
 #if UNITY_EDITOR
         private readonly string[] _reasonTexts = { "NO_KEY", "MISSING", "ALT_WORD" };
 
@@ -126,6 +128,8 @@ namespace Prg.Scripts.Common.Unity.Localization
             File.WriteAllText(path, text);
         }
 #endif
+
+        #endregion
     }
 
     /// <summary>
@@ -187,14 +191,6 @@ namespace Prg.Scripts.Common.Unity.Localization
             _curLanguage = _languages.GetLanguage(language);
         }
 
-        [Conditional("UNITY_EDITOR")]
-        public static void TrackWords(string key, string word, SmartText component)
-        {
-#if UNITY_EDITOR
-            _curLanguage.TrackWords(key, word, component);
-#endif
-        }
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void LoadTranslations()
         {
@@ -207,74 +203,85 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             _languages = BinAsset.Load(config.LanguagesBinFile);
             LocalizerHelper.Reset();
-            SetEditorStatus();
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        public static void SaveTranslations()
-        {
-            var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
-            Assert.IsNotNull(config, "config != null");
-            var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
-            BinAsset.Save(languages, config.LanguagesBinFile);
-            LocalizerHelper.Reset();
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        public static void ShowTranslations()
-        {
-            if (_languages == null)
-            {
-                Debug.Log("No languages loaded");
-                return;
-            }
-            Debug.Log($"Current language is {(_curLanguage != null ? _curLanguage.LanguageName.ToString() : "NOT SELECTED")}");
-            foreach (var language in _languages.GetLanguages)
-            {
-                Debug.Log(
-                    $"Language {language.Locale} {language.LanguageName} words {language.Words.Count} alt words {language.AltWords.Count}");
-            }
-            LocalizerHelper.Reset();
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private static void SetEditorStatus()
-        {
-#if UNITY_EDITOR
-            void PlayModeStateChangeCallback(PlayModeStateChange change)
-            {
-                if (_languages != null && change == PlayModeStateChange.ExitingPlayMode)
-                {
-                    foreach (var language in _languages.GetLanguages)
-                    {
-                        language.SaveIfDirty();
-                    }
-                }
-            }
-
-            // Trying to keep at most one callback alive at a time.
-            EditorApplication.playModeStateChanged -= PlayModeStateChangeCallback;
-            EditorApplication.playModeStateChanged += PlayModeStateChangeCallback;
-#endif
-        }
-
-        public static List<string> GetTranslationKeys()
-        {
-            return LocalizerHelper._GetTranslationKeys();
+            LocalizerHelper.SetEditorStatus();
         }
 
         /// <summary>
-        /// Helper to provide access to selected internal data for Editor utilities to use.
+        /// Helper to provide access to selected internal localization data for Editor utilities to use.
         /// </summary>
-        private static class LocalizerHelper
+        /// <remarks>
+        /// This is mostly used for "Localization process in Editor"
+        /// </remarks>
+        public static class LocalizerHelper
         {
-#if UNITY_EDITOR
             private static List<string> _keys;
-#endif
 
-            public static List<string> _GetTranslationKeys()
+            [Conditional("UNITY_EDITOR")]
+            internal static void SetEditorStatus()
             {
 #if UNITY_EDITOR
+                void PlayModeStateChangeCallback(PlayModeStateChange change)
+                {
+                    if (_languages != null && change == PlayModeStateChange.ExitingPlayMode)
+                    {
+                        foreach (var language in _languages.GetLanguages)
+                        {
+                            language.SaveIfDirty();
+                        }
+                    }
+                }
+
+                // Trying to keep at most one callback alive at a time.
+                EditorApplication.playModeStateChanged -= PlayModeStateChangeCallback;
+                EditorApplication.playModeStateChanged += PlayModeStateChangeCallback;
+#endif
+            }
+
+            [Conditional("UNITY_EDITOR")]
+            public static void TrackWords(string key, string word, SmartText component)
+            {
+                _curLanguage.TrackWords(key, word, component);
+            }
+
+            /// <summary>
+            /// Save translations from .tsv file to internal binary format.
+            /// </summary>
+            [Conditional("UNITY_EDITOR")]
+            public static void SaveTranslations()
+            {
+                var config = Resources.Load<LocalizationConfig>(nameof(LocalizationConfig));
+                Assert.IsNotNull(config, "config != null");
+                var languages = TsvLoader.LoadTranslations(config.TranslationsTsvFile);
+                BinAsset.Save(languages, config.LanguagesBinFile);
+                Reset();
+            }
+
+            /// <summary>
+            /// Show current translations info if they are loaded.
+            /// </summary>
+            [Conditional("UNITY_EDITOR")]
+            public static void ShowTranslations()
+            {
+                if (_languages == null)
+                {
+                    Debug.Log("No languages loaded");
+                    return;
+                }
+                Debug.Log($"Current language is {(_curLanguage != null ? _curLanguage.LanguageName.ToString() : "NOT SELECTED")}");
+                foreach (var language in _languages.GetLanguages)
+                {
+                    Debug.Log(
+                        $"Language {language.Locale} {language.LanguageName} words {language.Words.Count} alt words {language.AltWords.Count}");
+                }
+                Reset();
+            }
+
+            /// <summary>
+            /// Gets sorted list of all localization keys found in current language.
+            /// </summary>
+            /// <returns></returns>
+            public static List<string> GetTranslationKeys()
+            {
                 if (_curLanguage != null)
                 {
                     if (_keys == null)
@@ -287,15 +294,12 @@ namespace Prg.Scripts.Common.Unity.Localization
                         _keys.Sort();
                     }
                 }
-#endif
                 return _keys;
             }
 
-            public static void Reset()
+            internal static void Reset()
             {
-#if UNITY_EDITOR
                 _keys = null;
-#endif
             }
         }
     }

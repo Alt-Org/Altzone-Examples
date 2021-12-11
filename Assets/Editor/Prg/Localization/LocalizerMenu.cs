@@ -3,6 +3,9 @@ using UnityEditor;
 
 namespace Editor.Prg.Localization
 {
+    /// <summary>
+    /// Localization process in Editor menu commands.
+    /// </summary>
     public static class LocalizerMenu
     {
         public const string MenuRoot = "Window/ALT-Zone/Localization/";
@@ -18,14 +21,14 @@ namespace Editor.Prg.Localization
         private static void SaveTranslations()
         {
             Debug.Log("*");
-            Localizer.SaveTranslations();
+            Localizer.LocalizerHelper.SaveTranslations();
         }
 
         [MenuItem(MenuRoot + "Show Translations (bin)", false, 3)]
         private static void ShowTranslations()
         {
             Debug.Log("*");
-            Localizer.ShowTranslations();
+            Localizer.LocalizerHelper.ShowTranslations();
         }
     }
 }

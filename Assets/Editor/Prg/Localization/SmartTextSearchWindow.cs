@@ -126,7 +126,7 @@ namespace Editor.Prg.Localization
 
         private void OnInputChanged(string searchString)
         {
-            var results = Localizer.GetTranslationKeys();
+            var results = Localizer.LocalizerHelper.GetTranslationKeys();
             searchString = searchString?.ToLower() ?? string.Empty;
             var search = string.IsNullOrEmpty(searchString)
                 ? results

@@ -38,7 +38,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         {
             yield return null;
             _localizationValue = Localizer.Localize(_localizationKey);
-            Localizer.TrackWords(_localizationKey, _localizationValue, this);
+            Localizer.LocalizerHelper.TrackWords(_localizationKey, _localizationValue, this);
             if (string.IsNullOrWhiteSpace(_localizationValue))
             {
                 _text.text = _localizationValue;

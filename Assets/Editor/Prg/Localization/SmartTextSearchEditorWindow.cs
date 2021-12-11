@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 namespace Editor.Prg.Localization
 {
+    /// <summary>
+    /// Localization process in Editor utility window.
+    /// </summary>
     public class SmartTextSearchEditorWindow : EditorWindow
     {
         private const string MenuRoot = LocalizerMenu.MenuRoot;
@@ -74,10 +77,12 @@ namespace Editor.Prg.Localization
                 Localizer.LoadTranslations();
             }
             Localizer.SetLanguage(language);
-            _fullResults = Localizer.GetTranslationKeys().Where(x => !x.StartsWith("lang.")).ToList();
+            _fullResults = Localizer.LocalizerHelper.GetTranslationKeys().Where(x => !x.StartsWith("lang.")).ToList();
             // Prevent double registration
             Selection.selectionChanged -= SelectionChanged;
             Selection.selectionChanged += SelectionChanged;
+            // Wake up call.
+            SelectionChanged();
         }
 
         private void OnDestroy()
@@ -163,7 +168,7 @@ namespace Editor.Prg.Localization
             else
             {
                 _label1 = string.Empty;
-                _label2 = string.Empty;
+                _label2 = "NO Text component!";
                 _label3 = string.Empty;
             }
             Repaint();
