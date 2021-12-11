@@ -12,7 +12,6 @@ namespace Prg.Scripts.Common.Unity.Localization
         [SerializeField] private string _localizationKey;
 
         [Header("Live Data"), SerializeField] private Text _text;
-        private string _localizationValue;
 
         public string LocalizationKey
         {
@@ -37,17 +36,9 @@ namespace Prg.Scripts.Common.Unity.Localization
         private IEnumerator OnEnableDelayed()
         {
             yield return null;
-            _localizationValue = Localizer.Localize(_localizationKey);
-            TrackWords(this);
-            if (string.IsNullOrWhiteSpace(_localizationValue))
-            {
-                _text.text = _localizationValue;
-            }
-        }
-
-        public static void TrackWords(SmartText smartText)
-        {
-            Localizer.LocalizerHelper.TrackWords(smartText._localizationKey, smartText._localizationValue, smartText);
+            var localizedText = Localizer.Localize(_localizationKey);
+            _text.text = localizedText;
+            Localizer.LocalizerHelper.TrackWords(this, _localizationKey, localizedText);
         }
 
         private string GetComponentName()

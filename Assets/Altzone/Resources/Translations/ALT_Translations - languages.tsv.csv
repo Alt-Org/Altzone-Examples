@@ -12,19 +12,13 @@ lang.ch	中文
 lang.tw	中文		
 menu.language	Language	Kieli	Språk
 app.name	Altzone Game	Altzone Game	Altzone Spel
-			
+App/Dummy/Key	-override this key-		
+ButtonBack/Text	Back		
 ButtonBackMini/Text	Back		
 FooterPanel/FooterText	Footer		
 HeaderPanel/ButtonBackMini	Back		
 HeaderPanel/TitleText	choose language		
-HeaderPanel/TitleText16	player name		
-HeaderPanel/TitleText27	altzone lobby		
-HeaderPanel/TitleText30	window name		
-HeaderPanel/TitleText34	player name		
-HeaderPanel/TitleText5	loading		
-LanguageSelection/Button	Continue		
-LanguageSelection/Button	Continue		
-LanguageSelection/TextLabel	Choose your language:		
+LanguageSelection/ContinueButton	Continue		
 LanguageSelection/TextLabel	Choose your language:		
 LanguageSelection/TitleText	choose language		
 Loader/TextLabel	Wait for application to load		
@@ -39,8 +33,6 @@ PlayerNameFirst/InputField/Placeholder	playername
 PlayerNameFirst/TextLabel	Choose your player name		
 PlayerNameFirst/TitleText	player name		
 PlayerNameNormal/ButtonBack	Continue		
-PlayerNameNormal/ButtonBackMini	Back		
-PlayerNameNormal/FooterText	Footer		
 PlayerNameNormal/InputField/Placeholder	playername		
 PlayerNameNormal/TextLabel	Choose your player name		
 PlayerNameNormal/TitleText	player name		
@@ -49,7 +41,6 @@ TermsOfService/TextLabel1	I have read the Terms and Conditions
 TermsOfService/TextLabel2	in above Company's web page		
 TermsOfService/TitleText	terms of service		
 TermsOfService/Toggle/Label	Accept		
-Toggle/Label	Accept		
 UserSettings/CharacterSelectionButton	Character Selection		
 UserSettings/PlayerNameButton	Player Name		
 UserSettings/TitleText	user settings		

@@ -78,7 +78,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Accept
+  m_Text: Toggle
 --- !u!114 &7923462411407431653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5702b5eba140009036598614059259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _localizationKey: Toggle/Label
+  _localizationKey: App/Dummy/Key
   _text: {fileID: 0}
 --- !u!1 &3779439164741787977
 GameObject:

@@ -50,16 +50,22 @@ namespace Prg.Scripts.Common.Unity.Localization
         private readonly string[] _reasonTexts = { "NO_KEY", "NO_TEXT", "ALT_TEXT" };
 
         private Dictionary<string, Tuple<string, int>> _debugWords;
+        private HashSet<string> _usedWords;
 
-        internal void TrackWords(string key, string word, SmartText component)
+        internal void TrackWords(SmartText component, string key, string word)
         {
             var hasWord = _words.ContainsKey(key);
             if (hasWord)
             {
+                if (_usedWords == null)
+                {
+                    _usedWords = new HashSet<string>();
+                }
+                _usedWords.Add(key);
                 return;
             }
             var isNoKey = string.IsNullOrWhiteSpace(key);
-            var isMissing = word.StartsWith("[") && word.EndsWith("]");
+            var isMissing = string.IsNullOrEmpty(word) || (word.StartsWith("[") && word.EndsWith("]"));
             var reasonIndex = isNoKey ? NoKey : isMissing ? NoText : AltText;
             var reason = _reasonTexts[reasonIndex];
             var text = component.GetComponent<Text>().text;
@@ -104,8 +110,10 @@ namespace Prg.Scripts.Common.Unity.Localization
                 // Add current words "as is".
                 foreach (var entry in _words)
                 {
+                    var used = _usedWords.Contains(entry.Key) ? "\tIN_USE" : "";
                     builder.Append(entry.Key).Append('\t')
-                        .Append(entry.Value).AppendLine();
+                        .Append(entry.Value)
+                        .Append(used).AppendLine();
                 }
                 // Sort "new" words by category.
                 foreach (var item2 in new[] { NoKey, NoText, AltText })
@@ -239,9 +247,9 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
 
             [Conditional("UNITY_EDITOR")]
-            public static void TrackWords(string key, string word, SmartText component)
+            public static void TrackWords(SmartText component, string key, string word)
             {
-                _curLanguage.TrackWords(key, word, component);
+                _curLanguage.TrackWords(component, key, word);
             }
 
             [Conditional("UNITY_EDITOR")]

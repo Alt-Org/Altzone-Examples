@@ -84,7 +84,10 @@ namespace Editor.Prg.Localization
                 return;
             }
             context.Add(new SmartTextContext(parent, "1 SmartText: ", child));
-            SmartText.TrackWords(smartText);
+            // Emulate SmartText localization
+            var localizationKey = smartText.LocalizationKey;
+            var localizedText = Localizer.Localize(localizationKey);
+            Localizer.LocalizerHelper.TrackWords(smartText, localizationKey, localizedText);
         }
 
         private class SmartTextContext
