@@ -291,10 +291,13 @@ namespace Altzone.Scripts.Window
             var isSceneObject = prefab.scene.handle != 0;
             if (!isSceneObject)
             {
-                prefab = Instantiate(prefab);
-                if (_windowsParent != null)
+                if (_windowsParent == null)
                 {
-                    prefab.transform.SetParent(_windowsParent.transform);
+                    prefab = Instantiate(prefab);
+                }
+                else
+                {
+                    prefab = Instantiate(prefab, _windowsParent.transform);
                 }
                 prefab.name = prefab.name.Replace("(Clone)", string.Empty);
             }
