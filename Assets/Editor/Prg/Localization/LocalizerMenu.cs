@@ -49,6 +49,7 @@ namespace Editor.Prg.Localization
             }
             Localizer.SetLanguage(language);
             DoSmartTextAndTextAssetCheck();
+            Localizer.LocalizerHelper.SaveIfDirty();
         }
 
         private static void DoSmartTextAndTextAssetCheck()

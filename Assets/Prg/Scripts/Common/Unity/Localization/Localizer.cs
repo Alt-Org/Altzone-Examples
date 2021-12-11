@@ -123,12 +123,12 @@ namespace Prg.Scripts.Common.Unity.Localization
                 }
             }
             var text = builder.ToString();
-            var path = Path.Combine(Application.dataPath, $"_words_{Locale}.tsv");
+            var path = Path.Combine(Application.dataPath, $"_dirty_words_{Locale}_tsv.txt");
             if (Application.platform.ToString().ToLower().Contains("windows"))
             {
                 path = path.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
             }
-            Debug.Log($"Save {_debugWords.Count} NEW words to {path}");
+            Debug.Log($"Save {_debugWords.Count} NEW 'dirty' words to {path}");
             File.WriteAllText(path, text);
         }
 #endif
@@ -226,12 +226,9 @@ namespace Prg.Scripts.Common.Unity.Localization
 #if UNITY_EDITOR
                 void PlayModeStateChangeCallback(PlayModeStateChange change)
                 {
-                    if (_languages != null && change == PlayModeStateChange.ExitingPlayMode)
+                    if (change == PlayModeStateChange.ExitingPlayMode)
                     {
-                        foreach (var language in _languages.GetLanguages)
-                        {
-                            language.SaveIfDirty();
-                        }
+                        SaveIfDirty();
                     }
                 }
 
@@ -245,6 +242,18 @@ namespace Prg.Scripts.Common.Unity.Localization
             public static void TrackWords(string key, string word, SmartText component)
             {
                 _curLanguage.TrackWords(key, word, component);
+            }
+
+            [Conditional("UNITY_EDITOR")]
+            public static void SaveIfDirty()
+            {
+                if (_languages != null)
+                {
+                    foreach (var language in _languages.GetLanguages)
+                    {
+                        language.SaveIfDirty();
+                    }
+                }
             }
 
             /// <summary>
