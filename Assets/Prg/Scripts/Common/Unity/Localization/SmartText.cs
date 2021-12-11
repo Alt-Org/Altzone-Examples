@@ -38,11 +38,16 @@ namespace Prg.Scripts.Common.Unity.Localization
         {
             yield return null;
             _localizationValue = Localizer.Localize(_localizationKey);
-            Localizer.LocalizerHelper.TrackWords(_localizationKey, _localizationValue, this);
+            TrackWords(this);
             if (string.IsNullOrWhiteSpace(_localizationValue))
             {
                 _text.text = _localizationValue;
             }
+        }
+
+        public static void TrackWords(SmartText smartText)
+        {
+            Localizer.LocalizerHelper.TrackWords(smartText._localizationKey, smartText._localizationValue, smartText);
         }
 
         private string GetComponentName()
