@@ -75,7 +75,7 @@ namespace Editor.Prg
                     // Missing components will be null, we can't find their type, etc.
                     if (!component)
                     {
-                        Debug.LogWarning($"Missing Component ? in GameObject: {GetFullPath(go)}", go);
+                        Debug.LogWarning($"Missing Component ? in GameObject: {go.GetFullPath()}", go);
                         continue;
                     }
                     var so = new SerializedObject(component);
@@ -135,22 +135,15 @@ namespace Editor.Prg
                              && go.hideFlags == HideFlags.None).ToArray();
         }
 
-        private static void ShowMissing(string context, GameObject go, string componentName, string propertyName)
+        private static void ShowMissing(string context, GameObject gameObject, string componentName, string propertyName)
         {
-            Debug.LogWarning($"Missing Ref in: [{context}]{GetFullPath(go)}. Component: {componentName}, Property: {propertyName}");
+            Debug.LogWarning(
+                $"Missing Ref in: [{context}]{gameObject.GetFullPath()}. Component: {componentName}, Property: {propertyName}", gameObject);
         }
 
         /*private static void ShowMissing(string context, ScriptableObject so, string propertyName, Type propertyType)
         {
             Debug.LogWarning($"Missing Ref in: [{context}]{so.name}. Property: {propertyName} ({propertyType.Name})");
         }*/
-
-        private static string GetFullPath(GameObject go)
-        {
-            var parent = go.transform.parent;
-            return parent == null
-                ? go.name
-                : GetFullPath(parent.gameObject) + "/" + go.name;
-        }
     }
 }
