@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace GameUi.Scripts.FirstTime
 {
-    public class FirstTimeView : MonoBehaviour
+    public class TermsOfServiceView : MonoBehaviour
     {
         [SerializeField] private Toggle _acceptToS;
         [SerializeField] private Button _linkButton;
@@ -18,9 +18,15 @@ namespace GameUi.Scripts.FirstTime
             _linkButton.SetCaption(text);
         }
 
-        public void SetCanContinue(bool canContinue)
+        public void SetMustAcceptToS()
         {
-            _continueButton.interactable = canContinue;
+            _acceptToS.isOn = false;
+            _continueButton.interactable = false;
+        }
+
+        public void SetCanContinue(bool state)
+        {
+            _continueButton.interactable = state;
         }
     }
 }

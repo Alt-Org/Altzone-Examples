@@ -20,6 +20,11 @@ namespace Altzone.Scripts.Window
         void RegisterGoBackHandlerOnce(Func<WindowManager.GoBackAction> handler);
 
         /// <summary>
+        /// Unregisters callback handler.
+        /// </summary>
+        void UnRegisterGoBackHandlerOnce(Func<WindowManager.GoBackAction> handler);
+
+        /// <summary>
         /// Go back in window chain following bread crumbs.
         /// </summary>
         void GoBack();

@@ -56,6 +56,11 @@ namespace GameUi.Scripts.LanguageSelection
             SetLanguage(language);
         }
 
+        private void OnDisable()
+        {
+            WindowManager.Get().UnRegisterGoBackHandlerOnce(AbortGoBackAlways);
+        }
+
         private static WindowManager.GoBackAction AbortGoBackAlways()
         {
             WindowManager.Get().RegisterGoBackHandlerOnce(AbortGoBackAlways);

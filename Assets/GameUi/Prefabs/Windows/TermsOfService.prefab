@@ -418,6 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _view: {fileID: 301710761442405320}
+  _previousWindow: {fileID: 11400000, guid: 69e9f27591e39564c99ebf02e61cb974, type: 2}
   _nextWindow: {fileID: 11400000, guid: 476f8a40d22528f40ba630526eb84b07, type: 2}
   _companyUrl: {fileID: 11400000, guid: 79de4d3b46ab3964e930e8457bac40b5, type: 2}
 --- !u!1 &2877994163622974770

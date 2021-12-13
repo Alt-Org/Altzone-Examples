@@ -7,9 +7,10 @@ using UnityEngine.Assertions;
 
 namespace GameUi.Scripts.FirstTime
 {
-    public class FirstTimeController : MonoBehaviour
+    public class TermsOfServiceController : MonoBehaviour
     {
-        [SerializeField] private FirstTimeView _view;
+        [SerializeField] private TermsOfServiceView _view;
+        [SerializeField] private WindowDef _previousWindow;
         [SerializeField] private WindowDef _nextWindow;
         [SerializeField] private LinkToHtmlPage _companyUrl;
 
@@ -29,10 +30,17 @@ namespace GameUi.Scripts.FirstTime
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (playerData.IsTosAccepted)
             {
-                StartCoroutine(LoadNextWindow(playerData.Language));
+                StartCoroutine(LoadNextWindow());
                 return;
             }
-            _view.SetCanContinue(false);
+            _view.SetMustAcceptToS();
+            WindowManager.Get().RegisterGoBackHandlerOnce(GoBackAlways);
+        }
+
+        private WindowManager.GoBackAction GoBackAlways()
+        {
+            WindowManager.Get().ShowWindow(_previousWindow);
+            return WindowManager.GoBackAction.Abort;
         }
 
         private void AcceptToS(bool state)
@@ -53,7 +61,7 @@ namespace GameUi.Scripts.FirstTime
             Debug.Log($"TOS ACCEPTED {playerData}");
         }
 
-        private IEnumerator LoadNextWindow(SystemLanguage language)
+        private IEnumerator LoadNextWindow()
         {
             yield return null;
             WindowManager.Get().ShowWindow(_nextWindow);

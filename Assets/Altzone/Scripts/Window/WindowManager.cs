@@ -123,6 +123,10 @@ namespace Altzone.Scripts.Window
             _goBackOnceHandler += handler;
         }
 
+        void IWindowManager.UnRegisterGoBackHandlerOnce(Func<GoBackAction> handler)
+        {
+            _goBackOnceHandler -= handler;
+        }
         void IWindowManager.GoBack()
         {
             Debug.Log($"GoBack count {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
