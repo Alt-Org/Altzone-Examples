@@ -18,5 +18,10 @@ namespace GameUi.Scripts.PlayerName
         public InputField PlayerNameInput => _playerName;
         public Button BackButton => _backButton;
         public Button ContinueButton => _continueButton;
+
+        public void HideBackButton()
+        {
+            _backButton.gameObject.SetActive(false);
+        }
     }
 }

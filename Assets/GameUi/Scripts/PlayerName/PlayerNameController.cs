@@ -31,7 +31,7 @@ namespace GameUi.Scripts.PlayerName
             _view.PlayerName = playerData.PlayerName;
             if (_isFirstTimeLoader)
             {
-                _view.BackButton.gameObject.SetActive(false);
+                _view.HideBackButton();
             }
         }
 
