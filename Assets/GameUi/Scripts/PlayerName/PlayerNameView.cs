@@ -20,15 +20,18 @@ namespace GameUi.Scripts.PlayerName
         public Button BackButton => _backButton;
         public Button ContinueButton => _continueButton;
 
-        public void HideWhenFirstTime()
+        public void ShowNormalOperation()
         {
+            _backButtonMini.gameObject.SetActive(true);
+            _backButton.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
         }
 
-        public void HideWhenNormalOperation()
+        public void ShowFirstTime()
         {
             _backButtonMini.gameObject.SetActive(false);
             _backButton.gameObject.SetActive(false);
+            _continueButton.gameObject.SetActive(true);
         }
     }
 }

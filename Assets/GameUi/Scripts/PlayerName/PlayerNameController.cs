@@ -26,16 +26,17 @@ namespace GameUi.Scripts.PlayerName
 
         private void OnEnable()
         {
+            Debug.Log($"OnEnable FirsTime {RuntimeGameConfig.IsFirsTimePlaying} windows #{WindowManager.Get().WindowCount}");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log(playerData.ToString());
+            Debug.Log($"{playerData}");
             _view.PlayerName = playerData.PlayerName;
-            if (RuntimeGameConfig.IsFirsTimePlaying)
+            if (RuntimeGameConfig.IsFirsTimePlaying || WindowManager.Get().WindowCount <= 1)
             {
-                _view.HideWhenNormalOperation();
+                _view.ShowFirstTime();
             }
             else
             {
-                _view.HideWhenFirstTime();
+                _view.ShowNormalOperation();
             }
         }
 
@@ -98,6 +99,7 @@ namespace GameUi.Scripts.PlayerName
             }
             if (RuntimeGameConfig.IsFirsTimePlaying)
             {
+                RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
                 WindowManager.Get().Unwind(null);
             }
         }

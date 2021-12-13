@@ -272,7 +272,6 @@ namespace Altzone.Scripts.Config
 
         public static bool IsFirsTimePlaying => PlayerPrefs.GetInt(IsFirsTimePlayingKey, 1) == 1;
 
-        public static void SetIsFirsTimePlayingStatus() => PlayerPrefs.SetInt(IsFirsTimePlayingKey, 1);
         public static void RemoveIsFirsTimePlayingStatus() => PlayerPrefs.SetInt(IsFirsTimePlayingKey, 0);
 
 #if UNITY_EDITOR

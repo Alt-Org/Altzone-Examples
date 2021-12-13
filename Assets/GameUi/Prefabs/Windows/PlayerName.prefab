@@ -455,12 +455,12 @@ PrefabInstance:
         type: 3}
       propertyPath: _naviTarget
       value: 
-      objectReference: {fileID: 11400000, guid: 27d63a2257605bf409f1841ec69427ed,
+      objectReference: {fileID: 11400000, guid: 084050a49b8307048bf91949d0f3c57e,
         type: 2}
     - target: {fileID: 3633816852405729019, guid: 1e3f06f2ba81ec745bda07bc6ff9e5c6,
         type: 3}
       propertyPath: _isCurrentPopOutWindow
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3722655679675288137, guid: 1e3f06f2ba81ec745bda07bc6ff9e5c6,
         type: 3}

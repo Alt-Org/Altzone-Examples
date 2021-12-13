@@ -19,15 +19,18 @@ namespace GameUi.Scripts.LanguageSelection
             _localizable = GetComponentsInChildren<SmartText>();
         }
 
-        public void HideWhenFirstTime()
+        public void ShowNormalOperation()
         {
+            _backButtonMini.gameObject.SetActive(true);
+            _backButton.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
         }
 
-        public void HideWhenNormalOperation()
+        public void ShowFirstTime()
         {
             _backButtonMini.gameObject.SetActive(false);
             _backButton.gameObject.SetActive(false);
+            _continueButton.gameObject.SetActive(true);
         }
 
         public void Localize()

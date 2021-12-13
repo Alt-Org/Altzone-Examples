@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dca1768bd6a44a9fe3bfb30afa666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _naviTarget: {fileID: 11400000, guid: 084050a49b8307048bf91949d0f3c57e, type: 2}
+  _naviTarget: {fileID: 0}
   _isCurrentPopOutWindow: 0
 --- !u!1 &8995870867367296970
 GameObject:

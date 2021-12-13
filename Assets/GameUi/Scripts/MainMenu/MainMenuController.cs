@@ -20,8 +20,14 @@ namespace GameUi.Scripts.MainMenu
 
         private void OnEnable()
         {
+            Debug.Log($"OnEnable IsFirsTimePlaying {RuntimeGameConfig.IsFirsTimePlaying}");
+            if (RuntimeGameConfig.IsFirsTimePlaying)
+            {
+                // Patch IsFirsTimePlaying if it is still set!
+                RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
+            }
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log(playerData.ToString());
+            Debug.Log($"{playerData}");
             _view.PlayerInfo = $"{playerData.PlayerName} : {playerData.CharacterModel.Name}";
             _view.TestText = string.Empty;
         }

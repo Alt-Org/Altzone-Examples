@@ -33,29 +33,32 @@ namespace GameUi.Scripts.LanguageSelection
 
         private void OnEnable()
         {
-            if (RuntimeGameConfig.IsFirsTimePlaying)
+            if (RuntimeGameConfig.IsFirsTimePlaying || WindowManager.Get().WindowCount <= 1)
             {
-                _view.HideWhenNormalOperation();
+                _view.ShowFirstTime();
                 WindowManager.Get().RegisterGoBackHandlerOnce(AbortGoBackAlways);
             }
             else
             {
-                _view.HideWhenFirstTime();
+                _view.ShowNormalOperation();
             }
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var language =
+                Localizer.HasLanguage(playerData.Language) ? playerData.Language
+                : Localizer.HasLanguage(Application.systemLanguage) ? Application.systemLanguage
+                : Localizer.DefaultLanguage;
+            Debug.Log(
+                $"OnEnable language {language} FirsTime {RuntimeGameConfig.IsFirsTimePlaying} windows #{WindowManager.Get().WindowCount}");
+            Debug.Log($"{playerData}");
             foreach (var button in _buttons)
             {
                 button.SetLanguageCallback += SetLanguage;
             }
-            var language = Localizer.HasLanguage(Application.systemLanguage)
-                ? Application.systemLanguage
-                : Localizer.DefaultLanguage;
-            Debug.Log($"OnEnable language {language} IsFirsTimePlaying {RuntimeGameConfig.IsFirsTimePlaying}");
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log($"{playerData}");
             SetLanguage(language);
         }
 
         private bool _isApplicationQuit;
+
         private void OnApplicationQuit()
         {
             _isApplicationQuit = true;
@@ -76,6 +79,19 @@ namespace GameUi.Scripts.LanguageSelection
             return WindowManager.GoBackAction.Abort;
         }
 
+        private void SetLanguage(SystemLanguage language)
+        {
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Debug.Log($"SetLanguage {playerData.Language} <- {language}");
+            if (playerData.Language != language)
+            {
+                playerData.BatchSave(() => { playerData.Language = language; });
+            }
+            Localizer.SetLanguage(language);
+            SelectLanguage(language);
+            _view.Localize();
+        }
+
         private void SelectLanguage(SystemLanguage language)
         {
             _view.ContinueButton.interactable = false;
@@ -88,16 +104,6 @@ namespace GameUi.Scripts.LanguageSelection
                     _view.ContinueButton.interactable = true;
                 }
             }
-        }
-
-        private void SetLanguage(SystemLanguage language)
-        {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log($"SetLanguage {playerData.Language} <- {language}");
-            playerData.BatchSave(() => { playerData.Language = language; });
-            Localizer.SetLanguage(language);
-            SelectLanguage(language);
-            _view.Localize();
         }
     }
 }

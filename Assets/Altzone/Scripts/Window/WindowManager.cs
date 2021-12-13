@@ -127,6 +127,9 @@ namespace Altzone.Scripts.Window
         {
             _goBackOnceHandler -= handler;
         }
+
+        int IWindowManager.WindowCount => _currentWindows.Count;
+
         void IWindowManager.GoBack()
         {
             Debug.Log($"GoBack count {_currentWindows.Count} handler {_goBackOnceHandler?.GetInvocationList().Length ?? -1}");
@@ -198,7 +201,7 @@ namespace Altzone.Scripts.Window
                 }
             }
 
-            Assert.IsTrue(_showWindowLevel == 0,  "_showWindowLevel == 0");
+            Assert.IsTrue(_showWindowLevel == 0, "_showWindowLevel == 0");
             _showWindowLevel += 1;
             Debug.Log($"Unwind {unwindWindowDef} count {_currentWindows.Count} level {_showWindowLevel}");
 
@@ -216,7 +219,7 @@ namespace Altzone.Scripts.Window
 
         void IWindowManager.ShowWindow(WindowDef windowDef)
         {
-            Assert.IsTrue(_showWindowLevel == 0,  "_showWindowLevel == 0");
+            Assert.IsTrue(_showWindowLevel == 0, "_showWindowLevel == 0");
             _showWindowLevel += 1;
             Debug.Log($"LoadWindow {windowDef} count {_currentWindows.Count} level {_showWindowLevel}");
             Assert.IsNotNull(windowDef, "windowDef != null");
