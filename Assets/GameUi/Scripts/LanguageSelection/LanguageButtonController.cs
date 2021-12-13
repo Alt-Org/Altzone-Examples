@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameUi.Scripts.LanguageSelection
 {
@@ -18,6 +19,12 @@ namespace GameUi.Scripts.LanguageSelection
                 Debug.Log($"LangButton.onClick {_language}");
                 SetLanguageCallback?.Invoke(_language);
             });
+        }
+
+        public void Initialize(LanguageSelectionController.LangButtonConfig config)
+        {
+            _language = config._language;
+            _view.Initialize(config);
         }
 
         public void SetSelected(bool isSelected)

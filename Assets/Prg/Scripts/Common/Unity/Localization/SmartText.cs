@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -21,22 +20,15 @@ namespace Prg.Scripts.Common.Unity.Localization
 
         public string ComponentName => GetComponentName();
 
-        private void Awake()
-        {
-            _text = GetComponent<Text>();
-        }
-
         private void OnEnable()
         {
-            // Wait one frame before doing localization,
-            // not particularly needed but then everything has been initialized properly for sure!
-            StartCoroutine(OnEnableDelayed());
+            Localize();
         }
 
-        private IEnumerator OnEnableDelayed()
+        public void Localize()
         {
-            yield return null;
             var localizedText = Localizer.Localize(_localizationKey);
+            _text = GetComponent<Text>();
             _text.text = localizedText;
             Localizer.LocalizerHelper.TrackWords(this, _localizationKey, localizedText);
         }

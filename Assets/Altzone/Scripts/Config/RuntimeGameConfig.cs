@@ -230,7 +230,7 @@ namespace Altzone.Scripts.Config
         [Conditional("UNITY_EDITOR")]
         public void DebugResetPlayer()
         {
-            // Actually can not delete - just invalidate everything!
+            // Actually can not delete at this level - just invalidate everything!
             BatchSave(() =>
             {
                 PlayerName = string.Empty;
@@ -257,6 +257,8 @@ namespace Altzone.Scripts.Config
     /// </remarks>
     public class RuntimeGameConfig : MonoBehaviour
     {
+        internal const string IsFirsTimePlayingKey = "PlayerData.IsFirsTimePlaying";
+
         public static RuntimeGameConfig Get()
         {
             var instance = FindObjectOfType<RuntimeGameConfig>();
@@ -267,6 +269,11 @@ namespace Altzone.Scripts.Config
             }
             return instance;
         }
+
+        public static bool IsFirsTimePlaying => !PlayerPrefs.HasKey(IsFirsTimePlayingKey);
+
+        public static void SetIsFirsTimePlayingStatus() => PlayerPrefs.DeleteKey(IsFirsTimePlayingKey);
+        public static void RemoveIsFirsTimePlayingStatus() => PlayerPrefs.SetInt(IsFirsTimePlayingKey, 1);
 
 #if UNITY_EDITOR
         public static PlayerDataCache GetPlayerDataCacheInEditor() => LoadPlayerDataCache();

@@ -1,10 +1,8 @@
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Altzone.Scripts.Config;
 using GameUi.Scripts.ServiceTest;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace GameUi.Scripts.MainMenu
 {
@@ -16,6 +14,7 @@ namespace GameUi.Scripts.MainMenu
 
         private void Awake()
         {
+            RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
             _view.TestButtonA.onClick.AddListener(TestButtonA);
             _view.TestButtonB.onClick.AddListener(TestButtonB);
         }

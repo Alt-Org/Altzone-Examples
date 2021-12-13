@@ -1,26 +1,19 @@
 key	en	fi	sv
 lang.name	English	Suomi	Svenska
-lang.en	English		
-lang.fi	Suomi		
-lang.se	Svenska		
-lang.es	Español		
-lang.it	Italiano		
-lang.fr	Français		
-lang.de	Deutsche		
-lang.ru	Русский		
-lang.ch	中文		
-lang.tw	中文		
+lang.en	English	English	English
+lang.fi	Suomi	Suomi	Suomi
+lang.sv	Svenska	Svenska	Svenska
 menu.language	Language	Kieli	Språk
-app.name	Altzone Game	Altzone Game	Altzone Spel
+app.name	Altzone Game	Altzone Peli	Altzone Spel
 App/Dummy/Key	-override this key-		
-ButtonBack/Text	Back		
+ButtonBack/Text	Back	Takaisin	Tillbaka
 ButtonBackMini/Text	Back		
-FooterPanel/FooterText	Footer		
+FooterPanel/FooterText	Footer	Alatunniste	Sidfot
 HeaderPanel/ButtonBackMini	Back		
 HeaderPanel/TitleText	choose language		
-LanguageSelection/ContinueButton	Continue		
-LanguageSelection/TextLabel	Choose your language:		
-LanguageSelection/TitleText	choose language		
+LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
+LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
+LanguageSelection/TitleText	choose language	valitse kieli	välj språk
 Loader/TextLabel	Wait for application to load		
 Loader/TitleText	loading		
 MainMenu/LobbyButton	Lobby		
@@ -42,5 +35,6 @@ TermsOfService/TextLabel2	in above Company's web page
 TermsOfService/TitleText	terms of service		
 TermsOfService/Toggle/Label	Accept		
 UserSettings/CharacterSelectionButton	Character Selection		
+UserSettings/LanguageButton	Language		
 UserSettings/PlayerNameButton	Player Name		
 UserSettings/TitleText	user settings		

@@ -27,11 +27,35 @@ namespace Prg.Scripts.Common.Unity.Localization
         internal Dictionary<string, string> Words => _words;
         internal Dictionary<string, string> AltWords => _altWords;
 
+#if UNITY_EDITOR && false
+        public string Word(string key)
+        {
+            string result = string.Empty;
+            string source = string.Empty;
+            if (_words.TryGetValue(key, out var value))
+            {
+                result = value;
+                source = "ok";
+            }
+            else if (_altWords.TryGetValue(key, out var altValue))
+            {
+                result = altValue;
+                source = "alt";
+            }
+            else
+            {
+              result  =$"[{key}]";
+              source = "NOT FOUND";
+            }
+            Debug.Log($"Word {Locale} {key} <- {result} {source}");
+            return result;
+        }
+#else
         public string Word(string key) =>
             _words.TryGetValue(key, out var value) ? value
             : _altWords.TryGetValue(key, out var altValue) ? altValue
             : $"[{key}]";
-
+#endif
         public Language(SystemLanguage language, string localeName, Dictionary<string, string> words, Dictionary<string, string> altWords)
         {
             LanguageName = language;

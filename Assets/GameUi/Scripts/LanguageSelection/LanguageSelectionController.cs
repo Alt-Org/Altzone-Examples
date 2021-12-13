@@ -1,41 +1,48 @@
-﻿using System.Collections;
+﻿using System;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Window;
-using Altzone.Scripts.Window.ScriptableObjects;
 using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
 namespace GameUi.Scripts.LanguageSelection
 {
+    /// <summary>
+    /// Selects player's UI language.
+    /// </summary>
     public class LanguageSelectionController : MonoBehaviour
     {
-        [SerializeField] private LanguageSelectionView _view;
-        [SerializeField] private WindowDef _nextWindow;
-        [SerializeField] private LanguageButtonController[] _buttons;
+        [Serializable]
+        public class LangButtonConfig
+        {
+            public string _localizationKey;
+            public SystemLanguage _language;
+            public Sprite _flag;
+        }
 
-        private bool _isSkippingFirstTime;
+        [SerializeField] private LanguageSelectionView _view;
+        [SerializeField] private LangButtonConfig[] _langConfigs;
+        [SerializeField] private LanguageButtonController[] _buttons;
 
         private void Awake()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log($"Awake {playerData}");
-            if (playerData.HasLanguageCode)
+            RuntimeGameConfig.SetIsFirsTimePlayingStatus();
+            for (var i = 0; i < _buttons.Length; ++i)
             {
-                _isSkippingFirstTime = true;
-                StartCoroutine(LoadNextWindow(playerData.Language));
+                _buttons[i].Initialize(_langConfigs[i]);
             }
         }
 
         private void OnEnable()
         {
-            if (_isSkippingFirstTime)
+            if (RuntimeGameConfig.IsFirsTimePlaying)
             {
-                _isSkippingFirstTime = false;
-                return;
+                _view.HideWhenNormalOperation();
+                WindowManager.Get().RegisterGoBackHandlerOnce(AbortGoBackAlways);
             }
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log($"OnEnable {playerData}");
-            WindowManager.Get().RegisterGoBackHandlerOnce(AbortForEver);
+            else
+            {
+                _view.HideWhenFirstTime();
+            }
             foreach (var button in _buttons)
             {
                 button.SetLanguageCallback += SetLanguage;
@@ -43,13 +50,15 @@ namespace GameUi.Scripts.LanguageSelection
             var language = Localizer.HasLanguage(Application.systemLanguage)
                 ? Application.systemLanguage
                 : Localizer.DefaultLanguage;
-            Debug.Log($"language {language}");
-            SelectLanguage(language);
+            Debug.Log($"OnEnable language {language} IsFirsTimePlaying {RuntimeGameConfig.IsFirsTimePlaying}");
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Debug.Log($"{playerData}");
+            SetLanguage(language);
         }
 
-        private static WindowManager.GoBackAction AbortForEver()
+        private static WindowManager.GoBackAction AbortGoBackAlways()
         {
-            WindowManager.Get().RegisterGoBackHandlerOnce(AbortForEver);
+            WindowManager.Get().RegisterGoBackHandlerOnce(AbortGoBackAlways);
             return WindowManager.GoBackAction.Abort;
         }
 
@@ -67,21 +76,14 @@ namespace GameUi.Scripts.LanguageSelection
             }
         }
 
-        private IEnumerator LoadNextWindow(SystemLanguage language)
-        {
-            yield return null;
-            Localizer.SetLanguage(language);
-            WindowManager.Get().ShowWindow(_nextWindow);
-        }
-
         private void SetLanguage(SystemLanguage language)
         {
-            SelectLanguage(language);
-
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"SetLanguage {playerData.Language} <- {language}");
             playerData.BatchSave(() => { playerData.Language = language; });
             Localizer.SetLanguage(language);
+            SelectLanguage(language);
+            _view.Localize();
         }
     }
 }
