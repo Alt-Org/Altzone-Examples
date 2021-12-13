@@ -13,7 +13,6 @@ namespace GameUi.Scripts.LanguageSelection
 
         private SmartText[] _localizable;
         public Button ContinueButton => _continueButton;
-        public Button BackButton => _backButton;
 
         private void Awake()
         {

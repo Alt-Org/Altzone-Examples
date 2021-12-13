@@ -8,9 +8,9 @@ namespace GameUi.Scripts.PlayerName
     public class PlayerNameController : MonoBehaviour
     {
         [SerializeField] private PlayerNameView _view;
-        [SerializeField] private bool _isFirstTimeLoader;
 
         private int minPlayerNameLength;
+
         private void Awake()
         {
             var gameConstraints = RuntimeGameConfig.Get().GameConstraints;
@@ -29,9 +29,13 @@ namespace GameUi.Scripts.PlayerName
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
             _view.PlayerName = playerData.PlayerName;
-            if (_isFirstTimeLoader)
+            if (RuntimeGameConfig.IsFirsTimePlaying)
             {
-                _view.HideBackButton();
+                _view.HideWhenNormalOperation();
+            }
+            else
+            {
+                _view.HideWhenFirstTime();
             }
         }
 
@@ -92,7 +96,7 @@ namespace GameUi.Scripts.PlayerName
                 playerData.BatchSave(() => { playerData.PlayerName = _view.PlayerName; });
                 Debug.Log(playerData.ToString());
             }
-            if (_isFirstTimeLoader)
+            if (RuntimeGameConfig.IsFirsTimePlaying)
             {
                 WindowManager.Get().Unwind(null);
             }

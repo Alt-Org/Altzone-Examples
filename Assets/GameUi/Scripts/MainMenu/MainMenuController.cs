@@ -14,7 +14,6 @@ namespace GameUi.Scripts.MainMenu
 
         private void Awake()
         {
-            RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
             _view.TestButtonA.onClick.AddListener(TestButtonA);
             _view.TestButtonB.onClick.AddListener(TestButtonB);
         }

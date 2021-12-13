@@ -6,8 +6,9 @@ namespace GameUi.Scripts.PlayerName
     public class PlayerNameView : MonoBehaviour
     {
         [SerializeField] private InputField _playerName;
+        [Header("First Time"), SerializeField] private Button _continueButton;
+        [Header("Normal Operation"), SerializeField] private Button _backButtonMini;
         [SerializeField] private Button _backButton;
-        [SerializeField] private Button _continueButton;
 
         public string PlayerName
         {
@@ -19,8 +20,14 @@ namespace GameUi.Scripts.PlayerName
         public Button BackButton => _backButton;
         public Button ContinueButton => _continueButton;
 
-        public void HideBackButton()
+        public void HideWhenFirstTime()
         {
+            _continueButton.gameObject.SetActive(false);
+        }
+
+        public void HideWhenNormalOperation()
+        {
+            _backButtonMini.gameObject.SetActive(false);
             _backButton.gameObject.SetActive(false);
         }
     }
