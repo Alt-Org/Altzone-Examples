@@ -67,7 +67,7 @@ namespace Editor.Prg.Localization
                     CheckGameObject(gameObject, component.gameObject, ref result);
                 }
             }
-            Debug.Log($"Checked assets {result.Count}");
+            Debug.Log($"Checked components {result.Count}");
             result.Sort((a, b) => String.Compare(a.sortKey, b.sortKey, StringComparison.Ordinal));
             foreach (var smartTextContext in result)
             {
