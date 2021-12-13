@@ -94,7 +94,6 @@ namespace Prg.Scripts.Common.Unity.Localization
             var reason = _reasonTexts[reasonIndex];
             var text = component.GetComponent<Text>().text;
             var componentName = component.ComponentName;
-            Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
             if (isNoKey)
             {
                 key = componentName;
@@ -109,6 +108,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             if (!_debugWords.TryGetValue(key, out var tuple))
             {
+                Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
                 _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
                 return;
             }
@@ -116,6 +116,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 // Duplicate key with different text!
                 key = $"{component.GetFullPath()}_{_debugWords.Count}";
+                Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
                 _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
             }
         }
