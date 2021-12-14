@@ -185,20 +185,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _localizationKey: HeaderPanel/TitleText
   _text: {fileID: 0}
---- !u!114 &1691792896551824807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6285968393325267871}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a5702b5eba140009036598614059259, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _localizationKey: HeaderPanel/ButtonBackMini
-  _text: {fileID: 0}
 --- !u!1001 &8014243308604592883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -206,6 +192,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4454490671114837491}
     m_Modifications:
+    - target: {fileID: 3934852680759780042, guid: f807569afafcf2144b175e7db225c516,
+        type: 3}
+      propertyPath: _localizationKey
+      value: ButtonBackMini/Text
+      objectReference: {fileID: 0}
     - target: {fileID: 4036475550920600768, guid: f807569afafcf2144b175e7db225c516,
         type: 3}
       propertyPath: m_Pivot.x
@@ -332,12 +323,6 @@ PrefabInstance:
 --- !u!224 &6285968395142069811 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4036475550920600768, guid: f807569afafcf2144b175e7db225c516,
-    type: 3}
-  m_PrefabInstance: {fileID: 8014243308604592883}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &6285968393325267871 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4036475552336566636, guid: f807569afafcf2144b175e7db225c516,
     type: 3}
   m_PrefabInstance: {fileID: 8014243308604592883}
   m_PrefabAsset: {fileID: 0}

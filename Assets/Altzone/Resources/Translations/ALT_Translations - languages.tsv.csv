@@ -7,28 +7,24 @@ menu.language	Language	Kieli	Språk
 app.name	Altzone Game	Altzone Peli	Altzone Spel
 App/Dummy/Key	-override this key-		
 ButtonBack/Text	Back	Takaisin	Tillbaka
-ButtonBackMini/Text	Back		
+ButtonBackMini/Text	««	««	««
 FooterPanel/FooterText	Footer	Alatunniste	Sidfot
-HeaderPanel/ButtonBackMini	Back		
 HeaderPanel/TitleText	-override this key-		
-LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
+LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
 MainMenu/LobbyButton	Lobby	Aula	Lobby
-MainMenu/SettingsButton	Settings	asetukset	inställningar
+MainMenu/SettingsButton	Settings	Asetukset	Inställningar
 MainMenu/TestButtonA	Test async	Testaa A	Testa A
 MainMenu/TestButtonB	Test block	Testaa B	Testa B
 MainMenu/TitleText	main  menu	päävalikko	huvudmeny
-PlayerNameFirst/ContinueButton	Continue	Jatka	Fortsätta
-PlayerNameFirst/InputField/Placeholder	playername	pelaaja nimi	spelarnamn
-PlayerNameFirst/TextLabel	Choose your player name	Valitse nimesi	Välj ditt spelarnamn
-PlayerNameFirst/TitleText	player name	pelaaja nimi	spelarnamn
-PlayerNameNormal/ButtonBack	Continue	Jatka	Fortsätta
-PlayerNameNormal/InputField/Placeholder	playername	pelaaja nimi	spelarnamn
-PlayerNameNormal/TextLabel	Choose your player name	Valitse nimesi	Välj ditt spelarnamn
-PlayerNameNormal/TitleText	player name	pelaaja nimi	spelarnamn
+PlayerName/ButtonBack	Continue	Jatka	Fortsätta
+PlayerName/ContinueButton	Continue	Jatka	Fortsätta
+PlayerName/InputField/Placeholder	playername	pelaajanimi	spelarnamn
+PlayerName/TextLabel	Choose your player name	Valitse pelaajanimesi	Välj ditt spelarnamn
+PlayerName/TitleText	player name	pelaaja nimi	spelarnamn
 TermsOfService/ContinueButton	Continue	Jatka	Fortsätta
 TermsOfService/TextLabel1	I have read the Terms and Conditions	Olen lukenut käyttöehdot	Jag har läst användarvillkoren
 TermsOfService/TextLabel2	in above Company's web page	yllä olevalla Yhtiön verkkosivulla	på företagets webbsida ovan
