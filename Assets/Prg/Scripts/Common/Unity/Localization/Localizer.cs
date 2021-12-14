@@ -56,12 +56,14 @@ namespace Prg.Scripts.Common.Unity.Localization
             : _altWords.TryGetValue(key, out var altValue) ? altValue
             : $"[{key}]";
 #endif
-        public Language(SystemLanguage language, string localeName, Dictionary<string, string> words, Dictionary<string, string> altWords)
+        public Language(SystemLanguage language, string localeName,
+            Dictionary<string, string> words = null,
+            Dictionary<string, string> altWords = null)
         {
             LanguageName = language;
             Locale = localeName;
-            _words = words;
-            _altWords = altWords;
+            _words = words ?? new Dictionary<string, string>();
+            _altWords = altWords ?? new Dictionary<string, string>();
         }
 
         #region Localization process in Editor
@@ -201,7 +203,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 {
                     return _languages[0];
                 }
-                return new Language(language, "xx", new Dictionary<string, string>(), new Dictionary<string, string>());
+                return new Language(language, "xx");
             }
             return _languages[index];
         }
@@ -212,10 +214,12 @@ namespace Prg.Scripts.Common.Unity.Localization
     /// </summary>
     public static class Localizer
     {
+        private const string LanguageCodeKey = "Localizer.LanguageCode";
+
         private static Languages _languages;
         private static Language _curLanguage;
 
-        public const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
+        public static SystemLanguage Language => GetLanguage();
 
         public static string Localize(string key) => _curLanguage.Word(key);
 
@@ -224,10 +228,17 @@ namespace Prg.Scripts.Common.Unity.Localization
             return _languages?.HasLanguage(language) ?? false;
         }
 
+        private static SystemLanguage GetLanguage()
+        {
+            var language = (SystemLanguage)PlayerPrefs.GetInt(LanguageCodeKey, (int)SystemLanguage.Finnish);
+            return language;
+        }
+
         public static void SetLanguage(SystemLanguage language)
         {
             Debug.Log($"SetLanguage {language}");
             _curLanguage = _languages.GetLanguage(language);
+            PlayerPrefs.SetInt(LanguageCodeKey, (int)language);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -238,9 +249,18 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 Debug.LogWarning($"{nameof(LocalizationConfig)} is missing");
                 _languages = new Languages();
-                return;
+                _languages.Add(new Language(SystemLanguage.Unknown, "xx"));
             }
-            _languages = BinAsset.Load(config.LanguagesBinFile);
+            else
+            {
+                _languages = BinAsset.Load(config.LanguagesBinFile);
+            }
+            var language = GetLanguage();
+            if (!HasLanguage(language))
+            {
+                language = _languages.GetLanguages[0].LanguageName;
+            }
+            SetLanguage(language);
             LocalizerHelper.SetEditorStatus();
         }
 
@@ -394,18 +414,15 @@ namespace Prg.Scripts.Common.Unity.Localization
 
         internal static Languages LoadTranslations(TextAsset textAsset)
         {
-            var stopwatch = new Stopwatch();
             //--Debug.Log($"Translations tsv {textAsset.name} text len {textAsset.text.Length}");
             var lines = textAsset.text;
             var languages = new Languages();
             var maxIndex = SupportedLocales.Length;
             var dictionaries = new Dictionary<string, string>[maxIndex];
-            var lineCount = 0;
             using (var reader = new StringReader(lines))
             {
                 var line = reader.ReadLine();
                 Assert.IsNotNull(line, "line != null");
-                lineCount += 1;
                 //--Debug.Log($"FIRST LINE: {line.Replace('\t', ' ')}");
                 // key en fi sv es ru it de fr zh-CN
                 var tokens = line.Split('\t');
@@ -423,7 +440,6 @@ namespace Prg.Scripts.Common.Unity.Localization
                     }
                     dictionaries[i] = new Dictionary<string, string>();
                 }
-                stopwatch.Start();
                 for (;;)
                 {
                     line = reader.ReadLine();
@@ -431,14 +447,12 @@ namespace Prg.Scripts.Common.Unity.Localization
                     {
                         break;
                     }
-                    lineCount += 1;
                     if (string.IsNullOrWhiteSpace(line))
                     {
                         continue;
                     }
                     ParseLine(line, maxIndex, ref dictionaries);
                 }
-                stopwatch.Stop();
             }
             //--Debug.Log($"lineCount {lineCount} in {stopwatch.ElapsedMilliseconds} ms");
             Dictionary<string, string> altDictionary = null;

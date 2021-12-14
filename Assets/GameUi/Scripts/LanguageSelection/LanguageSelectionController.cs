@@ -46,7 +46,7 @@ namespace GameUi.Scripts.LanguageSelection
             var language =
                 Localizer.HasLanguage(playerData.Language) ? playerData.Language
                 : Localizer.HasLanguage(Application.systemLanguage) ? Application.systemLanguage
-                : Localizer.DefaultLanguage;
+                : Localizer.Language;
             Debug.Log(
                 $"OnEnable language {language} FirsTime {RuntimeGameConfig.IsFirsTimePlaying} windows #{WindowManager.Get().WindowCount}");
             Debug.Log($"{playerData}");

@@ -69,13 +69,6 @@ namespace Editor.Prg.Localization
             _label1 = string.Empty;
             _label2 = string.Empty;
             _label3 = string.Empty;
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            var language = playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage;
-            if (!Localizer.HasLanguage(language))
-            {
-                Localizer.LoadTranslations();
-            }
-            Localizer.SetLanguage(language);
             _fullResults = Localizer.LocalizerHelper.GetTranslationKeys().Where(x => !x.StartsWith("lang.")).ToList();
             // Prevent double registration
             Selection.selectionChanged -= SelectionChanged;

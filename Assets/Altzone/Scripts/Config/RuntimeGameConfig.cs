@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using Altzone.Scripts.Model;
+using Prg.Scripts.Common.Unity.Localization;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
 
@@ -173,22 +174,14 @@ namespace Altzone.Scripts.Config
             }
         }
 
-        [SerializeField] protected SystemLanguage _language;
-
         /// <summary>
         /// Player's UNITY language.
         /// </summary>
         public SystemLanguage Language
         {
-            get => _language;
-            set
-            {
-                _language = value;
-                Save();
-            }
+            get => Localizer.Language;
+            set => Localizer.SetLanguage(value);
         }
-
-        public bool HasLanguageCode => _language != SystemLanguage.Unknown;
 
         [SerializeField] protected bool _isTosAccepted;
 
@@ -208,7 +201,7 @@ namespace Altzone.Scripts.Config
         /// <summary>
         /// Player is considered to be valid when it has non-empty name, valid language code and ToS accepted.
         /// </summary>
-        public bool IsValid => !string.IsNullOrEmpty(PlayerName) && HasLanguageCode && IsTosAccepted;
+        public bool IsValid => !string.IsNullOrEmpty(PlayerName) && IsTosAccepted;
 
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
@@ -235,7 +228,6 @@ namespace Altzone.Scripts.Config
             {
                 PlayerName = string.Empty;
                 CharacterModelId = -1;
-                Language = SystemLanguage.Unknown;
                 IsTosAccepted = false;
             });
         }
@@ -244,8 +236,8 @@ namespace Altzone.Scripts.Config
         {
             // This is required for actual implementation to detect changes in our changeable properties!
             return
-                $"Name:{PlayerName}, ModelId:{CharacterModelId}, Lang {Language}, ToS {(IsTosAccepted ? 1 : 0)}, " +
-                $"Valid {(IsValid ? 1 : 0)}, Guid:{PlayerHandle}";
+                $"Name:{PlayerName}, ModelId:{CharacterModelId}, ToS {(IsTosAccepted ? 1 : 0)}, " +
+                $"Lang {Language}, Valid {(IsValid ? 1 : 0)}, Guid:{PlayerHandle}";
         }
     }
 
@@ -338,7 +330,6 @@ namespace Altzone.Scripts.Config
             private const string PlayerNameKey = "PlayerData.PlayerName";
             private const string PlayerHandleKey = "PlayerData.PlayerHandle";
             private const string CharacterModelIdKey = "PlayerData.CharacterModelId";
-            private const string LanguageCodeKey = "PlayerData.LanguageCode";
             private const string TermsOfServiceKey = "PlayerData.TermsOfService";
 
             private bool _isBatchSave;
@@ -355,7 +346,6 @@ namespace Altzone.Scripts.Config
                     // Writes all modified preferences to disk.
                     PlayerPrefs.Save();
                 }
-                _language = (SystemLanguage)PlayerPrefs.GetInt(LanguageCodeKey, (int)SystemLanguage.Unknown);
                 _isTosAccepted = PlayerPrefs.GetInt(TermsOfServiceKey, 0) == 1;
             }
 
@@ -401,7 +391,6 @@ namespace Altzone.Scripts.Config
                 PlayerPrefs.SetString(PlayerNameKey, PlayerName);
                 PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
                 PlayerPrefs.SetString(PlayerHandleKey, PlayerHandle);
-                PlayerPrefs.SetInt(LanguageCodeKey, (int)Language);
                 PlayerPrefs.SetInt(TermsOfServiceKey, IsTosAccepted ? 1 : 0);
             }
         }

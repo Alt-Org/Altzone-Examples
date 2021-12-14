@@ -45,13 +45,6 @@ namespace Editor.Prg.Localization
                 Debug.Log("Select one or more assets in Project window");
                 return;
             }
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            var language = playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage;
-            if (!Localizer.HasLanguage(language))
-            {
-                Localizer.LoadTranslations();
-            }
-            Localizer.SetLanguage(language);
             var selectedGuids = Selection.assetGUIDs;
             foreach (var guid in selectedGuids)
             {
