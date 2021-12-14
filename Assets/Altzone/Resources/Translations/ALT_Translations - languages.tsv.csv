@@ -7,7 +7,10 @@ menu.language	Language	Kieli	Språk
 app.name	Altzone Game	Altzone Peli	Altzone Spel
 App/Dummy/Key	-override this key-		
 ButtonBack/Text	Back	Takaisin	Tillbaka
+ButtonBackContinue/Text	Continue	Jatka	Fortsätta
 ButtonBackMini/Text	««	««	««
+ButtonNavi/Text	-override this key-		
+ButtonNaviContinue/Text	Continue	Jatka	Fortsätta
 FooterPanel/FooterText	Footer	Alatunniste	Sidfot
 HeaderPanel/TitleText	-override this key-		
 LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
@@ -15,8 +18,8 @@ LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
-MainMenu/LobbyButton	Lobby	Aula	Lobby
-MainMenu/SettingsButton	Settings	Asetukset	Inställningar
+MainMenu/ButtonNaviLobby	Lobby	Aula	Lobby
+MainMenu/ButtonNaviSettings	Settings	Asetukset	Inställningar
 MainMenu/TestButtonA	Test async	Testaa A	Testa A
 MainMenu/TestButtonB	Test block	Testaa B	Testa B
 MainMenu/TitleText	main  menu	päävalikko	huvudmeny
@@ -24,13 +27,13 @@ PlayerName/ButtonBack	Continue	Jatka	Fortsätta
 PlayerName/ContinueButton	Continue	Jatka	Fortsätta
 PlayerName/InputField/Placeholder	playername	pelaajanimi	spelarnamn
 PlayerName/TextLabel	Choose your player name	Valitse pelaajanimesi	Välj ditt spelarnamn
-PlayerName/TitleText	player name	pelaaja nimi	spelarnamn
+PlayerName/TitleText	player name	pelaajanimi	spelarnamn
 TermsOfService/ContinueButton	Continue	Jatka	Fortsätta
 TermsOfService/TextLabel1	I have read the Terms and Conditions	Olen lukenut käyttöehdot	Jag har läst användarvillkoren
 TermsOfService/TextLabel2	in above Company's web page	yllä olevalla Yhtiön verkkosivulla	på företagets webbsida ovan
 TermsOfService/TitleText	terms of service	käyttöehdot	användarvillkor
 TermsOfService/Toggle/Label	Accept	Hyväksy	Acceptera
-UserSettings/CharacterSelectionButton	Character Selection	Hahmon valinta	Karaktärsval
-UserSettings/LanguageButton	Language	Kieli	Språk
-UserSettings/PlayerNameButton	Player Name	Pelaaja nimi	Spelarnamn
+UserSettings/ButtonNaviCharacterSelection	Character Selection	Hahmon valinta	Karaktärsval
+UserSettings/ButtonNaviLanguage	Language	Kieli	Språk
+UserSettings/ButtonNaviPlayerName	Player Name	Pelaajanimi	Spelarnamn
 UserSettings/TitleText	user settings	käyttäjäasetukset	användarinställningar

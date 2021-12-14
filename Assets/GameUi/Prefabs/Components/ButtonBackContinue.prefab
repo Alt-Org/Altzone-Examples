@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 2518245871717897783}
   - component: {fileID: 8197275056532875799}
   - component: {fileID: 1598728208929607062}
-  - component: {fileID: 3633816852405729019}
+  - component: {fileID: 6487276266279597083}
   m_Layer: 5
-  m_Name: ButtonNavi
+  m_Name: ButtonBackContinue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3633816852405729019
+--- !u!114 &6487276266279597083
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,11 +129,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7147199096920258824}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 337dca1768bd6a44a9fe3bfb30afa666, type: 3}
+  m_Script: {fileID: 11500000, guid: 33659b0b1c0242c3b28bc17acb0079e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _naviTarget: {fileID: 0}
-  _isCurrentPopOutWindow: 0
 --- !u!1 &8995870867367296970
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,7 +144,7 @@ GameObject:
   - component: {fileID: 5735014368416901094}
   - component: {fileID: 6049379375887848701}
   - component: {fileID: 911697358154105424}
-  - component: {fileID: 2490925956299317781}
+  - component: {fileID: 1934245575529546058}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -213,7 +211,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: ButtonNavi
+  m_Text: Continue
 --- !u!114 &911697358154105424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,7 +227,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
---- !u!114 &2490925956299317781
+--- !u!114 &1934245575529546058
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -241,5 +239,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5702b5eba140009036598614059259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _localizationKey: ButtonNavi/Text
+  _localizationKey: ButtonBackContinue/Text
   _text: {fileID: 0}
