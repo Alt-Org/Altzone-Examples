@@ -57,19 +57,8 @@ namespace GameUi.Scripts.LanguageSelection
             SetLanguage(language);
         }
 
-        private bool _isApplicationQuit;
-
-        private void OnApplicationQuit()
-        {
-            _isApplicationQuit = true;
-        }
-
         private void OnDisable()
         {
-            if (_isApplicationQuit)
-            {
-                return;
-            }
             WindowManager.Get().UnRegisterGoBackHandlerOnce(AbortGoBackAlways);
         }
 
