@@ -10,31 +10,31 @@ ButtonBack/Text	Back	Takaisin	Tillbaka
 ButtonBackMini/Text	Back		
 FooterPanel/FooterText	Footer	Alatunniste	Sidfot
 HeaderPanel/ButtonBackMini	Back		
-HeaderPanel/TitleText	choose language		
+HeaderPanel/TitleText	-override this key-		
 LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
-Loader/TextLabel	Wait for application to load		
-Loader/TitleText	loading		
-MainMenu/LobbyButton	Lobby		
-MainMenu/SettingsButton	Settings		
-MainMenu/TestButtonA	Test async		
-MainMenu/TestButtonB	Test block		
-MainMenu/TitleText	main  menu		
-PlayerNameFirst/ContinueButton	Continue		
-PlayerNameFirst/InputField/Placeholder	playername		
-PlayerNameFirst/TextLabel	Choose your player name		
-PlayerNameFirst/TitleText	player name		
-PlayerNameNormal/ButtonBack	Continue		
-PlayerNameNormal/InputField/Placeholder	playername		
-PlayerNameNormal/TextLabel	Choose your player name		
-PlayerNameNormal/TitleText	player name		
-TermsOfService/ContinueButton	Continue		
-TermsOfService/TextLabel1	I have read the Terms and Conditions		
-TermsOfService/TextLabel2	in above Company's web page		
-TermsOfService/TitleText	terms of service		
-TermsOfService/Toggle/Label	Accept		
-UserSettings/CharacterSelectionButton	Character Selection		
-UserSettings/LanguageButton	Language		
-UserSettings/PlayerNameButton	Player Name		
-UserSettings/TitleText	user settings		
+Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
+Loader/TitleText	loading	Ladataan	läser in
+MainMenu/LobbyButton	Lobby	Aula	Lobby
+MainMenu/SettingsButton	Settings	asetukset	inställningar
+MainMenu/TestButtonA	Test async	Testaa A	Testa A
+MainMenu/TestButtonB	Test block	Testaa B	Testa B
+MainMenu/TitleText	main  menu	päävalikko	huvudmeny
+PlayerNameFirst/ContinueButton	Continue	Jatka	Fortsätta
+PlayerNameFirst/InputField/Placeholder	playername	pelaaja nimi	spelarnamn
+PlayerNameFirst/TextLabel	Choose your player name	Valitse nimesi	Välj ditt spelarnamn
+PlayerNameFirst/TitleText	player name	pelaaja nimi	spelarnamn
+PlayerNameNormal/ButtonBack	Continue	Jatka	Fortsätta
+PlayerNameNormal/InputField/Placeholder	playername	pelaaja nimi	spelarnamn
+PlayerNameNormal/TextLabel	Choose your player name	Valitse nimesi	Välj ditt spelarnamn
+PlayerNameNormal/TitleText	player name	pelaaja nimi	spelarnamn
+TermsOfService/ContinueButton	Continue	Jatka	Fortsätta
+TermsOfService/TextLabel1	I have read the Terms and Conditions	Olen lukenut käyttöehdot	Jag har läst användarvillkoren
+TermsOfService/TextLabel2	in above Company's web page	yllä olevalla Yhtiön verkkosivulla	på företagets webbsida ovan
+TermsOfService/TitleText	terms of service	käyttöehdot	användarvillkor
+TermsOfService/Toggle/Label	Accept	Hyväksy	Acceptera
+UserSettings/CharacterSelectionButton	Character Selection	Hahmon valinta	Karaktärsval
+UserSettings/LanguageButton	Language	Kieli	Språk
+UserSettings/PlayerNameButton	Player Name	Pelaaja nimi	Spelarnamn
+UserSettings/TitleText	user settings	käyttäjäasetukset	användarinställningar
