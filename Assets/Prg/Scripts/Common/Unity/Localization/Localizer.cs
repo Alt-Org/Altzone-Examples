@@ -44,7 +44,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
             else
             {
-              result  =$"[{key}]";
+              result = $"[{key}]";
               source = "NOT FOUND";
             }
             Debug.Log($"Word {Locale} {key} <- {result} {source}");
@@ -67,16 +67,17 @@ namespace Prg.Scripts.Common.Unity.Localization
         #region Localization process in Editor
 
 #if UNITY_EDITOR
-        private const int NoKey = 0;
-        private const int NoText = 1;
-        private const int AltText = 2;
+        private const int OkKey = 0;
+        private const int NoKey = 1;
+        private const int NoText = 2;
+        private const int AltText = 3;
 
-        private readonly string[] _reasonTexts = { "NO_KEY", "NO_TEXT", "ALT_TEXT" };
+        private readonly string[] _reasonTexts = { "OK", "NO_KEY", "NO_TEXT", "ALT_TEXT" };
 
         private Dictionary<string, Tuple<string, int>> _debugWords;
         private HashSet<string> _usedWords;
 
-        internal void TrackWords(SmartText component, string key, string word)
+        internal int TrackWords(SmartText component, string key, string word)
         {
             var hasWord = _words.ContainsKey(key);
             if (hasWord)
@@ -86,7 +87,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                     _usedWords = new HashSet<string>();
                 }
                 _usedWords.Add(key);
-                return;
+                return OkKey;
             }
             var isNoKey = string.IsNullOrWhiteSpace(key);
             var isMissing = string.IsNullOrEmpty(word) || (word.StartsWith("[") && word.EndsWith("]"));
@@ -110,7 +111,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             {
                 Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
                 _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
-                return;
+                return reasonIndex;
             }
             if (tuple.Item1 != word)
             {
@@ -119,6 +120,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 Debug.Log($"{Locale} {reason} {componentName} key={key} word={word} text={text}");
                 _debugWords.Add(key, new Tuple<string, int>(word, reasonIndex));
             }
+            return reasonIndex;
         }
 
         /// <summary>
@@ -271,10 +273,13 @@ namespace Prg.Scripts.Common.Unity.Localization
 #endif
             }
 
-            [Conditional("UNITY_EDITOR")]
-            public static void TrackWords(SmartText component, string key, string word)
+            public static int TrackWords(SmartText component, string key, string word)
             {
-                _curLanguage.TrackWords(component, key, word);
+#if UNITY_EDITOR
+                return _curLanguage.TrackWords(component, key, word);
+#else
+                return 0;
+#endif
             }
 
             [Conditional("UNITY_EDITOR")]

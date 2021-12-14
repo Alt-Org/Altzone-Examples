@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Altzone.Scripts.Config;
 using Prg.Scripts.Common.Unity.Localization;
 using UnityEditor;
@@ -37,10 +36,15 @@ namespace Editor.Prg.Localization
             Localizer.LocalizerHelper.ShowTranslations();
         }
 
-        [MenuItem(MenuRoot + "Check Used Translations In Assets", false, 4)]
+        [MenuItem(MenuRoot + "Check Selected Asset(s)", false, 4)]
         private static void CheckUsedTranslationsInAssets()
         {
             Debug.Log("*");
+            if (Selection.assetGUIDs.Length == 0)
+            {
+                Debug.Log("Select one or more assets in Project window");
+                return;
+            }
             var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
             var language = playerData.HasLanguageCode ? playerData.Language : Localizer.DefaultLanguage;
             if (!Localizer.HasLanguage(language))
@@ -48,67 +52,70 @@ namespace Editor.Prg.Localization
                 Localizer.LoadTranslations();
             }
             Localizer.SetLanguage(language);
-            DoSmartTextAndTextAssetCheck();
+            var selectedGuids = Selection.assetGUIDs;
+            foreach (var guid in selectedGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var gameObject = AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) as GameObject;
+                if (gameObject == null)
+                {
+                    Debug.Log($"Unable to load asset: {path}");
+                    continue;
+                }
+                DoSmartTextAndTextAssetCheck(gameObject);
+            }
             Localizer.LocalizerHelper.SaveIfDirty();
         }
 
-        private static void DoSmartTextAndTextAssetCheck()
+        private static void DoSmartTextAndTextAssetCheck(GameObject gameObject)
         {
-            var allAssets = AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith("Assets/"));
-            var gameObjects = allAssets.Select(a =>
-                AssetDatabase.LoadAssetAtPath(a, typeof(GameObject)) as GameObject).Where(a => a != null).ToList();
-            Debug.Log($"Total assets {gameObjects.Count} to check");
             var result = new List<SmartTextContext>();
-            foreach (var gameObject in gameObjects)
+            var components = gameObject.GetComponentsInChildren<Text>(true);
+            foreach (var component in components)
             {
-                var components = gameObject.GetComponentsInChildren<Text>(true);
-                foreach (var component in components)
-                {
-                    CheckGameObject(gameObject, component.gameObject, ref result);
-                }
+                CheckGameObject(component.gameObject, ref result);
             }
-            Debug.Log($"Checked components {result.Count}");
-            result.Sort((a, b) => String.Compare(a.sortKey, b.sortKey, StringComparison.Ordinal));
+            Debug.LogWarning($"Checked components {result.Count} in {gameObject.GetFullPath()}", gameObject);
+            result.Sort((a, b) => String.Compare(a.SortKey, b.SortKey, StringComparison.Ordinal));
             foreach (var smartTextContext in result)
             {
                 smartTextContext.ShowMissing();
             }
         }
 
-        private static void CheckGameObject(GameObject parent, GameObject child, ref List<SmartTextContext> context)
+        private static void CheckGameObject(GameObject child, ref List<SmartTextContext> context)
         {
             var smartText = child.GetComponent<SmartText>();
             if (smartText == null)
             {
-                context.Add(new SmartTextContext(parent, "2 Text is not localized: ", child));
+                context.Add(new SmartTextContext(child, "9 Text is not localized: "));
                 return;
             }
-            context.Add(new SmartTextContext(parent, "1 SmartText: ", child));
-            // Emulate SmartText localization
+            string[] reasonTexts = { "OK", "NO_KEY", "NO_TEXT", "ALT_TEXT" };
+            // Emulate SmartText Localize() method
             var localizationKey = smartText.LocalizationKey;
             var localizedText = Localizer.Localize(localizationKey);
-            Localizer.LocalizerHelper.TrackWords(smartText, localizationKey, localizedText);
+            var result = Localizer.LocalizerHelper.TrackWords(smartText, localizationKey, localizedText);
+            context.Add(new SmartTextContext(child, $"{result} {reasonTexts[result]} SmartText: {localizationKey} <- {localizedText}"));
         }
 
         private class SmartTextContext
         {
-            private readonly GameObject _parent;
             private readonly string _message;
             private readonly string _childPath;
 
-            public readonly string sortKey;
+            public readonly string SortKey;
 
-            public SmartTextContext(GameObject parent, string message, GameObject child)
+            public SmartTextContext(GameObject child, string message)
             {
-                _parent = parent;
-                _message = message;
                 _childPath = child.GetFullPath();
-                sortKey = message + _childPath;
+                _message = message;
+                SortKey = message + _childPath;
             }
 
             public void ShowMissing()
             {
-                Debug.LogWarning($"{_message}{_childPath}", _parent);
+                Debug.Log($"{_message} in {_childPath}");
             }
         }
     }
