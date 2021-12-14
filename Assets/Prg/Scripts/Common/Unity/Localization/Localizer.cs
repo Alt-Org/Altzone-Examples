@@ -395,7 +395,7 @@ namespace Prg.Scripts.Common.Unity.Localization
         internal static Languages LoadTranslations(TextAsset textAsset)
         {
             var stopwatch = new Stopwatch();
-            Debug.Log($"Translations tsv {textAsset.name} text len {textAsset.text.Length}");
+            //--Debug.Log($"Translations tsv {textAsset.name} text len {textAsset.text.Length}");
             var lines = textAsset.text;
             var languages = new Languages();
             var maxIndex = SupportedLocales.Length;
@@ -406,7 +406,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 var line = reader.ReadLine();
                 Assert.IsNotNull(line, "line != null");
                 lineCount += 1;
-                Debug.Log($"FIRST LINE: {line.Replace('\t', ' ')}");
+                //--Debug.Log($"FIRST LINE: {line.Replace('\t', ' ')}");
                 // key en fi sv es ru it de fr zh-CN
                 var tokens = line.Split('\t');
                 Assert.IsTrue(tokens.Length >= maxIndex, "tokens.Length >= maxIndex");
@@ -440,7 +440,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 }
                 stopwatch.Stop();
             }
-            Debug.Log($"lineCount {lineCount} in {stopwatch.ElapsedMilliseconds} ms");
+            //--Debug.Log($"lineCount {lineCount} in {stopwatch.ElapsedMilliseconds} ms");
             Dictionary<string, string> altDictionary = null;
             for (var i = 1; i < maxIndex; ++i)
             {
@@ -453,7 +453,7 @@ namespace Prg.Scripts.Common.Unity.Localization
                 }
                 var language = new Language(lang, locale, dictionary, altDictionary);
                 languages.Add(language);
-                Debug.Log($"dictionary for {locale} {lang} has {dictionary.Count} words");
+                //--Debug.Log($"dictionary for {locale} {lang} has {dictionary.Count} words");
             }
             return languages;
         }
@@ -516,7 +516,7 @@ namespace Prg.Scripts.Common.Unity.Localization
             }
 
             var path = GetAssetPath(binAsset.name);
-            Debug.Log($"Save Languages bin {binAsset.name} path {path}");
+            //--Debug.Log($"Save Languages bin {binAsset.name} path {path}");
             int byteCount;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
