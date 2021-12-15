@@ -19,26 +19,17 @@ namespace GameUi.Scripts.UiLoader
             // Simulate that we load some services before can continue to the game main menu (or first time process).
             Debug.Log($"OnEnable _isServicesLoaded {_isServicesLoaded}");
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            if (playerData.IsValid)
-            {
-                if (!_isServicesLoaded)
-                {
-                    _isServicesLoaded = true;
-                    StartCoroutine(SpinAndWait(_demoLoadDelay, _windowMainMenu));
-                }
-                else
-                {
-                    StartCoroutine(LoadNextWindow(_windowMainMenu));
-                }
-                return;
-            }
+            Debug.Log(playerData.ToString());
+            var nextWindowToLoad = playerData.IsTosAccepted && playerData.HasPlayerName
+                ? _windowMainMenu
+                : _windowFirstTime;
             if (!_isServicesLoaded)
             {
                 _isServicesLoaded = true;
-                StartCoroutine(SpinAndWait(_demoLoadDelay, _windowFirstTime));
+                StartCoroutine(SpinAndWait(_demoLoadDelay, nextWindowToLoad));
                 return;
             }
-            StartCoroutine(LoadNextWindow(_windowFirstTime));
+            StartCoroutine(LoadNextWindow(nextWindowToLoad));
         }
 
         private static IEnumerator SpinAndWait(float delay, WindowDef windowDef)
