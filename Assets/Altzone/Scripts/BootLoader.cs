@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
-using Altzone.Scripts.Config;
+using Altzone.Scripts.Config.ScriptableObjects;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using Prg.Scripts.Common.Util;

@@ -1,4 +1,5 @@
 using Altzone.Scripts.Config;
+using Altzone.Scripts.Config.Photon;
 using UnityEngine;
 
 namespace Tests
