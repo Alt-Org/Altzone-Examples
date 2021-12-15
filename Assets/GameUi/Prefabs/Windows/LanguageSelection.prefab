@@ -403,6 +403,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _view: {fileID: 2580354325816153696}
+  _nextWindow: {fileID: 11400000, guid: 27d63a2257605bf409f1841ec69427ed, type: 2}
   _langConfigs:
   - _localizationKey: lang.fi
     _language: 13

@@ -22,6 +22,7 @@ namespace GameUi.Scripts.PlayerName
             playerNameInput.onEndEdit.AddListener(OnEndEdit);
             OnValueChanged(_view.PlayerName);
             _view.ContinueButton.onClick.AddListener(ContinueButton);
+            WindowManager.Get().RegisterGoBackHandlerOnce(GoBackContinue);
         }
 
         private void OnEnable()
@@ -38,6 +39,12 @@ namespace GameUi.Scripts.PlayerName
             {
                 _view.ShowNormalOperation();
             }
+        }
+
+        private WindowManager.GoBackAction GoBackContinue()
+        {
+            ContinueButton();
+            return WindowManager.GoBackAction.Continue;
         }
 
         private static char OnValidateInput(string input, int charIndex, char addedChar)
@@ -94,8 +101,11 @@ namespace GameUi.Scripts.PlayerName
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             if (_view.PlayerName != playerData.PlayerName)
             {
-                playerData.BatchSave(() => { playerData.PlayerName = _view.PlayerName; });
-                Debug.Log(playerData.ToString());
+                playerData.BatchSave(() =>
+                {
+                    playerData.PlayerName = _view.PlayerName;
+                    Debug.Log(playerData.ToString());
+                });
             }
             if (RuntimeGameConfig.IsFirsTimePlaying)
             {

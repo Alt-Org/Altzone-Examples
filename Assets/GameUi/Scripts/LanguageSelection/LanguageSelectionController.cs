@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Window;
+using Altzone.Scripts.Window.ScriptableObjects;
 using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
@@ -20,6 +22,7 @@ namespace GameUi.Scripts.LanguageSelection
         }
 
         [SerializeField] private LanguageSelectionView _view;
+        [SerializeField] private WindowDef _nextWindow;
         [SerializeField] private LangButtonConfig[] _langConfigs;
         [SerializeField] private LanguageButtonController[] _buttons;
 
@@ -33,13 +36,19 @@ namespace GameUi.Scripts.LanguageSelection
 
         private void OnEnable()
         {
-            if (RuntimeGameConfig.IsFirsTimePlaying || WindowManager.Get().WindowCount <= 1)
+            if (RuntimeGameConfig.IsFirsTimePlaying)
             {
-                _view.ShowFirstTime();
                 WindowManager.Get().RegisterGoBackHandlerOnce(AbortGoBackAlways);
+                _view.ShowFirstTime();
             }
             else
             {
+                var isGameStarting = WindowManager.Get().WindowCount <= 1;
+                if (isGameStarting)
+                {
+                    StartCoroutine(LoadNextWindow());
+                    return;
+                }
                 _view.ShowNormalOperation();
             }
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
@@ -93,6 +102,12 @@ namespace GameUi.Scripts.LanguageSelection
                     _view.ContinueButton.interactable = true;
                 }
             }
+        }
+
+        private IEnumerator LoadNextWindow()
+        {
+            yield return null;
+            WindowManager.Get().ShowWindow(_nextWindow);
         }
     }
 }
