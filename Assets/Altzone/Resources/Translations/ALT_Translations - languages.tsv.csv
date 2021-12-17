@@ -18,6 +18,8 @@ LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
+Lobby/StartGameButton	Start	Aloita	Start
+Lobby/TitleText	Lobby	Aula	Lobby
 MainMenu/ButtonNaviLobby	Lobby	Aula	Lobby
 MainMenu/ButtonNaviSettings	Settings	Asetukset	Inställningar
 MainMenu/TestButtonA	Test async	Testaa A	Testa A

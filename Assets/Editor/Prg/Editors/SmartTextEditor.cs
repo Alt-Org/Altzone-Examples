@@ -5,7 +5,21 @@ using UnityEngine;
 namespace Editor.Prg.Editors
 {
     [CustomEditor(typeof(SmartText)), CanEditMultipleObjects]
-    public class SmartTextEditor : UnityEditor.Editor
+    public class SmartTextEditor : SmartComponentEditor
+    {
+    }
+
+    [CustomEditor(typeof(SmartButton)), CanEditMultipleObjects]
+    public class SmartButtonEditor : SmartComponentEditor
+    {
+    }
+
+    [CustomEditor(typeof(SmartToggle)), CanEditMultipleObjects]
+    public class SmartToggleEditor : SmartComponentEditor
+    {
+    }
+
+    public class SmartComponentEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
@@ -40,6 +54,7 @@ namespace Editor.Prg.Editors
                 }
             }
         }
+
         private static void ResetState(SerializedObject serializedObject)
         {
             var localizationKey = serializedObject.FindProperty("_localizationKey");

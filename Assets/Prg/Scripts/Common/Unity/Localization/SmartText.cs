@@ -5,12 +5,15 @@ using UnityEngine.UI;
 
 namespace Prg.Scripts.Common.Unity.Localization
 {
+    /// <summary>
+    /// Class for UI <c>Text</c> component localization.
+    /// </summary>
     [RequireComponent(typeof(Text))]
     public class SmartText : MonoBehaviour
     {
-        [SerializeField] private string _localizationKey;
+        [SerializeField] protected string _localizationKey;
 
-        [Header("Live Data"), SerializeField] private Text _text;
+        [Header("Live Data"), SerializeField] protected Text _text;
 
         public string LocalizationKey
         {

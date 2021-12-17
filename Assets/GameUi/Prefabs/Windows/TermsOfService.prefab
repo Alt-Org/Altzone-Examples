@@ -1065,6 +1065,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7796525501178729136, guid: 46013f936c0312142beee7c1da7af4eb,
+        type: 3}
+      propertyPath: _localizationKey
+      value: TermsOfService/Toggle/Label
+      objectReference: {fileID: 0}
     - target: {fileID: 7923462411407431653, guid: 46013f936c0312142beee7c1da7af4eb,
         type: 3}
       propertyPath: _localizationKey

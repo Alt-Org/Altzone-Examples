@@ -541,6 +541,11 @@ PrefabInstance:
       propertyPath: _localizationKey
       value: UserSettings/ButtonNaviLanguage
       objectReference: {fileID: 0}
+    - target: {fileID: 3552819234532470125, guid: 388a2de4ed8d7fc4787097d6aae3f393,
+        type: 3}
+      propertyPath: _localizationKey
+      value: UserSettings/ButtonNaviLanguage
+      objectReference: {fileID: 0}
     - target: {fileID: 3633816852405729019, guid: 388a2de4ed8d7fc4787097d6aae3f393,
         type: 3}
       propertyPath: _naviTarget
@@ -673,6 +678,11 @@ PrefabInstance:
     m_TransformParent: {fileID: 681520168594102717}
     m_Modifications:
     - target: {fileID: 2490925956299317781, guid: 388a2de4ed8d7fc4787097d6aae3f393,
+        type: 3}
+      propertyPath: _localizationKey
+      value: UserSettings/ButtonNaviPlayerName
+      objectReference: {fileID: 0}
+    - target: {fileID: 3552819234532470125, guid: 388a2de4ed8d7fc4787097d6aae3f393,
         type: 3}
       propertyPath: _localizationKey
       value: UserSettings/ButtonNaviPlayerName
@@ -934,6 +944,11 @@ PrefabInstance:
     m_TransformParent: {fileID: 681520168594102717}
     m_Modifications:
     - target: {fileID: 2490925956299317781, guid: 388a2de4ed8d7fc4787097d6aae3f393,
+        type: 3}
+      propertyPath: _localizationKey
+      value: UserSettings/ButtonNaviCharacterSelection
+      objectReference: {fileID: 0}
+    - target: {fileID: 3552819234532470125, guid: 388a2de4ed8d7fc4787097d6aae3f393,
         type: 3}
       propertyPath: _localizationKey
       value: UserSettings/ButtonNaviCharacterSelection

@@ -96,9 +96,9 @@ namespace Altzone.Scripts.Window
 #endif
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) pending {_pendingWindow}");
             if (_pendingWindow != null)
             {
+                Debug.Log($"sceneLoaded {scene.name} ({scene.buildIndex}) pending {_pendingWindow}");
                 ((IWindowManager)this).ShowWindow(_pendingWindow);
                 _pendingWindow = null;
             }
