@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using Altzone.Scripts.Config;
-using Altzone.Scripts.Window;
-using Altzone.Scripts.Window.ScriptableObjects;
 using Prg.Scripts.Common.Unity.Localization;
+using Prg.Scripts.Common.Unity.Window;
+using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine;
 
 namespace GameUi.Scripts.LanguageSelection

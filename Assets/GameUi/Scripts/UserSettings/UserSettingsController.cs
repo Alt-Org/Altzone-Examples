@@ -1,5 +1,4 @@
 using Altzone.Scripts.Config;
-using Altzone.Scripts.Window;
 using UnityEngine;
 
 namespace GameUi.Scripts.UserSettings

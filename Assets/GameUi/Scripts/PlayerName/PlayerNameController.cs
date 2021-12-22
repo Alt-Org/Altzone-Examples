@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using Altzone.Scripts.Config;
-using Altzone.Scripts.Window;
+using Prg.Scripts.Common.Unity.Window;
 using UnityEngine;
 
 namespace GameUi.Scripts.PlayerName
