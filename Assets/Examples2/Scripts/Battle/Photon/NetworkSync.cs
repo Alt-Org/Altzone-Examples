@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 namespace Examples2.Scripts.Battle.Photon
 {
     /// <summary>
-    /// Activates networked components when all participants have been created, on for each player.
+    /// Activates networked components when all participants have been created, one for each player.
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
     internal class NetworkSync : MonoBehaviour
