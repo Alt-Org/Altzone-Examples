@@ -54,7 +54,7 @@ namespace Examples2.Scripts.Battle.Ball
         private Rigidbody2D _rigidbody;
 
         [SerializeField] private float _currentSpeed;
-        private bool _isCheckVelocityTime;
+        private bool _isCheckVelocityAfterCollision;
         private float _checkVelocityTime;
 
         // This is indexed by BallColor!
@@ -163,9 +163,9 @@ namespace Examples2.Scripts.Battle.Ball
                     : Vector2.MoveTowards(position, _networkPosition, Time.deltaTime);
                 return;
             }
-            if (_isCheckVelocityTime && _checkVelocityTime > Time.time)
+            if (_isCheckVelocityAfterCollision && _checkVelocityTime > Time.time)
             {
-                _isCheckVelocityTime = false;
+                _isCheckVelocityAfterCollision = false;
                 if (!Mathf.Approximately(_currentSpeed, _rigidbody.velocity.magnitude))
                 {
                     Debug.Log("fix velocity");
@@ -239,7 +239,7 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 return; // Collision events will be sent to disabled MonoBehaviours, to allow enabling Behaviours in response to collisions.
             }
-            _isCheckVelocityTime = true;
+            _isCheckVelocityAfterCollision = true;
             _checkVelocityTime = Time.time + CheckVelocityDelay;
             var otherGameObject = other.gameObject;
             var layer = otherGameObject.layer;
