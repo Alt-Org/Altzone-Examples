@@ -27,6 +27,10 @@ namespace Prg.Scripts.Common.Unity.Window
         [Conditional("UNITY_EDITOR")]
         private void SetEditorStatus()
         {
+            if (_window == null && _sceneTestWindow != null)
+            {
+                _window = ScriptableObject.CreateInstance<WindowDef>();
+            }
             if (_window.WindowPrefab == null)
             {
                 _window.SetWindowPrefab(_sceneTestWindow);
