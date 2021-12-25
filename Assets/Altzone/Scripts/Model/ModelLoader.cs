@@ -43,8 +43,9 @@
             AddModel("Tytöt", new CharacterModel(
                 (int)Defence.Confluence, "Tytöt", Defence.Confluence, 6, 7, 1, 6));
 
-            AddModel("Alpha", new ClanModel(1, "Alpha"));
-            AddModel("Beta", new ClanModel(2, "Beta"));
+            AddModel("Alpha", new ClanModel(1, "Alpha", "ALPHA"));
+            AddModel("Beta", new ClanModel(2, "Beta", "BETA"));
+            AddModel("Viewer", new ClanModel(9, "Viewer", "VIEW", true));
         }
 
         private static void AddModel(string name, AbstractModel model)

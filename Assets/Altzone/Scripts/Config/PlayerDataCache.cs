@@ -130,7 +130,7 @@ namespace Altzone.Scripts.Config
                 var clan = Storefront.Get().GetClanModel(ClanId);
                 if (clan != null)
                 {
-                    return $"{PlayerName}[{clan.Name}] {CharacterModel.Name}";
+                    return $"{PlayerName}[{clan.Tag}] {CharacterModel.Name}";
                 }
             }
             return $"{PlayerName} {CharacterModel.Name}";
@@ -168,7 +168,7 @@ namespace Altzone.Scripts.Config
         {
             // This is required for actual implementation to detect changes in our changeable properties!
             return
-                $"Name:{PlayerName}, Model:{CharacterModelId}, Clan:{ClanId}, ToS {(IsTosAccepted ? 1 : 0)}, Lang {Language}, Guid:{PlayerGuid}";
+                $"Name {PlayerName}, Model {CharacterModelId}, Clan {ClanId}, ToS {(IsTosAccepted ? 1 : 0)}, Lang {Language}, Guid {PlayerGuid}";
         }
     }
 
