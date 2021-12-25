@@ -28,7 +28,7 @@ namespace GameUi.Scripts.MainMenu
             }
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"{playerData}");
-            _view.PlayerInfo = $"{playerData.PlayerName} : {playerData.CharacterModel.Name}";
+            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
             _view.TestText = string.Empty;
         }
 

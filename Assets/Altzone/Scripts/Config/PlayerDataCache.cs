@@ -123,6 +123,18 @@ namespace Altzone.Scripts.Config
             }
         }
 
+        public string GetPlayerInfoLabel()
+        {
+            if (ClanId > 0)
+            {
+                var clan = Storefront.Get().GetClanModel(ClanId);
+                if (clan != null)
+                {
+                    return $"{PlayerName}[{clan.Name}] {CharacterModel.Name}";
+                }
+            }
+            return $"{PlayerName} {CharacterModel.Name}";
+        }
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
         /// </summary>

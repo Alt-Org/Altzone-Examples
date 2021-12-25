@@ -10,7 +10,7 @@ namespace GameUi.Scripts.UserSettings
         private void OnEnable()
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            _view.PlayerInfo = $"{playerData.PlayerName} - {playerData.CharacterModel.Name}";
+            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
         }
     }
 }

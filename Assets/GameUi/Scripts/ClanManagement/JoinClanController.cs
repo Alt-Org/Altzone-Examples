@@ -18,7 +18,7 @@ namespace GameUi.Scripts.ClanManagement
         {
             _view.ResetView();
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            _view.PlayerInfo = $"{playerData.PlayerName} - {playerData.CharacterModel.Name}";
+            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
             var clanId = playerData.ClanId;
             if (clanId > 0)
             {

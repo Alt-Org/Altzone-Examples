@@ -12,7 +12,7 @@ namespace GameUi.Scripts.BattleLobby
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
-            _view.PlayerInfo = $"{playerData.PlayerName} : {playerData.CharacterModel.Name}";
+            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
             _view.StartGameButton.interactable = false;
         }
     }
