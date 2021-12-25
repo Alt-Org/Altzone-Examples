@@ -11,6 +11,14 @@ namespace GameUi.Scripts.UserSettings
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             _view.PlayerInfo = playerData.GetPlayerInfoLabel();
+            if (playerData.ClanId > 0)
+            {
+                _view.ShowLeaveClanButton();
+            }
+            else
+            {
+                _view.ShowJoinClanButton();
+            }
         }
     }
 }

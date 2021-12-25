@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4b57a021d60bc4ab545fa1d0fe92d7, type: 3}
   m_Name: window-25-join-clan
   m_EditorClassIdentifier: 
-  _windowPrefab: {fileID: 1639751647383498152, guid: ee9c39fcd340494438e732d3cde7d673,
+  _windowPrefab: {fileID: 1639751647383498152, guid: 431aeba67cb509549868b528d7069033,
     type: 3}
   _isPopOutWindow: 0
   _scene: {fileID: 0}
