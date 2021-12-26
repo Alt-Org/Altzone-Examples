@@ -84,6 +84,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 911663475260677701, guid: 49be6c90717860e42b81cde7d645a0d9,
         type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 911663475260677701, guid: 49be6c90717860e42b81cde7d645a0d9,
+        type: 3}
       propertyPath: _localizationKey
       value: JoinClan/JoinClanButton
       objectReference: {fileID: 0}
