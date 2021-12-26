@@ -388,7 +388,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe7ca5ff99982584b8bab03236f5f55e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _title: {fileID: 6698001281248219998}
   _playerInfo: {fileID: 1613117141156861480}
   _clanInfo: {fileID: 8618753435420208856}
   _buttons:
@@ -1085,8 +1084,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: HeaderPanel
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1344693900755622451, guid: c7be5a115c592e747ac327d2f87dfcb1, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c7be5a115c592e747ac327d2f87dfcb1, type: 3}
 --- !u!224 &681520169464170949 stripped
 RectTransform:
@@ -1094,18 +1092,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3793360546434798646}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6698001281248219998 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7516699076508977000, guid: c7be5a115c592e747ac327d2f87dfcb1,
-    type: 3}
-  m_PrefabInstance: {fileID: 3793360546434798646}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &5961670385989295640
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1492,12 +1478,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2572df3981969b4a84eef4519fdd2a4, type: 3}
---- !u!224 &1603169553496774215 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8252115053086380040, guid: b2572df3981969b4a84eef4519fdd2a4,
-    type: 3}
-  m_PrefabInstance: {fileID: 7258391772730721871}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1613117141156861480 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8275379305090125927, guid: b2572df3981969b4a84eef4519fdd2a4,
@@ -1510,6 +1490,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1603169553496774215 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8252115053086380040, guid: b2572df3981969b4a84eef4519fdd2a4,
+    type: 3}
+  m_PrefabInstance: {fileID: 7258391772730721871}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8236404392351262094
 PrefabInstance:
   m_ObjectHideFlags: 0

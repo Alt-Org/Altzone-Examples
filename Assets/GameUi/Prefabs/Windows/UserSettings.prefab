@@ -424,7 +424,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _naviTarget
       value: 
-      objectReference: {fileID: 11400000, guid: 6f77be0dc8a6a7942919e530f7b9dc1a,
+      objectReference: {fileID: 11400000, guid: a202de05392217c4f8834043eb28690f,
         type: 2}
     - target: {fileID: 3722655679675288137, guid: 388a2de4ed8d7fc4787097d6aae3f393,
         type: 3}

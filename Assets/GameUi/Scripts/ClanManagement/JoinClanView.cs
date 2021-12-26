@@ -6,15 +6,9 @@ namespace GameUi.Scripts.ClanManagement
 {
     public class JoinClanView : MonoBehaviour
     {
-        [SerializeField] private Text _title;
         [SerializeField] private Text _playerInfo;
         [SerializeField] private Text _clanInfo;
         [SerializeField] private Button[] _buttons;
-
-        public string Title
-        {
-            set => _title.text = value;
-        }
 
         public string PlayerInfo
         {
@@ -28,6 +22,8 @@ namespace GameUi.Scripts.ClanManagement
 
         public void ResetView()
         {
+            PlayerInfo = string.Empty;
+            ClanInfo = string.Empty;
             foreach (var button in _buttons)
             {
                 button.gameObject.SetActive(false);

@@ -1,6 +1,5 @@
 ﻿using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
-using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
 namespace GameUi.Scripts.ClanManagement
@@ -18,17 +17,14 @@ namespace GameUi.Scripts.ClanManagement
         {
             _view.ResetView();
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
+            _view.PlayerInfo = playerData.PlayerName;
             var clanId = playerData.ClanId;
-            if (clanId > 0)
+            var existingClan = Storefront.Get().GetClanModel(clanId);
+            if (existingClan != null)
             {
-                _view.Title = Localizer.Localize("JoinClan/TitleText2");
-                var clan = Storefront.Get().GetClanModel(clanId);
-                _view.ClanInfo = $"Clan: {clan.Name}";
-                _view.AddButton("Leave Clan", LeaveClanButton);
+                _view.ClanInfo = existingClan.Name;
                 return;
             }
-            _view.Title = Localizer.Localize("JoinClan/TitleText1");
             _view.ClanInfo = $"Join Clan";
             var clans = Storefront.Get().GetAllClanModels();
             foreach (var clan in clans)
@@ -43,16 +39,6 @@ namespace GameUi.Scripts.ClanManagement
                     LoadClanInfo();
                 });
             }
-        }
-
-        private void LeaveClanButton()
-        {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            playerData.BatchSave(() =>
-            {
-                playerData.ClanId = -1;
-            });
-            LoadClanInfo();
         }
     }
 }

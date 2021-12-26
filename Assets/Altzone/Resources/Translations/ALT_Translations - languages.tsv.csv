@@ -15,12 +15,12 @@ FooterPanel/FooterText	Footer	Alatunniste	Sidfot
 HeaderPanel/TitleText	-override this key-		
 JoinClan/InfoText1	Clan: {0}		
 JoinClan/InfoText2	Join Clan		
-JoinClan/LeaveClanButton	Leave Clan		
-JoinClan/TitleText1	join clan		
-JoinClan/TitleText2	leave clan		
+JoinClan/TitleText	join clan		
 LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
 LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
+LeaveClan/LeaveClanButton	Leave Clan		
+LeaveClan/TitleText	leave clan		
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
 Lobby/StartGameButton	Start	Aloita	Start
@@ -42,7 +42,7 @@ TermsOfService/TitleText	terms of service	käyttöehdot	användarvillkor
 TermsOfService/Toggle/Label	Accept	Hyväksy	Acceptera
 UserSettings/ButtonNaviCharacterSelection	Character Selection	Hahmon valinta	Karaktärsval
 UserSettings/ButtonNaviJoinClan	Join Clan		
-UserSettings/ButtonNaviLeaveClan	Leave Clan		
 UserSettings/ButtonNaviLanguage	Language	Kieli	Språk
+UserSettings/ButtonNaviLeaveClan	Leave Clan		
 UserSettings/ButtonNaviPlayerName	Player Name	Pelaajanimi	Spelarnamn
 UserSettings/TitleText	user settings	käyttäjäasetukset	användarinställningar
