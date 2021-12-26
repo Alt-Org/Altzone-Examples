@@ -10,6 +10,7 @@ namespace GameUi.Scripts.UserSettings
         private void OnEnable()
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            Debug.Log($"OnEnable {playerData}");
             _view.PlayerInfo = playerData.GetPlayerInfoLabel();
             if (playerData.ClanId > 0)
             {

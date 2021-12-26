@@ -160,6 +160,7 @@ namespace Altzone.Scripts.Config
             {
                 PlayerName = string.Empty;
                 CharacterModelId = -1;
+                ClanId = -1;
                 IsTosAccepted = false;
             });
         }

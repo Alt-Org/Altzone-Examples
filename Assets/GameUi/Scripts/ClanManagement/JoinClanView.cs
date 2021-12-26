@@ -8,7 +8,8 @@ namespace GameUi.Scripts.ClanManagement
     {
         [SerializeField] private Text _playerInfo;
         [SerializeField] private Text _clanInfo;
-        [SerializeField] private Button[] _buttons;
+        [SerializeField] private Transform _contentRoot;
+        [SerializeField] private GameObject _buttonPrefab;
 
         public string PlayerInfo
         {
@@ -24,31 +25,20 @@ namespace GameUi.Scripts.ClanManagement
         {
             PlayerInfo = string.Empty;
             ClanInfo = string.Empty;
-            foreach (var button in _buttons)
+            var childCount = _contentRoot.childCount;
+            for (var i = childCount - 1; i >= 0; --i)
             {
-                button.gameObject.SetActive(false);
-                button.onClick.RemoveAllListeners();
+                Destroy(_contentRoot.GetChild(i).gameObject);
             }
         }
 
         public void AddButton(string buttonCaption, Action clickHandler)
         {
-            var button = GetFreeButton();
+            var instance = Instantiate(_buttonPrefab, _contentRoot);
+            var button = instance.GetComponentInChildren<Button>();
             button.SetCaption(buttonCaption);
             button.gameObject.SetActive(true);
             button.onClick.AddListener(() => clickHandler());
-        }
-
-        private Button GetFreeButton()
-        {
-            foreach (var button in _buttons)
-            {
-                if (!button.gameObject.activeSelf)
-                {
-                    return button;
-                }
-            }
-            throw new UnityException("Run out of buttons");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
 namespace GameUi.Scripts.ClanManagement
@@ -25,18 +26,19 @@ namespace GameUi.Scripts.ClanManagement
                 _view.ClanInfo = existingClan.Name;
                 return;
             }
-            _view.ClanInfo = $"Join Clan";
+            _view.ClanInfo = Localizer.Localize("JoinClan/InfoText2");
             var clans = Storefront.Get().GetAllClanModels();
             foreach (var clan in clans)
             {
                 var capturedClanId = clan.Id;
-                _view.AddButton(clan.Name, () =>
+                var caption = $"{clan.Name} [{clan.Tag}]";
+                _view.AddButton(caption, () =>
                 {
+                    Debug.Log($"SAVE CLAN {capturedClanId}");
                     playerData.BatchSave(() =>
                     {
                         playerData.ClanId = capturedClanId;
                     });
-                    LoadClanInfo();
                 });
             }
         }
