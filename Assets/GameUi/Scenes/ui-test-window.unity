@@ -436,6 +436,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4420917178279563233, guid: 70b7377a1062b60478a213f7be30dfb3,
         type: 3}
+      propertyPath: _findWindow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4420917178279563233, guid: 70b7377a1062b60478a213f7be30dfb3,
+        type: 3}
       propertyPath: _sceneTestWindow
       value: 
       objectReference: {fileID: 0}
