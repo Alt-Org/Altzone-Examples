@@ -8,12 +8,12 @@ namespace GameUi.Scripts.BattleLobby
     {
         [SerializeField] private BattleLobbyView _view;
 
-        private void Awake()
+        private void OnEnable()
         {
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            Debug.Log(playerData.ToString());
+            Debug.Log($"OnEnable {playerData}");
+            _view.ResetView();
             _view.PlayerInfo = playerData.GetPlayerInfoLabel();
-            _view.StartGameButton.interactable = false;
         }
     }
 }

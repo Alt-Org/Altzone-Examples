@@ -15,5 +15,10 @@ namespace GameUi.Scripts.BattleLobby
         }
 
         public Button StartGameButton => _startGameButton;
+
+        public void ResetView()
+        {
+            _startGameButton.interactable = false;
+        }
     }
 }
