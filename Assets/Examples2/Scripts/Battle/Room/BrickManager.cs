@@ -1,6 +1,7 @@
 using Examples2.Scripts.Battle.interfaces;
 using Prg.Scripts.Common.Photon;
 using System.Collections.Generic;
+using Altzone.Scripts.Config;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,7 +23,14 @@ namespace Examples2.Scripts.Battle.Room
 
         private void Awake()
         {
-            Debug.Log("Awake");
+            var isBricksVisible = RuntimeGameConfig.Get().Features._isBricksVisible;
+            Debug.Log("Awake isBricksVisible {isBricksVisible");
+            if (!isBricksVisible)
+            {
+                _upperBricks.SetActive(false);
+                _lowerBricks.SetActive(false);
+                return;
+            }
             CreateBrickMarkersFrom(_upperBricks.transform, _bricks);
             CreateBrickMarkersFrom(_lowerBricks.transform, _bricks);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
