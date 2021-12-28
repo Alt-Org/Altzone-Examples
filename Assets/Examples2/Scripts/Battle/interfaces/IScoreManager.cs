@@ -2,9 +2,10 @@ namespace Examples2.Scripts.Battle.interfaces
 {
     internal enum ScoreType
     {
-        PlayerHed = 0,
-        BlueWall = 1,
-        RedWall = 2
+        BlueHead = 1,
+        RedHead = 2,
+        BlueWall = 3,
+        RedWall = 4
     }
 
     internal interface IScoreManager

@@ -47,7 +47,8 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"onHeadCollision {other.name}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
-            this.Publish(new ScoreManager.ScoreEvent(ScoreType.PlayerHed));
+            var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.BlueHead : ScoreType.RedHead;
+            this.Publish(new ScoreManager.ScoreEvent(scoreType));
         }
 
         private void OnShieldCollision(GameObject other)

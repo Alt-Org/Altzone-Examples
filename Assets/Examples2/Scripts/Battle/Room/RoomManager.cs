@@ -28,6 +28,7 @@ namespace Examples2.Scripts.Battle.Room
             _isWaitForCountdown = false;
             Debug.Log($"Awake required {_requiredActorCount} master {PhotonNetwork.IsMasterClient}");
             this.Subscribe<ActorReportEvent>(OnActorReportEvent);
+            this.Subscribe<ScoreManager.GameScoreEvent>(OnGameScoreEvent);
         }
 
         private void OnDestroy()
@@ -50,6 +51,11 @@ namespace Examples2.Scripts.Battle.Room
                 _playerManager = Context.GetPlayerManager;
                 _playerManager.StartCountdown(OnCountdownFinished);
             }
+        }
+
+        private void OnGameScoreEvent(ScoreManager.GameScoreEvent data)
+        {
+            Debug.Log($"OnGameScoreEvent {data}");
         }
 
         private void OnCountdownFinished()

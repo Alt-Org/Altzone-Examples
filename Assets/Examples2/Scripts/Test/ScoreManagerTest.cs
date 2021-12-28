@@ -10,15 +10,17 @@ namespace Examples2.Scripts.Test
     {
         public enum ScoreType
         {
-            PlayerHed = 0,
-            BlueWall = 1,
-            RedWall = 2
+            BadEnum = 0,
+            BlueHead = 1,
+            RedHead = 2,
+            BlueWall = 3,
+            RedWall = 4,
         }
 
         [Header("Debug Only")] public bool _addScore;
         public bool _publishScore;
 
-        [Header("Score")] public ScoreType _scoreType = ScoreType.PlayerHed;
+        [Header("Score")] public ScoreType _scoreType;
         [Min(0)] public int _scoreAmount;
 
         private IScoreManager _scoreManager;
