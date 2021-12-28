@@ -8217,6 +8217,7 @@ MonoBehaviour:
   _currentActorCount: 0
   _isWaitForActors: 0
   _isWaitForCountdown: 0
+  _gameOverWindow: {fileID: 11400000, guid: 562b5b76e824ec1488faad0f144d9a50, type: 2}
 --- !u!114 &1651784412
 MonoBehaviour:
   m_ObjectHideFlags: 0

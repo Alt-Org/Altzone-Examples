@@ -1,8 +1,12 @@
+using System.Collections;
 using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
+using Prg.Scripts.Common.Unity.Window;
+using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,6 +21,7 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField] private int _currentActorCount;
         [SerializeField] private bool _isWaitForActors;
         [SerializeField] private bool _isWaitForCountdown;
+        [SerializeField] private WindowDef _gameOverWindow;
 
         private IPlayerManager _playerManager;
 
@@ -56,6 +61,33 @@ namespace Examples2.Scripts.Battle.Room
         private void OnGameScoreEvent(ScoreManager.GameScoreEvent data)
         {
             Debug.Log($"OnGameScoreEvent {data}");
+            var variables = RuntimeGameConfig.Get().Variables;
+            if (data.TeamBlueHeadScore >= variables._headScoreToWin ||
+                data.TeamBlueWallScore >= variables._wallScoreToWin)
+            {
+                GameOver(PhotonBattle.TeamBlueValue, PhotonBattle.TeamBlueKey);
+                return;
+            }
+            if (data.TeamRedHeadScore >= variables._headScoreToWin ||
+                data.TeamRedWallScore >= variables._wallScoreToWin)
+            {
+                GameOver(PhotonBattle.TeamRedValue, PhotonBattle.TeamRedKey);
+            }
+        }
+
+        private void GameOver(int winningTeamNumber, string winningTeamKey)
+        {
+            Debug.Log($"GameOver winningTeam {winningTeamNumber} {winningTeamKey}");
+            var room = PhotonNetwork.CurrentRoom;
+            room.SetCustomProperty(winningTeamKey, 1);
+            StartCoroutine(LoadGameOverWindow());
+        }
+
+        private IEnumerator LoadGameOverWindow()
+        {
+            yield return null;
+            Debug.Log($"LoadGameOverWindow {_gameOverWindow}");
+            WindowManager.Get().ShowWindow(_gameOverWindow);
         }
 
         private void OnCountdownFinished()

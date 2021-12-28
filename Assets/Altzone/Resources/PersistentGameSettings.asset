@@ -13,27 +13,33 @@ MonoBehaviour:
   m_Name: PersistentGameSettings
   m_EditorClassIdentifier: 
   _features:
-    isRotateGameCamera: 0
-    isLocalPLayerOnTeamBlue: 0
-    isSPawnMiniBall: 0
-    isSinglePlayerShieldOn: 0
+    _isRotateGameCamera: 0
+    _isLocalPLayerOnTeamBlue: 0
+    _isSPawnMiniBall: 0
+    _isSinglePlayerShieldOn: 0
+    _isBricksVisible: 0
+  _constraints:
+    _minPlayerNameLength: 2
+    _maxPlayerNameLength: 16
   _variables:
-    roomStartDelay: 0
-    ballMoveSpeedMultiplier: 0
-    ballLerpSmoothingFactor: 0
-    ballTeleportDistance: 0
-    minSlingShotDistance: 0
-    maxSlingShotDistance: 0
-    ballRestartDelay: 0
-    playerMoveSpeedMultiplier: 0
-    playerSqrMinRotationDistance: 0
-    playerSqrMaxRotationDistance: 0
-    shieldDistanceMultiplier: 0
+    _roomStartDelay: 0
+    _headScoreToWin: 2
+    _wallScoreToWin: 2
+    _ballMoveSpeedMultiplier: 0
+    _ballLerpSmoothingFactor: 0
+    _ballTeleportDistance: 0
+    _minSlingShotDistance: 0
+    _maxSlingShotDistance: 0
+    _ballRestartDelay: 0
+    _playerMoveSpeedMultiplier: 0
+    _playerSqrMinRotationDistance: 0
+    _playerSqrMaxRotationDistance: 0
+    _shieldDistanceMultiplier: 0
   _prefabs:
-    playerForDes: {fileID: 0}
-    playerForDef: {fileID: 0}
-    playerForInt: {fileID: 0}
-    playerForPro: {fileID: 0}
-    playerForRet: {fileID: 0}
-    playerForEgo: {fileID: 0}
-    playerForCon: {fileID: 0}
+    _playerForDes: {fileID: 0}
+    _playerForDef: {fileID: 0}
+    _playerForInt: {fileID: 0}
+    _playerForPro: {fileID: 0}
+    _playerForRet: {fileID: 0}
+    _playerForEgo: {fileID: 0}
+    _playerForCon: {fileID: 0}
