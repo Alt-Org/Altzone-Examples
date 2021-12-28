@@ -16,7 +16,7 @@ namespace Examples2.Scripts.Battle.Room
         private void Awake()
         {
             _countdown = _countdownText.gameObject;
-            _countdown.SetActive(false);
+            HideCountdown();
             this.Subscribe<PlayerManager.CountdownEvent>(OnCountdownEvent);
         }
 
@@ -29,7 +29,7 @@ namespace Examples2.Scripts.Battle.Room
             }
             if (data.CurValue >= 0)
             {
-                ShowCountdown(data.CurValue);
+                SetCountdownValue(data.CurValue);
                 return;
             }
             HideCountdown();
@@ -39,10 +39,10 @@ namespace Examples2.Scripts.Battle.Room
         private void StartCountdown(int value)
         {
             _countdown.SetActive(true);
-            _countdownText.text = value.ToString("N0");
+            SetCountdownValue(value);
         }
 
-        private void ShowCountdown(int value)
+        private void SetCountdownValue(int value)
         {
             _countdownText.text = value.ToString("N0");
         }
