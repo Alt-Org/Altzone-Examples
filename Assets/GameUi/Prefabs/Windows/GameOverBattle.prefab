@@ -207,7 +207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823fcbcbe5ee0ff409c4f8f897b4d8ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _winnerInfo: {fileID: 5084103364573459581}
+  _winnerInfo1: {fileID: 5084103364573459581}
+  _winnerInfo2: {fileID: 1479789815820081459}
   _continueButton: {fileID: 5952449513055698051}
 --- !u!114 &207284715564931638
 MonoBehaviour:
@@ -222,6 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _view: {fileID: 6078231900938770628}
+  _timeOutDelay: 0
 --- !u!1 &2043907499675552608
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,7 +237,7 @@ GameObject:
   - component: {fileID: 1479789815820081459}
   - component: {fileID: 8229423808982487902}
   m_Layer: 5
-  m_Name: Label
+  m_Name: LabelWinner2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -517,7 +519,7 @@ GameObject:
   - component: {fileID: 5084103364573459581}
   - component: {fileID: 4659481295532644098}
   m_Layer: 5
-  m_Name: LabelWinnerName
+  m_Name: LabelWinner1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

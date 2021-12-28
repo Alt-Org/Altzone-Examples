@@ -5,13 +5,20 @@ namespace GameUi.Scripts.GameOver
 {
     public class GameOverView : MonoBehaviour
     {
-        [SerializeField] private Text _winnerInfo;
+        [SerializeField] private Text _winnerInfo1;
+        [SerializeField] private Text _winnerInfo2;
         [SerializeField] private Button _continueButton;
 
-        public string WinnerInfo
+        public string WinnerInfo1
         {
-            get => _winnerInfo.text;
-            set => _winnerInfo.text = value;
+            get => _winnerInfo1.text;
+            set => _winnerInfo1.text = value;
+        }
+
+        public string WinnerInfo2
+        {
+            get => _winnerInfo2.text;
+            set => _winnerInfo2.text = value;
         }
 
         public Button ContinueButton => _continueButton;

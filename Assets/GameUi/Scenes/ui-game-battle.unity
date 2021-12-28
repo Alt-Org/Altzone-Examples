@@ -310,7 +310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _window: {fileID: 11400000, guid: d398c6b4f88a00745b4af823e20604d8, type: 2}
-  _sceneTestWindow: {fileID: 0}
+  _findWindow: 0
 --- !u!4 &1822987809
 Transform:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ GameObject:
   - component: {fileID: 1854897040}
   - component: {fileID: 1854897039}
   m_Layer: 0
-  m_Name: GotoGameOver
+  m_Name: EscapeKeyRedirect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
