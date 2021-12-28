@@ -165,9 +165,10 @@ namespace Examples2.Scripts.Battle.Room
             {
                 var payload = (byte[])data;
                 Assert.AreEqual(3, payload.Length, "Invalid message length");
-                Assert.AreEqual((byte)MsgSendScore, payload[0], "Invalid message id");
-                var scoreType = (ScoreType)payload[1];
-                var scoreAmount = (int)payload[1];
+                var index = 0;
+                Assert.AreEqual((byte)MsgSendScore, payload[index], "Invalid message id");
+                var scoreType = (ScoreType)payload[++index];
+                var scoreAmount = (int)payload[++index];
                 LocalScore.AddScore(scoreType, scoreAmount);
             }
 

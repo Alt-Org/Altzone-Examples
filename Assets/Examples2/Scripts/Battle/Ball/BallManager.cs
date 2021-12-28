@@ -71,7 +71,7 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
             }
-            else if (other.CompareTag(Tags.BlueTeam))
+            else if (other.CompareTag(Tags.RedTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
             }
