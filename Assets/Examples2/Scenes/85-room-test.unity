@@ -8124,6 +8124,7 @@ GameObject:
   - component: {fileID: 1651784412}
   - component: {fileID: 1651784407}
   - component: {fileID: 1651784411}
+  - component: {fileID: 1651784413}
   - component: {fileID: 1651784409}
   m_Layer: 0
   m_Name: Managers
@@ -8226,6 +8227,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bfbda57998a4e6089de965c70d1c272, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1651784413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651784406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9036f9f14b834eac9cea10f8e4067419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1688737731
@@ -9782,4 +9795,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01fc2f98fef0e664d9275ea569ef0cd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetAspectRatio: {x: 9, y: 16}
+  _targetAspectRatio: {x: 9, y: 16}

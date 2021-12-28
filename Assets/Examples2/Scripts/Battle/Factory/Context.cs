@@ -30,6 +30,8 @@ namespace Examples2.Scripts.Battle.Factory
 
         internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
 
+        internal static IScoreManager GetScoreManager => Object.FindObjectOfType<ScoreManager>();
+
         internal static IPlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 1
             ? Object.FindObjectOfType<HelpersCollection>()?._teamBlueLineConnector
             : Object.FindObjectOfType<HelpersCollection>()?._teamRedLineConnector;

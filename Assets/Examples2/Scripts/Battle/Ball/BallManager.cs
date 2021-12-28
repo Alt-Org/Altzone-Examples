@@ -2,6 +2,7 @@ using System;
 using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Room;
 using Prg.Scripts.Common.PubSub;
 using UnityConstants;
 using UnityEngine;
@@ -46,11 +47,14 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"onHeadCollision {other.name}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
+            this.Publish(new ScoreManager.ScoreEvent(ScoreType.PlayerHed));
         }
 
         private void OnShieldCollision(GameObject other)
         {
             Debug.Log($"onShieldCollision {other.name}");
+            var playerActor = other.GetComponentInParent<IPlayerActor>();
+            playerActor.ShieldCollision();
         }
 
         private void OnBrickCollision(GameObject other)
@@ -62,6 +66,14 @@ namespace Examples2.Scripts.Battle.Ball
         private void OnWallCollision(GameObject other)
         {
             Debug.Log($"onWallCollision {other.name} {other.tag}");
+            if (other.CompareTag(Tags.BlueTeam))
+            {
+                this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
+            }
+            else if (other.CompareTag(Tags.BlueTeam))
+            {
+                this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
+            }
         }
 
         private void OnEnterTeamArea(GameObject other)

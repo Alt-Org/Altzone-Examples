@@ -143,6 +143,11 @@ namespace Examples2.Scripts.Battle.Players
             }
         }
 
+        void IPlayerActor.ShieldCollision()
+        {
+            // NOP - until game features are implemented
+        }
+
         void IPlayerActor.SetNormalMode()
         {
             if (PhotonNetwork.IsMasterClient)
