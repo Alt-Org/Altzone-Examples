@@ -1,4 +1,5 @@
 using Examples2.Scripts.Battle.interfaces;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using UnityEngine;
@@ -43,6 +44,10 @@ namespace Examples2.Scripts.Battle.Room
 
         void IScoreManager.AddScore(ScoreType scoreType, int scoreAmount)
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
             Debug.Log($"AddScore {scoreType} {scoreAmount}");
             Assert.IsTrue(scoreAmount > 0, "scoreAmount > 0");
             _networkScore.AddScore(scoreType, scoreAmount);
@@ -57,6 +62,11 @@ namespace Examples2.Scripts.Battle.Room
             {
                 ScoreType = scoreType;
                 ScoreAmount = scoreAmount;
+            }
+
+            public override string ToString()
+            {
+                return $"Score: {ScoreType} : {ScoreAmount}";
             }
         }
 
