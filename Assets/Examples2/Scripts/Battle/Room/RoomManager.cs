@@ -65,13 +65,13 @@ namespace Examples2.Scripts.Battle.Room
             if (data.TeamBlueHeadScore >= variables._headScoreToWin ||
                 data.TeamBlueWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamBlueValue, PhotonBattle.TeamBlueKey);
+                GameOver(PhotonBattle.TeamRedValue, PhotonBattle.TeamRedKey);
                 return;
             }
             if (data.TeamRedHeadScore >= variables._headScoreToWin ||
                 data.TeamRedWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamRedValue, PhotonBattle.TeamRedKey);
+                GameOver(PhotonBattle.TeamBlueValue, PhotonBattle.TeamBlueKey);
             }
         }
 
