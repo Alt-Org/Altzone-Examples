@@ -10,14 +10,26 @@ using UnityEngine;
 
 namespace Editor.Prg.Build
 {
+    /// <summary>
+    /// Analyze text file from bach build to find out unused or suspicious files.
+    /// </summary>
+    /// <remarks>
+    /// Paths for ExcludedFolders and TestFolders uses <c>RegexOptions.IgnoreCase</c>
+    /// </remarks>
     public class MenuBuildReport : MonoBehaviour
     {
         private static readonly string[] ExcludedFolders =
         {
             "Assets/Photon",
             "Assets/Photon Unity Networking",
-            "Assets/Editor",
+            ".*/Editor/.*",
             "Assets/TextMesh Pro",
+        };
+
+        private static readonly string[] TestFolders =
+        {
+            ".*/test/.*",
+            ".*/zPlayGound/.*",
         };
 
         [MenuItem("Window/ALT-Zone/Build/Create Build Script", false, 1)]
@@ -92,32 +104,69 @@ namespace Editor.Prg.Build
             {
                 logWriter.Log($"Build contains {fileCount[3]} Built-in files, their size is {fileSize[3]:### ### ##0.0} kb ({filePercent[3]:0.0}%)");
             }
-            var unusedAssets = CheckUnusedAssets(usedAssets, logWriter);
+            var testAssets = new List<string>();
+            var unusedAssets = CheckUnusedAssets(usedAssets, testAssets);
             logWriter.Log($"Project contains {unusedAssets.Count} unused assets for {buildTargetName} build");
-            if (_excludedAssetCount > 0)
+            if (_excludedFolderCount > 0 || _excludedFileCount > 0)
             {
-                logWriter.Log($"Excluded {_excludedAssetCount} files or folders");
+                logWriter.Log($"Excluded {_excludedFolderCount} folders and {_excludedFileCount} files");
             }
-            double unusedAssetSizeTotal = unusedAssets.Select(x => x.FileSizeKb).Sum();
+            if (testAssets.Count > 0)
+            {
+                logWriter.Log($"Build uses {testAssets.Count} TEST assets");
+                foreach (var testAsset in testAssets)
+                {
+                    logWriter.Log($"TEST ASSET\t{testAsset}");
+                }
+            }
+            var unusedAssetSizeTotal = unusedAssets.Select(x => x.FileSizeKb).Sum();
             logWriter.Log($"Unused assets total size is {unusedAssetSizeTotal:### ### ##0.0} kb");
-            foreach (var unusedAsset in unusedAssets.OrderBy(x => x.FileSizeKb).Reverse())
+            var unusedCount = 0;
+            var unusedSize = 0D;
+            foreach (var unusedAsset in unusedAssets.Where(x => !x.IsTestAsset).OrderBy(x => x.FileSizeKb).Reverse())
             {
-                logWriter.Log($"UNUSED\t{unusedAsset.FilePath}\t{unusedAsset.FileSizeKb:### ### ##0.0} kb");
+                unusedCount += 1;
+                unusedSize += unusedAsset.FileSizeKb;
+                logWriter.Log($"UNUSED\tPROD\t{unusedAsset.FilePath}\t{unusedAsset.FileSizeKb:### ### ##0.0} kb");
             }
+            logWriter.Log($"Unused assets PROD size is {unusedSize:### ### ##0.0} kb in {unusedCount} files");
+            unusedCount = 0;
+            unusedSize = 0D;
+            foreach (var unusedAsset in unusedAssets.Where(x => x.IsTestAsset).OrderBy(x => x.FileSizeKb).Reverse())
+            {
+                unusedCount += 1;
+                unusedSize += unusedAsset.FileSizeKb;
+                logWriter.Log($"UNUSED\tTEST\t{unusedAsset.FilePath}\t{unusedAsset.FileSizeKb:### ### ##0.0} kb");
+            }
+            logWriter.Log($"Unused assets TEST size is {unusedSize:### ### ##0.0} kb in {unusedCount} files");
+
             var reportName = $"{Path.GetFileNameWithoutExtension(buildReport)}_report.log";
             logWriter.Save(reportName);
             Debug.Log($"Report save in {reportName}");
         }
 
-        private static int _excludedAssetCount;
+        private static int _excludedFolderCount;
+        private static int _excludedFileCount;
 
-        private static List<AssetLine> CheckUnusedAssets(HashSet<string> usedAssets, LogWriter logWriter)
+        private static List<AssetLine> CheckUnusedAssets(HashSet<string> usedAssets, List<string> testAssets)
         {
-            void HandleSubFolder(string parent, List<Regex> excluded, ref List<AssetLine> result)
+            bool IsTestAsset(string assetPath, List<Regex> testFiles)
+            {
+                foreach (var regex in testFiles)
+                {
+                    if (regex.IsMatch(assetPath))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            void HandleSubFolder(string parent, List<Regex> excluded, List<Regex> testFiles, ref List<AssetLine> result)
             {
                 if (ExcludedFolders.Contains(parent))
                 {
-                    _excludedAssetCount += 1;
+                    _excludedFolderCount += 1;
                     return;
                 }
                 string[] guids = AssetDatabase.FindAssets(null, new[] { parent });
@@ -129,14 +178,13 @@ namespace Editor.Prg.Build
                     {
                         if (regex.IsMatch(assetPath))
                         {
-                            logWriter.Log($"skip {assetPath} ({regex})");
                             isExclude = true;
                             break;
                         }
                     }
                     if (isExclude)
                     {
-                        _excludedAssetCount += 1;
+                        _excludedFileCount += 1;
                     }
                     else
                     {
@@ -150,24 +198,40 @@ namespace Editor.Prg.Build
                             var assetLine = new AssetLine(assetPath, isFile: true);
                             if (!result.Contains(assetLine))
                             {
+                                if (IsTestAsset(assetPath, testFiles))
+                                {
+                                    assetLine.SetIsTestAsset();
+                                }
                                 result.Add(assetLine);
                             }
+                            continue;
+                        }
+                        if (IsTestAsset(assetPath, testFiles))
+                        {
+                            testAssets.Add(assetPath);
+                            break;
                         }
                     }
                 }
             }
 
+            _excludedFolderCount = 0;
+            _excludedFileCount = 0;
             var excludedList = new List<Regex>();
             foreach (var excludedFolder in ExcludedFolders)
             {
-                excludedList.Add(new Regex(excludedFolder));
+                excludedList.Add(new Regex(excludedFolder, RegexOptions.IgnoreCase));
             }
-            _excludedAssetCount = 0;
+            var testRegExpList = new List<Regex>();
+            foreach (var testPath in TestFolders)
+            {
+                testRegExpList.Add(new Regex(testPath, RegexOptions.IgnoreCase));
+            }
             var resultList = new List<AssetLine>();
             var folders = AssetDatabase.GetSubFolders("Assets");
             foreach (var folder in folders)
             {
-                HandleSubFolder(folder, excludedList, ref resultList);
+                HandleSubFolder(folder, excludedList, testRegExpList, ref resultList);
             }
             return resultList;
         }
@@ -209,6 +273,7 @@ namespace Editor.Prg.Build
             public readonly double FileSizeKb;
             public readonly double Percentage;
             public readonly string FilePath;
+            public bool IsTestAsset { get; private set; }
 
             public bool IsAsset => FilePath.StartsWith("Assets/");
             public bool IsPackage => FilePath.StartsWith("Packages/");
@@ -265,6 +330,11 @@ namespace Editor.Prg.Build
             public override int GetHashCode()
             {
                 return _line.GetHashCode();
+            }
+
+            public void SetIsTestAsset()
+            {
+                IsTestAsset = true;
             }
         }
 
