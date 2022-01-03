@@ -38,6 +38,7 @@ namespace Examples2.Scripts.Battle.Room
 
         private void StartCountdown(int value)
         {
+            // If you got exception saying GameObject has been destroyed, restart UNITY to fix it
             _countdown.SetActive(true);
             SetCountdownValue(value);
         }

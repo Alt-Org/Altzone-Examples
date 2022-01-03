@@ -7286,6 +7286,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1620697641}
+  - component: {fileID: 1620697642}
   - component: {fileID: 1620697640}
   m_Layer: 0
   m_Name: PlayerInstantiate
@@ -7326,6 +7327,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1620697642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620697639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 646714739964ecd4f8f3eae4d3813191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _config: {fileID: 0}
+  _mouse:
+    zoomSpeed: 0
+    minZoomSpeed: 0
+    maxZoomSpeed: 0
+    panSpeed: 0
+    minPanSpeed: 0
+    maxPanSpeed: 0
+  _touch:
+    zoomSpeed: 0
+    minZoomSpeed: 0
+    maxZoomSpeed: 0
+    panSpeed: 0
+    minPanSpeed: 0
+    maxPanSpeed: 0
+  _handler: {fileID: 0}
 --- !u!1 &1645258094
 GameObject:
   m_ObjectHideFlags: 0
@@ -7472,7 +7501,6 @@ GameObject:
   - component: {fileID: 1651784408}
   - component: {fileID: 1651784407}
   - component: {fileID: 1651784409}
-  - component: {fileID: 1651784410}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -7520,34 +7548,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8742ff6b398d49448b9910857cf9b67c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1651784410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1651784406}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 646714739964ecd4f8f3eae4d3813191, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _config: {fileID: 0}
-  _mouse:
-    zoomSpeed: 0
-    minZoomSpeed: 0
-    maxZoomSpeed: 0
-    panSpeed: 0
-    minPanSpeed: 0
-    maxPanSpeed: 0
-  _touch:
-    zoomSpeed: 0
-    minZoomSpeed: 0
-    maxZoomSpeed: 0
-    panSpeed: 0
-    minPanSpeed: 0
-    maxPanSpeed: 0
-  _handler: {fileID: 0}
 --- !u!1 &1688737731
 GameObject:
   m_ObjectHideFlags: 0
@@ -8432,6 +8432,7 @@ MonoBehaviour:
   _hideBall: 0
   _showBall: 0
   _ghostBall: 0
+  _useScoreFlash: 0
 --- !u!1 &1955689416
 GameObject:
   m_ObjectHideFlags: 0
@@ -9126,4 +9127,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01fc2f98fef0e664d9275ea569ef0cd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetAspectRatio: {x: 9, y: 16}
+  _targetAspectRatio: {x: 9, y: 16}
