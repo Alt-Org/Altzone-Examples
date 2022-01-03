@@ -17,6 +17,25 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     internal class RoomManager : MonoBehaviour
     {
+        private class TeamInfo
+        {
+            public readonly int Team;
+            public readonly int Score;
+            public readonly string ScoreKey;
+
+            public TeamInfo(int team, int score, string scoreKey)
+            {
+                Team = team;
+                Score = score;
+                ScoreKey = scoreKey;
+            }
+
+            public override string ToString()
+            {
+                return $"Team: {Team}, Score: {Score}";
+            }
+        }
+
         [Header("Live Data"), SerializeField] private int _requiredActorCount;
         [SerializeField] private int _currentActorCount;
         [SerializeField] private bool _isWaitForActors;
@@ -61,25 +80,36 @@ namespace Examples2.Scripts.Battle.Room
         private void OnGameScoreEvent(ScoreManager.GameScoreEvent data)
         {
             Debug.Log($"OnGameScoreEvent {data}");
+
+            var blue = new TeamInfo(PhotonBattle.TeamBlueValue, data.TeamBlueHeadScore + data.TeamBlueWallScore, PhotonBattle.TeamBlueScoreKey);
+            var red = new TeamInfo(PhotonBattle.TeamRedValue, data.TeamRedHeadScore + data.TeamRedWallScore, PhotonBattle.TeamRedScoreKey);
+
             var variables = RuntimeGameConfig.Get().Variables;
             if (data.TeamBlueHeadScore >= variables._headScoreToWin ||
                 data.TeamBlueWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamRedValue, PhotonBattle.TeamRedKey);
+                GameOver(PhotonBattle.TeamBlueValue, blue, red);
                 return;
             }
             if (data.TeamRedHeadScore >= variables._headScoreToWin ||
                 data.TeamRedWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamBlueValue, PhotonBattle.TeamBlueKey);
+                GameOver(PhotonBattle.TeamRedValue, blue, red);
             }
         }
 
-        private void GameOver(int winningTeamNumber, string winningTeamKey)
+        private void GameOver(int winningTeam, TeamInfo blue, TeamInfo red)
         {
-            Debug.Log($"GameOver winningTeam {winningTeamNumber} {winningTeamKey}");
+            Debug.Log($"GameOver win {winningTeam} : {blue} : {red}");
             var room = PhotonNetwork.CurrentRoom;
-            room.SetCustomProperty(winningTeamKey, 1);
+            var props = new ExitGames.Client.Photon.Hashtable
+            {
+                { PhotonBattle.TeamWinKey, winningTeam },
+                { blue.ScoreKey, blue.Score },
+                { red.ScoreKey, red.Score },
+            };
+            room.SetCustomProperties(props);
+
             StartCoroutine(LoadGameOverWindow());
         }
 

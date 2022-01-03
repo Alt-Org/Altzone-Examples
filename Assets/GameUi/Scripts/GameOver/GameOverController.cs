@@ -28,25 +28,36 @@ namespace GameUi.Scripts.GameOver
             var timeOutTime = _timeOutDelay + Time.time;
             while (PhotonWrapper.InRoom)
             {
-                var teamBlueWinning = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamBlueKey, 0);
-                if (teamBlueWinning != 0)
-                {
-                    _view.WinnerInfo1 = RichText.Blue("Team BLUE");
-                    break;
-                }
-                var teamRedWinning = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamRedKey, 0);
-                if (teamRedWinning != 0)
-                {
-                    _view.WinnerInfo1 = RichText.Red("Team RED");
-                    break;
-                }
                 if (Time.time > timeOutTime)
                 {
                     _view.WinnerInfo1 = RichText.Yellow("UNKNOWN RESULT");
                     _view.WinnerInfo2 = "No scores found";
                     break;
                 }
-                yield return null;
+                var winnerTeam = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamWinKey, -1);
+                if (winnerTeam == -1)
+                {
+                    yield return null;
+                    continue;
+                }
+                var blueScore = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamBlueScoreKey, 0);
+                var redScore = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamRedScoreKey, 0);
+                if (winnerTeam == PhotonBattle.TeamBlueValue)
+                {
+                    _view.WinnerInfo1 = RichText.Blue("Team BLUE");
+                    _view.WinnerInfo2 = $"{blueScore} - {redScore}";
+                }
+                else if (winnerTeam == PhotonBattle.TeamRedValue)
+                {
+                    _view.WinnerInfo1 = RichText.Red("Team RED");
+                    _view.WinnerInfo2 = $"{redScore} - {blueScore}";
+                }
+                else
+                {
+                    _view.WinnerInfo1 = RichText.Yellow("DRAW!");
+                    _view.WinnerInfo2 = string.Empty;
+                }
+                break;
             }
             _view.ContinueButton.interactable = true;
         }
