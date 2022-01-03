@@ -1,0 +1,40 @@
+lang.name	Suomi
+lang.en	English	IN_USE
+lang.fi	Suomi	IN_USE
+lang.sv	Svenska	IN_USE
+menu.language	Kieli
+app.name	Altzone Peli	IN_USE
+ButtonBack/Text	Takaisin
+ButtonBackContinue/Text	Jatka	IN_USE
+ButtonBackMini/Text	««	IN_USE
+ButtonNaviContinue/Text	Jatka	IN_USE
+FooterPanel/FooterText	Alatunniste	IN_USE
+LanguageSelection/ChooseLanguageLabel	Valitse kielesi:	IN_USE
+LanguageSelection/ContinueButton	Jatka
+LanguageSelection/TitleText	valitse kieli	IN_USE
+Loader/TextLabel	Odota, että sovellus latautuu	IN_USE
+Loader/TitleText	Ladataan	IN_USE
+Lobby/StartGameButton	Aloita
+Lobby/TitleText	Aula
+MainMenu/ButtonNaviLobby	Aula	IN_USE
+MainMenu/ButtonNaviSettings	Asetukset	IN_USE
+MainMenu/TestButtonA	Testaa A	IN_USE
+MainMenu/TestButtonB	Testaa B	IN_USE
+MainMenu/TitleText	päävalikko	IN_USE
+PlayerName/ButtonBack	Jatka
+PlayerName/ContinueButton	Jatka
+PlayerName/InputField/Placeholder	pelaajanimi	IN_USE
+PlayerName/TextLabel	Valitse pelaajanimesi	IN_USE
+PlayerName/TitleText	pelaajanimi	IN_USE
+TermsOfService/ContinueButton	Jatka
+TermsOfService/TextLabel1	Olen lukenut käyttöehdot	IN_USE
+TermsOfService/TextLabel2	yllä olevalla Yhtiön verkkosivulla	IN_USE
+TermsOfService/TitleText	käyttöehdot	IN_USE
+TermsOfService/Toggle/Label	Hyväksy	IN_USE
+UserSettings/ButtonNaviCharacterSelection	Hahmon valinta	IN_USE
+UserSettings/ButtonNaviLanguage	Kieli	IN_USE
+UserSettings/ButtonNaviPlayerName	Pelaajanimi	IN_USE
+UserSettings/TitleText	käyttäjäasetukset	IN_USE
+UserSettings/ButtonNaviJoinClan	Join Clan	ALT_TEXT
+JoinClan/TitleText	join clan	ALT_TEXT
+UserSettings/ButtonNaviLeaveClan	Leave Clan	ALT_TEXT

@@ -30,6 +30,6 @@ EditorBuildSettings:
     path: Assets/Examples2/Scenes/87-ball-test.unity
     guid: 37a0e84ee812c7146b715ac8eec70b6c
   - enabled: 0
-    path: Assets/Examples2/Scenes/85-room-test-avatar.unity
+    path: Assets/Examples2/Scenes/85-room-test.unity
     guid: dc89caebf072e164b9031f8237062275
   m_configObjects: {}

@@ -31,6 +31,8 @@ namespace Examples2.Scripts.Battle.Room
                 _lowerBricks.SetActive(false);
                 return;
             }
+            _upperBricks.SetActive(true);
+            _lowerBricks.SetActive(true);
             CreateBrickMarkersFrom(_upperBricks.transform, _bricks);
             CreateBrickMarkersFrom(_lowerBricks.transform, _bricks);
             _photonEventDispatcher = PhotonEventDispatcher.Get();
