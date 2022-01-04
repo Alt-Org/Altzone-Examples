@@ -81,25 +81,24 @@ namespace Examples2.Scripts.Battle.Room
         {
             Debug.Log($"OnGameScoreEvent {data}");
 
-            var blue = new TeamInfo(PhotonBattle.TeamBlueValue, data.TeamBlueHeadScore + data.TeamBlueWallScore, PhotonBattle.TeamBlueScoreKey);
-            var red = new TeamInfo(PhotonBattle.TeamRedValue, data.TeamRedHeadScore + data.TeamRedWallScore, PhotonBattle.TeamRedScoreKey);
-
             var variables = RuntimeGameConfig.Get().Variables;
             if (data.TeamBlueHeadScore >= variables._headScoreToWin ||
                 data.TeamBlueWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamBlueValue, blue, red);
+                GameOver(PhotonBattle.TeamBlueValue, data);
                 return;
             }
             if (data.TeamRedHeadScore >= variables._headScoreToWin ||
                 data.TeamRedWallScore >= variables._wallScoreToWin)
             {
-                GameOver(PhotonBattle.TeamRedValue, blue, red);
+                GameOver(PhotonBattle.TeamRedValue, data);
             }
         }
 
-        private void GameOver(int winningTeam, TeamInfo blue, TeamInfo red)
+        private void GameOver(int winningTeam, ScoreManager.GameScoreEvent data)
         {
+            var blue = new TeamInfo(PhotonBattle.TeamBlueValue, data.TeamBlueHeadScore + data.TeamBlueWallScore, PhotonBattle.TeamBlueScoreKey);
+            var red = new TeamInfo(PhotonBattle.TeamRedValue, data.TeamRedHeadScore + data.TeamRedWallScore, PhotonBattle.TeamRedScoreKey);
             Debug.Log($"GameOver win {winningTeam} : {blue} : {red}");
             var room = PhotonNetwork.CurrentRoom;
             var props = new ExitGames.Client.Photon.Hashtable
