@@ -6,22 +6,19 @@ namespace Tests.Editor.Model
     [TestFixture]
     public class ModelTest
     {
-        private const string DefenceNameConfluence = "Confluence";
         private const string ModelNameVitsiniekka = "Vitsiniekka";
         private const string ModelNameTaiteilija = "Taiteilija";
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Debug.Log("OneTimeSetUp start");
             ModelLoader.LoadAndClearModels();
-            Debug.Log("OneTimeSetUp done");
         }
 
         [Test]
         public void GetByName()
         {
-            var model1 = Models.GetByName<DefenceModel>(DefenceNameConfluence);
+            var model1 = Models.GetByName<DefenceModel>(Defence.Confluence);
             Assert.That(model1, Is.Not.Null);
             var model2 = Models.GetByName<CharacterModel>(ModelNameVitsiniekka);
             Assert.That(model2, Is.Not.Null);
@@ -41,7 +38,7 @@ namespace Tests.Editor.Model
         }
 
         [Test]
-        public void Find_BySelector()
+        public void FindByPredicate()
         {
             var model1 = Models.Find<DefenceModel>(x => x.Defence == Defence.Egotism);
             Assert.That(model1.Id, Is.EqualTo((int)Defence.Egotism));
