@@ -40,7 +40,8 @@ namespace Editor.Prg
                 ".png",
                 ".prefab",
                 ".psd",
-                ".ttf"
+                ".ttf",
+                ".wav",
             };
             foreach (var guid in selectedGuids)
             {
