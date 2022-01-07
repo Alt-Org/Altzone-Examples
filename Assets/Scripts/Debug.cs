@@ -97,17 +97,17 @@ public static class Debug
     }
 
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
-    public static void Log(string message)
+    public static void Log(string message, Object context = null)
     {
         var frame = new StackFrame(1);
         var method = frame.GetMethod();
         if (method == null || method.ReflectedType == null)
         {
-            UnityEngine.Debug.Log(message);
+            UnityEngine.Debug.Log(message, context);
         }
         else if (IsMethodAllowedForLog(method))
         {
-            UnityEngine.Debug.Log($"{GetPrefix(method)}{message}");
+            UnityEngine.Debug.Log($"{GetPrefix(method)}{message}", context);
         }
     }
 
