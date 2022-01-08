@@ -47,10 +47,15 @@ namespace Editor.Prg
                 ".ttf",
                 ".wav",
             };
+            var hasShaders = false;
             foreach (var guid in selectedGuids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var extension = Path.HasExtension(path) ? Path.GetExtension(path).ToLower() : string.Empty;
+                if (!hasShaders && extension == ".shader")
+                {
+                    hasShaders = true;
+                }
                 if (validExtensions.Contains(extension))
                 {
                     continue;
@@ -102,6 +107,10 @@ namespace Editor.Prg
                     var asset = AssetDatabase.LoadMainAssetAtPath(path);
                     Debug.LogWarning($"{path} {message}", asset);
                 }
+            }
+            if (hasShaders)
+            {
+                Debug.LogWarning($"{RichText.Yellow("Shaders are referenced by name and can not be detected with this script")}");
             }
         }
 
