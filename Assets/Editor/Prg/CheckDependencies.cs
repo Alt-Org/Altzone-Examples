@@ -17,7 +17,7 @@ namespace Editor.Prg
     {
         private const string MenuRoot = "Window/ALT-Zone/Dependencies/";
 
-        [MenuItem(MenuRoot + "Check Dependencies", false, 10)]
+        [MenuItem(MenuRoot + "Check Usages", false, 10)]
         private static void _CheckDependencies()
         {
             Debug.Log("*");
