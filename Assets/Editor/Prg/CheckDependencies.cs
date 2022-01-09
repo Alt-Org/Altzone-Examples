@@ -30,12 +30,16 @@ namespace Editor.Prg
             // Keep extensions lowercase!
             var validExtensions = new[]
             {
+                ".anim",
                 ".asset",
                 ".blend",
+                ".controller",
                 ".cs",
                 ".cubemap",
+                ".flare",
                 ".gif",
                 ".mat",
+                ".mp3",
                 ".otf",
                 ".physicMaterial",
                 ".physicsmaterial2d",
