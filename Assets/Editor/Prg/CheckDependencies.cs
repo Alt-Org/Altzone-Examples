@@ -44,6 +44,7 @@ namespace Editor.Prg
                 ".psd",
                 ".shader",
                 ".tga",
+                ".tif",
                 ".ttf",
                 ".wav",
             };
