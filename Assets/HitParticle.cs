@@ -8,7 +8,7 @@ public class HitParticle : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.tag == "Ball")
+        if (collision.transform.CompareTag(UnityConstants.Tags.Ball))
         {
             Debug.Log("HIT!");
             foreach (ContactPoint2D hitPos in collision.contacts)
