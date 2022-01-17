@@ -66,10 +66,10 @@ namespace Examples2.Scripts.Battle.Ball
         private int _brickMaskValue;
         private int _wallMaskValue;
 
-        private Action<GameObject> _onHeadCollision;
-        private Action<GameObject> _onShieldCollision;
-        private Action<GameObject> _onBrickCollision;
-        private Action<GameObject> _onWallCollision;
+        private Action<Collision2D> _onHeadCollision;
+        private Action<Collision2D> _onShieldCollision;
+        private Action<Collision2D> _onBrickCollision;
+        private Action<Collision2D> _onWallCollision;
         private Action<GameObject> _onEnterTeamArea;
         private Action<GameObject> _onExitTeamArea;
 
@@ -233,7 +233,7 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"UNHANDLED trigger_exit {otherGameObject.name} layer {layer} {LayerMask.LayerToName(layer)}");
         }
 
-        private void OnCollisionEnter2D(Collision2D other)
+        private void OnCollisionEnter2D(Collision2D collision)
         {
             if (!enabled)
             {
@@ -241,7 +241,7 @@ namespace Examples2.Scripts.Battle.Ball
             }
             _isCheckVelocityAfterCollision = true;
             _checkVelocityTime = Time.time + CheckVelocityDelay;
-            var otherGameObject = other.gameObject;
+            var otherGameObject = collision.gameObject;
             var layer = otherGameObject.layer;
             if (layer == 0)
             {
@@ -249,15 +249,15 @@ namespace Examples2.Scripts.Battle.Ball
                 return;
             }
             var colliderMask = 1 << layer;
-            if (CallbackEvent(_headMaskValue, colliderMask, otherGameObject, _onHeadCollision))
+            if (CallbackEvent(_headMaskValue, colliderMask, collision, _onHeadCollision))
             {
                 return;
             }
-            if (CallbackEvent(_shieldMaskValue, colliderMask, otherGameObject, _onShieldCollision))
+            if (CallbackEvent(_shieldMaskValue, colliderMask, collision, _onShieldCollision))
             {
                 return;
             }
-            if (CallbackEvent(_brickMaskValue, colliderMask, otherGameObject, _onBrickCollision))
+            if (CallbackEvent(_brickMaskValue, colliderMask, collision, _onBrickCollision))
             {
                 return;
             }
@@ -265,7 +265,7 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 if (!otherGameObject.CompareTag(Tags.Untagged))
                 {
-                    _onWallCollision?.Invoke(otherGameObject);
+                    _onWallCollision?.Invoke(collision);
                 }
                 return;
             }
@@ -275,6 +275,16 @@ namespace Examples2.Scripts.Battle.Ball
         private static bool IsCallbackEvent(int maskValue, int colliderMask)
         {
             return maskValue == (maskValue | colliderMask);
+        }
+
+        private static bool CallbackEvent(int maskValue, int colliderMask, Collision2D collision, Action<Collision2D> callback)
+        {
+            if (maskValue == (maskValue | colliderMask))
+            {
+                callback?.Invoke(collision);
+                return true;
+            }
+            return false;
         }
 
         private static bool CallbackEvent(int maskValue, int colliderMask, GameObject gameObject, Action<GameObject> callback)
@@ -347,25 +357,25 @@ namespace Examples2.Scripts.Battle.Ball
 
         #region IBallCollision
 
-        Action<GameObject> IBallCollision.OnHeadCollision
+        Action<Collision2D> IBallCollision.OnHeadCollision
         {
             get => _onHeadCollision;
             set => _onHeadCollision = value;
         }
 
-        Action<GameObject> IBallCollision.OnShieldCollision
+        Action<Collision2D> IBallCollision.OnShieldCollision
         {
             get => _onShieldCollision;
             set => _onShieldCollision = value;
         }
 
-        Action<GameObject> IBallCollision.OnWallCollision
+        Action<Collision2D> IBallCollision.OnWallCollision
         {
             get => _onWallCollision;
             set => _onWallCollision = value;
         }
 
-        Action<GameObject> IBallCollision.OnBrickCollision
+        Action<Collision2D> IBallCollision.OnBrickCollision
         {
             get => _onBrickCollision;
             set => _onBrickCollision = value;

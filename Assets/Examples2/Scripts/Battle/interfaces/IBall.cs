@@ -29,10 +29,10 @@ namespace Examples2.Scripts.Battle.interfaces
 
     internal interface IBallCollision
     {
-        Action<GameObject> OnHeadCollision { get; set; }
-        Action<GameObject> OnShieldCollision { get; set; }
-        Action<GameObject> OnBrickCollision { get; set; }
-        Action<GameObject> OnWallCollision { get; set; }
+        Action<Collision2D> OnHeadCollision { get; set; }
+        Action<Collision2D> OnShieldCollision { get; set; }
+        Action<Collision2D> OnBrickCollision { get; set; }
+        Action<Collision2D> OnWallCollision { get; set; }
         Action<GameObject> OnEnterTeamArea { get; set; }
         Action<GameObject> OnExitTeamArea { get; set; }
     }

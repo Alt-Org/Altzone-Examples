@@ -42,8 +42,9 @@ namespace Examples2.Scripts.Battle.Ball
 
         #region IBallCollision callback events
 
-        private void OnHeadCollision(GameObject other)
+        private void OnHeadCollision(Collision2D collision)
         {
+            var other = collision.gameObject;
             Debug.Log($"onHeadCollision {other.name}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
@@ -51,21 +52,23 @@ namespace Examples2.Scripts.Battle.Ball
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
         }
 
-        private void OnShieldCollision(GameObject other)
+        private void OnShieldCollision(Collision2D collision)
         {
+            var other = collision.gameObject;
             Debug.Log($"onShieldCollision {other.name}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.ShieldCollision();
         }
 
-        private void OnBrickCollision(GameObject other)
+        private void OnBrickCollision(Collision2D collision)
         {
             //Debug.Log($"onBrickCollision {other.name}");
-            _brickManager.DeleteBrick(other);
+            _brickManager.DeleteBrick(collision.gameObject);
         }
 
-        private void OnWallCollision(GameObject other)
+        private void OnWallCollision(Collision2D collision)
         {
+            var other = collision.gameObject;
             Debug.Log($"onWallCollision {other.name} {other.tag}");
             if (other.CompareTag(Tags.BlueTeam))
             {
