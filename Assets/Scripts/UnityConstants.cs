@@ -19,6 +19,7 @@ namespace UnityConstants
         public const string ErikoisTiili = "ErikoisTiili";
         public const string RedTeam = "RedTeam";
         public const string BlueTeam = "BlueTeam";
+        public const string Ball = "Ball";
     }
 
     /// <summary>
