@@ -2,7 +2,7 @@ using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 #if PHOTON_UNITY_NETWORKING
-using PhotonNetwork = Photon.Pun.PhotonNetwork;
+using Photon.Pun;
 #endif
 
 namespace Prg.Scripts.Common.Unity.Window
