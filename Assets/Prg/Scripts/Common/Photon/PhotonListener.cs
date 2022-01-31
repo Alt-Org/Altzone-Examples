@@ -1,20 +1,19 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Prg.Scripts.Common.Photon
 {
     /// <summary>
     /// Utility to log all Photon events.
     /// </summary>
-    /// <remarks>
-    /// Should have very low "script execution order" number in order to be able to log events before others can see them.
-    /// </remarks>
+    [DefaultExecutionOrder(-100)]
     public class PhotonListener : MonoBehaviour,
         IConnectionCallbacks, ILobbyCallbacks, IMatchmakingCallbacks, IInRoomCallbacks, IPunOwnershipCallbacks
     {
@@ -62,35 +61,27 @@ namespace Prg.Scripts.Common.Photon
             UnityExtensions.CreateGameObjectAndComponent<PhotonListener>(nameof(PhotonListener), true);
         }
 
-        private void OnEnable()
+        private IEnumerator Start()
         {
-            if (PhotonNetwork.NetworkingClient != null)
-            {
-                PhotonNetwork.AddCallbackTarget(this);
-            }
-            else
-            {
-                this.ExecuteOnNextFrame(() => PhotonNetwork.AddCallbackTarget(this));
-            }
+            Debug.Log("Start");
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
-        }
-
-        private void Start()
-        {
+            yield return new WaitUntil(() => PhotonNetwork.NetworkingClient != null);
+            PhotonNetwork.AddCallbackTarget(this);
             LogPhotonStatus();
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             SceneManager.sceneLoaded -= SceneLoaded;
             SceneManager.sceneUnloaded -= SceneUnloaded;
             PhotonNetwork.RemoveCallbackTarget(this);
+            Debug.Log("OnApplicationQuit");
         }
 
         private void OnApplicationQuit()
         {
-            Debug.Log("OnApplicationQuit");
+            Debug.Log("OnDestroy");
         }
 
         private static void LogPhotonStatus(string message = null)
