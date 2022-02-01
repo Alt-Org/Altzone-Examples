@@ -23,7 +23,7 @@ LeaveClan/LeaveClanButton	Leave Clan
 LeaveClan/TitleText	leave clan		
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
-Lobby/StartGameButton	Start	Aloita	Start
+Lobby/CreateRoomButton	Create Room	Create Room	Create Room
 Lobby/TitleText	Lobby	Aula	Lobby
 MainMenu/ButtonNaviLobby	Lobby	Aula	Lobby
 MainMenu/ButtonNaviSettings	Settings	Asetukset	Inställningar
