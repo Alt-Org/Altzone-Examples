@@ -1,6 +1,6 @@
+using System.Collections;
 using Altzone.Scripts.Config;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace GameUi.Scripts.BattleLobby
 {
@@ -14,6 +14,13 @@ namespace GameUi.Scripts.BattleLobby
             Debug.Log($"OnEnable {playerData}");
             _view.ResetView();
             _view.PlayerInfo = playerData.GetPlayerInfoLabel();
+            StopAllCoroutines();
+            StartCoroutine(WaitForRoom());
+        }
+
+        private IEnumerator WaitForRoom()
+        {
+            yield return null;
         }
     }
 }
