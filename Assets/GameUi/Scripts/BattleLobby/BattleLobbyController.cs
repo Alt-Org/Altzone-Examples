@@ -1,5 +1,6 @@
 using System.Collections;
 using Altzone.Scripts.Config;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace GameUi.Scripts.BattleLobby
 {
     public class BattleLobbyController : MonoBehaviour
     {
+        private const float QueryLobbyStatusDelay = 1.0f;
+
         [SerializeField] private BattleLobbyView _view;
         [SerializeField] private PhotonRoomList _photonRoomList;
 
@@ -22,6 +25,8 @@ namespace GameUi.Scripts.BattleLobby
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"OnEnable {playerData}");
             _view.ResetView();
+            _view.GameInfo = $"Version {PhotonLobby.GameVersion}";
+            _view.LobbyInfo = string.Empty;
             _view.CurrentPlayerInfo = playerData.GetPlayerInfoLabel();
             _view.RoomListInfo = string.Empty;
             StopAllCoroutines();
@@ -31,6 +36,7 @@ namespace GameUi.Scripts.BattleLobby
 
         private void OnDisable()
         {
+            StopAllCoroutines();
             _photonRoomList.OnRoomsUpdated -= OnRoomsUpdated;
         }
 
@@ -56,6 +62,7 @@ namespace GameUi.Scripts.BattleLobby
                 if (PhotonWrapper.InLobby)
                 {
                     _view.CreateRoomButton.interactable = true;
+                    StartCoroutine(QueryLobbyStatus());
                     yield break;
                 }
                 if (PhotonWrapper.CanJoinLobby)
@@ -73,6 +80,20 @@ namespace GameUi.Scripts.BattleLobby
             }
         }
 
+        private IEnumerator QueryLobbyStatus()
+        {
+            var delay = new WaitForSeconds(QueryLobbyStatusDelay);
+            for (;;)
+            {
+                if (!PhotonWrapper.InLobby)
+                {
+                    yield break;
+                }
+                _view.LobbyInfo = $"Number of players is {PhotonNetwork.CountOfPlayers}";
+                yield return delay;
+            }
+        }
+
         private void OnRoomsUpdated()
         {
             Debug.Log($"OnRoomsUpdated InLobby {PhotonWrapper.InLobby}");
@@ -82,7 +103,9 @@ namespace GameUi.Scripts.BattleLobby
                 _view.RoomListInfo = "Disconnected from Lobby";
                 return;
             }
-            _view.RoomListInfo = "Room listing updated";
+            var currentRooms = _photonRoomList.CurrentRooms;
+            _view.RoomListInfo = $"Room count is {currentRooms.Count}";
+            _view.UpdateRoomList(currentRooms);
         }
 
         private void CreateRoom()
