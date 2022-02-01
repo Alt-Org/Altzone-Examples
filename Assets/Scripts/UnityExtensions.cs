@@ -56,6 +56,21 @@ public static class UnityExtensions
         }
         Assert.IsTrue(false, "button does not have a text component");
     }
+    public static string GetCaption(this Button button)
+    {
+        var text = button.GetComponentInChildren<Text>();
+        if (text != null)
+        {
+            return text.text;
+        }
+        var tmpText = button.GetComponentInChildren<TMP_Text>();
+        if (tmpText != null)
+        {
+            return tmpText.text;
+        }
+        Assert.IsTrue(false, "button does not have a text component");
+        return null;
+    }
 
     #endregion
 
