@@ -283,9 +283,14 @@ namespace Prg.Scripts.Common.Unity.Window
             Assert.IsTrue(_executionLevel == 0, "_executionLevel == 0");
             _executionLevel += 1;
             Debug.Log($"SafeExecution {actionName} start count {_currentWindows.Count}");
-
-            action();
-
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"SafeExecution {actionName} failed {e.Message}");
+            }
             Debug.Log($"SafeExecution {actionName} exit count {_currentWindows.Count}");
             _executionLevel -= 1;
             Assert.IsTrue(_executionLevel == 0, "_executionLevel == 0");
