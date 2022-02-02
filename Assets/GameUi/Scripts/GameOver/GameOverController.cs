@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Altzone.Scripts.Battle;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace GameUi.Scripts.GameOver
 {
     public class GameOverController : MonoBehaviour
     {
+        private const float DefaultTimeout = 2.0f;
+
         [SerializeField] private GameOverView _view;
         [SerializeField] private float _timeOutDelay;
 
@@ -18,7 +21,12 @@ namespace GameUi.Scripts.GameOver
                 _view.WinnerInfo2 = string.Empty;
                 return;
             }
+            if (_timeOutDelay == 0f)
+            {
+                _timeOutDelay = DefaultTimeout;
+            }
             _view.ContinueButton.interactable = false;
+            Debug.Log($"OnEnable {PhotonNetwork.CurrentRoom.GetDebugLabel()}");
             StartCoroutine(WaitForWinner());
         }
 
@@ -32,6 +40,7 @@ namespace GameUi.Scripts.GameOver
                 {
                     _view.WinnerInfo1 = RichText.Yellow("UNKNOWN RESULT");
                     _view.WinnerInfo2 = "No scores found";
+                    PhotonNetwork.LeaveRoom();
                     break;
                 }
                 var winnerTeam = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamWinKey, -1);
@@ -57,6 +66,7 @@ namespace GameUi.Scripts.GameOver
                     _view.WinnerInfo1 = RichText.Yellow("DRAW!");
                     _view.WinnerInfo2 = string.Empty;
                 }
+                PhotonNetwork.LeaveRoom();
                 break;
             }
             _view.ContinueButton.interactable = true;
