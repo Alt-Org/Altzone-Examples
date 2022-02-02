@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using UnityConstants;
 using UnityEngine;
 
 public class HeadHit : MonoBehaviour
@@ -9,11 +9,11 @@ public class HeadHit : MonoBehaviour
 
     private IEnumerator OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.tag == "Ball")
+        if (collision.transform.CompareTag(Tags.Ball))
         {
             yield return new WaitForSeconds(.5f);
             _currentCount++;
-            Debug.Log("Current hit count " + _currentCount.ToString());
+            Debug.Log($"Current hit count {_currentCount}");
         }
         if (_currentCount >= 1)
         {
