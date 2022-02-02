@@ -21,15 +21,9 @@ EditorBuildSettings:
     path: Assets/GameUi/Scenes/ui-game-over-battle.unity
     guid: 3d7d1da8e17ac784183574b51c864674
   - enabled: 0
-    path: Assets/Examples2/Scenes/85-room-test.unity
-    guid: f5c393f4ccd536840ae77ef08a02ae7a
-  - enabled: 0
-    path: Assets/Examples2/Scenes/86-player-test.unity
-    guid: ff9aa80e812fd7f4e99a810b829d3866
-  - enabled: 0
     path: Assets/Examples2/Scenes/87-ball-test.unity
     guid: 37a0e84ee812c7146b715ac8eec70b6c
-  - enabled: 0
+  - enabled: 1
     path: Assets/Examples2/Scenes/85-room-test.unity
     guid: dc89caebf072e164b9031f8237062275
   m_configObjects: {}
