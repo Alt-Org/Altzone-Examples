@@ -287,9 +287,10 @@ namespace Prg.Scripts.Common.Unity.Window
             {
                 action();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.LogWarning($"SafeExecution {actionName} failed {e.Message}");
+                _executionLevel = 0;
+                throw;
             }
             Debug.Log($"SafeExecution {actionName} exit count {_currentWindows.Count}");
             _executionLevel -= 1;
