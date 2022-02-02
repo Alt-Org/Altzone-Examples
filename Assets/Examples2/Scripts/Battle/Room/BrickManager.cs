@@ -24,7 +24,7 @@ namespace Examples2.Scripts.Battle.Room
         private void Awake()
         {
             var isBricksVisible = RuntimeGameConfig.Get().Features._isBricksVisible;
-            Debug.Log("Awake isBricksVisible {isBricksVisible");
+            Debug.Log($"Awake isBricksVisible {isBricksVisible}");
             if (!isBricksVisible)
             {
                 _upperBricks.SetActive(false);
