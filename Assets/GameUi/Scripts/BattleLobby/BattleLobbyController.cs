@@ -3,6 +3,7 @@ using System.Collections;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Photon.Pun;
+using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity.Window;
 using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
@@ -18,6 +19,7 @@ namespace GameUi.Scripts.BattleLobby
     public class BattleLobbyController : MonoBehaviourPunCallbacks
     {
         private const float QueryLobbyStatusDelay = 1.0f;
+        private const int MaxPlayersInRoom = 4;
 
         [SerializeField] private WindowDef _roomWindow;
         [SerializeField] private BattleLobbyView _view;
@@ -129,7 +131,12 @@ namespace GameUi.Scripts.BattleLobby
         {
             var roomName = $"Room{DateTime.Now.Second:00}";
             Debug.Log($"CreateRoom {roomName}");
-            PhotonLobby.CreateRoom(roomName);
+            // For simplicity limit players to 4!
+            var roomOptions = new RoomOptions
+            {
+                MaxPlayers = 4,
+            };
+            PhotonLobby.CreateRoom(roomName, roomOptions);
             _view.DisableButtons();
         }
 
@@ -139,7 +146,7 @@ namespace GameUi.Scripts.BattleLobby
             var rooms = _photonRoomList.CurrentRooms;
             foreach (var roomInfo in rooms)
             {
-                if (roomInfo.Name == roomName && !roomInfo.RemovedFromList && roomInfo.IsOpen)
+                if (roomInfo.Name == roomName && !roomInfo.RemovedFromList && roomInfo.IsOpen && roomInfo.PlayerCount < MaxPlayersInRoom)
                 {
                     if (PhotonLobby.JoinRoom(roomInfo))
                     {
@@ -170,6 +177,13 @@ namespace GameUi.Scripts.BattleLobby
             var positions = new[]
                 { PhotonBattle.PlayerPosition1, PhotonBattle.PlayerPosition2, PhotonBattle.PlayerPosition3, PhotonBattle.PlayerPosition4 };
             var playerPosition = positions[room.PlayerCount - 1];
+            if (playerPosition >= positions.Length)
+            {
+                // Room is full - current implementation can not handle this and UI will be "stuck"
+                // - if we have proper staging area for the room then this logic will be different and not here.
+                PhotonNetwork.LeaveRoom();
+                return;
+            }
             player.SetCustomProperties(new Hashtable
             {
                 { PhotonBattle.PlayerPositionKey, playerPosition },
