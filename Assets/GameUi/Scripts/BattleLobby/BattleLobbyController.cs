@@ -1,15 +1,25 @@
+using System;
 using System.Collections;
+using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
+using Prg.Scripts.Common.Unity.Window;
+using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace GameUi.Scripts.BattleLobby
 {
-    public class BattleLobbyController : MonoBehaviour
+    /// <summary>
+    /// Controller for Photon Lobby.<br />
+    /// List current rooms and can create a new room or join on existing room.
+    /// </summary>
+    public class BattleLobbyController : MonoBehaviourPunCallbacks
     {
         private const float QueryLobbyStatusDelay = 1.0f;
 
+        [SerializeField] private WindowDef _roomWindow;
         [SerializeField] private BattleLobbyView _view;
         [SerializeField] private PhotonRoomList _photonRoomList;
 
@@ -17,11 +27,12 @@ namespace GameUi.Scripts.BattleLobby
         {
             _photonRoomList = gameObject.GetOrAddComponent<PhotonRoomList>();
             _view.CreateRoomButton.onClick.AddListener(CreateRoom);
-            _view.OnJoinRoom = OnJoinRoom;
+            _view.OnJoinRoom = OnJoinRoomClick;
         }
 
-        private void OnEnable()
+        public override void OnEnable()
         {
+            base.OnEnable();
             var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"OnEnable {playerData}");
             _view.ResetView();
@@ -34,25 +45,29 @@ namespace GameUi.Scripts.BattleLobby
             StartCoroutine(WaitForLobby());
         }
 
-        private void OnDisable()
+        public override void OnDisable()
         {
             StopAllCoroutines();
             _photonRoomList.OnRoomsUpdated -= OnRoomsUpdated;
+            base.OnDisable();
         }
 
         private IEnumerator WaitForLobby()
         {
+            Debug.Log($"WaitForLobby {PhotonNetwork.NetworkClientState}");
             // Start new Lobby connection every time.
             PhotonLobby.OfflineMode = false;
             if (PhotonWrapper.InRoom)
             {
                 _view.RoomListInfo = "Prepare connection";
+                Debug.Log($"WaitForLobby LeaveRoom {PhotonNetwork.NetworkClientState}");
                 PhotonLobby.LeaveRoom();
                 yield return new WaitUntil(() => PhotonWrapper.CanConnect);
             }
             if (PhotonWrapper.InLobby)
             {
                 _view.RoomListInfo = "Prepare connection";
+                Debug.Log($"WaitForLobby LeaveLobby {PhotonNetwork.NetworkClientState}");
                 PhotonLobby.LeaveLobby();
                 yield return new WaitUntil(() => PhotonWrapper.CanConnect);
             }
@@ -68,6 +83,7 @@ namespace GameUi.Scripts.BattleLobby
                 if (PhotonWrapper.CanJoinLobby)
                 {
                     _view.RoomListInfo = "Joining to Lobby";
+                    Debug.Log($"WaitForLobby JoinLobby {PhotonNetwork.NetworkClientState}");
                     PhotonLobby.JoinLobby();
                     continue;
                 }
@@ -75,6 +91,7 @@ namespace GameUi.Scripts.BattleLobby
                 {
                     _view.RoomListInfo = "Connecting to Lobby";
                     var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+                    Debug.Log($"WaitForLobby Connect {PhotonNetwork.NetworkClientState}");
                     PhotonLobby.Connect(playerData.PlayerName);
                 }
             }
@@ -110,12 +127,66 @@ namespace GameUi.Scripts.BattleLobby
 
         private void CreateRoom()
         {
-            Debug.Log($"CreateRoom");
+            var roomName = $"Room{DateTime.Now.Second:00}";
+            Debug.Log($"CreateRoom {roomName}");
+            PhotonLobby.CreateRoom(roomName);
+            _view.DisableButtons();
         }
 
-        private void OnJoinRoom(string roomName)
+        private void OnJoinRoomClick(string roomName)
         {
             Debug.Log($"OnJoinRoom {roomName}");
+            var rooms = _photonRoomList.CurrentRooms;
+            foreach (var roomInfo in rooms)
+            {
+                if (roomInfo.Name == roomName && !roomInfo.RemovedFromList && roomInfo.IsOpen)
+                {
+                    if (PhotonLobby.JoinRoom(roomInfo))
+                    {
+                        _view.DisableButtons();
+                    }
+                }
+            }
+        }
+
+        public override void OnJoinedRoom()
+        {
+            var room = PhotonNetwork.CurrentRoom;
+            var player = PhotonNetwork.LocalPlayer;
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var defence = playerData.CharacterModel.MainDefence;
+            PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
+            Debug.Log($"OnJoinedRoom InRoom '{room.Name}' as '{PhotonNetwork.NickName}' with {defence}");
+
+            // Simplified setup for room.
+            if (player.IsMasterClient)
+            {
+                room.SetCustomProperties(new Hashtable
+                {
+                    { PhotonBattle.TeamBlueKey, "Alpha" },
+                    { PhotonBattle.TeamRedKey, "Beta" }
+                });
+            }
+            var positions = new[]
+                { PhotonBattle.PlayerPosition1, PhotonBattle.PlayerPosition2, PhotonBattle.PlayerPosition3, PhotonBattle.PlayerPosition4 };
+            var playerPosition = positions[room.PlayerCount - 1];
+            player.SetCustomProperties(new Hashtable
+            {
+                { PhotonBattle.PlayerPositionKey, playerPosition },
+                { PhotonBattle.PlayerMainSkillKey, (int)defence }
+            });
+
+            WindowManager.Get().ShowWindow(_roomWindow);
+        }
+
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            _view.EnableButtons();
+        }
+
+        public override void OnJoinRoomFailed(short returnCode, string message)
+        {
+            _view.EnableButtons();
         }
     }
 }

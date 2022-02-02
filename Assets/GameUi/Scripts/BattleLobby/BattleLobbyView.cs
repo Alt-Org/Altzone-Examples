@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -8,6 +9,9 @@ using UnityEngine.UI;
 
 namespace GameUi.Scripts.BattleLobby
 {
+    /// <summary>
+    /// View component for Photon Lobby.
+    /// </summary>
     public class BattleLobbyView : MonoBehaviour
     {
         [SerializeField] private Text _gameInfo;
@@ -68,18 +72,39 @@ namespace GameUi.Scripts.BattleLobby
             }
         }
 
+        public void EnableButtons()
+        {
+            _createRoomButton.interactable = true;
+            SetRoomButtonsInteractable(true);
+        }
+
+        public void DisableButtons()
+        {
+            _createRoomButton.interactable = false;
+            SetRoomButtonsInteractable(false);
+        }
+
+        private void SetRoomButtonsInteractable(bool canInteract)
+        {
+            var childCount = _viewportContent.childCount;
+            for (var i = 0; i < childCount; ++i)
+            {
+                var roomInfo = _currentRooms[i];
+                var button = _viewportContent.GetChild(i).GetComponent<Button>();
+                button.interactable = canInteract && roomInfo.IsOpen;
+            }
+        }
+
         public void UpdateRoomList(ReadOnlyCollection<RoomInfo> currentRooms)
         {
-            _currentRooms.Clear();
-            _currentRooms.AddRange(currentRooms);
             var childCount = _viewportContent.childCount;
-            while (childCount > _currentRooms.Count)
+            while (childCount > currentRooms.Count)
             {
                 childCount -= 1;
                 var child = _viewportContent.GetChild(childCount).gameObject;
                 Destroy(child);
             }
-            while (childCount < _currentRooms.Count)
+            while (childCount < currentRooms.Count)
             {
                 var button = Instantiate(_joinRoomButtonTemplate, _viewportContent);
                 button.gameObject.SetActive(true);
@@ -87,7 +112,13 @@ namespace GameUi.Scripts.BattleLobby
                 button.onClick.AddListener(() => { InvokeOnJoinRoom(capturedIndex); });
                 childCount += 1;
             }
-            Assert.IsTrue(_currentRooms.Count == childCount, "currentRooms.Count == childCount");
+            Assert.IsTrue(currentRooms.Count == childCount, "currentRooms.Count == childCount");
+
+            _currentRooms = currentRooms
+                .OrderBy(x => x.IsOpen ? 1 : 2)
+                .ThenBy(x => x.PlayerCount)
+                .ThenBy(x => x.Name)
+                .ToList();
             for (var i = 0; i < childCount; ++i)
             {
                 var roomInfo = _currentRooms[i];

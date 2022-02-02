@@ -597,6 +597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c24445cfb64a47a70f0dd1e0e9d612, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _roomWindow: {fileID: 11400000, guid: 8774e6b9eb56fbf47b0bf17ddb8e783d, type: 2}
   _view: {fileID: 6690904775278634633}
   _photonRoomList: {fileID: 0}
 --- !u!1 &1782626368434577892
