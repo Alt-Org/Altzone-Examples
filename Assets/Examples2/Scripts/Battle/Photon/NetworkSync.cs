@@ -69,7 +69,8 @@ namespace Examples2.Scripts.Battle.Photon
 
         private void OnDisable()
         {
-            Debug.Log($"OnDisable type {_componentTypeId} owner {_ownerActorNr} {name} required {_requiredComponentCount}");
+            Debug.Log(
+                $"OnDisable type {_componentTypeId} owner {_ownerActorNr} {name} required {_requiredComponentCount} current {_currentComponentCount}");
         }
 
         private void Update()
