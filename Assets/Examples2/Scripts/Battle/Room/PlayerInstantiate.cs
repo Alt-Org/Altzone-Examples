@@ -27,6 +27,16 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField] private Vector2 _playerPosition2;
         [SerializeField] private Vector2 _playerPosition3;
         [SerializeField] private Vector2 _playerPosition4;
+        [SerializeField] private GameObject _altPlayerPrefab;
+
+        private void Awake()
+        {
+            if (_altPlayerPrefab != null)
+            {
+                _playerPrefab = _altPlayerPrefab;
+                _altPlayerPrefab = null;
+            }
+        }
 
         private void OnEnable()
         {

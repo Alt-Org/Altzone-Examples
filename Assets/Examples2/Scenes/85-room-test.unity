@@ -2828,6 +2828,7 @@ MonoBehaviour:
   _playerPosition2: {x: 2.5, y: -4.25}
   _playerPosition3: {x: 2.5, y: 4.25}
   _playerPosition4: {x: -2.5, y: 4.25}
+  _altPlayerPrefab: {fileID: 0}
 --- !u!4 &577912818
 Transform:
   m_ObjectHideFlags: 0

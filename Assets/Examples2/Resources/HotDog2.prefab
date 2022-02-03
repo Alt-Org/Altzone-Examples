@@ -1747,16 +1747,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8515706434229322689}
-  - component: {fileID: 6964329712909252541}
-  - component: {fileID: 6054979454992024287}
-  - component: {fileID: 5281763393549137009}
+  - component: {fileID: 4090218326562762104}
+  - component: {fileID: 7961235062397563125}
   m_Layer: 0
-  m_Name: HotDog
+  m_Name: HotDog2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8515706434229322689
 Transform:
   m_ObjectHideFlags: 0
@@ -1777,7 +1776,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6964329712909252541
+--- !u!114 &4090218326562762104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8607368454165204979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3b8b9b85594c3fa6bafc5d860d7ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _state:
+    _currentMode: 0
+    _transform: {fileID: 0}
+    _playerPos: 0
+    _teamNumber: 0
+    _teamMate: {fileID: 0}
+  _uiContentRoot: {fileID: 2539828711543658249}
+  _highlightSprite: {fileID: 5813433697713424832}
+  _stateSprite: {fileID: 5191372987036681836}
+  _collider: {fileID: 6349736578825980098}
+  _playerShield: {fileID: 1107281703295872973}
+  _hasPlayerShield: 0
+  _playerInfo: {fileID: 8867706765776995095}
+--- !u!114 &7961235062397563125
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1794,60 +1818,11 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 0
-  ObservedComponents:
-  - {fileID: 0}
+  observableSearch: 2
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &6054979454992024287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8607368454165204979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8652549e4f31489f8c9bfee147fbf47b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentTypeId: 2
-  _failSafeActivationDelay: 1
-  _componentsToActivate:
-  - {fileID: 5281763393549137009}
-  _requiredComponentCount: 0
-  _currentComponentCount: 0
-  _ownerActorNr: 0
-  _failSafeActivationTime: 0
-  _isMsgNetworkReadySent: 0
---- !u!114 &5281763393549137009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8607368454165204979}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d45bb675f47f4bcca4e1b68af256c173, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _state:
-    _currentMode: 0
-    _transform: {fileID: 0}
-    _playerPos: 0
-    _teamNumber: 0
-    _teamMate: {fileID: 0}
-  _uiContentRoot: {fileID: 2539828711543658249}
-  _highlightSprite: {fileID: 5813433697713424832}
-  _stateSprite: {fileID: 5191372987036681836}
-  _collider: {fileID: 6349736578825980098}
-  _playerShield: {fileID: 1107281703295872973}
-  _isReParentOnDestroy: 0
-  _alternateParent: {fileID: 0}
-  _hasPlayerShield: 0
-  _playerInfo: {fileID: 8867706765776995095}
 --- !u!1 &9038238513312975551
 GameObject:
   m_ObjectHideFlags: 0
