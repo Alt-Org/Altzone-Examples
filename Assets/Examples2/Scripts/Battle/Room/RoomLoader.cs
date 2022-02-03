@@ -12,6 +12,9 @@ namespace Examples2.Scripts.Battle.Room
     /// <summary>
     /// Game room loader to establish a well known state for the room before actual gameplay starts.
     /// </summary>
+    /// <remarks>
+    /// Can create a test room environment in Editor for testing single player stuff.
+    /// </remarks>
     internal class RoomLoader : MonoBehaviourPunCallbacks
     {
         [Header("Settings"), SerializeField] private bool _isOfflineMode;
@@ -29,32 +32,38 @@ namespace Examples2.Scripts.Battle.Room
             }
             if (PhotonNetwork.InRoom)
             {
+                // Normal logic is that we are in a room and just do what we must do and continue.
                 ContinueToNextStage();
                 enabled = false;
+                return;
             }
+            Debug.Log($"Awake and create test room {PhotonNetwork.NetworkClientState}");
         }
 
         public override void OnEnable()
         {
+            // Create a test room - in offline (faster to create) or online (real thing) mode
             base.OnEnable();
             var state = PhotonNetwork.NetworkClientState;
-            if (state == ClientState.PeerCreated || state == ClientState.Disconnected)
+            var isStateValid = state == ClientState.PeerCreated || state == ClientState.Disconnected;
+            if (!isStateValid)
             {
-                var playerName = PhotonBattle.GetLocalPlayerName();
-                Debug.Log($"connect {PhotonNetwork.NetworkClientState} isOfflineMode {_isOfflineMode} player {playerName}");
-                PhotonNetwork.OfflineMode = _isOfflineMode;
-                if (_isOfflineMode)
-                {
-                    PhotonNetwork.NickName = playerName;
-                    PhotonNetwork.JoinRandomRoom();
-                }
-                else
-                {
-                    PhotonLobby.Connect(playerName);
-                }
-                return;
+                throw new UnityException($"OnEnable: invalid connection state {PhotonNetwork.NetworkClientState}");
             }
-            throw new UnityException($"OnEnable: invalid connection state {PhotonNetwork.NetworkClientState}");
+            var playerName = PhotonBattle.GetLocalPlayerName();
+            Debug.Log($"connect {PhotonNetwork.NetworkClientState} isOfflineMode {_isOfflineMode} player {playerName}");
+            PhotonNetwork.OfflineMode = _isOfflineMode;
+            if (_isOfflineMode)
+            {
+                // JoinRandomRoom -> CreateRoom -> OnJoinedRoom -> OnPlayerPropertiesUpdate -> ContinueToNextStage
+                PhotonNetwork.NickName = playerName;
+                PhotonNetwork.JoinRandomRoom();
+            }
+            else
+            {
+                // Connect -> JoinLobby -> CreateRoom -> OnJoinedRoom -> OnPlayerPropertiesUpdate -> ContinueToNextStage
+                PhotonLobby.Connect(playerName);
+            }
         }
 
         private void ContinueToNextStage()
