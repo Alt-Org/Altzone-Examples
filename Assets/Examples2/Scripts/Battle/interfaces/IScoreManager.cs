@@ -7,11 +7,4 @@ namespace Examples2.Scripts.Battle.interfaces
         BlueWall = 3,
         RedWall = 4
     }
-
-    internal interface IScoreManager
-    {
-        void AddScore(ScoreType scoreType);
-
-        void AddScore(ScoreType scoreType, int scoreAmount);
-    }
 }

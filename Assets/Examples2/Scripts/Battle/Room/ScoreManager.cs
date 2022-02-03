@@ -10,39 +10,37 @@ namespace Examples2.Scripts.Battle.Room
     /// <summary>
     /// Collects local scores and synchronizes them over network.
     /// </summary>
-    internal class ScoreManager : MonoBehaviour, IScoreManager
+    /// <remarks>
+    /// Scores are transformed from input <c>ScoreEvent</c> to output <c>GameScoreEvent</c> during the process.
+    /// </remarks>
+    internal class ScoreManager : MonoBehaviour
     {
         private readonly LocalScore _localScore = new LocalScore();
         private readonly NetworkScore _networkScore = new NetworkScore();
 
-        private void OnEnable()
+        private void Awake()
         {
-            Debug.Log($"OnEnable");
-            _localScore.OnEnable();
-            _networkScore.OnEnable();
+            Debug.Log($"Awake");
+            _localScore.Initialize();
+            _networkScore.Initialize();
             _networkScore.LocalScore = _localScore;
             this.Subscribe<ScoreEvent>(OnScoreEvent);
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             this.Unsubscribe();
-            _localScore.OnDisable();
-            _networkScore.OnDisable();
+            _localScore.UnInitialize();
+            _networkScore.UnInitialize();
         }
 
         private void OnScoreEvent(ScoreEvent data)
         {
             Debug.Log($"OnScoreEvent {data}");
-            ((IScoreManager)this).AddScore(data.ScoreType, data.ScoreAmount);
+            AddScore(data.ScoreType, data.ScoreAmount);
         }
 
-        void IScoreManager.AddScore(ScoreType scoreType)
-        {
-            ((IScoreManager)this).AddScore(scoreType, 1);
-        }
-
-        void IScoreManager.AddScore(ScoreType scoreType, int scoreAmount)
+        private void AddScore(ScoreType scoreType, int scoreAmount)
         {
             if (!PhotonNetwork.IsMasterClient)
             {
@@ -53,6 +51,9 @@ namespace Examples2.Scripts.Battle.Room
             _networkScore.AddScore(scoreType, scoreAmount);
         }
 
+        /// <summary>
+        /// Single score "point" for one team.
+        /// </summary>
         internal class ScoreEvent
         {
             public readonly ScoreType ScoreType;
@@ -70,6 +71,9 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
+        /// <summary>
+        /// Current game score state for all teams.
+        /// </summary>
         internal class GameScoreEvent
         {
             public int TeamBlueHeadScore => _teamBlueHeadScore;
@@ -115,17 +119,20 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
+        /// <summary>
+        /// Manages local game score and publishes scores to local listeners.
+        /// </summary>
         private class LocalScore
         {
             private readonly GameScoreEvent _currentScore =
                 new GameScoreEvent(0, 0, 0, 0);
 
-            public void OnEnable()
+            public void Initialize()
             {
                 // NOP.
             }
 
-            public void OnDisable()
+            public void UnInitialize()
             {
                 // NOP.
             }
@@ -137,6 +144,9 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
+        /// <summary>
+        /// Manages scores over network
+        /// </summary>
         private class NetworkScore
         {
             private const int MsgSendScore = PhotonEventDispatcher.eventCodeBase + 4;
@@ -145,7 +155,7 @@ namespace Examples2.Scripts.Battle.Room
 
             private PhotonEventDispatcher _photonEventDispatcher;
 
-            public void OnEnable()
+            public void Initialize()
             {
                 if (_photonEventDispatcher == null)
                 {
@@ -154,7 +164,7 @@ namespace Examples2.Scripts.Battle.Room
                 }
             }
 
-            public void OnDisable()
+            public void UnInitialize()
             {
                 // No need to unregister anything.
             }
