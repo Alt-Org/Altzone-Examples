@@ -51,5 +51,11 @@ namespace Examples2.Scripts.Battle.Player2
             myTransform.parent = playerTransform;
             enabled = false;
         }
+
+        [PunRPC]
+        private void SetPlayerPlayModeRpc(int playMode)
+        {
+            _playerActor.SetPlayerPlayModeRpc(playMode);
+        }
     }
 }

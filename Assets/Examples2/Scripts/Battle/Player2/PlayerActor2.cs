@@ -152,8 +152,8 @@ namespace Examples2.Scripts.Battle.Player2
             }
         }
 
-        [PunRPC]
-        private void SetPlayerPlayModeRpc(int playMode)
+        /*[PunRPC]*/
+        public void SetPlayerPlayModeRpc(int playMode)
         {
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
