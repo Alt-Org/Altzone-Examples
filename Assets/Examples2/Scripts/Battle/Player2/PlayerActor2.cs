@@ -1,5 +1,6 @@
 using System.Linq;
 using Altzone.Scripts.Battle;
+using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
@@ -13,13 +14,13 @@ namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        [Header("Settings"), SerializeField] private Transform _uiContentRoot;
-        [SerializeField] private SpriteRenderer _highlightSprite;
+        [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
-        [SerializeField] private PlayerShield _playerShield;
+        [SerializeField] private Transform _playerShieldHead;
+        [SerializeField] private Transform _playerShieldFoot;
 
-        [Header("Live Data"), SerializeField] private bool _hasPlayerShield;
+        [Header("Live Data"), SerializeField] private Transform _playerShield;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
@@ -36,7 +37,7 @@ namespace Examples2.Scripts.Battle.Player2
             _state._playerPos = PhotonBattle.GetPlayerPos(player);
             _state._teamNumber = PhotonBattle.GetTeamNumber(_state._playerPos);
             var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamNumber}";
-            name = $"{prefix}:{player.NickName}";
+            name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
             _playerInfo.text = _state._playerPos.ToString("N0");
             Debug.Log($"Awake {name}");
@@ -45,13 +46,15 @@ namespace Examples2.Scripts.Battle.Player2
             {
                 _highlightSprite.color = Color.yellow;
             }
-            _hasPlayerShield = _playerShield != null;
-            if (_hasPlayerShield)
-            {
-                _playerShield.SetShieldMode(PlayModeGhosted);
-                _playerShield.SetShieldSide(_state._teamNumber);
-                _playerShield.SetShieldRotation(0);
-            }
+            _playerShield = PlayerPos <= PhotonBattle.PlayerPosition2
+                ? _playerShieldHead
+                : _playerShieldFoot;
+            var model = PhotonBattle.GetPlayerCharacterModel(player);
+            // Keep compiler happy, waiting more shield prefabs to fix this.
+            var defence = model.MainDefence == Defence.Retroflection
+                ? model.MainDefence :
+                Defence.Retroflection;
+            LoadShield(defence, PlayerPos, _playerShield);
             Debug.Log($"Awake Done {name}");
         }
 
@@ -60,15 +63,25 @@ namespace Examples2.Scripts.Battle.Player2
             var players = FindObjectsOfType<PlayerActor>();
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} players {players.Length}");
             _state._teamMate = players
-                .FirstOrDefault(x => x.TeamNumber == _state._teamNumber && x.PlayerPos != _state._playerPos);
-            gameObject.AddComponent<LocalPlayer>();
-            ((IPlayerActor)this).SetNormalMode();
+                .FirstOrDefault(x => x.TeamNumber == TeamNumber && x.PlayerPos != PlayerPos);
         }
 
         private void OnDestroy()
         {
             Debug.Log($"OnDestroy {name}");
             this.Unsubscribe();
+        }
+
+        private static GameObject LoadShield(Defence defence, int playerPos, Transform transform)
+        {
+            var prefab = Resources.Load<GameObject>($"Shields/{defence}");
+            var instance = Instantiate(prefab, transform);
+            if (playerPos > PhotonBattle.PlayerPosition2)
+            {
+                var renderer = instance.GetComponent<SpriteRenderer>();
+                renderer.flipY = false;
+            }
+            return instance;
         }
 
         #region External events
@@ -145,10 +158,6 @@ namespace Examples2.Scripts.Battle.Player2
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;
-            if (_hasPlayerShield)
-            {
-                _playerShield.SetShieldMode(playMode);
-            }
             switch (playMode)
             {
                 case PlayModeNormal:

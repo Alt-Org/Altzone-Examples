@@ -1,3 +1,5 @@
+using System.Collections;
+using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using UnityEngine;
 
@@ -7,7 +9,7 @@ namespace Examples2.Scripts.Battle.Player2
     /// Prefab for <c>Photon</c> to instantiate over network without any visual geometry.
     /// </summary>
     /// <remarks>
-    /// Functional geometry is added later and this can be detached from it any time if required or when connection is lost etc. errors.
+    /// Functional geometry is added later (by us) and we can be detached from it any time if required or when connection is lost etc. errors.
     /// </remarks>
     [RequireComponent(typeof(PhotonView))]
     public class PhotonPlayer : MonoBehaviour
@@ -22,16 +24,32 @@ namespace Examples2.Scripts.Battle.Player2
             {
                 return;
             }
-            Debug.Log($"OnEnable with {_playerActorPrefab.name}");
-            name = nameof(PhotonPlayer);
-            Debug.Log($"Instantiate");
+            name = name.Replace("(Clone)", string.Empty);
+            Debug.Log($"OnEnable start {name} for {_playerActorPrefab.name}");
             _playerActor = Instantiate(_playerActorPrefab);
-            Debug.Log($"Re-parent");
-            GetComponent<Transform>().parent = _playerActor.GetComponent<Transform>();
-            Debug.Log($"SetActive");
+            var myTransform = GetComponent<Transform>();
+            var playerTransform = _playerActor.GetComponent<Transform>();
+            playerTransform.position = myTransform.position;
             _playerActor.SetPhotonView(PhotonView.Get(this));
             _playerActor.gameObject.SetActive(true);
-            Debug.Log($"OnEnable Done");
+            Debug.Log($"OnEnable done {name} for {_playerActorPrefab.name}");
+
+            StartCoroutine(WaitForSystemToStabilize());
+        }
+
+        private IEnumerator WaitForSystemToStabilize()
+        {
+            var networkSync = GetComponent<NetworkSync>();
+            if (networkSync.enabled)
+            {
+                yield return new WaitUntil(() => networkSync.enabled = false);
+            }
+            Debug.Log($"OnEnable re-parent {name} for {_playerActorPrefab.name}");
+            // Re-parent us under player so that we can be detached without disturbing the player so much.
+            var myTransform = GetComponent<Transform>();
+            var playerTransform = _playerActor.GetComponent<Transform>();
+            myTransform.parent = playerTransform;
+            enabled = false;
         }
     }
 }

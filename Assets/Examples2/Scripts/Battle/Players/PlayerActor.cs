@@ -5,9 +5,9 @@ namespace Examples2.Scripts.Battle.Players
 {
     internal abstract class PlayerActor : MonoBehaviour
     {
-        public const int PlayModeNormal = 0;
-        public const int PlayModeFrozen = 1;
-        public const int PlayModeGhosted = 2;
+        internal const int PlayModeNormal = 0;
+        internal const int PlayModeFrozen = 1;
+        internal const int PlayModeGhosted = 2;
 
         [Serializable]
         internal class PlayerState

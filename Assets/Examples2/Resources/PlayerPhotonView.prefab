@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8515706434229322689}
   - component: {fileID: 6964329712909252541}
-  - component: {fileID: 6054979454992024287}
+  - component: {fileID: -6756444455638793321}
   - component: {fileID: -7203469316981571742}
   m_Layer: 0
   m_Name: PlayerPhotonView
@@ -56,7 +56,7 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &6054979454992024287
+--- !u!114 &-6756444455638793321
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
