@@ -24,8 +24,7 @@ public static class Debug
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void RuntimeInitializeOnLoadMethod()
     {
-        UnityEngine.Debug.Log($"SubsystemRegistration cache {CachedMethods.Count}");
-        // Reset static fields even when Domain Reloading is disabled.
+        // Manual reset if UNITY Domain Reloading is disabled.
         _logLineAllowedFilter = null;
         RemoveTagsForClassName();
         CachedMethods.Clear();
