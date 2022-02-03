@@ -15,8 +15,8 @@ namespace Examples2.Scripts.Battle.Photon
     [RequireComponent(typeof(PhotonView))]
     internal class NetworkSync : MonoBehaviour
     {
-        private const int MsgNetworkCreated = PhotonEventDispatcher.eventCodeBase + 1;
-        private const int MsgNetworkReady = PhotonEventDispatcher.eventCodeBase + 2;
+        private const int MsgNetworkCreated = PhotonEventDispatcher.EventCodeBase + 1;
+        private const int MsgNetworkReady = PhotonEventDispatcher.EventCodeBase + 2;
 
         [Header("Settings"), Min(1), SerializeField] private int _componentTypeId;
         [SerializeField, Min(1)] private float _failSafeActivationDelay;
@@ -56,8 +56,8 @@ namespace Examples2.Scripts.Battle.Photon
             _failSafeActivationTime = float.MaxValue;
             _isMsgNetworkReadySent = false;
             _photonEventDispatcher = PhotonEventDispatcher.Get();
-            _photonEventDispatcher.registerEventListener(MsgNetworkCreated, data => { OnMsgNetworkCreated(data.CustomData); });
-            _photonEventDispatcher.registerEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
+            _photonEventDispatcher.RegisterEventListener(MsgNetworkCreated, data => { OnMsgNetworkCreated(data.CustomData); });
+            _photonEventDispatcher.RegisterEventListener(MsgNetworkReady, data => { OnMsgNetworkReady(data.CustomData); });
         }
 
         private void OnEnable()

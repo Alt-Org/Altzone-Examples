@@ -17,7 +17,7 @@ namespace Examples2.Scripts.Battle.Room
     /// </summary>
     internal class PlayerManager : MonoBehaviour, IPlayerManager
     {
-        private const int MsgCountdown = PhotonEventDispatcher.eventCodeBase + 3;
+        private const int MsgCountdown = PhotonEventDispatcher.EventCodeBase + 3;
 
         private PhotonEventDispatcher _photonEventDispatcher;
         private Action _countdownFinished;
@@ -28,7 +28,7 @@ namespace Examples2.Scripts.Battle.Room
         {
             Debug.Log("Awake");
             _photonEventDispatcher = PhotonEventDispatcher.Get();
-            _photonEventDispatcher.registerEventListener(MsgCountdown, data => { OnCountdown(data.CustomData); });
+            _photonEventDispatcher.RegisterEventListener(MsgCountdown, data => { OnCountdown(data.CustomData); });
         }
 
         #region Photon Events

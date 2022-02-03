@@ -149,7 +149,7 @@ namespace Examples2.Scripts.Battle.Room
         /// </summary>
         private class NetworkScore
         {
-            private const int MsgSendScore = PhotonEventDispatcher.eventCodeBase + 4;
+            private const int MsgSendScore = PhotonEventDispatcher.EventCodeBase + 4;
 
             public LocalScore LocalScore { get; set; }
 
@@ -160,7 +160,7 @@ namespace Examples2.Scripts.Battle.Room
                 if (_photonEventDispatcher == null)
                 {
                     _photonEventDispatcher = PhotonEventDispatcher.Get();
-                    _photonEventDispatcher.registerEventListener(MsgSendScore, data => { OnSendScore(data.CustomData); });
+                    _photonEventDispatcher.RegisterEventListener(MsgSendScore, data => { OnSendScore(data.CustomData); });
                 }
             }
 
