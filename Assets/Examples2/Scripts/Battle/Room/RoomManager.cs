@@ -108,6 +108,8 @@ namespace Examples2.Scripts.Battle.Room
                 { red.ScoreKey, red.Score },
             };
             room.SetCustomProperties(props);
+            // Unsubscribe now to be on the safe side
+            this.Unsubscribe<ScoreManager.GameScoreEvent>(OnGameScoreEvent);
 
             StartCoroutine(LoadGameOverWindow());
         }
