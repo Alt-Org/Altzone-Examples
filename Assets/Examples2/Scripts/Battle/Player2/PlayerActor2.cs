@@ -32,14 +32,11 @@ namespace Examples2.Scripts.Battle.Player2
         {
             Debug.Log($"Awake {_photonView}");
             var player = _photonView.Owner;
-            _state._currentMode = PlayModeNormal;
-            _state._transform = GetComponent<Transform>();
-            _state._playerPos = PhotonBattle.GetPlayerPos(player);
-            _state._teamNumber = PhotonBattle.GetTeamNumber(_state._playerPos);
-            var prefix = $"{(player.IsLocal ? "L" : "R")}{_state._playerPos}:{_state._teamNumber}";
+            _state.InitState(GetComponent<Transform>(), player);
+            var prefix = $"{(player.IsLocal ? "L" : "R")}{PlayerPos}:{TeamNumber}";
             name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
-            _playerInfo.text = _state._playerPos.ToString("N0");
+            _playerInfo.text = PlayerPos.ToString("N0");
             Debug.Log($"Awake {name}");
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
             if (_photonView.IsMine)
@@ -60,10 +57,8 @@ namespace Examples2.Scripts.Battle.Player2
 
         private void OnEnable()
         {
-            var players = FindObjectsOfType<PlayerActor>();
-            Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} players {players.Length}");
-            _state._teamMate = players
-                .FirstOrDefault(x => x.TeamNumber == TeamNumber && x.PlayerPos != PlayerPos);
+            Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
+            _state.FindTeamMember();
         }
 
         private void OnDestroy()
