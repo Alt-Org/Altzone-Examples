@@ -1,4 +1,4 @@
-using System.Linq;
+using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
@@ -9,6 +9,7 @@ using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
 
 namespace Examples2.Scripts.Battle.Player2
 {
@@ -19,12 +20,18 @@ namespace Examples2.Scripts.Battle.Player2
         [SerializeField] private Collider2D _collider;
         [SerializeField] private Transform _playerShieldHead;
         [SerializeField] private Transform _playerShieldFoot;
+        [SerializeField] private UnityEngine.InputSystem.PlayerInput _playerInput;
 
         [Header("Live Data"), SerializeField] private Transform _playerShield;
+        [SerializeField] private bool _isMoving;
+        [SerializeField] private Vector2 _inputClick;
+        [SerializeField] private Vector3 _inputPosition;
+        [SerializeField] private Vector3 _tempPosition;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
         private PhotonView _photonView;
+        private Transform _transform;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
@@ -32,7 +39,8 @@ namespace Examples2.Scripts.Battle.Player2
         {
             Debug.Log($"Awake {_photonView}");
             var player = _photonView.Owner;
-            _state.InitState(GetComponent<Transform>(), player);
+            _transform = GetComponent<Transform>();
+            _state.InitState(_transform, player);
             var prefix = $"{(player.IsLocal ? "L" : "R")}{PlayerPos}:{TeamNumber}";
             name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
@@ -49,10 +57,74 @@ namespace Examples2.Scripts.Battle.Player2
             var model = PhotonBattle.GetPlayerCharacterModel(player);
             // Keep compiler happy, waiting more shield prefabs to fix this.
             var defence = model.MainDefence == Defence.Retroflection
-                ? model.MainDefence :
-                Defence.Retroflection;
+                ? model.MainDefence
+                : Defence.Retroflection;
             LoadShield(defence, PlayerPos, _playerShield);
+            SetInput(Camera.main);
             Debug.Log($"Awake Done {name}");
+        }
+
+        private void SetInput(Camera camera)
+        {
+            void StartMove(InputAction.CallbackContext ctx)
+            {
+                _inputClick = ctx.ReadValue<Vector2>();
+            }
+
+            void DoMove(InputAction.CallbackContext ctx)
+            {
+                _inputClick = ctx.ReadValue<Vector2>();
+            }
+
+            void StopMove(InputAction.CallbackContext ctx)
+            {
+                _inputClick = Vector2.zero;
+            }
+
+            void StartClick(InputAction.CallbackContext ctx)
+            {
+                _isMoving = true;
+            }
+
+            void DoClick(InputAction.CallbackContext ctx)
+            {
+                // Save input position in world coordinates
+                _inputClick = ctx.ReadValue<Vector2>();
+                _tempPosition.x = _inputClick.x;
+                _tempPosition.y = _inputClick.y;
+                _inputPosition = camera.ScreenToWorldPoint(_tempPosition);
+                _inputPosition.z = 0;
+            }
+
+            void StopClick(InputAction.CallbackContext ctx)
+            {
+                _isMoving = false;
+            }
+
+            var moveAction = _playerInput.actions["Move"];
+            moveAction.started += StartMove;
+            moveAction.performed += DoMove;
+            moveAction.canceled += StopMove;
+
+            var clickAction = _playerInput.actions["Click"];
+            clickAction.started += StartClick;
+            clickAction.canceled += StopClick;
+
+            var positionAction = _playerInput.actions["Position"];
+            positionAction.performed += DoClick;
+        }
+
+        private void MoveTo(Vector3 position)
+        {
+            Debug.Log($"MoveTo {position}");
+
+            var playArea = Rect.MinMaxRect(-100, -100, 100, 100);
+            position.x = Mathf.Clamp(position.x, playArea.xMin, playArea.xMax);
+            position.y = Mathf.Clamp(position.y, playArea.yMin, playArea.yMax);
+            var _speed = 10f;
+
+            _tempPosition = Vector3.MoveTowards(_transform.position, position, _speed * Time.deltaTime);
+            _transform.position = _tempPosition;
         }
 
         private void OnEnable()
@@ -65,6 +137,14 @@ namespace Examples2.Scripts.Battle.Player2
         {
             Debug.Log($"OnDestroy {name}");
             this.Unsubscribe();
+        }
+
+        private void Update()
+        {
+            if (_isMoving)
+            {
+                MoveTo(_inputPosition);
+            }
         }
 
         private static GameObject LoadShield(Defence defence, int playerPos, Transform transform)
