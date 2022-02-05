@@ -1,4 +1,3 @@
-using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
@@ -9,16 +8,11 @@ using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.InputSystem;
 
 namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        // Current gameplay area for one team is about 10.0 x 8.5
-        private const float UnReachableDistance = 20;
-        private const float Speed = 10f;
-
         [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
@@ -27,15 +21,12 @@ namespace Examples2.Scripts.Battle.Player2
         [SerializeField] private UnityEngine.InputSystem.PlayerInput _playerInput;
 
         [Header("Live Data"), SerializeField] private Transform _playerShield;
-        [SerializeField] private bool _isMoving;
-        [SerializeField] private Vector2 _inputClick;
-        [SerializeField] private Vector3 _inputPosition;
-        [SerializeField] private Vector3 _tempPosition;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
         private PhotonView _photonView;
         private Transform _transform;
+        private PlayerMovement2 _playerMovement;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
@@ -55,7 +46,8 @@ namespace Examples2.Scripts.Battle.Player2
             {
                 _highlightSprite.color = Color.yellow;
             }
-            _playerShield = PlayerPos <= PhotonBattle.PlayerPosition2
+            var isLower = PlayerPos <= PhotonBattle.PlayerPosition2;
+            _playerShield = isLower
                 ? _playerShieldHead
                 : _playerShieldFoot;
             var model = PhotonBattle.GetPlayerCharacterModel(player);
@@ -64,70 +56,16 @@ namespace Examples2.Scripts.Battle.Player2
                 ? model.MainDefence
                 : Defence.Retroflection;
             LoadShield(defence, PlayerPos, _playerShield);
-            SetInput(Camera.main);
+            var playerArea = isLower
+                ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
+                : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
+            _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main)
+            {
+                PlayerArea = playerArea,
+                UnReachableDistance = 100,
+                Speed = 10f,
+            };
             Debug.Log($"Awake Done {name}");
-        }
-
-        private void SetInput(Camera mainCamera)
-        {
-            // https://gamedevbeginner.com/input-in-unity-made-easy-complete-guide-to-the-new-system/
-
-            void StartMove(InputAction.CallbackContext ctx)
-            {
-                _isMoving = true;
-                Debug.Log($"StartMove @ {_transform.position}");
-            }
-
-            void DoMove(InputAction.CallbackContext ctx)
-            {
-                _inputClick = ctx.ReadValue<Vector2>() * UnReachableDistance;
-                _inputPosition = _transform.position;
-                _inputPosition.x += _inputClick.x;
-                _inputPosition.y += _inputClick.y;
-                Debug.Log($"MoveTo {_inputPosition}");
-            }
-
-            void StopMove(InputAction.CallbackContext ctx)
-            {
-                _isMoving = false;
-                Debug.Log($"StopMove @ {_transform.position}");
-            }
-
-            void DoClick(InputAction.CallbackContext ctx)
-            {
-                if (!_isMoving)
-                {
-                    _isMoving = true;
-                }
-                _inputClick = ctx.ReadValue<Vector2>();
-                _inputPosition.x = _inputClick.x;
-                _inputPosition.y = _inputClick.y;
-                _inputPosition = mainCamera.ScreenToWorldPoint(_inputPosition);
-                _inputPosition.z = 0;
-                Debug.Log($"MoveTo {_inputPosition}");
-            }
-
-            // WASD or GamePad -> move only when actively "steering".
-            var moveAction = _playerInput.actions["Move"];
-            moveAction.started += StartMove;
-            moveAction.performed += DoMove;
-            moveAction.canceled += StopMove;
-
-            // Pointer movement when pressed down -> move to given point even pointer is released.
-            var clickAction = _playerInput.actions["Click"];
-            clickAction.performed += DoClick;
-        }
-
-        private bool MoveTo(Vector3 position, float speed)
-        {
-            var playArea = Rect.MinMaxRect(-100, -100, 100, 100);
-            position.x = Mathf.Clamp(position.x, playArea.xMin, playArea.xMax);
-            position.y = Mathf.Clamp(position.y, playArea.yMin, playArea.yMax);
-
-            _tempPosition = Vector3.MoveTowards(_transform.position, position, speed * Time.deltaTime);
-            _transform.position = _tempPosition;
-            var isOnTarget = Mathf.Approximately(_tempPosition.x, position.x) && Mathf.Approximately(_tempPosition.y, position.y);
-            return isOnTarget;
         }
 
         private void OnEnable()
@@ -140,18 +78,13 @@ namespace Examples2.Scripts.Battle.Player2
         {
             Debug.Log($"OnDestroy {name}");
             this.Unsubscribe();
+            _playerMovement.OnDestroy();
+            _playerMovement = null;
         }
 
         private void Update()
         {
-            if (_isMoving)
-            {
-                if (MoveTo(_inputPosition, Speed))
-                {
-                    _isMoving = false;
-                    Debug.Log($"MoveTo DONE");
-                }
-            }
+            _playerMovement.Update();
         }
 
         private static void LoadShield(Defence defence, int playerPos, Transform transform)
