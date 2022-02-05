@@ -5,22 +5,22 @@ lang.fi	Suomi	Suomi	Suomi
 lang.sv	Svenska	Svenska	Svenska
 menu.language	Language	Kieli	Språk
 app.name	Altzone Game	Altzone Peli	Altzone Spel
-App/Dummy/Key	-override this key-		
+App/Dummy/Key	-override this key-	-override this key-	-override this key-
 ButtonBack/Text	Back	Takaisin	Tillbaka
 ButtonBackContinue/Text	Continue	Jatka	Fortsätta
 ButtonBackMini/Text	««	««	««
-ButtonNavi/Text	-override this key-		
+ButtonNavi/Text	-override this key-	-override this key-	-override this key-
 ButtonNaviContinue/Text	Continue	Jatka	Fortsätta
 FooterPanel/FooterText	Footer	Alatunniste	Sidfot
-HeaderPanel/TitleText	-override this key-		
-JoinClan/InfoText1	Clan: {0}		
-JoinClan/InfoText2	Join Clan		
-JoinClan/TitleText	join clan		
+HeaderPanel/TitleText	-override this key-	-override this key-	-override this key-
+JoinClan/InfoText1	Clan: {0}	Clan: {0}	Clan: {0}
+JoinClan/InfoText2	Join Clan	Join Clan1	Join Clan2
+JoinClan/TitleText	join clan	join clan1	join clan2
 LanguageSelection/ChooseLanguageLabel	Choose your language:	Valitse kielesi:	Välj ditt språk:
 LanguageSelection/ContinueButton	Continue	Jatka	Fortsätta
 LanguageSelection/TitleText	choose language	valitse kieli	välj språk
-LeaveClan/LeaveClanButton	Leave Clan	Leave Clan	Leave Clan
-LeaveClan/TitleText	leave clan	leave clan	leave clan
+LeaveClan/LeaveClanButton	Leave Clan	Leave Clan1	Leave Clan2
+LeaveClan/TitleText	leave clan	leave clan1	leave clan2
 Loader/TextLabel	Wait for application to load	Odota, että sovellus latautuu	Vänta tills applikationen laddas
 Loader/TitleText	loading	Ladataan	läser in
 Lobby/CreateRoomButton	Create Room	Create Room	Create Room
@@ -43,6 +43,6 @@ TermsOfService/Toggle/Label	Accept	Hyväksy	Acceptera
 UserSettings/ButtonNaviCharacterSelection	Character Selection	Hahmon valinta	Karaktärsval
 UserSettings/ButtonNaviJoinClan	Join Clan	Join Clan	Join Clan
 UserSettings/ButtonNaviLanguage	Language	Kieli	Språk
-UserSettings/ButtonNaviLeaveClan	Leave Clan	Leave Clan	Leave Clan
+UserSettings/ButtonNaviLeaveClan	Leave Clan	Leave Clan1	Leave Clan2
 UserSettings/ButtonNaviPlayerName	Player Name	Pelaajanimi	Spelarnamn
 UserSettings/TitleText	user settings	käyttäjäasetukset	användarinställningar
