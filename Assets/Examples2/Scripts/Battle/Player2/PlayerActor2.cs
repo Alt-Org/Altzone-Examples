@@ -15,6 +15,8 @@ namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
+        // Current gameplay area for one team is about 10.0 x 8.5
+        private const float UnReachableDistance = 20;
         private const float Speed = 10f;
 
         [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
@@ -72,31 +74,31 @@ namespace Examples2.Scripts.Battle.Player2
 
             void StartMove(InputAction.CallbackContext ctx)
             {
-                _inputClick = ctx.ReadValue<Vector2>();
+                _isMoving = true;
+                Debug.Log($"StartMove @ {_transform.position}");
             }
 
             void DoMove(InputAction.CallbackContext ctx)
             {
-                _inputClick = ctx.ReadValue<Vector2>();
+                _inputClick = ctx.ReadValue<Vector2>() * UnReachableDistance;
+                _inputPosition = _transform.position;
+                _inputPosition.x += _inputClick.x;
+                _inputPosition.y += _inputClick.y;
+                Debug.Log($"MoveTo {_inputPosition}");
             }
 
             void StopMove(InputAction.CallbackContext ctx)
             {
-                _inputClick = Vector2.zero;
-            }
-
-            void StartClick(InputAction.CallbackContext ctx)
-            {
-                _isMoving = true;
+                _isMoving = false;
+                Debug.Log($"StopMove @ {_transform.position}");
             }
 
             void DoClick(InputAction.CallbackContext ctx)
             {
-                TrackPosition(ctx);
-            }
-
-            void TrackPosition(InputAction.CallbackContext ctx)
-            {
+                if (!_isMoving)
+                {
+                    _isMoving = true;
+                }
                 _inputClick = ctx.ReadValue<Vector2>();
                 _inputPosition.x = _inputClick.x;
                 _inputPosition.y = _inputClick.y;
@@ -105,13 +107,14 @@ namespace Examples2.Scripts.Battle.Player2
                 Debug.Log($"MoveTo {_inputPosition}");
             }
 
+            // WASD or GamePad -> move only when actively "steering".
             var moveAction = _playerInput.actions["Move"];
             moveAction.started += StartMove;
             moveAction.performed += DoMove;
             moveAction.canceled += StopMove;
 
+            // Pointer movement when pressed down -> move to given point even pointer is released.
             var clickAction = _playerInput.actions["Click"];
-            clickAction.started += StartClick;
             clickAction.performed += DoClick;
         }
 
@@ -146,6 +149,7 @@ namespace Examples2.Scripts.Battle.Player2
                 if (MoveTo(_inputPosition, Speed))
                 {
                     _isMoving = false;
+                    Debug.Log($"MoveTo DONE");
                 }
             }
         }
