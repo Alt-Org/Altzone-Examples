@@ -15,6 +15,8 @@ namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
+        private const float Speed = 10f;
+
         [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
@@ -64,8 +66,10 @@ namespace Examples2.Scripts.Battle.Player2
             Debug.Log($"Awake Done {name}");
         }
 
-        private void SetInput(Camera camera)
+        private void SetInput(Camera mainCamera)
         {
+            // https://gamedevbeginner.com/input-in-unity-made-easy-complete-guide-to-the-new-system/
+
             void StartMove(InputAction.CallbackContext ctx)
             {
                 _inputClick = ctx.ReadValue<Vector2>();
@@ -88,17 +92,17 @@ namespace Examples2.Scripts.Battle.Player2
 
             void DoClick(InputAction.CallbackContext ctx)
             {
-                // Save input position in world coordinates
-                _inputClick = ctx.ReadValue<Vector2>();
-                _tempPosition.x = _inputClick.x;
-                _tempPosition.y = _inputClick.y;
-                _inputPosition = camera.ScreenToWorldPoint(_tempPosition);
-                _inputPosition.z = 0;
+                TrackPosition(ctx);
             }
 
-            void StopClick(InputAction.CallbackContext ctx)
+            void TrackPosition(InputAction.CallbackContext ctx)
             {
-                _isMoving = false;
+                _inputClick = ctx.ReadValue<Vector2>();
+                _inputPosition.x = _inputClick.x;
+                _inputPosition.y = _inputClick.y;
+                _inputPosition = mainCamera.ScreenToWorldPoint(_inputPosition);
+                _inputPosition.z = 0;
+                Debug.Log($"MoveTo {_inputPosition}");
             }
 
             var moveAction = _playerInput.actions["Move"];
@@ -108,23 +112,19 @@ namespace Examples2.Scripts.Battle.Player2
 
             var clickAction = _playerInput.actions["Click"];
             clickAction.started += StartClick;
-            clickAction.canceled += StopClick;
-
-            var positionAction = _playerInput.actions["Position"];
-            positionAction.performed += DoClick;
+            clickAction.performed += DoClick;
         }
 
-        private void MoveTo(Vector3 position)
+        private bool MoveTo(Vector3 position, float speed)
         {
-            Debug.Log($"MoveTo {position}");
-
             var playArea = Rect.MinMaxRect(-100, -100, 100, 100);
             position.x = Mathf.Clamp(position.x, playArea.xMin, playArea.xMax);
             position.y = Mathf.Clamp(position.y, playArea.yMin, playArea.yMax);
-            var _speed = 10f;
 
-            _tempPosition = Vector3.MoveTowards(_transform.position, position, _speed * Time.deltaTime);
+            _tempPosition = Vector3.MoveTowards(_transform.position, position, speed * Time.deltaTime);
             _transform.position = _tempPosition;
+            var isOnTarget = Mathf.Approximately(_tempPosition.x, position.x) && Mathf.Approximately(_tempPosition.y, position.y);
+            return isOnTarget;
         }
 
         private void OnEnable()
@@ -143,11 +143,14 @@ namespace Examples2.Scripts.Battle.Player2
         {
             if (_isMoving)
             {
-                MoveTo(_inputPosition);
+                if (MoveTo(_inputPosition, Speed))
+                {
+                    _isMoving = false;
+                }
             }
         }
 
-        private static GameObject LoadShield(Defence defence, int playerPos, Transform transform)
+        private static void LoadShield(Defence defence, int playerPos, Transform transform)
         {
             var prefab = Resources.Load<GameObject>($"Shields/{defence}");
             var instance = Instantiate(prefab, transform);
@@ -156,7 +159,6 @@ namespace Examples2.Scripts.Battle.Player2
                 var renderer = instance.GetComponent<SpriteRenderer>();
                 renderer.flipY = false;
             }
-            return instance;
         }
 
         #region External events

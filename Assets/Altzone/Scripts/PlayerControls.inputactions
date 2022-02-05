@@ -15,15 +15,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Position",
-                    "type": "Value",
-                    "id": "d1d274b9-17ba-4c7b-b66a-02afe6b2a66c",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Move",
                     "type": "Value",
                     "id": "4917987f-d03f-438d-ab3d-11795ee9cd10",
@@ -90,26 +81,37 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "94598f7d-7a51-4303-bd09-a61b5f483b6f",
-                    "path": "<Pointer>/position",
+                    "name": "One Modifier",
+                    "id": "91c957e0-6d16-4f8a-a071-275b6629fb5b",
+                    "path": "OneModifier",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Position",
-                    "isComposite": false,
+                    "action": "Click",
+                    "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "266565c0-ce2b-4d25-9cbf-ae1e691b07f8",
+                    "name": "modifier",
+                    "id": "12b56bf8-8961-4f82-ab60-b16c011a76ec",
                     "path": "<Pointer>/press",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Click",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "ef81e909-3eb8-4038-bfda-4275ea58b0fe",
+                    "path": "<Pointer>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
