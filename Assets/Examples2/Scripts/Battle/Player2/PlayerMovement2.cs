@@ -149,33 +149,44 @@ namespace Examples2.Scripts.Battle.Player2
             private readonly Action<Vector3, float> _callback;
 
             private Vector3 _targetPosition;
-            private byte[] _buffer = new byte[1 + 4 + 4 + 4];
+            private readonly byte[] _buffer = new byte[1 + 4 + 4 + 4];
 
             public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
             {
                 _photonEventDispatcher = photonEventDispatcher;
                 _playerId = playerId;
-                _photonEventDispatcher.RegisterEventListener(MsgMoveTo, data => { OnMsgMoveTo(data.CustomData); });
+                _photonEventDispatcher.RegisterEventListener(MsgMoveTo, data => { OnMsgMoveTo((byte[])data.CustomData); });
                 _callback = onMsgMoveToCallback;
                 _targetPosition.z = 0;
             }
 
-            private void OnMsgMoveTo(object data)
+            private void OnMsgMoveTo(byte[] payload)
             {
-                var payload = (float[])data;
-                if (payload[0] != _playerId)
+                var index = 0;
+                if (payload[index] != _playerId)
                 {
                     return;
                 }
-                _targetPosition.x = payload[1];
-                _targetPosition.y = payload[2];
-                _callback.Invoke(_targetPosition, payload[3]);
+                index += 1;
+                _targetPosition.x = BitConverter.ToSingle(payload, index);
+                index += 4;
+                _targetPosition.y = BitConverter.ToSingle(payload, index);
+                index += 4;
+                _callback.Invoke(_targetPosition, BitConverter.ToSingle(payload, index));
             }
 
             public void SendMsgMoveTo(Vector3 position, float speed)
             {
-                var payload = new[] { _playerId, position.x, position.y, speed };
-                _photonEventDispatcher.RaiseEvent(MsgMoveTo, payload);
+                var index = 0;
+                _buffer[index] = _playerId;
+                index += 1;
+                Array.Copy(BitConverter.GetBytes(position.x), 0, _buffer, index, 4);
+                index += 4;
+                Array.Copy(BitConverter.GetBytes(position.y), 0, _buffer, index, 4);
+                index += 4;
+                Array.Copy(BitConverter.GetBytes(speed), 0, _buffer, index, 4);
+
+                _photonEventDispatcher.RaiseEvent(MsgMoveTo, _buffer);
             }
         }
     }
