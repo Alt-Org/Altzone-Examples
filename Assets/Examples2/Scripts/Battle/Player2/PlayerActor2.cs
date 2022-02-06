@@ -59,7 +59,7 @@ namespace Examples2.Scripts.Battle.Player2
             var playerArea = isLower
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
-            _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main)
+            _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main, _photonView)
             {
                 PlayerArea = playerArea,
                 UnReachableDistance = 100,

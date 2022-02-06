@@ -1,6 +1,8 @@
 using System;
+using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
 namespace Examples2.Scripts.Battle.Player2
@@ -10,6 +12,7 @@ namespace Examples2.Scripts.Battle.Player2
         private readonly Transform _transform;
         private readonly UnityEngine.InputSystem.PlayerInput _playerInput;
         private readonly Camera _camera;
+        private readonly bool _isLocal;
         private readonly MovementHelper _helper;
 
         public Rect PlayerArea { get; set; } = Rect.MinMaxRect(-100, -100, 100, 100);
@@ -23,18 +26,20 @@ namespace Examples2.Scripts.Battle.Player2
         private Vector2 _inputClick;
         private Vector3 _inputPosition;
 
-        public PlayerMovement2(Transform transform, UnityEngine.InputSystem.PlayerInput playerInput, Camera camera)
+        public PlayerMovement2(Transform transform, UnityEngine.InputSystem.PlayerInput playerInput, Camera camera, PhotonView photonView)
         {
             _transform = transform;
             _playerInput = playerInput;
             _camera = camera;
-            _helper = new MovementHelper(PhotonEventDispatcher.Get(), (position, speed) =>
+            // In practice this might happen on runtime when players join and leves more than 256 times in a room.
+            Assert.IsTrue(photonView.OwnerActorNr <= byte.MaxValue, "photonView.OwnerActorNr <= byte.MaxValue");
+            var playerId = (byte)photonView.OwnerActorNr;
+            _isLocal = photonView.IsMine;
+            _helper = new MovementHelper(PhotonEventDispatcher.Get(), playerId, SetMoveTo);
+            if (_isLocal)
             {
-                _isMoving = true;
-                _targetPosition = position;
-                Speed = speed;
-            });
-            SetInput();
+                SetupInput();
+            }
         }
 
         public void Update()
@@ -47,7 +52,17 @@ namespace Examples2.Scripts.Battle.Player2
 
         public void OnDestroy()
         {
-            ReleaseInput();
+            if (_isLocal)
+            {
+                ReleaseInput();
+            }
+        }
+
+        private void SetMoveTo(Vector3 position, float speed)
+        {
+            _isMoving = true;
+            _targetPosition = position;
+            Speed = speed;
         }
 
         private void MoveTo()
@@ -57,7 +72,7 @@ namespace Examples2.Scripts.Battle.Player2
             _isMoving = !(Mathf.Approximately(_tempPosition.x, _targetPosition.x) && Mathf.Approximately(_tempPosition.y, _targetPosition.y));
         }
 
-        private void SetInput()
+        private void SetupInput()
         {
             // https://gamedevbeginner.com/input-in-unity-made-easy-complete-guide-to-the-new-system/
 
@@ -118,13 +133,16 @@ namespace Examples2.Scripts.Battle.Player2
             private const int MsgMoveTo = PhotonEventDispatcher.EventCodeBase + 5;
 
             private readonly PhotonEventDispatcher _photonEventDispatcher;
+            private readonly byte _playerId;
             private readonly Action<Vector3, float> _callback;
 
             private Vector3 _targetPosition;
+            private byte[] _buffer = new byte[1 + 4 + 4 + 4];
 
-            public MovementHelper(PhotonEventDispatcher photonEventDispatcher, Action<Vector3, float> onMsgMoveToCallback)
+            public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
             {
                 _photonEventDispatcher = photonEventDispatcher;
+                _playerId = playerId;
                 _photonEventDispatcher.RegisterEventListener(MsgMoveTo, data => { OnMsgMoveTo(data.CustomData); });
                 _callback = onMsgMoveToCallback;
                 _targetPosition.z = 0;
@@ -133,14 +151,18 @@ namespace Examples2.Scripts.Battle.Player2
             private void OnMsgMoveTo(object data)
             {
                 var payload = (float[])data;
-                _targetPosition.x = payload[0];
-                _targetPosition.y = payload[1];
-                _callback.Invoke(_targetPosition, payload[2]);
+                if (payload[0] != _playerId)
+                {
+                    return;
+                }
+                _targetPosition.x = payload[1];
+                _targetPosition.y = payload[2];
+                _callback.Invoke(_targetPosition, payload[3]);
             }
 
             public void SendMsgMoveTo(Vector3 position, float speed)
             {
-                var payload = new[] { position.x, position.y, speed };
+                var payload = new[] { _playerId, position.x, position.y, speed };
                 _photonEventDispatcher.RaiseEvent(MsgMoveTo, payload);
             }
         }
