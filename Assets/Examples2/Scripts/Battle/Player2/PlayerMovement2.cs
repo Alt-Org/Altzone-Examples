@@ -14,6 +14,7 @@ namespace Examples2.Scripts.Battle.Player2
         private readonly Camera _camera;
         private readonly bool _isLocal;
         private readonly MovementHelper _helper;
+        private readonly bool _isLimitMouseXY;
 
         public Rect PlayerArea { get; set; } = Rect.MinMaxRect(-100, -100, 100, 100);
         public float UnReachableDistance { get; set; } = 100;
@@ -40,6 +41,7 @@ namespace Examples2.Scripts.Battle.Player2
             {
                 SetupInput();
             }
+            _isLimitMouseXY = !Application.isMobilePlatform;
         }
 
         public void Update()
@@ -98,14 +100,14 @@ namespace Examples2.Scripts.Battle.Player2
 
         private void DoMove(InputAction.CallbackContext ctx)
         {
-            _isMoving = true;
             _inputClick = ctx.ReadValue<Vector2>() * UnReachableDistance;
+            _isMoving = true;
             _inputPosition = _transform.position;
             _inputPosition.x += _inputClick.x;
             _inputPosition.y += _inputClick.y;
             _inputPosition.x = Mathf.Clamp(_inputPosition.x, PlayerArea.xMin, PlayerArea.xMax);
             _inputPosition.y = Mathf.Clamp(_inputPosition.y, PlayerArea.yMin, PlayerArea.yMax);
-            _helper.SendMsgMoveTo(_inputPosition,Speed);
+            _helper.SendMsgMoveTo(_inputPosition, Speed);
         }
 
         private void StopMove(InputAction.CallbackContext ctx)
@@ -115,17 +117,27 @@ namespace Examples2.Scripts.Battle.Player2
 
         private void DoClick(InputAction.CallbackContext ctx)
         {
+            _inputClick = ctx.ReadValue<Vector2>();
+#if UNITY_STANDALONE
+            if (_isLimitMouseXY)
+            {
+                if (_inputClick.x < 0 || _inputClick.y < 0 ||
+                    _inputClick.x > Screen.width || _inputClick.y > Screen.height)
+                {
+                    return;
+                }
+            }
+#endif
             if (!_isMoving)
             {
                 _isMoving = true;
             }
-            _inputClick = ctx.ReadValue<Vector2>();
             _inputPosition.x = _inputClick.x;
             _inputPosition.y = _inputClick.y;
             _inputPosition = _camera.ScreenToWorldPoint(_inputPosition);
             _inputPosition.x = Mathf.Clamp(_inputPosition.x, PlayerArea.xMin, PlayerArea.xMax);
             _inputPosition.y = Mathf.Clamp(_inputPosition.y, PlayerArea.yMin, PlayerArea.yMax);
-            _helper.SendMsgMoveTo(_inputPosition,Speed);
+            _helper.SendMsgMoveTo(_inputPosition, Speed);
         }
 
         private class MovementHelper
