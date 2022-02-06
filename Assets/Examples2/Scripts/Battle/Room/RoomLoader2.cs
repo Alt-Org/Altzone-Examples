@@ -7,6 +7,7 @@ using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Examples2.Scripts.Battle.Room
@@ -26,7 +27,9 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField, Range(1, 4)] private int _debugPlayerPos = 1;
         [SerializeField, Range(1, 4), Tooltip(Tooltip2)] private int _minPlayersToStart = 1;
         [SerializeField] private GameObject[] _objectsToActivate;
+        [SerializeField] private Canvas _canvas;
         [SerializeField] private TMP_Text _roomInfoText;
+        [SerializeField] private Button _startNow;
 
         [Header("Live Data"), SerializeField] private int _currentPlayersInRoom;
 
@@ -49,10 +52,14 @@ namespace Examples2.Scripts.Battle.Room
             if (_minPlayersToStart > 1)
             {
                 _roomInfoText.text = $"Waiting for {_minPlayersToStart} players";
+                _startNow.onClick.AddListener(() =>
+                {
+                    _minPlayersToStart = 1;
+                });
             }
             else
             {
-                _roomInfoText.enabled = false;
+                _canvas.gameObject.SetActive(false);
             }
             Debug.Log($"Awake and create test room {PhotonNetwork.NetworkClientState}");
         }
@@ -86,6 +93,7 @@ namespace Examples2.Scripts.Battle.Room
 
         private void ContinueToNextStage()
         {
+            _canvas.gameObject.SetActive(false);
             if (PhotonNetwork.IsMasterClient)
             {
                 // Mark room "closed"
@@ -163,7 +171,6 @@ namespace Examples2.Scripts.Battle.Room
 
             StartCoroutine(Blink(_roomInfoText, 0.6f, 0.3f));
             yield return new WaitUntil(() => PhotonNetwork.InRoom && CountPlayersInRoom() >= _minPlayersToStart);
-            _roomInfoText.text = string.Empty;
             ContinueToNextStage();
         }
 
