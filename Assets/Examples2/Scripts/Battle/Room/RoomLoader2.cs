@@ -5,6 +5,7 @@ using Altzone.Scripts.Model;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
+using TMPro;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -22,9 +23,10 @@ namespace Examples2.Scripts.Battle.Room
         private const string Tooltip2 = "if > 1 Debug Player Pos is automatic";
 
         [Header("Settings"), SerializeField, Tooltip(Tooltip1)] private bool _isOfflineMode;
-        [SerializeField, Range(1,4)] private int _debugPlayerPos = 1;
-        [SerializeField, Range(1,4), Tooltip(Tooltip2)] private int _minPlayersToStart = 1;
+        [SerializeField, Range(1, 4)] private int _debugPlayerPos = 1;
+        [SerializeField, Range(1, 4), Tooltip(Tooltip2)] private int _minPlayersToStart = 1;
         [SerializeField] private GameObject[] _objectsToActivate;
+        [SerializeField] private TMP_Text _roomInfoText;
 
         [Header("Live Data"), SerializeField] private int _currentPlayersInRoom;
 
@@ -43,6 +45,14 @@ namespace Examples2.Scripts.Battle.Room
                 ContinueToNextStage();
                 enabled = false;
                 return;
+            }
+            if (_minPlayersToStart > 1)
+            {
+                _roomInfoText.text = $"Waiting for {_minPlayersToStart} players";
+            }
+            else
+            {
+                _roomInfoText.enabled = false;
             }
             Debug.Log($"Awake and create test room {PhotonNetwork.NetworkClientState}");
         }
@@ -147,11 +157,27 @@ namespace Examples2.Scripts.Battle.Room
             int CountPlayersInRoom()
             {
                 _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
+                _roomInfoText.text = $"Waiting for {_minPlayersToStart - _currentPlayersInRoom} players";
                 return _currentPlayersInRoom;
             }
 
+            StartCoroutine(Blink(_roomInfoText, 0.6f, 0.3f));
             yield return new WaitUntil(() => PhotonNetwork.InRoom && CountPlayersInRoom() >= _minPlayersToStart);
+            _roomInfoText.text = string.Empty;
             ContinueToNextStage();
+        }
+
+        private static IEnumerator Blink(Behaviour component, float visibleDuration, float hiddenDuration)
+        {
+            var delay1 = new WaitForSeconds(visibleDuration);
+            var delay2 = new WaitForSeconds(hiddenDuration);
+            for (;;)
+            {
+                yield return delay1;
+                component.enabled = false;
+                yield return delay2;
+                component.enabled = true;
+            }
         }
     }
 }
