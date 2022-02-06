@@ -61,6 +61,7 @@ namespace Examples2.Scripts.Battle.Players
         {
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
+            gameObject.AddComponent<LocalPlayer>();
             ((IPlayerActor)this).SetNormalMode();
         }
 
