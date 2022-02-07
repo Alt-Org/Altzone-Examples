@@ -1,9 +1,11 @@
+using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
+using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
@@ -13,6 +15,8 @@ namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
+        private const byte MsgVisualState = PhotonEventDispatcher.EventCodeBase + 6;
+
         [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
@@ -27,6 +31,7 @@ namespace Examples2.Scripts.Battle.Player2
         private PhotonView _photonView;
         private Transform _transform;
         private PlayerMovement2 _playerMovement;
+        private PlayerPlayModeHelper _helper;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
@@ -65,6 +70,8 @@ namespace Examples2.Scripts.Battle.Player2
                 UnReachableDistance = 100,
                 Speed = 10f,
             };
+            var playerId = (byte)_photonView.OwnerActorNr;
+            _helper = new PlayerPlayModeHelper(PhotonEventDispatcher.Get(), MsgVisualState, playerId, SetPlayerPlayMode);
             Debug.Log($"Awake Done {name}");
         }
 
@@ -72,6 +79,7 @@ namespace Examples2.Scripts.Battle.Player2
         {
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
+            ((IPlayerActor)this).SetNormalMode();
         }
 
         private void OnDestroy()
@@ -133,7 +141,7 @@ namespace Examples2.Scripts.Battle.Player2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeGhosted);
+                _helper.SendSetPlayerPlayMode(PlayModeGhosted);
             }
         }
 
@@ -146,7 +154,7 @@ namespace Examples2.Scripts.Battle.Player2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeNormal);
+                _helper.SendSetPlayerPlayMode(PlayModeNormal);
             }
         }
 
@@ -154,7 +162,7 @@ namespace Examples2.Scripts.Battle.Player2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeFrozen);
+                _helper.SendSetPlayerPlayMode(PlayModeFrozen);
             }
         }
 
@@ -162,12 +170,11 @@ namespace Examples2.Scripts.Battle.Player2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonView.RPC(nameof(SetPlayerPlayModeRpc), RpcTarget.All, PlayModeGhosted);
+                _helper.SendSetPlayerPlayMode(PlayModeGhosted);
             }
         }
 
-        /*[PunRPC]*/
-        public void SetPlayerPlayModeRpc(int playMode)
+        private void SetPlayerPlayMode(int playMode)
         {
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
@@ -190,5 +197,29 @@ namespace Examples2.Scripts.Battle.Player2
         }
 
         #endregion
+
+        private class PlayerPlayModeHelper : AbstractPhotonEventHelper
+        {
+            private readonly Action<int> _onSetPlayerPlayMode;
+
+            private readonly byte[] _buffer = new byte[1 + 1];
+
+            public PlayerPlayModeHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int> onSetPlayerPlayMode)
+                : base(photonEventDispatcher, msgId, playerId)
+            {
+                _onSetPlayerPlayMode = onSetPlayerPlayMode;
+            }
+
+            public void SendSetPlayerPlayMode(int playMode)
+            {
+                _buffer[1] = (byte)playMode;
+                RaiseEvent(_buffer);
+            }
+
+            protected override void OnMsgReceived(byte[] payload)
+            {
+                _onSetPlayerPlayMode((int)payload[1]);
+            }
+        }
     }
 }

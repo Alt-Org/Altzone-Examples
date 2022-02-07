@@ -9,6 +9,8 @@ namespace Examples2.Scripts.Battle.Player2
 {
     internal class PlayerMovement2
     {
+        private const byte MsgMoveTo = PhotonEventDispatcher.EventCodeBase + 5;
+
         private readonly Transform _transform;
         private readonly UnityEngine.InputSystem.PlayerInput _playerInput;
         private readonly Camera _camera;
@@ -35,8 +37,8 @@ namespace Examples2.Scripts.Battle.Player2
             // In practice this might happen on runtime when players join and leves more than 256 times in a room.
             Assert.IsTrue(photonView.OwnerActorNr <= byte.MaxValue, "photonView.OwnerActorNr <= byte.MaxValue");
             var playerId = (byte)photonView.OwnerActorNr;
+            _helper = new MovementHelper(PhotonEventDispatcher.Get(), MsgMoveTo, playerId, SetMoveTo);
             _isLocal = photonView.IsMine;
-            _helper = new MovementHelper(PhotonEventDispatcher.Get(), playerId, SetMoveTo);
             if (_isLocal)
             {
                 SetupInput();
@@ -140,53 +142,40 @@ namespace Examples2.Scripts.Battle.Player2
             _helper.SendMsgMoveTo(_inputPosition, Speed);
         }
 
-        private class MovementHelper
+        private class MovementHelper : AbstractPhotonEventHelper
         {
-            private const int MsgMoveTo = PhotonEventDispatcher.EventCodeBase + 5;
-
-            private readonly PhotonEventDispatcher _photonEventDispatcher;
-            private readonly byte _playerId;
             private readonly Action<Vector3, float> _callback;
 
             private Vector3 _targetPosition;
             private readonly byte[] _buffer = new byte[1 + 4 + 4 + 4];
 
-            public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
+            public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
+                : base(photonEventDispatcher, msgId, playerId)
             {
-                _photonEventDispatcher = photonEventDispatcher;
-                _playerId = playerId;
-                _photonEventDispatcher.RegisterEventListener(MsgMoveTo, data => { OnMsgMoveTo((byte[])data.CustomData); });
                 _callback = onMsgMoveToCallback;
                 _targetPosition.z = 0;
             }
 
-            private void OnMsgMoveTo(byte[] payload)
-            {
-                var index = 0;
-                if (payload[index] != _playerId)
-                {
-                    return;
-                }
-                index += 1;
-                _targetPosition.x = BitConverter.ToSingle(payload, index);
-                index += 4;
-                _targetPosition.y = BitConverter.ToSingle(payload, index);
-                index += 4;
-                _callback.Invoke(_targetPosition, BitConverter.ToSingle(payload, index));
-            }
-
             public void SendMsgMoveTo(Vector3 position, float speed)
             {
-                var index = 0;
-                _buffer[index] = _playerId;
-                index += 1;
+                var index = 1;
                 Array.Copy(BitConverter.GetBytes(position.x), 0, _buffer, index, 4);
                 index += 4;
                 Array.Copy(BitConverter.GetBytes(position.y), 0, _buffer, index, 4);
                 index += 4;
                 Array.Copy(BitConverter.GetBytes(speed), 0, _buffer, index, 4);
 
-                _photonEventDispatcher.RaiseEvent(MsgMoveTo, _buffer);
+                RaiseEvent(_buffer);
+            }
+
+            protected override void OnMsgReceived(byte[] payload)
+            {
+                var index = 1;
+                _targetPosition.x = BitConverter.ToSingle(payload, index);
+                index += 4;
+                _targetPosition.y = BitConverter.ToSingle(payload, index);
+                index += 4;
+                _callback.Invoke(_targetPosition, BitConverter.ToSingle(payload, index));
             }
         }
     }

@@ -6,10 +6,11 @@ using UnityEngine;
 namespace Examples2.Scripts.Battle.Player2
 {
     /// <summary>
-    /// Prefab for <c>Photon</c> to instantiate over network without any visual geometry.
+    /// Prefab for <c>Photon</c> to instantiate over network without any visual <c>GameObject</c>.
     /// </summary>
     /// <remarks>
-    /// Functional geometry is added later (by us) and we can be detached from it any time if required or when connection is lost etc. errors.
+    /// Functional <c>GameObject</c> is added later (by us) and
+    /// we can be detached from it any time if required or when connection is lost etc. errors.
     /// </remarks>
     [RequireComponent(typeof(PhotonView))]
     public class PhotonPlayer : MonoBehaviour
@@ -50,12 +51,6 @@ namespace Examples2.Scripts.Battle.Player2
             var playerTransform = _playerActor.GetComponent<Transform>();
             myTransform.parent = playerTransform;
             enabled = false;
-        }
-
-        [PunRPC]
-        private void SetPlayerPlayModeRpc(int playMode)
-        {
-            _playerActor.SetPlayerPlayModeRpc(playMode);
         }
     }
 }
