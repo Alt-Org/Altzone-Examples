@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using Altzone.Scripts.Battle;
@@ -18,7 +19,7 @@ namespace Examples2.Scripts.Battle.Room
     /// <remarks>
     /// Can create a test room environment for more than one player.
     /// </remarks>
-    public class RoomLoader2 : MonoBehaviourPunCallbacks
+    internal class RoomLoader2 : MonoBehaviourPunCallbacks
     {
         private const string Tooltip1 = "If Is Offline Mode only one player can play";
         private const string Tooltip2 = "if > 1 Debug Player Pos is automatic";
@@ -27,11 +28,12 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField, Range(1, 4)] private int _debugPlayerPos = 1;
         [SerializeField, Range(1, 4), Tooltip(Tooltip2)] private int _minPlayersToStart = 1;
         [SerializeField] private GameObject[] _objectsToActivate;
-        [SerializeField] private Canvas _canvas;
-        [SerializeField] private TMP_Text _roomInfoText;
-        [SerializeField] private Button _startNow;
+
+        [Header("UI Settings"), SerializeField] private UISettings _uiSettings;
 
         [Header("Live Data"), SerializeField] private int _currentPlayersInRoom;
+
+        private RoomLoaderUi _ui;
 
         private void Awake()
         {
@@ -49,17 +51,19 @@ namespace Examples2.Scripts.Battle.Room
                 enabled = false;
                 return;
             }
+            _ui = new RoomLoaderUi(_uiSettings);
             if (_minPlayersToStart > 1)
             {
-                _roomInfoText.text = $"Waiting for {_minPlayersToStart} players";
-                _startNow.onClick.AddListener(() =>
+                _ui.Show();
+                _ui.SetText($"Waiting for {_minPlayersToStart} players");
+                _ui.SetOnPlayClick(() =>
                 {
                     _minPlayersToStart = 1;
                 });
             }
             else
             {
-                _canvas.gameObject.SetActive(false);
+                _ui.Hide();
             }
             Debug.Log($"Awake and create test room {PhotonNetwork.NetworkClientState}");
         }
@@ -93,7 +97,8 @@ namespace Examples2.Scripts.Battle.Room
 
         private void ContinueToNextStage()
         {
-            _canvas.gameObject.SetActive(false);
+            StopAllCoroutines();
+            _ui.Hide();
             if (PhotonNetwork.IsMasterClient)
             {
                 // Mark room "closed"
@@ -165,25 +170,89 @@ namespace Examples2.Scripts.Battle.Room
             int CountPlayersInRoom()
             {
                 _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
-                _roomInfoText.text = $"Waiting for {_minPlayersToStart - _currentPlayersInRoom} players";
+                _ui.SetText($"Waiting for {_minPlayersToStart - _currentPlayersInRoom} players");
                 return _currentPlayersInRoom;
             }
 
-            StartCoroutine(Blink(_roomInfoText, 0.6f, 0.3f));
+            StartCoroutine(_ui.Blink(0.6f, 0.3f));
             yield return new WaitUntil(() => PhotonNetwork.InRoom && CountPlayersInRoom() >= _minPlayersToStart);
             ContinueToNextStage();
         }
 
-        private static IEnumerator Blink(Behaviour component, float visibleDuration, float hiddenDuration)
+        [Serializable]
+        internal class UISettings
         {
-            var delay1 = new WaitForSeconds(visibleDuration);
-            var delay2 = new WaitForSeconds(hiddenDuration);
-            for (;;)
+            public Canvas _canvas;
+            public TMP_Text _roomInfoText;
+            public Button _playNowButton;
+        }
+
+        private class RoomLoaderUi
+        {
+            private readonly bool _isValid;
+            private readonly Canvas _canvas;
+            private readonly TMP_Text _roomInfoText;
+            private readonly Button _playNowButton;
+
+            public RoomLoaderUi(UISettings uiSettings)
             {
-                yield return delay1;
-                component.enabled = false;
-                yield return delay2;
-                component.enabled = true;
+                _isValid = uiSettings._canvas != null;
+                _canvas = uiSettings._canvas;
+                _roomInfoText = uiSettings._roomInfoText;
+                _playNowButton = uiSettings._playNowButton;
+            }
+
+            public void Show()
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _canvas.gameObject.SetActive(true);
+            }
+
+            public void Hide()
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _canvas.gameObject.SetActive(false);
+            }
+
+            public void SetText(string text)
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _roomInfoText.text = text;
+            }
+
+            public void SetOnPlayClick(Action callback)
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _playNowButton.onClick.AddListener(() =>
+                {
+                    callback();
+                });
+
+            }
+            public IEnumerator Blink(float visibleDuration, float hiddenDuration)
+            {
+                var delay1 = new WaitForSeconds(visibleDuration);
+                var delay2 = new WaitForSeconds(hiddenDuration);
+                while (_isValid)
+                {
+                    yield return delay1;
+                    _roomInfoText.enabled = false;
+                    yield return delay2;
+                    // ReSharper disable once Unity.InefficientPropertyAccess
+                    _roomInfoText.enabled = true;
+                }
             }
         }
     }
