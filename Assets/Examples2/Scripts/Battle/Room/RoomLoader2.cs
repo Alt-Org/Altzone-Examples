@@ -56,10 +56,7 @@ namespace Examples2.Scripts.Battle.Room
             {
                 _ui.Show();
                 _ui.SetText($"Waiting for {_minPlayersToStart} players");
-                _ui.SetOnPlayClick(() =>
-                {
-                    _minPlayersToStart = 1;
-                });
+                _ui.SetOnPlayClick(() => { _minPlayersToStart = 1; });
             }
             else
             {
@@ -174,6 +171,14 @@ namespace Examples2.Scripts.Battle.Room
                 return _currentPlayersInRoom;
             }
 
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _ui.EnableButton();
+            }
+            else
+            {
+                _ui.HideButton();
+            }
             StartCoroutine(_ui.Blink(0.6f, 0.3f));
             yield return new WaitUntil(() => PhotonNetwork.InRoom && CountPlayersInRoom() >= _minPlayersToStart);
             ContinueToNextStage();
@@ -209,6 +214,7 @@ namespace Examples2.Scripts.Battle.Room
                     return;
                 }
                 _canvas.gameObject.SetActive(true);
+                _playNowButton.interactable = false;
             }
 
             public void Hide()
@@ -218,6 +224,24 @@ namespace Examples2.Scripts.Battle.Room
                     return;
                 }
                 _canvas.gameObject.SetActive(false);
+            }
+
+            public void EnableButton()
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _playNowButton.interactable = true;
+            }
+
+            public void HideButton()
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _playNowButton.gameObject.SetActive(false);
             }
 
             public void SetText(string text)
@@ -235,12 +259,9 @@ namespace Examples2.Scripts.Battle.Room
                 {
                     return;
                 }
-                _playNowButton.onClick.AddListener(() =>
-                {
-                    callback();
-                });
-
+                _playNowButton.onClick.AddListener(() => { callback(); });
             }
+
             public IEnumerator Blink(float visibleDuration, float hiddenDuration)
             {
                 var delay1 = new WaitForSeconds(visibleDuration);
