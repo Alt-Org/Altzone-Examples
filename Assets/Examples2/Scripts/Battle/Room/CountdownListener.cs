@@ -1,3 +1,4 @@
+using System;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
@@ -18,6 +19,11 @@ namespace Examples2.Scripts.Battle.Room
             _countdown = _countdownText.gameObject;
             HideCountdown();
             this.Subscribe<PlayerManager.CountdownEvent>(OnCountdownEvent);
+        }
+
+        private void OnDestroy()
+        {
+            this.Unsubscribe();
         }
 
         private void OnCountdownEvent(PlayerManager.CountdownEvent data)
