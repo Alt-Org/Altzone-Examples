@@ -70,7 +70,7 @@ namespace Examples2.Scripts.Battle.Room
             // Create a test room - in offline (faster to create) or online (real thing) mode
             base.OnEnable();
             var state = PhotonNetwork.NetworkClientState;
-            var isStateValid = state == ClientState.PeerCreated || state == ClientState.Disconnected;
+            var isStateValid = state == ClientState.PeerCreated || state == ClientState.Disconnected || state == ClientState.ConnectedToMasterServer;
             if (!isStateValid)
             {
                 throw new UnityException($"OnEnable: invalid connection state {PhotonNetwork.NetworkClientState}");
@@ -80,14 +80,20 @@ namespace Examples2.Scripts.Battle.Room
             PhotonNetwork.OfflineMode = _isOfflineMode;
             if (_isOfflineMode)
             {
-                // JoinRandomRoom -> CreateRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
+                // JoinRandomRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
                 _minPlayersToStart = 1;
                 PhotonNetwork.NickName = playerName;
                 PhotonNetwork.JoinRandomRoom();
             }
+            else if (state == ClientState.ConnectedToMasterServer)
+            {
+                // JoinLobby -> JoinOrCreateRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
+                PhotonNetwork.NickName = playerName;
+                PhotonLobby.JoinLobby();
+            }
             else
             {
-                // Connect -> JoinLobby -> CreateRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
+                // Connect -> JoinLobby -> JoinOrCreateRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
                 PhotonLobby.Connect(playerName);
             }
         }
