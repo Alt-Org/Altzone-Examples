@@ -101,9 +101,9 @@ namespace Examples2.Scripts.Battle.Ball
             _rigidbody.isKinematic = !PhotonNetwork.IsMasterClient;
         }
 
-        private void PhotonTakeover()
+        private void MasterClientSwitched()
         {
-            Debug.Log($"PhotonTakeover mine {_photonView.IsMine} room {_photonView.IsRoomView} master {PhotonNetwork.IsMasterClient}");
+            Debug.Log($"MasterClientSwitched mine {_photonView.IsMine} room {_photonView.IsRoomView} master {PhotonNetwork.IsMasterClient}");
             var velocity = _rigidbody.velocity;
             Debug.Log($"_rigidbody position {_rigidbody.position} velocity {velocity} isKinematic {_rigidbody.isKinematic}");
             _rigidbody.isKinematic = !PhotonNetwork.IsMasterClient;
@@ -166,19 +166,14 @@ namespace Examples2.Scripts.Battle.Ball
             if (_isCheckVelocityAfterCollision && _checkVelocityTime > Time.time)
             {
                 _isCheckVelocityAfterCollision = false;
-                if (!Mathf.Approximately(_currentSpeed, _rigidbody.velocity.magnitude))
+                if (!Mathf.Approximately(_currentSpeed*_currentSpeed, _rigidbody.velocity.sqrMagnitude))
                 {
-                    Debug.Log("fix velocity");
-                    KeepConstantVelocity();
+                    Debug.Log($"fix velocity {_rigidbody.velocity} <- {_currentSpeed:0.0}");
+                    _rigidbody.velocity = _rigidbody.velocity.normalized * _currentSpeed;
                 }
             }
             // Just for testing - this is expensive call!
             _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
-        }
-
-        private void KeepConstantVelocity()
-        {
-            _rigidbody.velocity = _rigidbody.velocity.normalized * _currentSpeed;
         }
 
         #endregion
@@ -401,7 +396,7 @@ namespace Examples2.Scripts.Battle.Ball
         {
             if (newMasterClient.Equals(PhotonNetwork.LocalPlayer))
             {
-                PhotonTakeover();
+                MasterClientSwitched();
             }
         }
 

@@ -27,6 +27,7 @@ Lobby/CreateRoomButton	Create Room	Create Room	Create Room
 Lobby/TitleText	Lobby	Aula	Lobby
 MainMenu/ButtonNaviLobby	Lobby	Aula	Lobby
 MainMenu/ButtonNaviSettings	Settings	Asetukset	Inställningar
+MainMenu/ButtonQuickGame	Quick Game	Nopea Peli	Joopa joo
 MainMenu/TestButtonA	Test async	Testaa A	Testa A
 MainMenu/TestButtonB	Test block	Testaa B	Testa B
 MainMenu/TitleText	main  menu	päävalikko	huvudmeny
