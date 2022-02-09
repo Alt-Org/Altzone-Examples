@@ -97,8 +97,11 @@ namespace Examples2.Scripts.Battle.Players2
 
         private static void LoadShield(Defence defence, int playerPos, Transform transform)
         {
-            var prefab = Resources.Load<GameObject>($"Shields/{defence}");
-            var instance = Instantiate(prefab, transform);
+            var shieldPrefab = Resources.Load<GameObject>($"Shields/{defence}");
+            Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
+            // Currently shield has no functionality!
+            var instance = Instantiate(shieldPrefab, transform);
+            instance.name = instance.name.Replace("Clone", "Shield");
             if (playerPos > PhotonBattle.PlayerPosition2)
             {
                 var renderer = instance.GetComponent<SpriteRenderer>();
