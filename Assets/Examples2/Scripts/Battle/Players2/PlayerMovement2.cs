@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
-namespace Examples2.Scripts.Battle.Player2
+namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerMovement2
     {

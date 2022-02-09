@@ -11,7 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Examples2.Scripts.Battle.Player2
+namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {

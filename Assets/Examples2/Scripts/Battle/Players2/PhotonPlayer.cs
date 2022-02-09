@@ -3,7 +3,7 @@ using Examples2.Scripts.Battle.Photon;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Examples2.Scripts.Battle.Player2
+namespace Examples2.Scripts.Battle.Players2
 {
     /// <summary>
     /// Prefab for <c>Photon</c> to instantiate over network without any visual <c>GameObject</c>.

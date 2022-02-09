@@ -1,7 +1,7 @@
 using Prg.Scripts.Common.Photon;
 using UnityEngine.Assertions;
 
-namespace Examples2.Scripts.Battle.Player2
+namespace Examples2.Scripts.Battle.Players2
 {
     /// <summary>
     /// Base class to send and receive Photon events for given player.
