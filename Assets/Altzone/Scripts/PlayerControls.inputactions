@@ -125,6 +125,54 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "Navigation",
+            "id": "3fa3c59c-967a-4cf2-ad01-42d3516560d1",
+            "actions": [
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "ae515691-2c49-413f-9e0e-4760798c2ce3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "1323cd38-9759-4e8c-8ae6-668850937ae1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1633aeaa-d51c-4421-89eb-eb007498566b",
+                    "path": "*/{Back}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb15a710-3226-413f-939c-0aba2baf2b3f",
+                    "path": "*/{Cancel}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
