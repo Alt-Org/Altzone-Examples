@@ -47,15 +47,17 @@ namespace Examples2.Scripts.Battle.Ball
         [Header("Photon"), SerializeField] private Vector2 _networkPosition;
         [SerializeField] private float _networkLag;
 
-        [Header("Debug"), SerializeField] private TextMeshPro _debugInfoText;
-        private GameObject _debugInfoParent;
-
         private PhotonView _photonView;
         private Rigidbody2D _rigidbody;
 
-        [SerializeField] private float _currentSpeed;
+        [Header("Live Data"), SerializeField] private float _currentSpeed;
         private bool _isCheckVelocityAfterCollision;
         private float _checkVelocityTime;
+
+        [Header("Debug"), SerializeField] private bool _isDebugInfoText;
+        [SerializeField] private TextMeshPro _debugInfoText;
+        private GameObject _debugInfoParent;
+
 
         // This is indexed by BallColor!
         private GameObject[] _stateObjects;
@@ -92,6 +94,10 @@ namespace Examples2.Scripts.Battle.Ball
             _brickMaskValue = _settings._brickMask.value;
             _wallMaskValue = _settings._wallMask.value;
             _debugInfoParent = _debugInfoText.gameObject;
+            if (!_isDebugInfoText)
+            {
+                _debugInfoParent.SetActive(false);
+            }
             PhotonSetup();
         }
 
@@ -147,7 +153,10 @@ namespace Examples2.Scripts.Battle.Ball
                 _networkPosition += _rigidbody.velocity * _networkLag;
 
                 // Just for testing - this is expensive call!
-                _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
+                if (_isDebugInfoText)
+                {
+                    _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
+                }
             }
         }
 
@@ -166,14 +175,17 @@ namespace Examples2.Scripts.Battle.Ball
             if (_isCheckVelocityAfterCollision && _checkVelocityTime > Time.time)
             {
                 _isCheckVelocityAfterCollision = false;
-                if (!Mathf.Approximately(_currentSpeed*_currentSpeed, _rigidbody.velocity.sqrMagnitude))
+                if (!Mathf.Approximately(_currentSpeed * _currentSpeed, _rigidbody.velocity.sqrMagnitude))
                 {
                     Debug.Log($"fix velocity {_rigidbody.velocity} <- {_currentSpeed:0.0}");
                     _rigidbody.velocity = _rigidbody.velocity.normalized * _currentSpeed;
                 }
             }
             // Just for testing - this is expensive call!
-            _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
+            if (_isDebugInfoText)
+            {
+                _debugInfoText.text = _rigidbody.velocity.magnitude.ToString("F1");
+            }
         }
 
         #endregion
@@ -345,7 +357,10 @@ namespace Examples2.Scripts.Battle.Ball
             _stateObjects[(int)_state._ballColor].SetActive(false);
             _state._ballColor = ballColor;
             _stateObjects[(int)_state._ballColor].SetActive(true);
-            _debugInfoParent.SetActive(ballColor != BallColor.Hidden);
+            if (_isDebugInfoText)
+            {
+                _debugInfoParent.SetActive(ballColor != BallColor.Hidden);
+            }
         }
 
         #endregion
