@@ -1,3 +1,4 @@
+using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Photon.Pun;
@@ -42,7 +43,7 @@ namespace Examples2.Scripts.Battle.Players
             if (_hasPlayerShield)
             {
                 var shield = (IPlayerShield)_playerShield;
-                shield.SetupShield(PlayerPos);
+                shield.SetupShield(PlayerPos, PlayerPos <= PhotonBattle.PlayerPosition2);
                 shield.SetShieldState(PlayModeGhosted, 0);
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
@@ -47,13 +48,22 @@ namespace Examples2.Scripts.Battle.Players2
             name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
             _playerInfo.text = PlayerPos.ToString("N0");
-            Debug.Log($"Awake {name}");
+            var isLower = PlayerPos <= PhotonBattle.PlayerPosition2;
+            if (!isLower)
+            {
+                var features = RuntimeGameConfig.Get().Features;
+                if (features._isRotateGameCamera)
+                {
+                    isLower = true;
+                    RotatePlayer(_transform, true);
+                }
+            }
+            Debug.Log($"Awake {name} isLower {isLower}");
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
             if (_photonView.IsMine)
             {
                 _highlightSprite.color = Color.yellow;
             }
-            var isLower = PlayerPos <= PhotonBattle.PlayerPosition2;
             _playerShield = isLower
                 ? _playerShieldHead
                 : _playerShieldFoot;
@@ -63,9 +73,11 @@ namespace Examples2.Scripts.Battle.Players2
                 ? model.MainDefence
                 : Defence.Retroflection;
             _shield = LoadShield(defence, _playerShield, _photonView);
-            _shield.SetupShield(PlayerPos);
+            _shield.SetupShield(PlayerPos, isLower);
             _rotationIndex = 0;
-            var playerArea = isLower
+            // Must detect player are from actual y coordinate!
+            var isYCoordNegative = _transform.position.y < 0;
+            var playerArea = isYCoordNegative
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
             _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main, _photonView)
@@ -209,6 +221,15 @@ namespace Examples2.Scripts.Battle.Players2
         }
 
         #endregion
+
+        private static void RotatePlayer(Transform playerTransform, bool upsideDown)
+        {
+            Debug.Log($"RotatePlayer {playerTransform.name} upsideDown {upsideDown}");
+            var rotation = upsideDown
+                ? Quaternion.Euler(0f, 0f, 180f) // Upside down
+                : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
+            playerTransform.rotation = rotation;
+        }
 
         private class PlayerPlayModeHelper : AbstractPhotonEventHelper
         {

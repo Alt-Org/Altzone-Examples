@@ -33,35 +33,69 @@ namespace Examples2.Scripts.Battle.Room
                 return;
             }
             var playerPos = PhotonBattle.GetPlayerPos(player);
+            var isNormalPos = playerPos <= PhotonBattle.PlayerPosition2;
             var teamNumber = PhotonBattle.GetTeamNumber(playerPos);
             if (teamNumber == PhotonBattle.TeamRedValue)
             {
-                RotateLocalPlayer(_gameCamera, _gameBackground);
+                var isRotated = RotateLocalPlayer(_gameCamera, _gameBackground);
+                if (isRotated)
+                {
+                    isNormalPos = false;
+                }
             }
-            Vector2 pos;
-            switch (playerPos)
-            {
-                case PlayerPosition1:
-                    pos = _playerPosition1;
-                    break;
-                case PlayerPosition2:
-                    pos = _playerPosition2;
-                    break;
-                case PlayerPosition3:
-                    pos = _playerPosition3;
-                    break;
-                case PlayerPosition4:
-                    pos = _playerPosition4;
-                    break;
-                default:
-                    throw new UnityException($"invalid playerPos: {playerPos}");
-            }
+            var pos = GetPlayerPosition(playerPos, isNormalPos);
             var instantiationPosition = new Vector3(pos.x, pos.y);
             Debug.Log($"OnEnable create player {player.GetDebugLabel()} @ {instantiationPosition} from {_playerPrefab.name}");
             PhotonNetwork.Instantiate(_playerPrefab.name, instantiationPosition, Quaternion.identity);
         }
 
-        private static void RotateLocalPlayer(Camera gameCamera, GameObject gameBackground)
+        private Vector2 GetPlayerPosition(int playerPos, bool isNormalPos)
+        {
+            Vector2 pos;
+            if (isNormalPos)
+            {
+                switch (playerPos)
+                {
+                    case PlayerPosition1:
+                        pos = _playerPosition1;
+                        break;
+                    case PlayerPosition2:
+                        pos = _playerPosition2;
+                        break;
+                    case PlayerPosition3:
+                        pos = _playerPosition3;
+                        break;
+                    case PlayerPosition4:
+                        pos = _playerPosition4;
+                        break;
+                    default:
+                        throw new UnityException($"invalid playerPos: {playerPos}");
+                }
+            }
+            else
+            {
+                switch (playerPos)
+                {
+                    case PlayerPosition1:
+                        pos = _playerPosition2;
+                        break;
+                    case PlayerPosition2:
+                        pos = _playerPosition1;
+                        break;
+                    case PlayerPosition3:
+                        pos = _playerPosition4;
+                        break;
+                    case PlayerPosition4:
+                        pos = _playerPosition3;
+                        break;
+                    default:
+                        throw new UnityException($"invalid playerPos: {playerPos}");
+                }
+            }
+            return pos;
+        }
+
+        private static bool RotateLocalPlayer(Camera gameCamera, GameObject gameBackground)
         {
             void RotateGameCamera(bool upsideDown)
             {
@@ -84,7 +118,8 @@ namespace Examples2.Scripts.Battle.Room
             }
 
             var features = RuntimeGameConfig.Get().Features;
-            if (features._isRotateGameCamera && gameCamera != null)
+            var isRotate = features._isRotateGameCamera && gameCamera != null;
+            if (isRotate)
             {
                 // Rotate game camera.
                 RotateGameCamera(true);
@@ -96,6 +131,7 @@ namespace Examples2.Scripts.Battle.Room
                 // Separate sprites for each team gameplay area - these might not be visible in final game
                 // - see Battle.Scripts.Room.RoomSetup.SetupLocalPlayer() how this is done in Altzone project.
             }
+            return isRotate;
         }
     }
 }

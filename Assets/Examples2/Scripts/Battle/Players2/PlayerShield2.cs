@@ -30,14 +30,14 @@ namespace Examples2.Scripts.Battle.Players2
             _stateHelper = new ShieldStateHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, OnSetShieldState);
         }
 
-        void IPlayerShield.SetupShield(int playerPos)
+        void IPlayerShield.SetupShield(int playerPos, bool isLower)
         {
             Debug.Log($"SetupShield playerPos {playerPos}");
             _playMode = -1;
             _rotationIndex = 0;
             _playerPos = playerPos;
             var shields = _config.Shields;
-            var isShieldFlipped = playerPos <= PhotonBattle.PlayerPosition2;
+            var isShieldFlipped = isLower;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];

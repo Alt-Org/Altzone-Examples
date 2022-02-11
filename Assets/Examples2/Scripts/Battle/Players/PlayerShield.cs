@@ -50,7 +50,7 @@ namespace Examples2.Scripts.Battle.Players
             _rightShield.RotationDirection = -1f;
         }
 
-        void IPlayerShield.SetupShield(int playerPos)
+        void IPlayerShield.SetupShield(int playerPos, bool isLower)
         {
             // Set shield side: "head" or "toes" relative to our origo.
             var localPosition = _shieldPivot.localPosition;
