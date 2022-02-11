@@ -61,7 +61,7 @@ namespace Examples2.Scripts.Battle.Players2
             var defence = model.MainDefence == Defence.Retroflection
                 ? model.MainDefence
                 : Defence.Retroflection;
-            _shield = LoadShield(defence, PlayerPos, _playerShield);
+            _shield = LoadShield(defence, PlayerPos, _playerShield, _photonView);
             var playerArea = isLower
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
@@ -96,13 +96,13 @@ namespace Examples2.Scripts.Battle.Players2
             _playerMovement.Update();
         }
 
-        private static IPlayerShield LoadShield(Defence defence, int playerPos, Transform transform)
+        private static IPlayerShield LoadShield(Defence defence, int playerPos, Transform transform, PhotonView photonView)
         {
             var shieldPrefab = Resources.Load<ShieldConfig>($"Shields/HotDogShield");
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
-            var shield = new PlayerShield2(shieldConfig) as IPlayerShield;
+            var shield = new PlayerShield2(shieldConfig, photonView) as IPlayerShield;
             shield.SetupShield(playerPos);
             return shield;
         }

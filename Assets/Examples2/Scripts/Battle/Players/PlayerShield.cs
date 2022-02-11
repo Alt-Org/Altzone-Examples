@@ -86,5 +86,10 @@ namespace Examples2.Scripts.Battle.Players
                     break;
             }
         }
+
+        void IPlayerShield.PlayHitEffects()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

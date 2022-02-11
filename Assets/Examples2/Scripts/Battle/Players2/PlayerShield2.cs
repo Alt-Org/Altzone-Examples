@@ -1,16 +1,24 @@
+using System;
 using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.interfaces;
+using Photon.Pun;
+using Prg.Scripts.Common.Photon;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerShield2 : IPlayerShield
     {
-        private readonly ShieldConfig _config;
+        private const byte MsgSetShield = PhotonEventDispatcher.EventCodeBase + 7;
 
-        public PlayerShield2(ShieldConfig config)
+        private readonly ShieldConfig _config;
+        private readonly ShieldHelper _helper;
+
+        public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {
             _config = config;
+            var playerId = (byte)photonView.OwnerActorNr;
+            _helper = new ShieldHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, SetShieldState);
         }
 
         void IPlayerShield.SetupShield(int playerPos)
@@ -26,6 +34,41 @@ namespace Examples2.Scripts.Battle.Players2
         void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
         {
             Debug.Log($"SetShieldState mode {playMode} rotation {rotationIndex}");
+            _helper.SetShieldState(playMode, rotationIndex);
+        }
+
+        void IPlayerShield.PlayHitEffects()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SetShieldState(int playMode, int rotationIndex)
+        {
+        }
+
+        private class ShieldHelper : AbstractPhotonEventHelper
+        {
+            private readonly Action<int, int> _callback;
+
+            private readonly byte[] _buffer = new byte[1 + 1 + 1];
+
+            public ShieldHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int, int> onSetShieldState)
+                : base(photonEventDispatcher, msgId, playerId)
+            {
+                _callback = onSetShieldState;
+            }
+
+            public void SetShieldState(int playMode, int rotationIndex)
+            {
+                _buffer[1] = (byte)playMode;
+                _buffer[2] = (byte)rotationIndex;
+                RaiseEvent(_buffer);
+            }
+
+            protected override void OnMsgReceived(byte[] payload)
+            {
+                _callback.Invoke(payload[1], payload[2]);
+            }
         }
     }
 }

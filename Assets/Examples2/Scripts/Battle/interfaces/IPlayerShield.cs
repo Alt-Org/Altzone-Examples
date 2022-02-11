@@ -4,5 +4,6 @@ namespace Examples2.Scripts.Battle.interfaces
     {
         void SetupShield(int playerPos);
         void SetShieldState(int playMode, int rotationIndex);
+        void PlayHitEffects();
     }
 }
