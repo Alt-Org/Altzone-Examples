@@ -21,6 +21,7 @@ namespace Examples2.Scripts.Battle.Players2
         private Transform _shield;
         private SpriteRenderer _renderer;
         private Collider2D _collider;
+        private int _playerPos;
 
         public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {
@@ -34,11 +35,13 @@ namespace Examples2.Scripts.Battle.Players2
             Debug.Log($"SetupShield playerPos {playerPos}");
             _playMode = -1;
             _rotationIndex = 0;
+            _playerPos = playerPos;
             var shields = _config.Shields;
             var isShieldFlipped = playerPos <= PhotonBattle.PlayerPosition2;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];
+                shield.name = $"{playerPos}:{shield.name}";
                 var renderer = shield.GetComponent<SpriteRenderer>();
                 renderer.flipY = isShieldFlipped;
                 if (i == _rotationIndex)
@@ -57,7 +60,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
         {
-            Debug.Log($"send SetShieldState mode {playMode} rotation {rotationIndex}");
+            Debug.Log($"send SetShieldState {_playerPos} mode {playMode} rotation {rotationIndex}");
             _stateHelper.SetShieldState(playMode, rotationIndex);
         }
 
@@ -68,11 +71,11 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void SetShieldState(int playMode, int rotationIndex)
         {
-            if (rotationIndex > _config.Shields.Length)
+            if (rotationIndex >= _config.Shields.Length)
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"SetShieldState mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
+            Debug.Log($"SetShieldState {_playerPos} mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
             if (rotationIndex != _rotationIndex)
             {
                 _shield.gameObject.SetActive(false);

@@ -62,7 +62,8 @@ namespace Examples2.Scripts.Battle.Players2
             var defence = model.MainDefence == Defence.Retroflection
                 ? model.MainDefence
                 : Defence.Retroflection;
-            _shield = LoadShield(defence, PlayerPos, _playerShield, _photonView);
+            _shield = LoadShield(defence, _playerShield, _photonView);
+            _shield.SetupShield(PlayerPos);
             _rotationIndex = 0;
             var playerArea = isLower
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
@@ -98,14 +99,13 @@ namespace Examples2.Scripts.Battle.Players2
             _playerMovement.Update();
         }
 
-        private static IPlayerShield LoadShield(Defence defence, int playerPos, Transform transform, PhotonView photonView)
+        private static IPlayerShield LoadShield(Defence defence, Transform transform, PhotonView photonView)
         {
             var shieldPrefab = Resources.Load<ShieldConfig>($"Shields/HotDogShield");
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
             var shield = new PlayerShield2(shieldConfig, photonView) as IPlayerShield;
-            shield.SetupShield(playerPos);
             return shield;
         }
 
@@ -183,7 +183,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void SetPlayerPlayMode(int playMode)
         {
-            Debug.Log($"SetPlayerPlayMode {playMode}");
+            Debug.Log($"SetPlayerPlayMode {name} {playMode}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;
