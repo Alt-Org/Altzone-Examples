@@ -51,9 +51,9 @@ namespace Examples2.Scripts.Battle.Players
             _hasPlayerShield = _playerShield != null;
             if (_hasPlayerShield)
             {
-                _playerShield.SetShieldMode(PlayModeGhosted);
-                _playerShield.SetShieldSide(_state._teamNumber);
-                _playerShield.SetShieldRotation(0);
+                var shield = (IPlayerShield)_playerShield;
+                shield.SetupShield(_state._teamNumber);
+                shield.SetShieldState(PlayModeGhosted, 0);
             }
         }
 
@@ -159,7 +159,7 @@ namespace Examples2.Scripts.Battle.Players
             _state._currentMode = playMode;
             if (_hasPlayerShield)
             {
-                _playerShield.SetShieldMode(playMode);
+                ((IPlayerShield)_playerShield).SetShieldState(playMode, 0);
             }
             switch (playMode)
             {

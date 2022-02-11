@@ -1,5 +1,6 @@
 using System;
 using Altzone.Scripts.Battle;
+using Examples2.Scripts.Battle.interfaces;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Players
@@ -37,7 +38,7 @@ namespace Examples2.Scripts.Battle.Players
     /// <summary>
     /// Manages player shield visible attributes.
     /// </summary>
-    public class PlayerShield : MonoBehaviour
+    public class PlayerShield : MonoBehaviour, IPlayerShield
     {
         [Header("Settings"), SerializeField] private Transform _shieldPivot;
         [SerializeField] private Shield _leftShield;
@@ -49,7 +50,7 @@ namespace Examples2.Scripts.Battle.Players
             _rightShield.RotationDirection = -1f;
         }
 
-        public void SetShieldSide(int teamNumber)
+        void IPlayerShield.SetupShield(int teamNumber)
         {
             // Set shield side: "head" or "toes" relative to our origo.
             var localPosition = _shieldPivot.localPosition;
@@ -58,7 +59,7 @@ namespace Examples2.Scripts.Battle.Players
             _shieldPivot.localPosition = localPosition;
         }
 
-        public void SetShieldMode(int playMode)
+        void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
         {
             switch (playMode)
             {
@@ -72,12 +73,18 @@ namespace Examples2.Scripts.Battle.Players
                     _rightShield.Set(Color.grey, false);
                     break;
             }
-        }
-
-        public void SetShieldRotation(float degrees)
-        {
-            _leftShield.Rotate(degrees);
-            _rightShield.Rotate(degrees);
+            // Current implementation does not "rotate" shields - so this is not implemented!
+            switch (rotationIndex)
+            {
+                case 0:
+                    _leftShield.Rotate(rotationIndex);
+                    _rightShield.Rotate(rotationIndex);
+                    break;
+                default:
+                    _leftShield.Rotate(0);
+                    _rightShield.Rotate(0);
+                    break;
+            }
         }
     }
 }
