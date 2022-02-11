@@ -29,6 +29,8 @@ namespace Examples2.Scripts.Battle.Players2
         private Vector2 _inputClick;
         private Vector3 _inputPosition;
 
+        public string StateString => $"{(_isMoving ? "Move" : "Idle")}";
+
         public PlayerMovement2(Transform transform, UnityEngine.InputSystem.PlayerInput playerInput, Camera camera, PhotonView photonView)
         {
             _transform = transform;

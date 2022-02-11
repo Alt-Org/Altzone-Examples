@@ -471,8 +471,9 @@ MonoBehaviour:
     width: 9
     height: 8
   _playerShield: {fileID: 0}
-  _playerInfo: {fileID: 8867706765776995095}
   _rotationIndex: 0
+  _playerInfo: {fileID: 8867706765776995095}
+  _isShowDebugCanvas: 1
 --- !u!1 &9101303184460959390
 GameObject:
   m_ObjectHideFlags: 0

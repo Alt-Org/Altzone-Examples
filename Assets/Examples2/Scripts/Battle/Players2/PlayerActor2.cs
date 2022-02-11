@@ -17,6 +17,8 @@ namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
+        private static string[] StateNames = new[] { "Norm", "Frozen", "Ghost" };
+
         private const byte MsgVisualState = PhotonEventDispatcher.EventCodeBase + 6;
 
         [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
@@ -30,9 +32,10 @@ namespace Examples2.Scripts.Battle.Players2
         [SerializeField] private Rect _lowerPlayArea;
 
         [Header("Live Data"), SerializeField] private Transform _playerShield;
+        [SerializeField] private int _rotationIndex;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
-        [SerializeField] private int _rotationIndex;
+        [SerializeField] private bool _isShowDebugCanvas;
 
         private PhotonView _photonView;
         private Transform _transform;
@@ -41,6 +44,8 @@ namespace Examples2.Scripts.Battle.Players2
         private IPlayerShield _shield;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
+
+        public string StateString => $"{StateNames[_state._currentMode]} {_playerMovement.StateString} {((PlayerShield2)_shield).StateString}";
 
         private void Awake()
         {
@@ -51,8 +56,10 @@ namespace Examples2.Scripts.Battle.Players2
             var prefix = $"{(player.IsLocal ? "L" : "R")}{PlayerPos}:{TeamNumber}";
             name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
-            _playerInfo.text = PlayerPos.ToString("N0");
-
+            if (_playerInfo != null)
+            {
+                _playerInfo.text = PlayerPos.ToString("N0");
+            }
             // Must detect player position from actual y coordinate!
             var isYCoordNegative = _transform.position.y < 0;
             var isLower = isYCoordNegative;
@@ -102,6 +109,12 @@ namespace Examples2.Scripts.Battle.Players2
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
             ((IPlayerActor)this).SetNormalMode();
+            if (_isShowDebugCanvas && _photonView.IsMine)
+            {
+                var debugInfoPrefab = Resources.Load<PlayerDebugInfo>($"PlayerDebugInfo");
+                var debugInfo = Instantiate(debugInfoPrefab, _transform);
+                debugInfo.PlayerActor = this;
+            }
         }
 
         private void OnDestroy()

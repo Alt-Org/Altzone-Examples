@@ -23,6 +23,8 @@ namespace Examples2.Scripts.Battle.Players2
         private Collider2D _collider;
         private int _playerPos;
 
+        public string StateString => $"R.{_rotationIndex}";
+
         public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {
             _config = config;
