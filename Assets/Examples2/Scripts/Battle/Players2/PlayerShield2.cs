@@ -1,5 +1,4 @@
 using System;
-using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
@@ -23,7 +22,7 @@ namespace Examples2.Scripts.Battle.Players2
         private Collider2D _collider;
         private int _playerPos;
 
-        public string StateString => $"R.{_rotationIndex}";
+        public string StateString => $"R{_rotationIndex} {(_collider.enabled ? "col" : "~~~")}";
 
         public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {

@@ -22,6 +22,22 @@ namespace Examples2.Scripts.Battle.Players2
         public float UnReachableDistance { get; set; } = 100;
         public float Speed { get; set; } = 1;
 
+        private bool _stopped;
+
+        public bool Stopped
+        {
+            get => _stopped;
+
+            set
+            {
+                _stopped = value;
+                if (_isMoving)
+                {
+                    _helper.SendMsgMoveTo(_transform.position, Speed);
+                }
+            }
+        }
+
         private bool _isMoving;
         private Vector3 _targetPosition;
         private Vector3 _tempPosition;
@@ -29,7 +45,7 @@ namespace Examples2.Scripts.Battle.Players2
         private Vector2 _inputClick;
         private Vector3 _inputPosition;
 
-        public string StateString => $"{(_isMoving ? "Move" : "Idle")}";
+        public string StateString => $"{(_stopped ? "Stop" : _isMoving ? "Move" : "Idle")} {Speed:0.0}";
 
         public PlayerMovement2(Transform transform, UnityEngine.InputSystem.PlayerInput playerInput, Camera camera, PhotonView photonView)
         {
@@ -39,7 +55,7 @@ namespace Examples2.Scripts.Battle.Players2
             // In practice this might happen on runtime when players join and leves more than 256 times in a room.
             Assert.IsTrue(photonView.OwnerActorNr <= byte.MaxValue, "photonView.OwnerActorNr <= byte.MaxValue");
             var playerId = (byte)photonView.OwnerActorNr;
-            _helper = new MovementHelper(PhotonEventDispatcher.Get(), MsgMoveTo, playerId, SetMoveTo);
+            _helper = new MovementHelper(PhotonEventDispatcher.Get(), MsgMoveTo, playerId, OnSetMoveTo);
             _isLocal = photonView.IsMine;
             if (_isLocal)
             {
@@ -64,9 +80,9 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        private void SetMoveTo(Vector3 position, float speed)
+        private void OnSetMoveTo(Vector3 position, float speed)
         {
-            _isMoving = true;
+            _isMoving = speed > 0;
             _targetPosition = position;
             Speed = speed;
         }
@@ -104,6 +120,10 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void DoMove(InputAction.CallbackContext ctx)
         {
+            if (Stopped)
+            {
+                return;
+            }
             _inputClick = ctx.ReadValue<Vector2>() * UnReachableDistance;
             _isMoving = true;
             _inputPosition = _transform.position;
@@ -121,6 +141,10 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void DoClick(InputAction.CallbackContext ctx)
         {
+            if (Stopped)
+            {
+                return;
+            }
             _inputClick = ctx.ReadValue<Vector2>();
 #if UNITY_STANDALONE
             if (_isLimitMouseXY)

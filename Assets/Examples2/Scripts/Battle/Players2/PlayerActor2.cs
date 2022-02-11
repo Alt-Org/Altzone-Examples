@@ -17,7 +17,7 @@ namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        private static string[] StateNames = new[] { "Norm", "Frozen", "Ghost" };
+        private static readonly string[] StateNames = new[] { "Norm", "Frozen", "Ghost" };
 
         private const byte MsgVisualState = PhotonEventDispatcher.EventCodeBase + 6;
 
@@ -224,14 +224,17 @@ namespace Examples2.Scripts.Battle.Players2
             {
                 case PlayModeNormal:
                     _collider.enabled = true;
+                    _playerMovement.Stopped = false;
                     _stateSprite.color = Color.blue;
                     break;
                 case PlayModeFrozen:
                     _collider.enabled = true;
+                    _playerMovement.Stopped = true;
                     _stateSprite.color = Color.magenta;
                     break;
                 case PlayModeGhosted:
                     _collider.enabled = false;
+                    _playerMovement.Stopped = false;
                     _stateSprite.color = Color.grey;
                     break;
             }
