@@ -52,7 +52,7 @@ namespace Examples2.Scripts.Battle.Players
             if (_hasPlayerShield)
             {
                 var shield = (IPlayerShield)_playerShield;
-                shield.SetupShield(_state._teamNumber);
+                shield.SetupShield(PlayerPos);
                 shield.SetShieldState(PlayModeGhosted, 0);
             }
         }

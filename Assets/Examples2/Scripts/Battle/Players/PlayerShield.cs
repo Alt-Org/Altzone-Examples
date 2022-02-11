@@ -50,11 +50,11 @@ namespace Examples2.Scripts.Battle.Players
             _rightShield.RotationDirection = -1f;
         }
 
-        void IPlayerShield.SetupShield(int teamNumber)
+        void IPlayerShield.SetupShield(int playerPos)
         {
             // Set shield side: "head" or "toes" relative to our origo.
             var localPosition = _shieldPivot.localPosition;
-            var side = teamNumber == PhotonBattle.TeamBlueValue ? 1f : -1f;
+            var side = PhotonBattle.GetTeamNumber(playerPos) == PhotonBattle.TeamBlueValue ? 1f : -1f;
             localPosition.y = side * localPosition.y;
             _shieldPivot.localPosition = localPosition;
         }
