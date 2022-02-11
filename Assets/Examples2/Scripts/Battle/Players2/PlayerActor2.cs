@@ -32,6 +32,7 @@ namespace Examples2.Scripts.Battle.Players2
         private Transform _transform;
         private PlayerMovement2 _playerMovement;
         private PlayerPlayModeHelper _helper;
+        private IPlayerShield _shield;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
@@ -60,7 +61,7 @@ namespace Examples2.Scripts.Battle.Players2
             var defence = model.MainDefence == Defence.Retroflection
                 ? model.MainDefence
                 : Defence.Retroflection;
-            LoadShield(defence, PlayerPos, _playerShield);
+            _shield = LoadShield(defence, PlayerPos, _playerShield);
             var playerArea = isLower
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
@@ -95,18 +96,15 @@ namespace Examples2.Scripts.Battle.Players2
             _playerMovement.Update();
         }
 
-        private static void LoadShield(Defence defence, int playerPos, Transform transform)
+        private static IPlayerShield LoadShield(Defence defence, int playerPos, Transform transform)
         {
-            var shieldPrefab = Resources.Load<GameObject>($"Shields/{defence}");
+            var shieldPrefab = Resources.Load<ShieldConfig>($"Shields/HotDogShield");
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
-            // Currently shield has no functionality!
-            var instance = Instantiate(shieldPrefab, transform);
-            instance.name = instance.name.Replace("Clone", "Shield");
-            if (playerPos > PhotonBattle.PlayerPosition2)
-            {
-                var renderer = instance.GetComponent<SpriteRenderer>();
-                renderer.flipY = false;
-            }
+            var shieldConfig = Instantiate(shieldPrefab, transform);
+            shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
+            var shield = new PlayerShield2(shieldConfig) as IPlayerShield;
+            shield.SetupShield(playerPos);
+            return shield;
         }
 
         #region External events
@@ -197,6 +195,7 @@ namespace Examples2.Scripts.Battle.Players2
                     _stateSprite.color = Color.grey;
                     return;
             }
+            _shield.SetShieldState(playMode, 0);
         }
 
         #endregion
