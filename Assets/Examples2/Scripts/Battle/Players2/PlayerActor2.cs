@@ -26,6 +26,9 @@ namespace Examples2.Scripts.Battle.Players2
         [SerializeField] private Transform _playerShieldFoot;
         [SerializeField] private UnityEngine.InputSystem.PlayerInput _playerInput;
 
+        [Header("Play Area"), SerializeField] private Rect _upperPlayArea;
+        [SerializeField] private Rect _lowerPlayArea;
+
         [Header("Live Data"), SerializeField] private Transform _playerShield;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
@@ -82,9 +85,7 @@ namespace Examples2.Scripts.Battle.Players2
             _shield = LoadShield(defence, _playerShield, _photonView);
             _shield.SetupShield(PlayerPos, isLower);
             _rotationIndex = 0;
-            var playerArea = isYCoordNegative
-                ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
-                : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
+            var playerArea = isYCoordNegative ? _lowerPlayArea : _upperPlayArea;
             _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main, _photonView)
             {
                 PlayerArea = playerArea,
@@ -93,7 +94,7 @@ namespace Examples2.Scripts.Battle.Players2
             };
             var playerId = (byte)_photonView.OwnerActorNr;
             _helper = new PlayerPlayModeHelper(PhotonEventDispatcher.Get(), MsgVisualState, playerId, SetPlayerPlayMode);
-            Debug.Log($"Awake Done {name}");
+            Debug.Log($"Awake Done {name} playerArea {playerArea}");
         }
 
         private void OnEnable()
@@ -118,7 +119,9 @@ namespace Examples2.Scripts.Battle.Players2
 
         private static IPlayerShield LoadShield(Defence defence, Transform transform, PhotonView photonView)
         {
-            var shieldPrefab = Resources.Load<ShieldConfig>($"Shields/HotDogShield");
+            var shieldPrefab = defence == Defence.Retroflection
+                ? Resources.Load<ShieldConfig>($"Shields/HotDogShield")
+                : Resources.Load<ShieldConfig>($"Shields/{defence}");
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
@@ -257,7 +260,7 @@ namespace Examples2.Scripts.Battle.Players2
 
             protected override void OnMsgReceived(byte[] payload)
             {
-                _onSetPlayerPlayMode((int)payload[1]);
+                _onSetPlayerPlayMode(payload[1]);
             }
         }
     }
