@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6124741033950776897}
   - component: {fileID: 136736778646372619}
   - component: {fileID: 2431870471260669052}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Retroflection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -142,7 +142,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1443933069272772321}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticlePivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 841068753417661855}
   - component: {fileID: 3525242855681178230}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,6 +302,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: HotdogParticle
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7583724057901581024, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}

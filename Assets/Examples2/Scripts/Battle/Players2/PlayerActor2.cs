@@ -27,6 +27,7 @@ namespace Examples2.Scripts.Battle.Players2
         [Header("Live Data"), SerializeField] private Transform _playerShield;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
+        [SerializeField] private int _rotationIndex;
 
         private PhotonView _photonView;
         private Transform _transform;
@@ -62,6 +63,7 @@ namespace Examples2.Scripts.Battle.Players2
                 ? model.MainDefence
                 : Defence.Retroflection;
             _shield = LoadShield(defence, PlayerPos, _playerShield, _photonView);
+            _rotationIndex = 0;
             var playerArea = isLower
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);
@@ -149,6 +151,8 @@ namespace Examples2.Scripts.Battle.Players2
         void IPlayerActor.ShieldCollision()
         {
             // NOP - until game features are implemented
+            _rotationIndex += 1;
+            _shield.SetShieldState(_state._currentMode, _rotationIndex);
         }
 
         void IPlayerActor.SetNormalMode()
@@ -177,6 +181,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void SetPlayerPlayMode(int playMode)
         {
+            Debug.Log($"SetPlayerPlayMode {playMode}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;
@@ -185,17 +190,17 @@ namespace Examples2.Scripts.Battle.Players2
                 case PlayModeNormal:
                     _collider.enabled = true;
                     _stateSprite.color = Color.blue;
-                    return;
+                    break;
                 case PlayModeFrozen:
                     _collider.enabled = true;
                     _stateSprite.color = Color.magenta;
-                    return;
+                    break;
                 case PlayModeGhosted:
                     _collider.enabled = false;
                     _stateSprite.color = Color.grey;
-                    return;
+                    break;
             }
-            _shield.SetShieldState(playMode, 0);
+            _shield.SetShieldState(playMode, _rotationIndex);
         }
 
         #endregion

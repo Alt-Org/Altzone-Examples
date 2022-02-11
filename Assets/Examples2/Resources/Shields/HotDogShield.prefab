@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2853714572701265601}
   - component: {fileID: 1516356551717532528}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4438498984064948392}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticlePivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 2636495971803568889}
   - component: {fileID: 4789468638376436960}
   - component: {fileID: 1390436550151877326}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Shield-1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -301,7 +301,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5545943212652545152}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticlePivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,7 +333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5607094345013886291}
   - component: {fileID: 7518773152296352678}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -460,7 +460,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6004097772808456190}
   - component: {fileID: 7499312778399289367}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -586,7 +586,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7890324507923469089}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticlePivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -617,7 +617,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6534007897622340967}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticlePivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -649,7 +649,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6452626085232391600}
   - component: {fileID: 2104078062014520395}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Shield-4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -733,7 +733,7 @@ GameObject:
   - component: {fileID: 4574739742237501865}
   - component: {fileID: 2080475418694482839}
   - component: {fileID: 4373893362728559159}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Shield-3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -864,7 +864,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2198869838996894109}
   - component: {fileID: 6068627035999382388}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -994,7 +994,7 @@ GameObject:
   - component: {fileID: 8938811677081840925}
   - component: {fileID: 1979532152912217439}
   - component: {fileID: 3477763916497702800}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Shield-2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1125,7 +1125,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8515706434229322689}
   - component: {fileID: 9005189776440697788}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HotDogShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1182,7 +1182,7 @@ GameObject:
   - component: {fileID: 865173861609546784}
   - component: {fileID: 6420741010022165354}
   - component: {fileID: 8737398622659063325}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Shield-0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1313,6 +1313,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: HotdogParticle
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7583724057901581024, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}
@@ -1445,6 +1450,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HotdogParticle
       objectReference: {fileID: 0}
+    - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7583724057901581024, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}
       propertyPath: lengthInSec
@@ -1576,6 +1586,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HotdogParticle
       objectReference: {fileID: 0}
+    - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7583724057901581024, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}
       propertyPath: lengthInSec
@@ -1706,6 +1721,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: HotdogParticle
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7583724057901581024, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}
