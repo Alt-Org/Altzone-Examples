@@ -1,4 +1,3 @@
-using System;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
@@ -6,17 +5,23 @@ using UnityEngine;
 namespace Examples2.Scripts.Battle.Room
 {
     /// <summary>
-    /// Helper class to manage countdown counter.
+    /// Helper class to manage countdown counter using <c>Text Mesh Pro</c>.
     /// </summary>
     internal class CountdownListener : MonoBehaviour
     {
-        [Header("Settings"), SerializeField] private TextMeshPro _countdownText;
+        [Header("Settings"), SerializeField] private TMP_Text _countdownTextCanvas;
 
+        [SerializeField] private TextMeshPro _countdownText;
+
+        private bool _isCanvas;
         private GameObject _countdown;
 
         private void Awake()
         {
-            _countdown = _countdownText.gameObject;
+            _isCanvas = _countdownTextCanvas != null;
+            _countdown = _isCanvas
+                ? _countdownTextCanvas.GetComponentInParent<Canvas>().gameObject
+                : _countdownText.gameObject;
             HideCountdown();
             this.Subscribe<PlayerManager.CountdownEvent>(OnCountdownEvent);
         }
@@ -44,14 +49,20 @@ namespace Examples2.Scripts.Battle.Room
 
         private void StartCountdown(int value)
         {
-            // If you got exception saying GameObject has been destroyed, restart UNITY to fix it
             _countdown.SetActive(true);
             SetCountdownValue(value);
         }
 
         private void SetCountdownValue(int value)
         {
-            _countdownText.text = value.ToString("N0");
+            if (_isCanvas)
+            {
+                _countdownTextCanvas.text = value.ToString("N0");
+            }
+            else
+            {
+                _countdownText.text = value.ToString("N0");
+            }
         }
 
         private void HideCountdown()
