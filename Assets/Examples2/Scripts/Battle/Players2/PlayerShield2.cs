@@ -12,13 +12,13 @@ namespace Examples2.Scripts.Battle.Players2
         private const byte MsgSetShield = PhotonEventDispatcher.EventCodeBase + 7;
 
         private readonly ShieldConfig _config;
-        private readonly ShieldHelper _helper;
+        private readonly ShieldStateHelper _stateHelper;
 
         public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {
             _config = config;
             var playerId = (byte)photonView.OwnerActorNr;
-            _helper = new ShieldHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, SetShieldState);
+            _stateHelper = new ShieldStateHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, SetShieldState);
         }
 
         void IPlayerShield.SetupShield(int playerPos)
@@ -34,7 +34,7 @@ namespace Examples2.Scripts.Battle.Players2
         void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
         {
             Debug.Log($"SetShieldState mode {playMode} rotation {rotationIndex}");
-            _helper.SetShieldState(playMode, rotationIndex);
+            _stateHelper.SetShieldState(playMode, rotationIndex);
         }
 
         void IPlayerShield.PlayHitEffects()
@@ -46,13 +46,13 @@ namespace Examples2.Scripts.Battle.Players2
         {
         }
 
-        private class ShieldHelper : AbstractPhotonEventHelper
+        private class ShieldStateHelper : AbstractPhotonEventHelper
         {
             private readonly Action<int, int> _callback;
 
             private readonly byte[] _buffer = new byte[1 + 1 + 1];
 
-            public ShieldHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int, int> onSetShieldState)
+            public ShieldStateHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int, int> onSetShieldState)
                 : base(photonEventDispatcher, msgId, playerId)
             {
                 _callback = onSetShieldState;
