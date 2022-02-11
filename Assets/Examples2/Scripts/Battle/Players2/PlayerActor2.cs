@@ -150,9 +150,11 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerActor.ShieldCollision()
         {
-            // NOP - until game features are implemented
-            _rotationIndex += 1;
-            _shield.SetShieldState(_state._currentMode, _rotationIndex);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _rotationIndex += 1;
+                _shield.SetShieldState(_state._currentMode, _rotationIndex);
+            }
         }
 
         void IPlayerActor.SetNormalMode()
