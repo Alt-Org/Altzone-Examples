@@ -1,8 +1,5 @@
-using System.Linq;
-using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
@@ -20,9 +17,7 @@ namespace Examples2.Scripts.Battle.Players
         [SerializeField] private Collider2D _collider;
         [SerializeField] private PlayerShield _playerShield;
 
-        [Header("Live Data"), SerializeField] private bool _isReParentOnDestroy;
-        [SerializeField] private Transform _alternateParent;
-        [SerializeField] private bool _hasPlayerShield;
+        [Header("Live Data"), SerializeField] private bool _hasPlayerShield;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
 
@@ -43,11 +38,6 @@ namespace Examples2.Scripts.Battle.Players
             {
                 _highlightSprite.color = Color.yellow;
             }
-            _isReParentOnDestroy = _uiContentRoot != null;
-            if (_isReParentOnDestroy)
-            {
-                _alternateParent = PlayerInstantiate.DetachedPlayerTransform;
-            }
             _hasPlayerShield = _playerShield != null;
             if (_hasPlayerShield)
             {
@@ -67,20 +57,8 @@ namespace Examples2.Scripts.Battle.Players
 
         private void OnDestroy()
         {
-            Debug.Log($"OnDestroy {name} re-parent {_isReParentOnDestroy}");
+            Debug.Log($"OnDestroy {name}");
             this.Unsubscribe();
-            if (_photonView.IsMine)
-            {
-                return;
-            }
-            if (_isReParentOnDestroy)
-            {
-                // We must disable ourself because at least Ball assumes that we are alive and all components are present.
-                _collider.enabled = false;
-                _highlightSprite.enabled = false;
-                _stateSprite.color = Color.grey;
-                _uiContentRoot.transform.parent = _alternateParent;
-            }
         }
 
         #region External events

@@ -109,8 +109,7 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
-            var player = PhotonNetwork.LocalPlayer;
-            Debug.Log($"Start game for {player.GetDebugLabel()}");
+            Debug.Log($"Start game for {targetPlayer.GetDebugLabel()}");
             ContinueToNextStage();
         }
     }
