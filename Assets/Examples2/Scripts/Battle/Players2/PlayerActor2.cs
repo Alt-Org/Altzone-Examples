@@ -5,6 +5,7 @@ using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
+using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
@@ -48,17 +49,23 @@ namespace Examples2.Scripts.Battle.Players2
             name = $"@{prefix}>{player.NickName}";
             _playerInfo = GetComponentInChildren<TextMeshPro>();
             _playerInfo.text = PlayerPos.ToString("N0");
-            var isLower = PlayerPos <= PhotonBattle.PlayerPosition2;
-            if (!isLower)
+
+            // Must detect player position from actual y coordinate!
+            var isYCoordNegative = _transform.position.y < 0;
+            var isLower = isYCoordNegative;
+            var features = RuntimeGameConfig.Get().Features;
+            if (features._isRotateGameCamera)
             {
-                var features = RuntimeGameConfig.Get().Features;
-                if (features._isRotateGameCamera)
+                var gameCameraInstance = FindObjectOfType<GameCamera>();
+                Assert.IsNotNull(gameCameraInstance, "gameCameraInstance != null");
+                if (gameCameraInstance.IsRotated)
                 {
-                    isLower = true;
+                    isLower = !isLower;
                     RotatePlayer(_transform, true);
                 }
             }
-            Debug.Log($"Awake {name} isLower {isLower}");
+            Debug.Log($"Awake {name} pos {_transform.position} isLower {isLower}");
+
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
             if (_photonView.IsMine)
             {
@@ -75,8 +82,6 @@ namespace Examples2.Scripts.Battle.Players2
             _shield = LoadShield(defence, _playerShield, _photonView);
             _shield.SetupShield(PlayerPos, isLower);
             _rotationIndex = 0;
-            // Must detect player are from actual y coordinate!
-            var isYCoordNegative = _transform.position.y < 0;
             var playerArea = isYCoordNegative
                 ? Rect.MinMaxRect(-4.5f, -8f, 4.5f, 0f)
                 : Rect.MinMaxRect(-4.5f, 0f, 4.5f, 8f);

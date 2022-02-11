@@ -21,8 +21,7 @@ namespace Examples2.Scripts.Battle.Room
         [SerializeField] private Vector2 _playerPosition3;
         [SerializeField] private Vector2 _playerPosition4;
 
-        [Header("Level Settings"), SerializeField] private Camera _gameCamera;
-        [SerializeField] private GameObject _gameBackground;
+        [Header("Level Settings"), SerializeField] private GameObject _gameBackground;
 
         private void OnEnable()
         {
@@ -37,7 +36,9 @@ namespace Examples2.Scripts.Battle.Room
             var teamNumber = PhotonBattle.GetTeamNumber(playerPos);
             if (teamNumber == PhotonBattle.TeamRedValue)
             {
-                var isRotated = RotateLocalPlayer(_gameCamera, _gameBackground);
+                var gameCameraInstance = FindObjectOfType<GameCamera>();
+                var gameCamera = gameCameraInstance != null ? gameCameraInstance.Camera : null;
+                var isRotated = RotateLocalPlayer(gameCamera, _gameBackground);
                 if (isRotated)
                 {
                     isNormalPos = false;

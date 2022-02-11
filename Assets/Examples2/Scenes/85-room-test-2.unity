@@ -3096,7 +3096,6 @@ MonoBehaviour:
   _playerPosition2: {x: 2.5, y: -4.25}
   _playerPosition3: {x: 2.5, y: 4.25}
   _playerPosition4: {x: -2.5, y: 4.25}
-  _gameCamera: {fileID: 6780388524306496468}
   _gameBackground: {fileID: 801765301}
 --- !u!4 &577912818
 Transform:
@@ -10327,6 +10326,7 @@ GameObject:
   - component: {fileID: 6780388524306496468}
   - component: {fileID: 6780388524306496469}
   - component: {fileID: 7483627637607579613}
+  - component: {fileID: 6780388524306496471}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -10334,6 +10334,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6780388524306496471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6780388524306496470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39f56b05824f48e68a8093f38eb19c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameCamera: {fileID: 6780388524306496468}
 --- !u!114 &7483627637607579613
 MonoBehaviour:
   m_ObjectHideFlags: 0
