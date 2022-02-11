@@ -1,6 +1,7 @@
 using System;
 using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.interfaces;
+using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using UnityEngine;
@@ -14,6 +15,13 @@ namespace Examples2.Scripts.Battle.Players2
         private readonly ShieldConfig _config;
         private readonly ShieldStateHelper _stateHelper;
 
+        private int _playMode;
+        private int _rotationIndex;
+
+        private Transform _shield;
+        private SpriteRenderer _renderer;
+        private Collider2D _collider;
+
         public PlayerShield2(ShieldConfig config, PhotonView photonView)
         {
             _config = config;
@@ -23,17 +31,32 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield.SetupShield(int playerPos)
         {
-            if (playerPos > PhotonBattle.PlayerPosition2)
+            _playMode = -1;
+            _rotationIndex = 0;
+            var shields = _config.Shields;
+            var isShieldFlipped = playerPos <= PhotonBattle.PlayerPosition2;
+            for (var i = 0; i < shields.Length; ++i)
             {
-                var shield = _config.Shields[0];
+                var shield = shields[i];
                 var renderer = shield.GetComponent<SpriteRenderer>();
-                renderer.flipY = false;
+                renderer.flipY = isShieldFlipped;
+                if (i == _rotationIndex)
+                {
+                    _shield = shield;
+                    _shield.gameObject.SetActive(true);
+                    _renderer = renderer;
+                    _collider = shield.GetComponent<Collider2D>();
+                }
+                else
+                {
+                    shield.gameObject.SetActive(false);
+                }
             }
         }
 
         void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
         {
-            Debug.Log($"SetShieldState mode {playMode} rotation {rotationIndex}");
+            Debug.Log($"send SetShieldState mode {playMode} rotation {rotationIndex}");
             _stateHelper.SetShieldState(playMode, rotationIndex);
         }
 
@@ -44,6 +67,26 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void SetShieldState(int playMode, int rotationIndex)
         {
+            Debug.Log($"SetShieldState mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
+            if (rotationIndex != _rotationIndex)
+            {
+                _shield.gameObject.SetActive(false);
+                _rotationIndex = rotationIndex;
+                _shield = _config.Shields[_rotationIndex];
+                _shield.gameObject.SetActive(true);
+                _renderer = _shield.GetComponent<SpriteRenderer>();
+                _collider = _shield.GetComponent<Collider2D>();
+            }
+            switch (playMode)
+            {
+                case PlayerActor.PlayModeNormal:
+                case PlayerActor.PlayModeFrozen:
+                    _collider.enabled = true;
+                    break;
+                default:
+                    _collider.enabled = false;
+                    break;
+            }
         }
 
         private class ShieldStateHelper : AbstractPhotonEventHelper
