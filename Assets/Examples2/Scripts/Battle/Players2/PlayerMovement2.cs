@@ -146,13 +146,14 @@ namespace Examples2.Scripts.Battle.Players2
         {
             private readonly Action<Vector3, float> _callback;
 
-            private Vector3 _targetPosition;
             private readonly byte[] _buffer = new byte[1 + 4 + 4 + 4];
+            private Vector3 _targetPosition;
 
             public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
                 : base(photonEventDispatcher, msgId, playerId)
             {
                 _callback = onMsgMoveToCallback;
+                _buffer[0] = playerId;
                 _targetPosition.z = 0;
             }
 

@@ -34,7 +34,7 @@ namespace Examples2.Scripts.Battle.Players2
         protected void RaiseEvent(byte[] payload)
         {
             Assert.IsTrue(payload.Length >= 1, "payload.Length >= 1");
-            payload[0] = _playerId;
+            Assert.IsTrue(payload[0] == _playerId, "payload[0] == _playerId");
             _photonEventDispatcher.RaiseEvent(_msgId, payload);
         }
 

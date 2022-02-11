@@ -27,7 +27,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             _config = config;
             var playerId = (byte)photonView.OwnerActorNr;
-            _stateHelper = new ShieldStateHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, SetShieldState);
+            _stateHelper = new ShieldStateHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, OnSetShieldState);
         }
 
         void IPlayerShield.SetupShield(int playerPos)
@@ -69,13 +69,13 @@ namespace Examples2.Scripts.Battle.Players2
             throw new NotImplementedException();
         }
 
-        private void SetShieldState(int playMode, int rotationIndex)
+        private void OnSetShieldState(int playMode, int rotationIndex)
         {
             if (rotationIndex >= _config.Shields.Length)
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"SetShieldState {_playerPos} mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
+            Debug.Log($"OnSetShieldState {_playerPos} mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
             if (rotationIndex != _rotationIndex)
             {
                 _shield.gameObject.SetActive(false);
@@ -113,6 +113,7 @@ namespace Examples2.Scripts.Battle.Players2
                 : base(photonEventDispatcher, msgId, playerId)
             {
                 _callback = onSetShieldState;
+                _buffer[0] = playerId;
             }
 
             public void SetShieldState(int playMode, int rotationIndex)

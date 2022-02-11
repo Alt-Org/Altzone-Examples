@@ -202,7 +202,10 @@ namespace Examples2.Scripts.Battle.Players2
                     _stateSprite.color = Color.grey;
                     break;
             }
-            _shield.SetShieldState(playMode, _rotationIndex);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _shield.SetShieldState(playMode, _rotationIndex);
+            }
         }
 
         #endregion
@@ -217,6 +220,7 @@ namespace Examples2.Scripts.Battle.Players2
                 : base(photonEventDispatcher, msgId, playerId)
             {
                 _onSetPlayerPlayMode = onSetPlayerPlayMode;
+                _buffer[0] = playerId;
             }
 
             public void SendSetPlayerPlayMode(int playMode)
