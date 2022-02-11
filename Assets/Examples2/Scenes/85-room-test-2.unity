@@ -2962,6 +2962,8 @@ MonoBehaviour:
   _playerPosition2: {x: 2.5, y: -4.25}
   _playerPosition3: {x: 2.5, y: 4.25}
   _playerPosition4: {x: -2.5, y: 4.25}
+  _gameCamera: {fileID: 6780388524306496468}
+  _gameBackground: {fileID: 801765301}
 --- !u!4 &577912818
 Transform:
   m_ObjectHideFlags: 0
