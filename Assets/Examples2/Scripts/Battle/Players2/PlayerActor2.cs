@@ -96,7 +96,7 @@ namespace Examples2.Scripts.Battle.Players2
                 Speed = 10f,
             };
             var playerId = (byte)_photonView.OwnerActorNr;
-            _helper = new PlayerPlayModeHelper(PhotonEventDispatcher.Get(), MsgVisualState, playerId, SetPlayerPlayMode);
+            _helper = new PlayerPlayModeHelper(PhotonEventDispatcher.Get(), MsgVisualState, playerId, OnSetPlayerPlayMode);
             Debug.Log($"Awake Done {name} playerArea {playerArea}");
         }
 
@@ -201,7 +201,7 @@ namespace Examples2.Scripts.Battle.Players2
             if (PhotonNetwork.IsMasterClient)
             {
                 _rotationIndex += 1;
-                _shield.SetShieldState(_state._currentMode, _rotationIndex);
+                _shield.SetShieldRotation(_rotationIndex);
             }
         }
 
@@ -229,7 +229,7 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        private void SetPlayerPlayMode(int playMode)
+        private void OnSetPlayerPlayMode(int playMode)
         {
             Debug.Log($"SetPlayerPlayMode {name} {playMode}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
@@ -253,10 +253,7 @@ namespace Examples2.Scripts.Battle.Players2
                     _stateSprite.color = Color.grey;
                     break;
             }
-            if (PhotonNetwork.IsMasterClient)
-            {
-                _shield.SetShieldState(playMode, _rotationIndex);
-            }
+            _shield.SetShieldState(playMode);
         }
 
         #endregion

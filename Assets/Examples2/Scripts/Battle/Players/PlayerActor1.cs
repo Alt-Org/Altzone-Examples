@@ -44,7 +44,7 @@ namespace Examples2.Scripts.Battle.Players
             {
                 var shield = (IPlayerShield)_playerShield;
                 shield.SetupShield(PlayerPos, PlayerPos <= PhotonBattle.PlayerPosition2);
-                shield.SetShieldState(PlayModeGhosted, 0);
+                shield.SetShieldState(PlayModeGhosted);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Examples2.Scripts.Battle.Players
             _state._currentMode = playMode;
             if (_hasPlayerShield)
             {
-                ((IPlayerShield)_playerShield).SetShieldState(playMode, 0);
+                ((IPlayerShield)_playerShield).SetShieldState(playMode);
             }
             switch (playMode)
             {

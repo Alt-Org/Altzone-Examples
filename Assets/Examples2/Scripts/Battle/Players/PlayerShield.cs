@@ -59,7 +59,7 @@ namespace Examples2.Scripts.Battle.Players
             _shieldPivot.localPosition = localPosition;
         }
 
-        void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
+        void IPlayerShield.SetShieldState(int playMode)
         {
             switch (playMode)
             {
@@ -73,6 +73,10 @@ namespace Examples2.Scripts.Battle.Players
                     _rightShield.Set(Color.grey, false);
                     break;
             }
+        }
+
+        void IPlayerShield.SetShieldRotation(int rotationIndex)
+        {
             // Current implementation does not "rotate" shields - so this is not implemented!
             switch (rotationIndex)
             {

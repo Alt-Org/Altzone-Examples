@@ -9,10 +9,10 @@ namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerShield2 : IPlayerShield
     {
-        private const byte MsgSetShield = PhotonEventDispatcher.EventCodeBase + 7;
+        private const byte MsgSetShieldRotation = PhotonEventDispatcher.EventCodeBase + 7;
 
         private readonly ShieldConfig _config;
-        private readonly ShieldStateHelper _stateHelper;
+        private readonly ShieldRotationHelper _rotationHelper;
 
         private int _playMode;
         private int _rotationIndex;
@@ -28,7 +28,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             _config = config;
             var playerId = (byte)photonView.OwnerActorNr;
-            _stateHelper = new ShieldStateHelper(PhotonEventDispatcher.Get(), MsgSetShield, playerId, OnSetShieldState);
+            _rotationHelper = new ShieldRotationHelper(PhotonEventDispatcher.Get(), MsgSetShieldRotation, playerId, OnSetShieldRotation);
         }
 
         void IPlayerShield.SetupShield(int playerPos, bool isLower)
@@ -59,33 +59,9 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerShield.SetShieldState(int playMode, int rotationIndex)
+        void IPlayerShield.SetShieldState(int playMode)
         {
-            Debug.Log($"send SetShieldState {_playerPos} mode {playMode} rotation {rotationIndex}");
-            _stateHelper.SetShieldState(playMode, rotationIndex);
-        }
-
-        void IPlayerShield.PlayHitEffects()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnSetShieldState(int playMode, int rotationIndex)
-        {
-            if (rotationIndex >= _config.Shields.Length)
-            {
-                rotationIndex %= _config.Shields.Length;
-            }
-            Debug.Log($"OnSetShieldState {_playerPos} mode {_playMode} <- {playMode} rotation {_rotationIndex} <- {rotationIndex}");
-            if (rotationIndex != _rotationIndex)
-            {
-                _shield.gameObject.SetActive(false);
-                _rotationIndex = rotationIndex;
-                _shield = _config.Shields[_rotationIndex];
-                _shield.gameObject.SetActive(true);
-                _renderer = _shield.GetComponent<SpriteRenderer>();
-                _collider = _shield.GetComponent<Collider2D>();
-            }
+            Debug.Log($"SetShieldState {_playerPos} mode {playMode}");
             if (playMode != _playMode)
             {
                 _playMode = playMode;
@@ -104,29 +80,57 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        private class ShieldStateHelper : AbstractPhotonEventHelper
+        void IPlayerShield.SetShieldRotation(int rotationIndex)
         {
-            private readonly Action<int, int> _callback;
+            Debug.Log($"SetShieldRotation {_playerPos} mode {_playMode} rotation {rotationIndex}");
+            _rotationHelper.SetShieldRotation(rotationIndex);
+        }
 
-            private readonly byte[] _buffer = new byte[1 + 1 + 1];
+        void IPlayerShield.PlayHitEffects()
+        {
+            throw new NotImplementedException();
+        }
 
-            public ShieldStateHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int, int> onSetShieldState)
+        private void OnSetShieldRotation(int rotationIndex)
+        {
+            if (rotationIndex >= _config.Shields.Length)
+            {
+                rotationIndex %= _config.Shields.Length;
+            }
+            Debug.Log($"OnSetShieldRotation {_playerPos} mode {_playMode} rotation {_rotationIndex} <- {rotationIndex}");
+            if (rotationIndex != _rotationIndex)
+            {
+                _shield.gameObject.SetActive(false);
+                _rotationIndex = rotationIndex;
+                _shield = _config.Shields[_rotationIndex];
+                _shield.gameObject.SetActive(true);
+                _renderer = _shield.GetComponent<SpriteRenderer>();
+                _collider = _shield.GetComponent<Collider2D>();
+            }
+        }
+
+        private class ShieldRotationHelper : AbstractPhotonEventHelper
+        {
+            private readonly Action<int> _callback;
+
+            private readonly byte[] _buffer = new byte[1 + 1];
+
+            public ShieldRotationHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int> onSetShieldRotation)
                 : base(photonEventDispatcher, msgId, playerId)
             {
-                _callback = onSetShieldState;
+                _callback = onSetShieldRotation;
                 _buffer[0] = playerId;
             }
 
-            public void SetShieldState(int playMode, int rotationIndex)
+            public void SetShieldRotation(int rotationIndex)
             {
-                _buffer[1] = (byte)playMode;
-                _buffer[2] = (byte)rotationIndex;
+                _buffer[1] = (byte)rotationIndex;
                 RaiseEvent(_buffer);
             }
 
             protected override void OnMsgReceived(byte[] payload)
             {
-                _callback.Invoke(payload[1], payload[2]);
+                _callback.Invoke(payload[1]);
             }
         }
     }
