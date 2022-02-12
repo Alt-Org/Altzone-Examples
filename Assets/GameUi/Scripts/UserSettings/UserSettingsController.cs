@@ -1,4 +1,5 @@
 using Altzone.Scripts.Config;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 
 namespace GameUi.Scripts.UserSettings
@@ -20,6 +21,17 @@ namespace GameUi.Scripts.UserSettings
             {
                 _view.ShowJoinClanButton();
             }
+            // Manual localization to amend button caption.
+            var localizationKeyName = _view.ToggleDebug.GetComponentsInChildren<LocalizationKeyName>(true)[0];
+            var originalCaption = Localizer.Localize(localizationKeyName.LocalizationKey);
+            var toggleDebugCaption = $"{originalCaption}: {(playerData.IsDebugFlag ? "1" : "0")}";
+            _view.ToggleDebug.SetCaption(toggleDebugCaption);
+            _view.ToggleDebug.onClick.AddListener(() =>
+            {
+                playerData.BatchSave(() => { playerData.IsDebugFlag = !playerData.IsDebugFlag; });
+                toggleDebugCaption = $"{originalCaption}: {(playerData.IsDebugFlag ? "1" : "0")}";
+                _view.ToggleDebug.SetCaption(toggleDebugCaption);
+            });
         }
     }
 }
