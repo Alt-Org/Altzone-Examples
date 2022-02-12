@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Players
 {
+    /// <summary>
+    /// Common base class for player actors so that FindObjectsOfType() for <c>PlayerActor</c> can be satisfied for all implementations.
+    /// </summary>
     internal abstract class PlayerActor : MonoBehaviour
     {
         internal const int PlayModeNormal = 0;
@@ -39,7 +42,8 @@ namespace Examples2.Scripts.Battle.Players
 
         [SerializeField] protected PlayerState _state;
 
-        public int PlayerPos => _state._playerPos;
-        public int TeamNumber => _state._teamNumber;
+        // These are public in IPlayerActor but for simplicity we have them here as internal aliases.
+        protected int PlayerPos => _state._playerPos;
+        protected int TeamNumber => _state._teamNumber;
     }
 }
