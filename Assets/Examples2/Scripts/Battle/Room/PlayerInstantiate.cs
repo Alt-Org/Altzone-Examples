@@ -98,24 +98,17 @@ namespace Examples2.Scripts.Battle.Room
 
         private static bool RotateLocalPlayer(Camera gameCamera, GameObject gameBackground)
         {
-            void RotateGameCamera(bool upsideDown)
+            void RotateGameCamera(bool isUpsideDown)
             {
                 // Rotate game camera for team red.
-                Debug.Log($"RotateGameCamera upsideDown {upsideDown}");
-                var cameraTransform = gameCamera.transform;
-                var rotation = upsideDown
-                    ? Quaternion.Euler(0f, 0f, 180f) // Upside down
-                    : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
-                cameraTransform.rotation = rotation;
+                Debug.Log($"RotateGameCamera upsideDown {isUpsideDown}");
+                gameCamera.GetComponent<Transform>().Rotate(isUpsideDown);
             }
 
-            void RotateBackground(bool upsideDown)
+            void RotateBackground(bool isUpsideDown)
             {
-                Debug.Log($"RotateBackground upsideDown {upsideDown}");
-                var rotation = upsideDown
-                    ? Quaternion.Euler(0f, 0f, 180f) // Upside down
-                    : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
-                gameBackground.transform.rotation = rotation;
+                Debug.Log($"RotateBackground upsideDown {isUpsideDown}");
+                gameBackground.transform.Rotate(isUpsideDown);
             }
 
             var features = RuntimeGameConfig.Get().Features;

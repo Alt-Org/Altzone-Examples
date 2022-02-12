@@ -246,13 +246,10 @@ namespace Examples2.Scripts.Battle.Players2
 
         #endregion
 
-        private static void RotatePlayer(Transform playerTransform, bool upsideDown)
+        private static void RotatePlayer(Transform playerTransform, bool isUpsideDown)
         {
-            Debug.Log($"RotatePlayer {playerTransform.name} upsideDown {upsideDown}");
-            var rotation = upsideDown
-                ? Quaternion.Euler(0f, 0f, 180f) // Upside down
-                : Quaternion.Euler(0f, 0f, 0f); // Normal orientation
-            playerTransform.rotation = rotation;
+            Debug.Log($"RotatePlayer {playerTransform.name} upsideDown {isUpsideDown}");
+            playerTransform.Rotate(isUpsideDown);
         }
 
         private class PlayerPlayModeHelper : AbstractPhotonEventHelper
