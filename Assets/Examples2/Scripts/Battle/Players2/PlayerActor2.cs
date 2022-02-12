@@ -55,11 +55,7 @@ namespace Examples2.Scripts.Battle.Players2
             _state.InitState(_transform, player);
             var prefix = $"{(player.IsLocal ? "L" : "R")}{PlayerPos}:{TeamNumber}";
             name = $"@{prefix}>{player.NickName}";
-            _playerInfo = GetComponentInChildren<TextMeshPro>();
-            if (_playerInfo != null)
-            {
-                _playerInfo.text = PlayerPos.ToString("N0");
-            }
+            SetDebug();
             // Must detect player position from actual y coordinate!
             var isYCoordNegative = _transform.position.y < 0;
             var isLower = isYCoordNegative;
@@ -102,6 +98,25 @@ namespace Examples2.Scripts.Battle.Players2
             var playerId = (byte)_photonView.OwnerActorNr;
             _helper = new PlayerPlayModeHelper(PhotonEventDispatcher.Get(), MsgVisualState, playerId, SetPlayerPlayMode);
             Debug.Log($"Awake Done {name} playerArea {playerArea}");
+        }
+
+        private void SetDebug()
+        {
+            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var isDebugFlag = playerData.IsDebugFlag;
+            _isShowDebugCanvas = isDebugFlag && _isShowDebugCanvas;
+            _playerInfo = GetComponentInChildren<TextMeshPro>();
+            if (_playerInfo != null)
+            {
+                if (isDebugFlag)
+                {
+                    _playerInfo.text = PlayerPos.ToString("N0");
+                }
+                else
+                {
+                    _playerInfo.enabled = false;
+                }
+            }
         }
 
         private void OnEnable()
