@@ -138,9 +138,9 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            if (_minPlayersToStart > 1)
+            var room = PhotonNetwork.CurrentRoom;
+            if (_minPlayersToStart > 1 || room.PlayerCount > 1)
             {
-                var room = PhotonNetwork.CurrentRoom;
                 switch (room.PlayerCount)
                 {
                     case 1:
