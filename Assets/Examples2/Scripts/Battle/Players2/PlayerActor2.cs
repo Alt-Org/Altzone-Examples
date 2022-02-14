@@ -21,8 +21,8 @@ namespace Examples2.Scripts.Battle.Players2
 
         private const byte MsgPlayMode = PhotonEventDispatcher.EventCodeBase + 6;
 
-        [Header("Settings"), SerializeField, Tooltip(Tooltip1), Range(0,2)] private int _startPlayMode;
-        [SerializeField]private SpriteRenderer _highlightSprite;
+        [Header("Settings"), SerializeField, Tooltip(Tooltip1), Range(0, 2)] private int _startPlayMode;
+        [SerializeField] private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
         [SerializeField] private Transform _playerShieldHead;
@@ -233,7 +233,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void SetPlayerPlayMode(int playMode)
         {
-            Debug.Log($"SetPlayerPlayMode {name} {playMode}");
+            Debug.Log($"SetPlayerPlayMode {name} {StateNames[playMode]}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;

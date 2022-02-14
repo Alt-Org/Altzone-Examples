@@ -9,6 +9,8 @@ namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerShield2 : IPlayerShield
     {
+        private static readonly string[] StateNames = { "Norm", "Frozen", "Ghost" };
+
         private const byte MsgSetShieldRotation = PhotonEventDispatcher.EventCodeBase + 7;
 
         private readonly ShieldConfig _config;
@@ -34,7 +36,7 @@ namespace Examples2.Scripts.Battle.Players2
         void IPlayerShield.SetupShield(int playerPos, bool isLower)
         {
             Debug.Log($"SetupShield playerPos {playerPos}");
-            _playMode = -1;
+            _playMode = 0;
             _rotationIndex = 0;
             _playerPos = playerPos;
             var shields = _config.Shields;
@@ -60,28 +62,25 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield.SetShieldState(int playMode)
         {
-            Debug.Log($"SetShieldState {_playerPos} mode {playMode}");
-            if (playMode != _playMode)
+            Debug.Log($"SetShieldState {_playerPos} mode {StateNames[_playMode]} <- {StateNames[playMode]} rotation {_rotationIndex} collider {_collider.enabled}");
+            _playMode = playMode;
+            switch (_playMode)
             {
-                _playMode = playMode;
-                switch (_playMode)
-                {
-                    case PlayerActor.PlayModeNormal:
-                    case PlayerActor.PlayModeFrozen:
-                        _collider.enabled = true;
-                        break;
-                    case PlayerActor.PlayModeGhosted:
-                        _collider.enabled = false;
-                        break;
-                    default:
-                        throw new UnityException($"invalid playmode {_playMode}");
-                }
+                case PlayerActor.PlayModeNormal:
+                case PlayerActor.PlayModeFrozen:
+                    _collider.enabled = true;
+                    break;
+                case PlayerActor.PlayModeGhosted:
+                    _collider.enabled = false;
+                    break;
+                default:
+                    throw new UnityException($"invalid playmode {_playMode}");
             }
         }
 
         void IPlayerShield.SetShieldRotation(int rotationIndex, Vector2 contactPoint)
         {
-            Debug.Log($"SetShieldRotation {_playerPos} mode {_playMode} rotation {rotationIndex}");
+            Debug.Log($"SetShieldRotation {_playerPos} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex}");
             SendShieldRotationRpc(rotationIndex, contactPoint);
         }
 
@@ -98,7 +97,7 @@ namespace Examples2.Scripts.Battle.Players2
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"OnSetShieldRotation {_playerPos} mode {_playMode} rotation {_rotationIndex} <- {rotationIndex} @ {contactPoint}");
+            Debug.Log($"OnSetShieldRotation {_playerPos} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex} @ {contactPoint}");
             if (rotationIndex != _rotationIndex)
             {
                 _shield.gameObject.SetActive(false);
@@ -106,6 +105,7 @@ namespace Examples2.Scripts.Battle.Players2
                 _shield = _config.Shields[_rotationIndex];
                 _shield.gameObject.SetActive(true);
                 _collider = _shield.GetComponent<Collider2D>();
+                ((IPlayerShield)this).SetShieldState(_playMode);
             }
             PlayHitEffects(contactPoint);
         }

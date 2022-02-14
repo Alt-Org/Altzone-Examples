@@ -5,6 +5,7 @@ using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Room;
 using Prg.Scripts.Common.PubSub;
 using UnityConstants;
+using UnityEditor;
 using UnityEngine;
 
 namespace Examples2.Scripts.Battle.Ball
@@ -45,10 +46,10 @@ namespace Examples2.Scripts.Battle.Ball
         private void OnHeadCollision(Collision2D collision)
         {
             var other = collision.gameObject;
-            Debug.Log($"onHeadCollision {other.name}");
+            Debug.Log($"onHeadCollision {other.GetFullPath()}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
-            var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.BlueHead : ScoreType.RedHead;
+            var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.RedHead : ScoreType.BlueHead;
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
         }
 
@@ -60,7 +61,7 @@ namespace Examples2.Scripts.Battle.Ball
             }
             var contactPoint = collision.GetContact(0);
             var other = collision.gameObject;
-            Debug.Log($"onShieldCollision {other.name} @ point {contactPoint.point}");
+            Debug.Log($"onShieldCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.ShieldCollision(contactPoint.point);
         }
