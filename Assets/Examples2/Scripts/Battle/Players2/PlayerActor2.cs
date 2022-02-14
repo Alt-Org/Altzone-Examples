@@ -1,4 +1,3 @@
-using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
@@ -97,7 +96,7 @@ namespace Examples2.Scripts.Battle.Players2
             };
             var playerId = (byte)_photonView.OwnerActorNr;
             _photonEvent = new PhotonEventHelper(PhotonEventDispatcher.Get(), playerId);
-            _photonEvent.RegisterEvent(MsgPlayMode, OnSetPlayerPlayMode);
+            _photonEvent.RegisterEvent(MsgPlayMode, OnSetPlayerPlayModeCallback);
             Debug.Log($"Awake Done {name} playerArea {playerArea}");
         }
 
@@ -179,24 +178,6 @@ namespace Examples2.Scripts.Battle.Players2
 
         #endregion
 
-        #region Photon Event Marhalling
-
-        private readonly byte[] _playModeMsgBuffer = new byte[1 + 1];
-
-        private byte[] PlayModeToBytes(int playMode)
-        {
-            _playModeMsgBuffer[1] = (byte)playMode;
-            return _playModeMsgBuffer;
-        }
-
-        private void OnSetPlayerPlayMode(byte[] payload)
-        {
-            var playMode = payload[1];
-            OnSetPlayerPlayMode(playMode);
-        }
-
-        #endregion
-
         #region IPlayerActor
 
         Transform IPlayerActor.Transform => _state._transform;
@@ -228,7 +209,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(PlayModeNormal));
+                SendSetPlayerPlayModeRpc(PlayModeNormal);
             }
         }
 
@@ -236,7 +217,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(PlayModeFrozen));
+                SendSetPlayerPlayModeRpc(PlayModeFrozen);
             }
         }
 
@@ -244,11 +225,11 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(PlayModeGhosted));
+                SendSetPlayerPlayModeRpc(PlayModeGhosted);
             }
         }
 
-        private void OnSetPlayerPlayMode(int playMode)
+        private void SetPlayerPlayMode(int playMode)
         {
             Debug.Log($"SetPlayerPlayMode {name} {playMode}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
@@ -273,6 +254,37 @@ namespace Examples2.Scripts.Battle.Players2
                     break;
             }
             _shield.SetShieldState(playMode);
+        }
+
+        #endregion
+
+        #region Photon Event (RPC Message) Marshalling
+
+        private readonly byte[] _playModeMsgBuffer = new byte[1 + 1];
+
+        private byte[] PlayModeToBytes(int playMode)
+        {
+            _playModeMsgBuffer[1] = (byte)playMode;
+
+            return _playModeMsgBuffer;
+        }
+
+        /// <summary>
+        /// Naming convention to send message over networks is Send-SetPlayerPlayMode-Rpc
+        /// </summary>
+        private void SendSetPlayerPlayModeRpc(int playMode)
+        {
+            _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(playMode));
+        }
+
+        /// <summary>
+        /// Naming convention to receive message from networks is On-SetPlayerPlayMode-Callback
+        /// </summary>
+        private void OnSetPlayerPlayModeCallback(byte[] payload)
+        {
+            var playMode = payload[1];
+
+            SetPlayerPlayMode(playMode);
         }
 
         #endregion

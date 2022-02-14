@@ -12,13 +12,12 @@ namespace Examples2.Scripts.Battle.Players2
         private const byte MsgSetShieldRotation = PhotonEventDispatcher.EventCodeBase + 7;
 
         private readonly ShieldConfig _config;
-        private readonly ShieldRotationHelper _rotationHelper;
+        private readonly PhotonEventHelper _photonEvent;
 
         private int _playMode;
         private int _rotationIndex;
 
         private Transform _shield;
-        private SpriteRenderer _renderer;
         private Collider2D _collider;
         private int _playerPos;
 
@@ -28,7 +27,8 @@ namespace Examples2.Scripts.Battle.Players2
         {
             _config = config;
             var playerId = (byte)photonView.OwnerActorNr;
-            _rotationHelper = new ShieldRotationHelper(PhotonEventDispatcher.Get(), MsgSetShieldRotation, playerId, OnSetShieldRotation);
+            _photonEvent = new PhotonEventHelper(PhotonEventDispatcher.Get(), playerId);
+            _photonEvent.RegisterEvent(MsgSetShieldRotation, OnSetShieldRotationCallback);
         }
 
         void IPlayerShield.SetupShield(int playerPos, bool isLower)
@@ -49,7 +49,6 @@ namespace Examples2.Scripts.Battle.Players2
                 {
                     _shield = shield;
                     _shield.gameObject.SetActive(true);
-                    _renderer = renderer;
                     _collider = shield.GetComponent<Collider2D>();
                 }
                 else
@@ -83,7 +82,7 @@ namespace Examples2.Scripts.Battle.Players2
         void IPlayerShield.SetShieldRotation(int rotationIndex)
         {
             Debug.Log($"SetShieldRotation {_playerPos} mode {_playMode} rotation {rotationIndex}");
-            _rotationHelper.SetShieldRotation(rotationIndex);
+            SendShieldRotationRpc(rotationIndex);
         }
 
         void IPlayerShield.PlayHitEffects()
@@ -91,7 +90,7 @@ namespace Examples2.Scripts.Battle.Players2
             throw new NotImplementedException();
         }
 
-        private void OnSetShieldRotation(int rotationIndex)
+        private void SetShieldRotation(int rotationIndex)
         {
             if (rotationIndex >= _config.Shields.Length)
             {
@@ -104,34 +103,39 @@ namespace Examples2.Scripts.Battle.Players2
                 _rotationIndex = rotationIndex;
                 _shield = _config.Shields[_rotationIndex];
                 _shield.gameObject.SetActive(true);
-                _renderer = _shield.GetComponent<SpriteRenderer>();
                 _collider = _shield.GetComponent<Collider2D>();
             }
         }
 
-        private class ShieldRotationHelper : AbstractPhotonEventHelper
+        #region Photon Event (RPC Message) Marshalling
+
+        private readonly byte[] _setShieldRotationMsgBuffer = new byte[1 + 1];
+
+        private byte[] SetShieldRotationBytes(int rotationIndex)
         {
-            private readonly Action<int> _callback;
+            _setShieldRotationMsgBuffer[1] = (byte)rotationIndex;
 
-            private readonly byte[] _buffer = new byte[1 + 1];
-
-            public ShieldRotationHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<int> onSetShieldRotation)
-                : base(photonEventDispatcher, msgId, playerId)
-            {
-                _callback = onSetShieldRotation;
-                _buffer[0] = playerId;
-            }
-
-            public void SetShieldRotation(int rotationIndex)
-            {
-                _buffer[1] = (byte)rotationIndex;
-                RaiseEvent(_buffer);
-            }
-
-            protected override void OnMsgReceived(byte[] payload)
-            {
-                _callback.Invoke(payload[1]);
-            }
+            return _setShieldRotationMsgBuffer;
         }
+
+        /// <summary>
+        /// Naming convention to send message over networks is Send-ShieldRotation-Rpc
+        /// </summary>
+        private void SendShieldRotationRpc(int rotationIndex)
+        {
+            _photonEvent.SendEvent(MsgSetShieldRotation, SetShieldRotationBytes(rotationIndex));
+        }
+
+        /// <summary>
+        /// Naming convention to receive message from networks is On-ShieldRotation-Callback
+        /// </summary>
+        private void OnSetShieldRotationCallback(byte[] payload)
+        {
+            var rotationIdex = payload[1];
+
+            SetShieldRotation(rotationIdex);
+        }
+
+        #endregion
     }
 }

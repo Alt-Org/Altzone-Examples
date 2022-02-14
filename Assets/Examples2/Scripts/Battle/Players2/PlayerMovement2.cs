@@ -15,8 +15,8 @@ namespace Examples2.Scripts.Battle.Players2
         private readonly UnityEngine.InputSystem.PlayerInput _playerInput;
         private readonly Camera _camera;
         private readonly bool _isLocal;
-        private readonly MovementHelper _helper;
         private readonly bool _isLimitMouseXY;
+        private readonly PhotonEventHelper _photonEvent;
 
         public Rect PlayerArea { get; set; } = Rect.MinMaxRect(-100, -100, 100, 100);
         public float UnReachableDistance { get; set; } = 100;
@@ -33,7 +33,7 @@ namespace Examples2.Scripts.Battle.Players2
                 _stopped = value;
                 if (_isMoving)
                 {
-                    _helper.SendMsgMoveTo(_transform.position, Speed);
+                    SendMoveToRpc(_transform.position, Speed);
                 }
             }
         }
@@ -52,16 +52,18 @@ namespace Examples2.Scripts.Battle.Players2
             _transform = transform;
             _playerInput = playerInput;
             _camera = camera;
-            // In practice this might happen on runtime when players join and leves more than 256 times in a room.
-            Assert.IsTrue(photonView.OwnerActorNr <= byte.MaxValue, "photonView.OwnerActorNr <= byte.MaxValue");
-            var playerId = (byte)photonView.OwnerActorNr;
-            _helper = new MovementHelper(PhotonEventDispatcher.Get(), MsgMoveTo, playerId, OnSetMoveTo);
             _isLocal = photonView.IsMine;
             if (_isLocal)
             {
                 SetupInput();
             }
             _isLimitMouseXY = !Application.isMobilePlatform;
+
+            // In practice this might happen on runtime when players join and leaves more than 256 times in a room.
+            Assert.IsTrue(photonView.OwnerActorNr <= byte.MaxValue, "photonView.OwnerActorNr <= byte.MaxValue");
+            var playerId = (byte)photonView.OwnerActorNr;
+            _photonEvent = new PhotonEventHelper(PhotonEventDispatcher.Get(), playerId);
+            _photonEvent.RegisterEvent(MsgMoveTo, OnMoveToCallback);
         }
 
         public void Update()
@@ -80,7 +82,7 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        private void OnSetMoveTo(Vector3 position, float speed)
+        private void SetMoveTo(Vector3 position, float speed)
         {
             _isMoving = speed > 0;
             _targetPosition = position;
@@ -93,6 +95,8 @@ namespace Examples2.Scripts.Battle.Players2
             _transform.position = _tempPosition;
             _isMoving = !(Mathf.Approximately(_tempPosition.x, _targetPosition.x) && Mathf.Approximately(_tempPosition.y, _targetPosition.y));
         }
+
+        #region UNITY Input System
 
         private void SetupInput()
         {
@@ -131,7 +135,7 @@ namespace Examples2.Scripts.Battle.Players2
             _inputPosition.y += _inputClick.y;
             _inputPosition.x = Mathf.Clamp(_inputPosition.x, PlayerArea.xMin, PlayerArea.xMax);
             _inputPosition.y = Mathf.Clamp(_inputPosition.y, PlayerArea.yMin, PlayerArea.yMax);
-            _helper.SendMsgMoveTo(_inputPosition, Speed);
+            SendMoveToRpc(_inputPosition, Speed);
         }
 
         private void StopMove(InputAction.CallbackContext ctx)
@@ -165,45 +169,52 @@ namespace Examples2.Scripts.Battle.Players2
             _inputPosition = _camera.ScreenToWorldPoint(_inputPosition);
             _inputPosition.x = Mathf.Clamp(_inputPosition.x, PlayerArea.xMin, PlayerArea.xMax);
             _inputPosition.y = Mathf.Clamp(_inputPosition.y, PlayerArea.yMin, PlayerArea.yMax);
-            _helper.SendMsgMoveTo(_inputPosition, Speed);
+            SendMoveToRpc(_inputPosition, Speed);
         }
 
-        private class MovementHelper : AbstractPhotonEventHelper
+        #endregion
+
+        #region Photon Event (RPC Message) Marshalling
+
+        private readonly byte[] _moveToMsgBuffer = new byte[1 + 4 + 4 + 4];
+
+        private byte[] MoveToToBytes(Vector3 position, float speed)
         {
-            private readonly Action<Vector3, float> _callback;
+            var index = 1;
+            Array.Copy(BitConverter.GetBytes(position.x), 0, _moveToMsgBuffer, index, 4);
+            index += 4;
+            Array.Copy(BitConverter.GetBytes(position.y), 0, _moveToMsgBuffer, index, 4);
+            index += 4;
+            Array.Copy(BitConverter.GetBytes(speed), 0, _moveToMsgBuffer, index, 4);
 
-            private readonly byte[] _buffer = new byte[1 + 4 + 4 + 4];
-            private Vector3 _targetPosition;
-
-            public MovementHelper(PhotonEventDispatcher photonEventDispatcher, byte msgId, byte playerId, Action<Vector3, float> onMsgMoveToCallback)
-                : base(photonEventDispatcher, msgId, playerId)
-            {
-                _callback = onMsgMoveToCallback;
-                _buffer[0] = playerId;
-                _targetPosition.z = 0;
-            }
-
-            public void SendMsgMoveTo(Vector3 position, float speed)
-            {
-                var index = 1;
-                Array.Copy(BitConverter.GetBytes(position.x), 0, _buffer, index, 4);
-                index += 4;
-                Array.Copy(BitConverter.GetBytes(position.y), 0, _buffer, index, 4);
-                index += 4;
-                Array.Copy(BitConverter.GetBytes(speed), 0, _buffer, index, 4);
-
-                RaiseEvent(_buffer);
-            }
-
-            protected override void OnMsgReceived(byte[] payload)
-            {
-                var index = 1;
-                _targetPosition.x = BitConverter.ToSingle(payload, index);
-                index += 4;
-                _targetPosition.y = BitConverter.ToSingle(payload, index);
-                index += 4;
-                _callback.Invoke(_targetPosition, BitConverter.ToSingle(payload, index));
-            }
+            return _moveToMsgBuffer;
         }
+
+        /// <summary>
+        /// Naming convention to send message over networks is Send-MoveTo-Rpc
+        /// </summary>
+        private void SendMoveToRpc(Vector3 position, float speed)
+        {
+            _photonEvent.SendEvent(MsgMoveTo, MoveToToBytes(position, speed));
+        }
+
+        /// <summary>
+        /// Naming convention to receive message from networks is On-MoveTo-Callback
+        /// </summary>
+        private void OnMoveToCallback(byte[] payload)
+        {
+            Vector3 position;
+            var index = 1;
+            position.x = BitConverter.ToSingle(payload, index);
+            index += 4;
+            position.y = BitConverter.ToSingle(payload, index);
+            position.z = 0;
+            index += 4;
+            var speed = BitConverter.ToSingle(payload, index);
+
+            SetMoveTo(position, speed);
+        }
+
+        #endregion
     }
 }
