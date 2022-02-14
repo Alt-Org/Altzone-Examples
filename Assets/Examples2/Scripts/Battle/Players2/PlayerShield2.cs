@@ -79,24 +79,26 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerShield.SetShieldRotation(int rotationIndex)
+        void IPlayerShield.SetShieldRotation(int rotationIndex, Vector2 contactPoint)
         {
             Debug.Log($"SetShieldRotation {_playerPos} mode {_playMode} rotation {rotationIndex}");
-            SendShieldRotationRpc(rotationIndex);
+            SendShieldRotationRpc(rotationIndex, contactPoint);
         }
 
-        void IPlayerShield.PlayHitEffects()
+        private void PlayHitEffects(Vector2 contactPoint)
         {
-            throw new NotImplementedException();
+#if UNITY_EDITOR
+            UnityEngine.Debug.DrawLine(Vector3.zero, contactPoint, Color.magenta, 1f);
+#endif
         }
 
-        private void SetShieldRotation(int rotationIndex)
+        private void SetShieldRotation(int rotationIndex, Vector2 contactPoint)
         {
             if (rotationIndex >= _config.Shields.Length)
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"OnSetShieldRotation {_playerPos} mode {_playMode} rotation {_rotationIndex} <- {rotationIndex}");
+            Debug.Log($"OnSetShieldRotation {_playerPos} mode {_playMode} rotation {_rotationIndex} <- {rotationIndex} @ {contactPoint}");
             if (rotationIndex != _rotationIndex)
             {
                 _shield.gameObject.SetActive(false);
@@ -105,15 +107,21 @@ namespace Examples2.Scripts.Battle.Players2
                 _shield.gameObject.SetActive(true);
                 _collider = _shield.GetComponent<Collider2D>();
             }
+            PlayHitEffects(contactPoint);
         }
 
         #region Photon Event (RPC Message) Marshalling
 
-        private readonly byte[] _setShieldRotationMsgBuffer = new byte[1 + 1];
+        private readonly byte[] _setShieldRotationMsgBuffer = new byte[1 + 1 + 4 + 4];
 
-        private byte[] SetShieldRotationBytes(int rotationIndex)
+        private byte[] SetShieldRotationBytes(int rotationIndex, Vector2 contactPoint)
         {
-            _setShieldRotationMsgBuffer[1] = (byte)rotationIndex;
+            var index = 1;
+            _setShieldRotationMsgBuffer[index] = (byte)rotationIndex;
+            index += 1;
+            Array.Copy(BitConverter.GetBytes(contactPoint.x), 0, _setShieldRotationMsgBuffer, index, 4);
+            index += 4;
+            Array.Copy(BitConverter.GetBytes(contactPoint.y), 0, _setShieldRotationMsgBuffer, index, 4);
 
             return _setShieldRotationMsgBuffer;
         }
@@ -121,9 +129,9 @@ namespace Examples2.Scripts.Battle.Players2
         /// <summary>
         /// Naming convention to send message over networks is Send-ShieldRotation-Rpc
         /// </summary>
-        private void SendShieldRotationRpc(int rotationIndex)
+        private void SendShieldRotationRpc(int rotationIndex, Vector2 contactPoint)
         {
-            _photonEvent.SendEvent(MsgSetShieldRotation, SetShieldRotationBytes(rotationIndex));
+            _photonEvent.SendEvent(MsgSetShieldRotation, SetShieldRotationBytes(rotationIndex, contactPoint));
         }
 
         /// <summary>
@@ -131,9 +139,15 @@ namespace Examples2.Scripts.Battle.Players2
         /// </summary>
         private void OnSetShieldRotationCallback(byte[] payload)
         {
-            var rotationIdex = payload[1];
+            var index = 1;
+            var rotationIndex = payload[index];
+            Vector2 contactPoint;
+            index += 1;
+            contactPoint.x = BitConverter.ToSingle(payload, index);
+            index += 4;
+            contactPoint.y = BitConverter.ToSingle(payload, index);
 
-            SetShieldRotation(rotationIdex);
+            SetShieldRotation(rotationIndex, contactPoint);
         }
 
         #endregion

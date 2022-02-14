@@ -75,7 +75,7 @@ namespace Examples2.Scripts.Battle.Players
             }
         }
 
-        void IPlayerShield.SetShieldRotation(int rotationIndex)
+        void IPlayerShield.SetShieldRotation(int rotationIndex, Vector2 contactPoint)
         {
             // Current implementation does not "rotate" shields - so this is not implemented!
             switch (rotationIndex)
@@ -89,11 +89,6 @@ namespace Examples2.Scripts.Battle.Players
                     _rightShield.Rotate(0);
                     break;
             }
-        }
-
-        void IPlayerShield.PlayHitEffects()
-        {
-            throw new NotImplementedException();
         }
     }
 }

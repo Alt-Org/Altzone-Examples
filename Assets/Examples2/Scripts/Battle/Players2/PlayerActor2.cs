@@ -196,12 +196,12 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerActor.ShieldCollision()
+        void IPlayerActor.ShieldCollision(Vector2 contactPoint)
         {
             if (PhotonNetwork.IsMasterClient)
             {
                 _rotationIndex += 1;
-                _shield.SetShieldRotation(_rotationIndex);
+                _shield.SetShieldRotation(_rotationIndex, contactPoint);
             }
         }
 

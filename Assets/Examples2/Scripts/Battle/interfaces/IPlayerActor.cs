@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.interfaces
         int TeamNumber { get; }
         IPlayerActor TeamMate { get; }
         void HeadCollision();
-        void ShieldCollision();
+        void ShieldCollision(Vector2 contactPoint);
         void SetNormalMode();
         void SetFrozenMode();
         void SetGhostedMode();

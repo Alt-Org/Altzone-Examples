@@ -54,10 +54,15 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnShieldCollision(Collision2D collision)
         {
+            if (collision.contactCount == 0)
+            {
+                return;
+            }
+            var contactPoint = collision.GetContact(0);
             var other = collision.gameObject;
-            Debug.Log($"onShieldCollision {other.name}");
+            Debug.Log($"onShieldCollision {other.name} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
-            playerActor.ShieldCollision();
+            playerActor.ShieldCollision(contactPoint.point);
         }
 
         private void OnBrickCollision(Collision2D collision)
