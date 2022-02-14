@@ -40,13 +40,15 @@ namespace Examples2.Scripts.Battle.Players2
             _rotationIndex = 0;
             _playerPos = playerPos;
             var shields = _config.Shields;
-            var isShieldFlipped = isLower;
+            var isShieldRotated = !isLower;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];
+                if (isShieldRotated)
+                {
+                    shield.Rotate(true);
+                }
                 shield.name = $"{playerPos}:{shield.name}";
-                var renderer = shield.GetComponent<SpriteRenderer>();
-                renderer.flipY = isShieldFlipped;
                 if (i == _rotationIndex)
                 {
                     _shield = shield;
