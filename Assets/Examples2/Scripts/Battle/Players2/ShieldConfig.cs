@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Players2
 {
@@ -12,16 +13,13 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void Awake()
         {
-            if (_shields.Length > 0)
-            {
-                return;
-            }
-            var myTransform = GetComponent<Transform>();
-            var childCount = myTransform.childCount;
-            _shields = new Transform[childCount];
+            Assert.IsTrue(_shields.Length > 0, "_shields.Length > 0");
+            var childCount = _shields.Length;
             for (int i = 0; i < childCount; i++)
             {
-                _shields[i] = myTransform.GetChild(i);
+                var child = _shields[i];
+                child.gameObject.SetActive(i == 0);
+                child.localPosition = Vector3.zero;
             }
         }
     }
