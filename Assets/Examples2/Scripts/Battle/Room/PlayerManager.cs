@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using Altzone.Scripts.Battle;
+using Altzone.Scripts.Config;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
-using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
@@ -70,7 +70,8 @@ namespace Examples2.Scripts.Battle.Room
             _countdownFinished = countdownFinished;
             if (PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(DoCountdown(3));
+                var roomStartDelay = RuntimeGameConfig.Get().Variables._roomStartDelay;
+                StartCoroutine(DoCountdown(roomStartDelay));
             }
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));
             _playerLineConnector = Context.GetTeamLineConnector(playerActor.TeamNumber);
@@ -120,6 +121,7 @@ namespace Examples2.Scripts.Battle.Room
         }
 
         #endregion
+
         internal class CountdownEvent
         {
             public readonly int CurValue;

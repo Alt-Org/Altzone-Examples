@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PersistentGameSettings
   m_EditorClassIdentifier: 
   _features:
-    _isRotateGameCamera: 0
-    _isRotateGamePlayArea: 0
+    _isRotateGameCamera: 1
+    _isRotateGamePlayArea: 1
     _isSPawnMiniBall: 0
     _isSinglePlayerShieldOn: 0
     _isBricksVisible: 0
@@ -22,9 +22,9 @@ MonoBehaviour:
     _minPlayerNameLength: 2
     _maxPlayerNameLength: 16
   _variables:
-    _roomStartDelay: 0
-    _headScoreToWin: 2
-    _wallScoreToWin: 2
+    _roomStartDelay: 3
+    _headScoreToWin: 1
+    _wallScoreToWin: 1
     _ballMoveSpeedMultiplier: 0
     _ballLerpSmoothingFactor: 0
     _ballTeleportDistance: 0
