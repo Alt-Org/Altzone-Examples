@@ -5,7 +5,6 @@ using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
-using Examples2.Scripts.Battle.Room;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
@@ -17,11 +16,13 @@ namespace Examples2.Scripts.Battle.Players2
 {
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        private static readonly string[] StateNames = new[] { "Norm", "Frozen", "Ghost" };
+        private const string Tooltip1 = @"0=""Normal"", 1=""Frozen"", 2=""Ghosted""";
+        private static readonly string[] StateNames = { "Norm", "Frozen", "Ghost" };
 
         private const byte MsgPlayMode = PhotonEventDispatcher.EventCodeBase + 6;
 
-        [Header("Settings"), SerializeField] private SpriteRenderer _highlightSprite;
+        [Header("Settings"), SerializeField, Tooltip(Tooltip1), Range(0,2)] private int _startPlayMode;
+        [SerializeField]private SpriteRenderer _highlightSprite;
         [SerializeField] private SpriteRenderer _stateSprite;
         [SerializeField] private Collider2D _collider;
         [SerializeField] private Transform _playerShieldHead;
@@ -124,7 +125,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
-            ((IPlayerActor)this).SetNormalMode();
+            SetPlayerPlayMode(_startPlayMode);
             if (_isShowDebugCanvas && _photonView.IsMine)
             {
                 var debugInfoPrefab = Resources.Load<PlayerDebugInfo>($"PlayerDebugInfo");

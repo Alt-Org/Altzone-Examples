@@ -452,6 +452,7 @@ MonoBehaviour:
     _playerPos: 0
     _teamNumber: 0
     _teamMate: {fileID: 0}
+  _startPlayMode: 2
   _highlightSprite: {fileID: 5813433697713424832}
   _stateSprite: {fileID: 5191372987036681836}
   _collider: {fileID: 6349736578825980098}
