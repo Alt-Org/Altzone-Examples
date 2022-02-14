@@ -44,6 +44,7 @@ namespace Examples2.Scripts.Battle.Room
                 enabled = false;
                 return;
             }
+            _ui = new RoomLoaderUi(_uiSettings);
             if (PhotonNetwork.InRoom)
             {
                 // Normal logic is that we are in a room and just do what we must do and continue.
@@ -51,7 +52,6 @@ namespace Examples2.Scripts.Battle.Room
                 enabled = false;
                 return;
             }
-            _ui = new RoomLoaderUi(_uiSettings);
             if (_minPlayersToStart > 1)
             {
                 _ui.Show();
