@@ -1,5 +1,6 @@
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
+using Examples2.Scripts.Battle.Factory;
 using Photon.Pun;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace Examples2.Scripts.Battle.Room
             var teamNumber = PhotonBattle.GetTeamNumber(playerPos);
             if (teamNumber == PhotonBattle.TeamRedValue)
             {
-                var gameCameraInstance = FindObjectOfType<GameCamera>();
+                var gameCameraInstance = Context.GetGameCamera;
                 var gameCamera = gameCameraInstance != null ? gameCameraInstance.Camera : null;
                 var isRotated = RotateLocalPlayer(gameCamera, _gameBackground);
                 if (isRotated)

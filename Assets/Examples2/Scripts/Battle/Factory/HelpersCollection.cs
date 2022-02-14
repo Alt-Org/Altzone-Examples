@@ -1,11 +1,15 @@
 using Examples2.Scripts.Battle.PlayerConnect;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Factory
 {
     internal class HelpersCollection : MonoBehaviour
     {
-        public PlayerLineConnector _teamRedLineConnector;
-        public PlayerLineConnector _teamBlueLineConnector;
+        [SerializeField] private PlayerLineConnector _teamRedLineConnector;
+        [SerializeField] private PlayerLineConnector _teamBlueLineConnector;
+
+        public PlayerLineConnector TeamRedLineConnector => _teamRedLineConnector;
+        public PlayerLineConnector TeamBlueLineConnector => _teamBlueLineConnector;
     }
 }

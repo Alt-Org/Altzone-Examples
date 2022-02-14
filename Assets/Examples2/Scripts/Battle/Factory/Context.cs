@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Ball;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
@@ -16,6 +17,8 @@ namespace Examples2.Scripts.Battle.Factory
     /// </remarks>
     internal static class Context
     {
+        internal static GameCamera GetGameCamera => Object.FindObjectOfType<GameCamera>();
+
         internal static IPlayerManager GetPlayerManager => Object.FindObjectOfType<PlayerManager>();
 
         internal static IBall GetBall => Object.FindObjectOfType<BallActor>();
@@ -30,8 +33,8 @@ namespace Examples2.Scripts.Battle.Factory
 
         internal static IBrickManager GetBrickManager => Object.FindObjectOfType<BrickManager>();
 
-        internal static IPlayerLineConnector GetTeamLineConnector(int teamIndex) => teamIndex == 1
-            ? Object.FindObjectOfType<HelpersCollection>()?._teamBlueLineConnector
-            : Object.FindObjectOfType<HelpersCollection>()?._teamRedLineConnector;
+        internal static IPlayerLineConnector GetTeamLineConnector(int teamNumber) => teamNumber == PhotonBattle.TeamBlueValue
+            ? Object.FindObjectOfType<HelpersCollection>()?.TeamBlueLineConnector
+            : Object.FindObjectOfType<HelpersCollection>()?.TeamRedLineConnector;
     }
 }

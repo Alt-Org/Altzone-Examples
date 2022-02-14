@@ -2,6 +2,7 @@ using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
 using Examples2.Scripts.Battle.Ball;
+using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
 using Examples2.Scripts.Battle.Room;
@@ -61,7 +62,7 @@ namespace Examples2.Scripts.Battle.Players2
             var features = RuntimeGameConfig.Get().Features;
             if (features._isRotateGameCamera)
             {
-                var gameCameraInstance = FindObjectOfType<GameCamera>();
+                var gameCameraInstance = Context.GetGameCamera;
                 Assert.IsNotNull(gameCameraInstance, "gameCameraInstance != null");
                 if (gameCameraInstance.IsRotated)
                 {
