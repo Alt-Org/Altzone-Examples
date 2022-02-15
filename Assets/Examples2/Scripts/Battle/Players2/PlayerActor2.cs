@@ -43,6 +43,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
         [SerializeField] private bool _isShowDebugCanvas;
+        [SerializeField] private bool _isStateSpriteColorTint;
 
         private PhotonView _photonView;
         private Transform _transform;
@@ -262,17 +263,26 @@ namespace Examples2.Scripts.Battle.Players2
                 case PlayModeNormal:
                     _collider.enabled = true;
                     _playerMovement.Stopped = false;
-                    _stateSprite.color = Color.blue;
+                    if (_isStateSpriteColorTint)
+                    {
+                        _stateSprite.color = Color.blue;
+                    }
                     break;
                 case PlayModeFrozen:
                     _collider.enabled = true;
                     _playerMovement.Stopped = true;
-                    _stateSprite.color = Color.magenta;
+                    if (_isStateSpriteColorTint)
+                    {
+                        _stateSprite.color = Color.magenta;
+                    }
                     break;
                 case PlayModeGhosted:
                     _collider.enabled = false;
                     _playerMovement.Stopped = false;
-                    _stateSprite.color = Color.grey;
+                    if (_isStateSpriteColorTint)
+                    {
+                        _stateSprite.color = Color.grey;
+                    }
                     break;
             }
             _shield.SetPlayMode(playMode);
