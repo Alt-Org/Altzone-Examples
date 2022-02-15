@@ -138,7 +138,7 @@ namespace Examples2.Scripts.Battle.Players2
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
             OnSetPlayMode(_startPlayMode);
-            if (_photonView.IsMine)
+            if (_photonView.IsMine && _highlightSprite.enabled)
             {
                 _highlightSprite.color = Color.yellow;
             }

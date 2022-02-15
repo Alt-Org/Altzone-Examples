@@ -93,7 +93,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3215710669095833033
 Transform:
   m_ObjectHideFlags: 0
@@ -472,7 +472,6 @@ MonoBehaviour:
     width: 9
     height: 8
   _playerShield: {fileID: 0}
-  _rotationIndex: 0
   _playerInfo: {fileID: 8867706765776995095}
   _isShowDebugCanvas: 1
 --- !u!1 &9101303184460959390
