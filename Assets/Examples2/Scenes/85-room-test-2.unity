@@ -5828,6 +5828,7 @@ MonoBehaviour:
   _isOfflineMode: 0
   _debugPlayerPos: 1
   _minPlayersToStart: 2
+  _isFillTeamBlueFirst: 0
   _objectsToActivate:
   - {fileID: 577912816}
   - {fileID: 1651784406}

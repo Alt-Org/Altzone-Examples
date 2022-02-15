@@ -27,6 +27,7 @@ namespace Examples2.Scripts.Battle.Room
         [Header("Settings"), SerializeField, Tooltip(Tooltip1)] private bool _isOfflineMode;
         [SerializeField, Range(1, 4)] private int _debugPlayerPos = 1;
         [SerializeField, Range(1, 4), Tooltip(Tooltip2)] private int _minPlayersToStart = 1;
+        [SerializeField] private bool _isFillTeamBlueFirst;
         [SerializeField] private GameObject[] _objectsToActivate;
 
         [Header("UI Settings"), SerializeField] private UISettings _uiSettings;
@@ -141,20 +142,29 @@ namespace Examples2.Scripts.Battle.Room
             var room = PhotonNetwork.CurrentRoom;
             if (_minPlayersToStart > 1 || room.PlayerCount > 1)
             {
-                switch (room.PlayerCount)
+                if (_isFillTeamBlueFirst)
                 {
-                    case 1:
-                        _debugPlayerPos = 1;
-                        break;
-                    case 2:
-                        _debugPlayerPos = 3;
-                        break;
-                    case 3:
-                        _debugPlayerPos = 2;
-                        break;
-                    default:
-                        _debugPlayerPos = 4;
-                        break;
+                    // Shield visibility testing needs two players on one team.
+                    _debugPlayerPos = room.PlayerCount;
+                }
+                else
+                {
+                    // Distribute players evenly on both teams.
+                    switch (room.PlayerCount)
+                    {
+                        case 1:
+                            _debugPlayerPos = 1;
+                            break;
+                        case 2:
+                            _debugPlayerPos = 3;
+                            break;
+                        case 3:
+                            _debugPlayerPos = 2;
+                            break;
+                        default:
+                            _debugPlayerPos = 4;
+                            break;
+                    }
                 }
             }
             var player = PhotonNetwork.LocalPlayer;
