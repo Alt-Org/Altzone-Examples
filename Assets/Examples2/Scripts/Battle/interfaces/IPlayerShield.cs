@@ -2,6 +2,20 @@ using UnityEngine;
 
 namespace Examples2.Scripts.Battle.interfaces
 {
+    /// <summary>
+    /// Local shield management interface.
+    /// </summary>
+    public interface IPlayerShield2
+    {
+        bool IsVisible { get; }
+        int RotationIndex { get; }
+        void Setup(int playerPos, bool isLower, bool isVisible, int playMode, int rotationIndex);
+        void SetVisibility(bool isVisible);
+        void SetPlayMode(int playMode);
+        void SetRotation(int rotationIndex);
+        void PlayHitEffects(Vector2 contactPoint);
+    }
+
     public interface IPlayerShield
     {
         void SetupShield(int playerPos, bool isLower);

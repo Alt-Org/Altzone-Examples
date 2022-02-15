@@ -1,3 +1,4 @@
+using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
@@ -14,12 +15,18 @@ using UnityEngine.Assertions;
 
 namespace Examples2.Scripts.Battle.Players2
 {
+    /// <summary>
+    /// Game Actor for player, manages player and shield state. Movement is handled separately.
+    /// </summary>
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        private const string Tooltip1 = @"0=""Normal"", 1=""Frozen"", 2=""Ghosted""";
+        private const byte MsgPlayMode = PhotonEventDispatcher.EventCodeBase + 6;
+        private const byte MsgShieldVisibility = PhotonEventDispatcher.EventCodeBase + 7;
+        private const byte MsgShieldRotation = PhotonEventDispatcher.EventCodeBase + 8;
+
         private static readonly string[] StateNames = { "Norm", "Frozen", "Ghost" };
 
-        private const byte MsgPlayMode = PhotonEventDispatcher.EventCodeBase + 6;
+        private const string Tooltip1 = @"0=""Normal"", 1=""Frozen"", 2=""Ghosted""";
 
         [Header("Settings"), SerializeField, Tooltip(Tooltip1), Range(0, 2)] private int _startPlayMode;
         [SerializeField] private SpriteRenderer _highlightSprite;
@@ -33,7 +40,6 @@ namespace Examples2.Scripts.Battle.Players2
         [SerializeField] private Rect _lowerPlayArea;
 
         [Header("Live Data"), SerializeField] private Transform _playerShield;
-        [SerializeField] private int _rotationIndex;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
         [SerializeField] private bool _isShowDebugCanvas;
@@ -41,7 +47,7 @@ namespace Examples2.Scripts.Battle.Players2
         private PhotonView _photonView;
         private Transform _transform;
         private PlayerMovement2 _playerMovement;
-        private IPlayerShield _shield;
+        private IPlayerShield2 _shield;
         private PhotonEventHelper _photonEvent;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
@@ -67,17 +73,15 @@ namespace Examples2.Scripts.Battle.Players2
                 Assert.IsNotNull(gameCameraInstance, "gameCameraInstance != null");
                 if (gameCameraInstance.IsRotated)
                 {
+                    // We are upside down!
                     isLower = !isLower;
-                    RotatePlayer(_transform, true);
+                    Debug.Log($"RotatePlayer {_transform.name}");
+                    _transform.Rotate(true);
                 }
             }
             Debug.Log($"Awake {name} pos {_transform.position} isLower {isLower}");
 
-            this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
-            if (_photonView.IsMine)
-            {
-                _highlightSprite.color = Color.yellow;
-            }
+            // Shield
             _playerShield = isLower
                 ? _playerShieldHead
                 : _playerShieldFoot;
@@ -86,9 +90,12 @@ namespace Examples2.Scripts.Battle.Players2
             var defence = model.MainDefence == Defence.Retroflection
                 ? model.MainDefence
                 : Defence.Retroflection;
-            _shield = LoadShield(defence, _playerShield, _photonView);
-            _shield.SetupShield(PlayerPos, isLower);
-            _rotationIndex = 0;
+            var shieldConfig = LoadShield(defence, _playerShield);
+            var isShieldVisible = features._isSinglePlayerShieldOn && PhotonNetwork.CurrentRoom.PlayerCount == 1;
+            _shield = new PlayerShield2(shieldConfig);
+            _shield.Setup(PlayerPos, isLower, isShieldVisible, _startPlayMode, 0);
+
+            // Player movement
             var playerArea = isYCoordNegative ? _lowerPlayArea : _upperPlayArea;
             _playerMovement = new PlayerMovement2(_transform, _playerInput, Camera.main, _photonView)
             {
@@ -98,7 +105,12 @@ namespace Examples2.Scripts.Battle.Players2
             };
             var playerId = (byte)_photonView.OwnerActorNr;
             _photonEvent = new PhotonEventHelper(PhotonEventDispatcher.Get(), playerId);
-            _photonEvent.RegisterEvent(MsgPlayMode, OnSetPlayerPlayModeCallback);
+            _photonEvent.RegisterEvent(MsgPlayMode, OnPlayModeCallback);
+            _photonEvent.RegisterEvent(MsgShieldVisibility, OnShieldVisibilityCallback);
+            _photonEvent.RegisterEvent(MsgShieldRotation, OnShieldRotationCallback);
+
+            this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
+
             Debug.Log($"Awake Done {name} playerArea {playerArea}");
         }
 
@@ -125,7 +137,11 @@ namespace Examples2.Scripts.Battle.Players2
         {
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
-            SetPlayerPlayMode(_startPlayMode);
+            OnSetPlayMode(_startPlayMode);
+            if (_photonView.IsMine)
+            {
+                _highlightSprite.color = Color.yellow;
+            }
             if (_isShowDebugCanvas && _photonView.IsMine)
             {
                 var debugInfoPrefab = Resources.Load<PlayerDebugInfo>($"PlayerDebugInfo");
@@ -147,7 +163,7 @@ namespace Examples2.Scripts.Battle.Players2
             _playerMovement.Update();
         }
 
-        private static IPlayerShield LoadShield(Defence defence, Transform transform, PhotonView photonView)
+        private static ShieldConfig LoadShield(Defence defence, Transform transform)
         {
             var shieldPrefab = defence == Defence.Retroflection
                 ? Resources.Load<ShieldConfig>($"Shields/HotDogShield")
@@ -155,8 +171,7 @@ namespace Examples2.Scripts.Battle.Players2
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
-            var shield = new PlayerShield2(shieldConfig, photonView) as IPlayerShield;
-            return shield;
+            return shieldConfig;
         }
 
         #region External events
@@ -202,8 +217,8 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                _rotationIndex += 1;
-                _shield.SetShieldRotation(_rotationIndex, contactPoint);
+                var rotationIndex = _shield.RotationIndex + 1;
+                SendShieldRotationRpc(rotationIndex, contactPoint);
             }
         }
 
@@ -211,7 +226,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendSetPlayerPlayModeRpc(PlayModeNormal);
+                SendPlayModeRpc(PlayModeNormal);
             }
         }
 
@@ -219,7 +234,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendSetPlayerPlayModeRpc(PlayModeFrozen);
+                SendPlayModeRpc(PlayModeFrozen);
             }
         }
 
@@ -227,13 +242,18 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendSetPlayerPlayModeRpc(PlayModeGhosted);
+                SendPlayModeRpc(PlayModeGhosted);
             }
         }
 
-        private void SetPlayerPlayMode(int playMode)
+        private void OnSetShieldVisibility(bool isVisible)
         {
-            Debug.Log($"SetPlayerPlayMode {name} {StateNames[playMode]}");
+            _shield.SetVisibility(isVisible);
+        }
+
+        private void OnSetPlayMode(int playMode)
+        {
+            Debug.Log($"OnSetPlayMode {name} {StateNames[playMode]}");
             Assert.IsTrue(playMode >= PlayModeNormal && playMode <= PlayModeGhosted,
                 "playMode >= PlayModeNormal && playMode <= PlayModeGhosted");
             _state._currentMode = playMode;
@@ -255,46 +275,103 @@ namespace Examples2.Scripts.Battle.Players2
                     _stateSprite.color = Color.grey;
                     break;
             }
-            _shield.SetShieldState(playMode);
+            _shield.SetPlayMode(playMode);
+        }
+
+        private void OnSetShieldRotation(int rotationIndex, Vector2 contactPoint)
+        {
+            _shield.SetRotation(rotationIndex);
+            _shield.PlayHitEffects(contactPoint);
         }
 
         #endregion
 
         #region Photon Event (RPC Message) Marshalling
 
-        private readonly byte[] _playModeMsgBuffer = new byte[1 + 1];
+        /// <summary>
+        /// Naming convention for message buffer is _msg-PlayerPlayMode-Buffer.<br />
+        /// Naming convention to send message over networks is Send-PlayerPlayMode-Rpc.<br />
+        /// Naming convention to receive message from networks is On-PlayerPlayMode-Callback.<br />
+        /// Naming convention to call actual implementation is On-SetPlayerPlayMode.
+        /// </summary>
+
+        // PlayMode
+        private readonly byte[] _msgPlayModeBuffer = new byte[1 + 1];
 
         private byte[] PlayModeToBytes(int playMode)
         {
-            _playModeMsgBuffer[1] = (byte)playMode;
+            _msgPlayModeBuffer[1] = (byte)playMode;
 
-            return _playModeMsgBuffer;
+            return _msgPlayModeBuffer;
         }
 
-        /// <summary>
-        /// Naming convention to send message over networks is Send-SetPlayerPlayMode-Rpc
-        /// </summary>
-        private void SendSetPlayerPlayModeRpc(int playMode)
+        private void SendPlayModeRpc(int playMode)
         {
             _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(playMode));
         }
 
-        /// <summary>
-        /// Naming convention to receive message from networks is On-SetPlayerPlayMode-Callback
-        /// </summary>
-        private void OnSetPlayerPlayModeCallback(byte[] payload)
+        private void OnPlayModeCallback(byte[] payload)
         {
             var playMode = payload[1];
 
-            SetPlayerPlayMode(playMode);
+            OnSetPlayMode(playMode);
+        }
+
+        // ShieldVisibility
+        private readonly byte[] _msgShieldVisibilityBuffer = new byte[1 + 1];
+
+        private byte[] ShieldVisibilityToBytes(bool isVisible)
+        {
+            _msgShieldVisibilityBuffer[1] = (byte)(isVisible ? 1 : 0);
+
+            return _msgShieldVisibilityBuffer;
+        }
+
+        private void SendShieldVisibilityRpc(bool isVisible)
+        {
+            _photonEvent.SendEvent(MsgShieldVisibility, ShieldVisibilityToBytes(isVisible));
+        }
+
+        private void OnShieldVisibilityCallback(byte[] payload)
+        {
+            var isVisible = payload[1] == 1;
+
+            OnSetShieldVisibility(isVisible);
+        }
+
+        // ShieldRotation
+        private readonly byte[] _msgShieldRotationBuffer = new byte[1 + 1 + 4 + 4];
+
+        private byte[] ShieldRotationToBytes(int rotationIndex, Vector2 contactPoint)
+        {
+            var index = 1;
+            _msgShieldRotationBuffer[index] = (byte)rotationIndex;
+            index += 1;
+            Array.Copy(BitConverter.GetBytes(contactPoint.x), 0, _msgShieldRotationBuffer, index, 4);
+            index += 4;
+            Array.Copy(BitConverter.GetBytes(contactPoint.y), 0, _msgShieldRotationBuffer, index, 4);
+
+            return _msgShieldRotationBuffer;
+        }
+
+        private void SendShieldRotationRpc(int rotationIndex, Vector2 contactPoint)
+        {
+            _photonEvent.SendEvent(MsgShieldRotation, ShieldRotationToBytes(rotationIndex, contactPoint));
+        }
+
+        private void OnShieldRotationCallback(byte[] payload)
+        {
+            var index = 1;
+            var rotationIndex = payload[index];
+            Vector2 contactPoint;
+            index += 1;
+            contactPoint.x = BitConverter.ToSingle(payload, index);
+            index += 4;
+            contactPoint.y = BitConverter.ToSingle(payload, index);
+
+            OnSetShieldRotation(rotationIndex, contactPoint);
         }
 
         #endregion
-
-        private static void RotatePlayer(Transform playerTransform, bool isUpsideDown)
-        {
-            Debug.Log($"RotatePlayer {playerTransform.name} upsideDown {isUpsideDown}");
-            playerTransform.Rotate(isUpsideDown);
-        }
     }
 }
