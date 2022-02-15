@@ -31,12 +31,12 @@ namespace Examples2.Scripts.Battle.Players
                 _playerPos = PhotonBattle.GetPlayerPos(player);
                 _teamNumber = PhotonBattle.GetTeamNumber(_playerPos);
             }
+
             public void FindTeamMember()
             {
                 var players = FindObjectsOfType<PlayerActor>();
                 _teamMate = players
                     .FirstOrDefault(x => x.TeamNumber == _teamNumber && x.PlayerPos != _playerPos);
-
             }
         }
 
@@ -45,5 +45,12 @@ namespace Examples2.Scripts.Battle.Players
         // These are public in IPlayerActor but for simplicity we have them here as internal aliases.
         protected int PlayerPos => _state._playerPos;
         protected int TeamNumber => _state._teamNumber;
+
+        protected PlayerActor TeamMate => _state._teamMate;
+
+        public void ConnectWith(PlayerActor other)
+        {
+            _state._teamMate = other;
+        }
     }
 }

@@ -136,8 +136,12 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient}");
             _state.FindTeamMember();
+            if (TeamMate != null)
+            {
+                TeamMate.ConnectWith(this);
+            }
+            Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} teamMate {TeamMate}");
             OnSetPlayMode(_startPlayMode);
             if (_photonView.IsMine && _highlightSprite.enabled)
             {
