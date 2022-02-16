@@ -190,6 +190,10 @@ namespace Examples2.Scripts.Battle.Room
             int CountPlayersInRoom()
             {
                 _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
+                if (_currentPlayersInRoom > 1)
+                {
+                    _ui.DisableButton();
+                }
                 _ui.SetWaitText(_minPlayersToStart - _currentPlayersInRoom);
                 return _currentPlayersInRoom;
             }
@@ -258,6 +262,15 @@ namespace Examples2.Scripts.Battle.Room
                     return;
                 }
                 _playNowButton.interactable = true;
+            }
+
+            public void DisableButton()
+            {
+                if (!_isValid)
+                {
+                    return;
+                }
+                _playNowButton.interactable = false;
             }
 
             public void HideButton()
