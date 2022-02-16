@@ -40,7 +40,7 @@ public static class UnityExtensions
 
     #region Transform
 
-    private static readonly Quaternion NormalRotation = Quaternion.Euler(0f, 0f, 180f);
+    private static readonly Quaternion NormalRotation = Quaternion.Euler(0f, 0f, 0f);
     private static readonly Quaternion UpsideDown = Quaternion.Euler(0f, 0f, 180f);
 
     public static void Rotate(this Transform transform, bool isUpsideDown)
