@@ -56,7 +56,7 @@ namespace Examples2.Scripts.Battle.Room
             if (_minPlayersToStart > 1)
             {
                 _ui.Show();
-                _ui.SetText($"Waiting for {_minPlayersToStart} players");
+                _ui.SetWaitText(_minPlayersToStart);
                 _ui.SetOnPlayClick(() => { _minPlayersToStart = 1; });
             }
             else
@@ -178,12 +178,18 @@ namespace Examples2.Scripts.Battle.Room
             StartCoroutine(WaitForPlayersToArrive());
         }
 
+        public override void OnJoinRoomFailed(short returnCode, string message)
+        {
+            Debug.Log($"OnJoinRoomFailed {returnCode} {message}");
+            _ui.SetErrorMessage(message);
+        }
+
         private IEnumerator WaitForPlayersToArrive()
         {
             int CountPlayersInRoom()
             {
                 _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
-                _ui.SetText($"Waiting for {_minPlayersToStart - _currentPlayersInRoom} players");
+                _ui.SetWaitText(_minPlayersToStart - _currentPlayersInRoom);
                 return _currentPlayersInRoom;
             }
 
@@ -260,13 +266,21 @@ namespace Examples2.Scripts.Battle.Room
                 _playNowButton.gameObject.SetActive(false);
             }
 
-            public void SetText(string text)
+            public void SetErrorMessage(string message)
+            {
+                _roomInfoText.text = message;
+                _playNowButton.interactable = false;
+            }
+
+            public void SetWaitText(int playersToWait)
             {
                 if (!_isValid)
                 {
                     return;
                 }
-                _roomInfoText.text = text;
+                _roomInfoText.text = playersToWait == 1
+                    ? $"Waiting for {playersToWait} player"
+                    : $"Waiting for {playersToWait} players";
             }
 
             public void SetOnPlayClick(Action callback)
