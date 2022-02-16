@@ -40,6 +40,7 @@ namespace Examples2.Scripts.Battle.Players2
         [SerializeField] private Rect _lowerPlayArea;
 
         [Header("Live Data"), SerializeField] private Transform _playerShield;
+        [SerializeField] private float _shieldDistance;
 
         [Header("Debug"), SerializeField] private TextMeshPro _playerInfo;
         [SerializeField] private bool _isShowDebugCanvas;
@@ -49,11 +50,12 @@ namespace Examples2.Scripts.Battle.Players2
         private Transform _transform;
         private PlayerMovement2 _playerMovement;
         private IPlayerShield2 _shield;
+        private IPlayerDistanceMeter _distanceMeter;
         private PhotonEventHelper _photonEvent;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
-        public string StateString => $"{StateNames[_state._currentMode]} {((PlayerShield2)_shield).StateString} {_playerMovement.StateString}";
+        public string StateString => $"{StateNames[_state._currentMode]} {((PlayerShield2)_shield).StateString} d={_distanceMeter.SqrDistance:0}\r\n{_playerMovement.StateString}";
 
         private void Awake()
         {
@@ -92,9 +94,10 @@ namespace Examples2.Scripts.Battle.Players2
                 ? model.MainDefence
                 : Defence.Retroflection;
             var shieldConfig = LoadShield(defence, _playerShield);
-            var isShieldVisible = features._isSinglePlayerShieldOn && PhotonNetwork.CurrentRoom.PlayerCount == 1;
             _shield = new PlayerShield2(shieldConfig);
-            _shield.Setup(PlayerPos, isLower, isShieldVisible, _startPlayMode, 0);
+            _shield.Setup(PlayerPos, isLower, false, _startPlayMode, 0);
+            var multiplier = RuntimeGameConfig.Get().Variables._shieldDistanceMultiplier;
+            _shieldDistance = model.Defence * multiplier;
 
             // Player movement
             var playerArea = isYCoordNegative ? _lowerPlayArea : _upperPlayArea;
@@ -112,7 +115,7 @@ namespace Examples2.Scripts.Battle.Players2
 
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
 
-            Debug.Log($"Awake Done {name} playerArea {playerArea}");
+            Debug.Log($"Awake Done {name} shieldDistance {_shieldDistance} playerArea {playerArea}");
         }
 
         private void SetDebug()
@@ -134,15 +137,35 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
+
+        private void CreateDistanceMeter()
+        {
+            var otherTransform = TeamMate.GetComponent<Transform>();
+            _distanceMeter = new PlayerDistanceMeter(_transform, otherTransform, _shieldDistance);
+        }
+
         private void OnEnable()
         {
+            // Finalize player setup when we have both team members available.
             _state.FindTeamMember();
+            var isShieldVisible = true;
             if (TeamMate != null)
             {
                 TeamMate.ConnectWith(this);
+                // TODO: refactor when PlayerActor and PlayerActor2 is merged and PlayerActor1 removed
+                CreateDistanceMeter();
+                ((PlayerActor2)TeamMate).CreateDistanceMeter();
+            }
+            else
+            {
+                var features = RuntimeGameConfig.Get().Features;
+                isShieldVisible = features._isSinglePlayerShieldOn && PhotonNetwork.CurrentRoom.PlayerCount == 1;
+                _distanceMeter = new PlayerDistanceMeterFixed(isShieldVisible);
             }
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} teamMate {TeamMate}");
             OnSetPlayMode(_startPlayMode);
+            OnSetShieldVisibility(isShieldVisible);
+
             if (_photonView.IsMine && _highlightSprite.enabled)
             {
                 _highlightSprite.color = Color.yellow;
@@ -166,6 +189,12 @@ namespace Examples2.Scripts.Battle.Players2
         private void Update()
         {
             _playerMovement.Update();
+            if (_photonView.IsMine)
+            {
+                _distanceMeter.CheckShieldVisibility(
+                    () => SendShieldVisibilityRpc(true),
+                    () => SendShieldVisibilityRpc(false));
+            }
         }
 
         private static ShieldConfig LoadShield(Defence defence, Transform transform)
