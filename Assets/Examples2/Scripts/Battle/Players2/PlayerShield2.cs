@@ -28,18 +28,15 @@ namespace Examples2.Scripts.Battle.Players2
             _config = config;
         }
 
-        private void Setup(bool isLower)
+        private void SetupShield(bool isShieldRotated)
         {
+            Debug.Log($"SetupShield playerPos {_playerPos} isShieldRotated {isShieldRotated}");
             var shields = _config.Shields;
-            var isShieldRotated = !isLower;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];
-                if (isShieldRotated)
-                {
-                    shield.Rotate(true);
-                }
                 shield.name = $"{_playerPos}:{shield.name}";
+                shield.Rotate(isShieldRotated);
                 if (i == _rotationIndex)
                 {
                     _shield = shield.gameObject;
@@ -53,10 +50,12 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerShield2.Setup(int playerPos, bool isLower, bool isVisible, int playMode, int rotationIndex)
+        void IPlayerShield2.Setup(int playerPos, bool isShieldRotated, bool isVisible, int playMode, int rotationIndex)
         {
             _playerPos = playerPos;
-            Setup(isLower);
+            _isVisible = isVisible;
+            _rotationIndex = rotationIndex;
+            SetupShield(isShieldRotated);
             ((IPlayerShield2)this).SetVisibility(isVisible);
             ((IPlayerShield2)this).SetPlayMode(playMode);
             ((IPlayerShield2)this).SetRotation(rotationIndex);
@@ -64,6 +63,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield2.SetVisibility(bool isVisible)
         {
+            Debug.Log($"SetVisibility {_playerPos} mode {StateNames[_playMode]} isVisible {_isVisible} <- {isVisible}");
             _isVisible = isVisible;
             _shield.SetActive(_isVisible);
         }
@@ -95,7 +95,7 @@ namespace Examples2.Scripts.Battle.Players2
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"OnSetShieldRotation {_playerPos} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex}");
+            Debug.Log($"SetRotation {_playerPos} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex}");
             _rotationIndex = rotationIndex;
             _shield.SetActive(false);
             _shield = _config.Shields[_rotationIndex].gameObject;
