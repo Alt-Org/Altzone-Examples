@@ -168,6 +168,7 @@ namespace Examples2.Scripts.Battle.Room
                 }
             }
             var player = PhotonNetwork.LocalPlayer;
+            PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
             var playerMainSkill = (int)Defence.Deflection;
             player.SetCustomProperties(new Hashtable
             {
@@ -202,7 +203,9 @@ namespace Examples2.Scripts.Battle.Room
                 _ui.HideButton();
             }
             StartCoroutine(_ui.Blink(0.6f, 0.3f));
-            yield return new WaitUntil(() => PhotonNetwork.InRoom && CountPlayersInRoom() >= _minPlayersToStart);
+            yield return new WaitUntil(() => PhotonNetwork.InRoom
+                                             && PhotonNetwork.CurrentRoom.IsOpen
+                                             && CountPlayersInRoom() >= _minPlayersToStart);
             ContinueToNextStage();
         }
 
