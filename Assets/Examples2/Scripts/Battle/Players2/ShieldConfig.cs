@@ -8,6 +8,7 @@ namespace Examples2.Scripts.Battle.Players2
         private const string Tooltip = "Leave Shields empty for auto config";
 
         [SerializeField, Tooltip(Tooltip)] private Transform[] _shields;
+        [SerializeField] public ParticleSystem _particle;
 
         public Transform[] Shields => _shields;
 

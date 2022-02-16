@@ -17,6 +17,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         private GameObject _shield;
         private Collider2D _collider;
+        private ParticleSystem _particleEffect;
 
         public bool IsVisible => _isVisible;
         public int RotationIndex => _rotationIndex;
@@ -30,6 +31,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         private void Setup(bool isLower)
         {
+            _particleEffect = _config._particle;
             var shields = _config.Shields;
             var isShieldRotated = !isLower;
             for (var i = 0; i < shields.Length; ++i)
@@ -105,6 +107,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield2.PlayHitEffects(Vector2 contactPoint)
         {
+            _particleEffect.Play();
 #if UNITY_EDITOR
             UnityEngine.Debug.DrawLine(Vector3.zero, contactPoint, Color.magenta, 1f);
 #endif
