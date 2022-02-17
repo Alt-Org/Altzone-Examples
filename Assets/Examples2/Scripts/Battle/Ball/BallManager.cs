@@ -4,6 +4,7 @@ using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Room;
 using Prg.Scripts.Common.PubSub;
+using Prg.Scripts.Common.Unity;
 using UnityConstants;
 using UnityEditor;
 using UnityEngine;
@@ -55,15 +56,12 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnShieldCollision(Collision2D collision)
         {
-            if (collision.contactCount == 0)
-            {
-                return;
-            }
-            var contactPoint = collision.GetContact(0);
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
             Debug.Log($"onShieldCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.ShieldCollision(contactPoint.point);
+            ScoreFlashNet.Push("HIT", contactPoint.point);
         }
 
         private void OnBrickCollision(Collision2D collision)
@@ -74,8 +72,9 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnWallCollision(Collision2D collision)
         {
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
-            Debug.Log($"onWallCollision {other.name} {other.tag}");
+            Debug.Log($"onWallCollision {other.name} {other.tag} @ point {contactPoint.point}");
             if (other.CompareTag(Tags.BlueTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
@@ -84,6 +83,7 @@ namespace Examples2.Scripts.Battle.Ball
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
             }
+            ScoreFlashNet.Push("POINT", contactPoint.point);
         }
 
         private void OnEnterTeamArea(GameObject other)
