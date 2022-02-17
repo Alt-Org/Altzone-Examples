@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Altzone.Scripts.Model;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 namespace GameUi.Scripts.CharacterSelection
