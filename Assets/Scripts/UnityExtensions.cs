@@ -51,6 +51,20 @@ public static class UnityExtensions
 
     #endregion
 
+    #region Collision2D
+
+    public static ContactPoint2D GetFirstContactPoint(this Collision2D collision)
+    {
+        if (collision == null || collision.contactCount == 0)
+        {
+            return new ContactPoint2D();
+        }
+        var contactPoint = collision.GetContact(0);
+        return contactPoint;
+    }
+
+    #endregion
+
     #region Button
 
     public static void SetCaption(this Button button, string caption)
