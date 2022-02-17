@@ -1,4 +1,3 @@
-using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
@@ -7,7 +6,6 @@ using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Players;
 using Photon.Pun;
-using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
@@ -20,10 +18,6 @@ namespace Examples2.Scripts.Battle.Players2
     /// </summary>
     internal class PlayerActor2 : PlayerActor, IPlayerActor
     {
-        private const byte MsgPlayMode = PhotonEventDispatcher.EventCodeBase + 6;
-        private const byte MsgShieldVisibility = PhotonEventDispatcher.EventCodeBase + 7;
-        private const byte MsgShieldRotation = PhotonEventDispatcher.EventCodeBase + 8;
-
         private static readonly string[] StateNames = { "Norm", "Frozen", "Ghost" };
 
         private const string Tooltip1 = @"0=""Normal"", 1=""Frozen"", 2=""Ghosted""";
@@ -51,7 +45,7 @@ namespace Examples2.Scripts.Battle.Players2
         private PlayerMovement2 _playerMovement;
         private IPlayerShield2 _shield;
         private IPlayerDistanceMeter _distanceMeter;
-        private PhotonEventHelper _photonEvent;
+        private PhotonPlayerRpc _rpc;
 
         public void SetPhotonView(PhotonView photonView) => _photonView = photonView;
 
@@ -112,12 +106,6 @@ namespace Examples2.Scripts.Battle.Players2
                 UnReachableDistance = 100,
                 Speed = 10f,
             };
-            var playerId = (byte)_photonView.OwnerActorNr;
-            _photonEvent = new PhotonEventHelper(PhotonEventDispatcher.Get(), playerId);
-            _photonEvent.RegisterEvent(MsgPlayMode, OnPlayModeCallback);
-            _photonEvent.RegisterEvent(MsgShieldVisibility, OnShieldVisibilityCallback);
-            _photonEvent.RegisterEvent(MsgShieldRotation, OnShieldRotationCallback);
-
             this.Subscribe<BallManager.ActiveTeamEvent>(OnActiveTeamEvent);
 
             Debug.Log($"Awake Done {name} shieldDistance {_shieldDistance} playerArea {playerArea}");
@@ -180,6 +168,10 @@ namespace Examples2.Scripts.Battle.Players2
                 var debugInfo = Instantiate(debugInfoPrefab, _transform);
                 debugInfo.PlayerActor = this;
             }
+            _rpc = _photonView.gameObject.GetOrAddComponent<PhotonPlayerRpc>();
+            _rpc.SendPlayMode(OnSetPlayMode);
+            _rpc.SendShieldVisibility(OnSetShieldVisibility);
+            _rpc.SendShieldRotation(OnSetShieldRotation);
         }
 
         private void OnDestroy()
@@ -196,8 +188,8 @@ namespace Examples2.Scripts.Battle.Players2
             if (_photonView.IsMine)
             {
                 _distanceMeter.CheckShieldVisibility(
-                    () => SendShieldVisibilityRpc(true),
-                    () => SendShieldVisibilityRpc(false));
+                    () => _rpc.SendShieldVisibility(OnSetShieldVisibility, true),
+                    () => _rpc.SendShieldVisibility(OnSetShieldVisibility, false));
             }
         }
 
@@ -256,7 +248,7 @@ namespace Examples2.Scripts.Battle.Players2
             if (PhotonNetwork.IsMasterClient)
             {
                 var rotationIndex = _shield.RotationIndex + 1;
-                SendShieldRotationRpc(rotationIndex, contactPoint);
+                _rpc.SendShieldRotation(OnSetShieldRotation, rotationIndex, contactPoint);
             }
         }
 
@@ -264,7 +256,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendPlayModeRpc(PlayModeNormal);
+                _rpc.SendPlayMode(OnSetPlayMode, PlayModeNormal);
             }
         }
 
@@ -272,7 +264,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendPlayModeRpc(PlayModeFrozen);
+                _rpc.SendPlayMode(OnSetPlayMode, PlayModeFrozen);
             }
         }
 
@@ -280,7 +272,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SendPlayModeRpc(PlayModeGhosted);
+                _rpc.SendPlayMode(OnSetPlayMode, PlayModeGhosted);
             }
         }
 
@@ -329,94 +321,6 @@ namespace Examples2.Scripts.Battle.Players2
         {
             _shield.SetRotation(rotationIndex);
             _shield.PlayHitEffects(contactPoint);
-        }
-
-        #endregion
-
-        #region Photon Event (RPC Message) Marshalling
-
-        /// <summary>
-        /// Naming convention for message buffer is _msg-PlayerPlayMode-Buffer.<br />
-        /// Naming convention to send message over networks is Send-PlayerPlayMode-Rpc.<br />
-        /// Naming convention to receive message from networks is On-PlayerPlayMode-Callback.<br />
-        /// Naming convention to call actual implementation is On-SetPlayerPlayMode.
-        /// </summary>
-
-        // PlayMode
-        private readonly byte[] _msgPlayModeBuffer = new byte[1 + 1];
-
-        private byte[] PlayModeToBytes(int playMode)
-        {
-            _msgPlayModeBuffer[1] = (byte)playMode;
-
-            return _msgPlayModeBuffer;
-        }
-
-        private void SendPlayModeRpc(int playMode)
-        {
-            _photonEvent.SendEvent(MsgPlayMode, PlayModeToBytes(playMode));
-        }
-
-        private void OnPlayModeCallback(byte[] payload)
-        {
-            var playMode = payload[1];
-
-            OnSetPlayMode(playMode);
-        }
-
-        // ShieldVisibility
-        private readonly byte[] _msgShieldVisibilityBuffer = new byte[1 + 1];
-
-        private byte[] ShieldVisibilityToBytes(bool isVisible)
-        {
-            _msgShieldVisibilityBuffer[1] = (byte)(isVisible ? 1 : 0);
-
-            return _msgShieldVisibilityBuffer;
-        }
-
-        private void SendShieldVisibilityRpc(bool isVisible)
-        {
-            _photonEvent.SendEvent(MsgShieldVisibility, ShieldVisibilityToBytes(isVisible));
-        }
-
-        private void OnShieldVisibilityCallback(byte[] payload)
-        {
-            var isVisible = payload[1] == 1;
-
-            OnSetShieldVisibility(isVisible);
-        }
-
-        // ShieldRotation
-        private readonly byte[] _msgShieldRotationBuffer = new byte[1 + 1 + 4 + 4];
-
-        private byte[] ShieldRotationToBytes(int rotationIndex, Vector2 contactPoint)
-        {
-            var index = 1;
-            _msgShieldRotationBuffer[index] = (byte)rotationIndex;
-            index += 1;
-            Array.Copy(BitConverter.GetBytes(contactPoint.x), 0, _msgShieldRotationBuffer, index, 4);
-            index += 4;
-            Array.Copy(BitConverter.GetBytes(contactPoint.y), 0, _msgShieldRotationBuffer, index, 4);
-
-            return _msgShieldRotationBuffer;
-        }
-
-        private void SendShieldRotationRpc(int rotationIndex, Vector2 contactPoint)
-        {
-            _photonEvent.SendEvent(MsgShieldRotation, ShieldRotationToBytes(rotationIndex, contactPoint));
-        }
-
-        private void OnShieldRotationCallback(byte[] payload)
-        {
-            var index = 1;
-            var rotationIndex = payload[index];
-            Vector2 contactPoint;
-            index += 1;
-            contactPoint.x = BitConverter.ToSingle(payload, index);
-            index += 4;
-            contactPoint.y = BitConverter.ToSingle(payload, index);
-
-            OnSetShieldRotation(rotationIndex, contactPoint);
         }
 
         #endregion

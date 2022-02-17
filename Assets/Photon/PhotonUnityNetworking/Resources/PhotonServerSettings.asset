@@ -34,14 +34,12 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
-  - catchABallRpc
   - MovePlayerRpc
-  - MoveTowardsRpc
-  - SendMessageRpc
+  - SendPlayModeRpc
+  - SendShieldRotationRpc
+  - SendShieldVisibilityRpc
   - SetBallColorRpc
-  - setBallVisibilityRpc
   - SetPlayerPlayModeRpc
-  - SyncPlayerHandleRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
