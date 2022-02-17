@@ -3,6 +3,7 @@ using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Room;
+using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity;
 using UnityConstants;
@@ -27,12 +28,14 @@ namespace Examples2.Scripts.Battle.Ball
 
         private IBall _ball;
         private IBrickManager _brickManager;
+        private PhotonView _photonView;
 
         private void Awake()
         {
             Debug.Log("Awake");
             _ball = Context.GetBall;
             _brickManager = Context.GetBrickManager;
+            _photonView = PhotonView.Get(this);
             var ballCollision = _ball.BallCollision;
             ballCollision.OnHeadCollision = OnHeadCollision;
             ballCollision.OnShieldCollision = OnShieldCollision;
@@ -55,7 +58,10 @@ namespace Examples2.Scripts.Battle.Ball
             playerActor.HeadCollision();
             var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.RedHead : ScoreType.BlueHead;
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
-            ScoreFlashNet.Push("HEAD", contactPoint.point);
+            if (_photonView.Owner.IsMasterClient)
+            {
+                ScoreFlashNet.Push("HEAD", contactPoint.point);
+            }
         }
 
         private void OnShieldCollision(Collision2D collision)
@@ -65,7 +71,10 @@ namespace Examples2.Scripts.Battle.Ball
             Debug.Log($"onShieldCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.ShieldCollision(contactPoint.point);
-            ScoreFlashNet.Push("HIT", contactPoint.point);
+            if (_photonView.Owner.IsMasterClient)
+            {
+                ScoreFlashNet.Push("HIT", contactPoint.point);
+            }
         }
 
         private void OnBrickCollision(Collision2D collision)
@@ -82,12 +91,18 @@ namespace Examples2.Scripts.Battle.Ball
             if (other.CompareTag(Tags.BlueTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
-                ScoreFlashNet.Push("POINT", contactPoint.point);
+                if (_photonView.Owner.IsMasterClient)
+                {
+                    ScoreFlashNet.Push("POINT", contactPoint.point);
+                }
             }
             else if (other.CompareTag(Tags.RedTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
-                ScoreFlashNet.Push("WALL", contactPoint.point);
+                if (_photonView.Owner.IsMasterClient)
+                {
+                    ScoreFlashNet.Push("WALL", contactPoint.point);
+                }
             }
         }
 
