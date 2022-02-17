@@ -3092,10 +3092,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 8607368454165204979, guid: cba24c40c25844d4da85815b5853f3fe,
     type: 3}
-  _playerPosition1: {x: -2.5, y: -4.25}
-  _playerPosition2: {x: 2.5, y: -4.25}
-  _playerPosition3: {x: 2.5, y: 4.25}
-  _playerPosition4: {x: -2.5, y: 4.25}
+  _playerPosition1: {x: -2.5, y: -4}
+  _playerPosition2: {x: 2.5, y: -5}
+  _playerPosition3: {x: 2.5, y: 4}
+  _playerPosition4: {x: -2.5, y: 5}
   _gameBackground: {fileID: 801765301}
 --- !u!4 &577912818
 Transform:
@@ -5827,7 +5827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isOfflineMode: 0
   _debugPlayerPos: 1
-  _minPlayersToStart: 2
+  _minPlayersToStart: 4
   _isFillTeamBlueFirst: 0
   _objectsToActivate:
   - {fileID: 577912816}

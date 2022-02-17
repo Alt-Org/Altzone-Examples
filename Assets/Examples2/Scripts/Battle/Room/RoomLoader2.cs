@@ -21,6 +21,8 @@ namespace Examples2.Scripts.Battle.Room
     /// </remarks>
     internal class RoomLoader2 : MonoBehaviourPunCallbacks
     {
+        private const string TestRoomName = "TestRoom4";
+
         private const string Tooltip1 = "If Is Offline Mode only one player can play";
         private const string Tooltip2 = "if > 1 Debug Player Pos is automatic";
 
@@ -57,7 +59,7 @@ namespace Examples2.Scripts.Battle.Room
             {
                 _ui.Show();
                 _ui.SetWaitText(_minPlayersToStart);
-                _ui.SetOnPlayClick(() => { _minPlayersToStart = 1; });
+                _ui.SetOnPlayClick(OnStartPlayClicked);
             }
             else
             {
@@ -68,7 +70,7 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnEnable()
         {
-            // Create a test room - in offline (faster to create) or online (real thing) mode
+            // Create a test room - in offline (faster to create) or online (real thing) mode.
             base.OnEnable();
             var state = PhotonNetwork.NetworkClientState;
             var isStateValid = state == ClientState.PeerCreated || state == ClientState.Disconnected || state == ClientState.ConnectedToMasterServer;
@@ -79,17 +81,16 @@ namespace Examples2.Scripts.Battle.Room
             var playerName = PhotonBattle.GetLocalPlayerName();
             Debug.Log($"connect {PhotonNetwork.NetworkClientState} isOfflineMode {_isOfflineMode} player {playerName}");
             PhotonNetwork.OfflineMode = _isOfflineMode;
+            PhotonNetwork.NickName = playerName;
             if (_isOfflineMode)
             {
                 // JoinRandomRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
                 _minPlayersToStart = 1;
-                PhotonNetwork.NickName = playerName;
                 PhotonNetwork.JoinRandomRoom();
             }
             else if (state == ClientState.ConnectedToMasterServer)
             {
                 // JoinLobby -> JoinOrCreateRoom -> OnJoinedRoom -> WaitForPlayersToArrive -> ContinueToNextStage
-                PhotonNetwork.NickName = playerName;
                 PhotonLobby.JoinLobby();
             }
             else
@@ -99,13 +100,37 @@ namespace Examples2.Scripts.Battle.Room
             }
         }
 
+        private void OnStartPlayClicked()
+        {
+            Debug.Log($"OnStartPlayClicked {PhotonNetwork.NetworkClientState} {PhotonNetwork.CurrentRoom.GetDebugLabel()}");
+            if (PhotonNetwork.InRoom
+                && PhotonNetwork.CurrentRoom.IsOpen
+                && PhotonNetwork.IsMasterClient)
+            {
+                PhotonLobby.CloseRoom(true);
+            }
+        }
+
         private void ContinueToNextStage()
         {
+            Debug.Log($"ContinueToNextStage {PhotonNetwork.NetworkClientState} {PhotonNetwork.CurrentRoom.GetDebugLabel()}");
             StopAllCoroutines();
-            _ui.Hide();
-            if (PhotonNetwork.IsMasterClient)
+            if (!PhotonNetwork.InRoom)
             {
-                // Mark room "closed"
+                _ui.SetErrorMessage("Not in room");
+                return;
+            }
+            var player = PhotonNetwork.LocalPlayer;
+            var playerPos = PhotonBattle.GetPlayerPos(player);
+            if (!PhotonBattle.IsValidPlayerPos(playerPos))
+            {
+                _ui.SetErrorMessage("Invalid player");
+                PhotonNetwork.LeaveRoom();
+                return;
+            }
+            _ui.Hide();
+            if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.IsOpen)
+            {
                 PhotonLobby.CloseRoom(true);
             }
             // Enable game objects when this room stage is ready to play
@@ -134,39 +159,41 @@ namespace Examples2.Scripts.Battle.Room
         public override void OnJoinedLobby()
         {
             Debug.Log($"createRoom {PhotonNetwork.NetworkClientState}");
-            PhotonLobby.JoinOrCreateRoom("testing2");
+            PhotonLobby.JoinOrCreateRoom(TestRoomName);
         }
 
         public override void OnJoinedRoom()
         {
-            var room = PhotonNetwork.CurrentRoom;
-            if (_minPlayersToStart > 1 || room.PlayerCount > 1)
+            int GetPlayerPosFromPlayerCount(int playerCount)
             {
+                if (_minPlayersToStart == 1)
+                {
+                    return _debugPlayerPos;
+                }
                 if (_isFillTeamBlueFirst)
                 {
-                    // Shield visibility testing needs two players on one team.
-                    _debugPlayerPos = room.PlayerCount;
+                    // Shield visibility testing needs two players on same team.
+                    return PhotonBattle.PlayerPosition1 + playerCount - 1;
                 }
-                else
+                // Distribute players evenly on both teams.
+                switch (playerCount)
                 {
-                    // Distribute players evenly on both teams.
-                    switch (room.PlayerCount)
-                    {
-                        case 1:
-                            _debugPlayerPos = 1;
-                            break;
-                        case 2:
-                            _debugPlayerPos = 3;
-                            break;
-                        case 3:
-                            _debugPlayerPos = 2;
-                            break;
-                        default:
-                            _debugPlayerPos = 4;
-                            break;
-                    }
+                    case 1:
+                        return PhotonBattle.PlayerPosition1;
+                    case 2:
+                        return PhotonBattle.PlayerPosition3;
+                    case 3:
+                        return PhotonBattle.PlayerPosition2;
+                    case 4:
+                        return PhotonBattle.PlayerPosition4;
+                    default:
+                        // Should not happen as Master Client closes room ASAP when it is full.
+                        return -1;
                 }
             }
+
+            var room = PhotonNetwork.CurrentRoom;
+            _debugPlayerPos = GetPlayerPosFromPlayerCount(room.PlayerCount);
             var player = PhotonNetwork.LocalPlayer;
             PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
             var playerMainSkill = (int)Defence.Deflection;
@@ -179,6 +206,17 @@ namespace Examples2.Scripts.Battle.Room
             StartCoroutine(WaitForPlayersToArrive());
         }
 
+        public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+        {
+            var room = PhotonNetwork.CurrentRoom;
+            Debug.Log($"OnRoomPropertiesUpdate {room.GetDebugLabel()}");
+            if (!room.IsOpen)
+            {
+                // Somebody has closed the room, we can continue as if Start button was pressed.
+                OnStartPlayClicked();
+            }
+        }
+
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
             Debug.Log($"OnJoinRoomFailed {returnCode} {message}");
@@ -187,15 +225,20 @@ namespace Examples2.Scripts.Battle.Room
 
         private IEnumerator WaitForPlayersToArrive()
         {
-            int CountPlayersInRoom()
+            bool CanContinueToNextStage()
             {
-                _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
-                if (_currentPlayersInRoom > 1)
+                if (!PhotonNetwork.InRoom)
                 {
-                    _ui.DisableButton();
+                    return true;
                 }
+                var room = PhotonNetwork.CurrentRoom;
+                if (!room.IsOpen)
+                {
+                    return true;
+                }
+                _currentPlayersInRoom = PhotonBattle.CountRealPlayers();
                 _ui.SetWaitText(_minPlayersToStart - _currentPlayersInRoom);
-                return _currentPlayersInRoom;
+                return _currentPlayersInRoom >= _minPlayersToStart;
             }
 
             if (PhotonNetwork.IsMasterClient)
@@ -207,9 +250,7 @@ namespace Examples2.Scripts.Battle.Room
                 _ui.HideButton();
             }
             StartCoroutine(_ui.Blink(0.6f, 0.3f));
-            yield return new WaitUntil(() => PhotonNetwork.InRoom
-                                             && PhotonNetwork.CurrentRoom.IsOpen
-                                             && CountPlayersInRoom() >= _minPlayersToStart);
+            yield return new WaitUntil(CanContinueToNextStage);
             ContinueToNextStage();
         }
 
@@ -284,6 +325,10 @@ namespace Examples2.Scripts.Battle.Room
 
             public void SetErrorMessage(string message)
             {
+                if (!_canvas.gameObject.activeSelf)
+                {
+                    _canvas.gameObject.SetActive(true);
+                }
                 _roomInfoText.text = message;
                 _playNowButton.interactable = false;
             }
