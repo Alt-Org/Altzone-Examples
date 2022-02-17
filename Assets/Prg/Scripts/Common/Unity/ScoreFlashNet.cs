@@ -21,6 +21,13 @@ namespace Prg.Scripts.Common.Unity
             return _instance ?? (_instance = new ScoreFlasherNet());
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void RuntimeInitializeOnLoadMethod()
+        {
+            // Manual reset if UNITY Domain Reloading is disabled.
+            _instance = null;
+        }
+
         public static void RegisterEventListener()
         {
             Get();
@@ -51,33 +58,33 @@ namespace Prg.Scripts.Common.Unity
     {
         private const int MsgScoreFlash = PhotonEventDispatcher.EventCodeBase + 6;
         private const int MsgBufferFixedLength = 4 + 4 + 1;
-        private const int MaxMessageLength = 16;
+        private const int MaxStringMessageLength = 16;
 
         private readonly PhotonEventDispatcher _photonEventDispatcher;
-        private Vector2 _messagePosition;
+
         private byte[] _messageBuffer = Array.Empty<byte>();
 
         internal ScoreFlasherNet()
         {
+            Debug.Log($"ScoreFlasherNet created");
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.RegisterEventListener(MsgScoreFlash, data => { OnScoreFlash((byte[])data.CustomData); });
         }
 
         void IScoreFlash.Push(string message, float worldX, float worldY)
         {
-            Assert.IsTrue(message.Length <= MaxMessageLength, "message.Length <= MaxMessageLength");
-            if (message.Length > MaxMessageLength)
+            Assert.IsTrue(message.Length <= MaxStringMessageLength, "message.Length <= MaxMessageLength");
+            if (message.Length > MaxStringMessageLength)
             {
-                message = message.Substring(0, MaxMessageLength);
+                message = message.Substring(0, MaxStringMessageLength);
             }
             SendScoreFlash(message, worldX, worldY);
         }
 
-        private void OnScoreFlash(string message, float x, float y)
+        private static void OnScoreFlash(string message, float x, float y)
         {
-            _messagePosition.x = x;
-            _messagePosition.y = y;
-            ScoreFlash.Push(message, _messagePosition);
+            Debug.Log($"OnScoreFlash {message} x {x} y {y}");
+            ScoreFlash.Push(message, x, y);
         }
 
         #region Photon Events

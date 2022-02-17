@@ -60,7 +60,7 @@ namespace Examples2.Scripts.Battle.Ball
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
             if (_photonView.Owner.IsMasterClient)
             {
-                //ScoreFlashNet.Push("HEAD", contactPoint.point);
+                ScoreFlashNet.Push("HEAD", contactPoint.point);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Examples2.Scripts.Battle.Ball
             playerActor.ShieldCollision(contactPoint.point);
             if (_photonView.Owner.IsMasterClient)
             {
-                //ScoreFlashNet.Push("HIT", contactPoint.point);
+                ScoreFlashNet.Push("HIT", contactPoint.point);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Examples2.Scripts.Battle.Ball
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
                 if (_photonView.Owner.IsMasterClient)
                 {
-                    //ScoreFlashNet.Push("POINT", contactPoint.point);
+                    ScoreFlashNet.Push("WALL", contactPoint.point);
                 }
             }
             else if (other.CompareTag(Tags.RedTeam))
@@ -101,7 +101,7 @@ namespace Examples2.Scripts.Battle.Ball
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
                 if (_photonView.Owner.IsMasterClient)
                 {
-                    //ScoreFlashNet.Push("WALL", contactPoint.point);
+                    ScoreFlashNet.Push("WALL", contactPoint.point);
                 }
             }
         }
