@@ -163,7 +163,7 @@ namespace Examples2.Scripts.Battle.Players2
             else
             {
                 var features = RuntimeGameConfig.Get().Features;
-                isShieldVisible = features._isSinglePlayerShieldOn && PhotonNetwork.CurrentRoom.PlayerCount == 1;
+                isShieldVisible = features._isSinglePlayerShieldOn;
                 _distanceMeter = new PlayerDistanceMeterFixed(isShieldVisible);
             }
             Debug.Log($"OnEnable {name} IsMine {_photonView.IsMine} IsMaster {_photonView.Owner.IsMasterClient} teamMate {TeamMate}");
