@@ -40,18 +40,22 @@ namespace Examples2.Scripts.Battle.Ball
             ballCollision.OnWallCollision = OnWallCollision;
             ballCollision.OnEnterTeamArea = OnEnterTeamArea;
             ballCollision.OnExitTeamArea = OnExitTeamArea;
+
+            ScoreFlashNet.RegisterEventListener();
         }
 
         #region IBallCollision callback events
 
         private void OnHeadCollision(Collision2D collision)
         {
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
-            Debug.Log($"onHeadCollision {other.GetFullPath()}");
+            Debug.Log($"onHeadCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
             var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.RedHead : ScoreType.BlueHead;
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
+            ScoreFlashNet.Push("HEAD", contactPoint.point);
         }
 
         private void OnShieldCollision(Collision2D collision)
@@ -78,12 +82,13 @@ namespace Examples2.Scripts.Battle.Ball
             if (other.CompareTag(Tags.BlueTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
+                ScoreFlashNet.Push("POINT", contactPoint.point);
             }
             else if (other.CompareTag(Tags.RedTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
+                ScoreFlashNet.Push("WALL", contactPoint.point);
             }
-            ScoreFlashNet.Push("POINT", contactPoint.point);
         }
 
         private void OnEnterTeamArea(GameObject other)

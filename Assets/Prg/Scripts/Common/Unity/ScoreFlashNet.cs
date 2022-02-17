@@ -9,17 +9,21 @@ namespace Prg.Scripts.Common.Unity
     /// <summary>
     /// Networked version of <c>ScoreFlash</c>.
     /// </summary>
+    /// <remarks>
+    /// Use <c>RegisterEventListener</c> if only listening for <c>ScoreFlash</c> messages.
+    /// </remarks>
     public static class ScoreFlashNet
     {
         private static IScoreFlash _instance;
 
         private static IScoreFlash Get()
         {
-            if (_instance == null)
-            {
-                _instance = new ScoreFlasherNet();
-            }
-            return _instance;
+            return _instance ?? (_instance = new ScoreFlasherNet());
+        }
+
+        public static void RegisterEventListener()
+        {
+            Get();
         }
 
         public static void Push(string message)
