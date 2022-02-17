@@ -31,19 +31,19 @@ namespace Prg.Scripts.Common.Unity
             Get().Push(message, 0f, 0f);
         }
 
-        public static void Push(string message, float x, float y)
+        public static void Push(string message, float worldX, float worldY)
         {
-            Get().Push(message, x, y);
+            Get().Push(message, worldX, worldY);
         }
 
-        public static void Push(string message, Vector2 position)
+        public static void Push(string message, Vector2 worldPosition)
         {
-            Get().Push(message, position.x, position.y);
+            Get().Push(message, worldPosition.x, worldPosition.y);
         }
 
-        public static void Push(string message, Vector3 position)
+        public static void Push(string message, Vector3 worldPosition)
         {
-            Get().Push(message, position.x, position.y);
+            Get().Push(message, worldPosition.x, worldPosition.y);
         }
     }
 
@@ -63,14 +63,14 @@ namespace Prg.Scripts.Common.Unity
             _photonEventDispatcher.RegisterEventListener(MsgScoreFlash, data => { OnScoreFlash((byte[])data.CustomData); });
         }
 
-        void IScoreFlash.Push(string message, float x, float y)
+        void IScoreFlash.Push(string message, float worldX, float worldY)
         {
             Assert.IsTrue(message.Length <= MaxMessageLength, "message.Length <= MaxMessageLength");
             if (message.Length > MaxMessageLength)
             {
                 message = message.Substring(0, MaxMessageLength);
             }
-            SendScoreFlash(message, x, y);
+            SendScoreFlash(message, worldX, worldY);
         }
 
         private void OnScoreFlash(string message, float x, float y)
@@ -95,7 +95,7 @@ namespace Prg.Scripts.Common.Unity
             OnScoreFlash(message, x, y);
         }
 
-        private void SendScoreFlash(string message, float x, float y)
+        private void SendScoreFlash(string message, float worldX, float worldY)
         {
             var messageBytes = Encoding.UTF8.GetBytes(message);
             var requiredBufferLength = MsgBufferFixedLength + messageBytes.Length;
@@ -104,9 +104,9 @@ namespace Prg.Scripts.Common.Unity
                 _messageBuffer = new byte[requiredBufferLength];
             }
             var index = 0;
-            Array.Copy(BitConverter.GetBytes(x), 0, _messageBuffer, index, 4);
+            Array.Copy(BitConverter.GetBytes(worldX), 0, _messageBuffer, index, 4);
             index += 4;
-            Array.Copy(BitConverter.GetBytes(y), 0, _messageBuffer, index, 4);
+            Array.Copy(BitConverter.GetBytes(worldY), 0, _messageBuffer, index, 4);
             index += 4;
             _messageBuffer[index] = (byte)messageBytes.Length;
             index += 1;

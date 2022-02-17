@@ -35,25 +35,25 @@ namespace Prg.Scripts.Common.Unity
             Get().Push(message, 0f, 0f);
         }
 
-        public static void Push(string message, float x, float y)
+        public static void Push(string message, float worldX, float worldY)
         {
-            Get().Push(message, x, y);
+            Get().Push(message, worldX, worldY);
         }
 
-        public static void Push(string message, Vector2 position)
+        public static void Push(string message, Vector2 worldPosition)
         {
-            Get().Push(message, position.x, position.y);
+            Get().Push(message, worldPosition.x, worldPosition.y);
         }
 
-        public static void Push(string message, Vector3 position)
+        public static void Push(string message, Vector3 worldPosition)
         {
-            Get().Push(message, position.x, position.y);
+            Get().Push(message, worldPosition.x, worldPosition.y);
         }
     }
 
     public interface IScoreFlash
     {
-        void Push(string message, float x, float y);
+        void Push(string message, float worldX, float y);
     }
 
     [Serializable]
@@ -148,6 +148,9 @@ namespace Prg.Scripts.Common.Unity
 
     internal class ScoreFlasher : MonoBehaviour, IScoreFlash
     {
+        private const float InflateScreenX = -0.20f;
+        private const float InflateScreenY = -0.10f;
+
         [SerializeField] private Camera _camera;
         [SerializeField] private Canvas _canvas;
         [SerializeField] private RectTransform _canvasRectTransform;
@@ -157,6 +160,8 @@ namespace Prg.Scripts.Common.Unity
         [SerializeField] private int _curIndex;
         private Coroutine[] _routines;
 
+        private bool _isClampToScreen;
+        private Rect _messageAreaScreen;
         private Action _destroyedCallback;
         private Vector3 _worldPos;
         private Vector3 _screenPos;
@@ -165,6 +170,16 @@ namespace Prg.Scripts.Common.Unity
         public void Setup(ScoreFlashConfig config, Camera screenCamera, Action destroyed)
         {
             _camera = screenCamera;
+            _isClampToScreen = config._isClampToScreen;
+            if (_isClampToScreen)
+            {
+                var width = Screen.width;
+                var height = Screen.height;
+                var screenRect = Rect.MinMaxRect(0, 0, width, height);
+                _messageAreaScreen = screenRect.Inflate(new Vector2(width * InflateScreenX, height * InflateScreenY));
+                Debug.Log($"Setup screenRect {screenRect} -> _messageAreaScreen {_messageAreaScreen}");
+                Debug.Log($"Setup _messageAreaScreen x [{_messageAreaScreen.xMin} .. {_messageAreaScreen.xMax}] y [{_messageAreaScreen.yMin} .. {_messageAreaScreen.yMax}]");
+            }
             _canvas = Instantiate(config._canvasPrefab, Vector3.zero, Quaternion.identity);
             Assert.IsTrue(_canvas.isRootCanvas, "_canvas.isRootCanvas");
             _canvasRectTransform = _canvas.GetComponent<RectTransform>();
@@ -271,6 +286,14 @@ namespace Prg.Scripts.Common.Unity
             _worldPos.x = worldX;
             _worldPos.y = worldY;
             _screenPos = _camera.WorldToScreenPoint(_worldPos);
+            if (_isClampToScreen)
+            {
+                var temp = _screenPos;
+                _screenPos.x = Mathf.Clamp(_screenPos.x, _messageAreaScreen.xMin, _messageAreaScreen.xMax);
+                _screenPos.y = Mathf.Clamp(_screenPos.y, _messageAreaScreen.yMin, _messageAreaScreen.yMax);
+                Debug.Log($"Clamp {temp} <- {_screenPos} delta x {Mathf.Abs(temp.x - _screenPos.x)} y {Mathf.Abs(temp.y - _screenPos.y)}");
+            }
+
             var hit = RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 _canvasRectTransform, _screenPos, null, out _localPos);
             Assert.IsTrue(hit, "RectTransformUtility.ScreenPointToLocalPointInRectangle was hit");
