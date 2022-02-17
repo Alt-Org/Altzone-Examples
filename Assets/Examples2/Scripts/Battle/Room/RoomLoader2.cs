@@ -139,34 +139,33 @@ namespace Examples2.Scripts.Battle.Room
 
         public override void OnJoinedRoom()
         {
-            var room = PhotonNetwork.CurrentRoom;
-            if (_minPlayersToStart > 1 || room.PlayerCount > 1)
+            int GetPlayerPosFromPlayerCount(int playerCount)
             {
+                if (_minPlayersToStart == 1)
+                {
+                    return _debugPlayerPos;
+                }
                 if (_isFillTeamBlueFirst)
                 {
-                    // Shield visibility testing needs two players on one team.
-                    _debugPlayerPos = room.PlayerCount;
+                    // Shield visibility testing needs two players on same team.
+                    return PhotonBattle.PlayerPosition1 + playerCount - 1;
                 }
-                else
+                // Distribute players evenly on both teams.
+                switch (playerCount)
                 {
-                    // Distribute players evenly on both teams.
-                    switch (room.PlayerCount)
-                    {
-                        case 1:
-                            _debugPlayerPos = 1;
-                            break;
-                        case 2:
-                            _debugPlayerPos = 3;
-                            break;
-                        case 3:
-                            _debugPlayerPos = 2;
-                            break;
-                        default:
-                            _debugPlayerPos = 4;
-                            break;
-                    }
+                    case 1:
+                        return PhotonBattle.PlayerPosition1;
+                    case 2:
+                        return PhotonBattle.PlayerPosition3;
+                    case 3:
+                        return PhotonBattle.PlayerPosition2;
+                    default:
+                        return PhotonBattle.PlayerPosition4;
                 }
             }
+
+            var room = PhotonNetwork.CurrentRoom;
+            _debugPlayerPos = GetPlayerPosFromPlayerCount(room.PlayerCount);
             var player = PhotonNetwork.LocalPlayer;
             PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
             var playerMainSkill = (int)Defence.Deflection;
