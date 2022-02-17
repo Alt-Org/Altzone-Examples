@@ -69,12 +69,14 @@ namespace Examples2.Scripts.Battle.Players2
             // Must detect player position from actual y coordinate!
             var isYCoordNegative = _transform.position.y < 0;
             var isLower = isYCoordNegative;
+            var isCameraRotated = false;
             var features = RuntimeGameConfig.Get().Features;
             if (features._isRotateGameCamera)
             {
                 var gameCameraInstance = Context.GetGameCamera;
                 Assert.IsNotNull(gameCameraInstance, "gameCameraInstance != null");
-                if (gameCameraInstance.IsRotated)
+                isCameraRotated = gameCameraInstance.IsRotated;
+                if (isCameraRotated)
                 {
                     // We are upside down!
                     isLower = !isLower;
@@ -82,7 +84,6 @@ namespace Examples2.Scripts.Battle.Players2
                     _transform.Rotate(true);
                 }
             }
-            Debug.Log($"Awake {name} pos {_transform.position} isLower {isLower}");
 
             // Shield
             _playerShield = isLower
@@ -95,9 +96,13 @@ namespace Examples2.Scripts.Battle.Players2
                 : Defence.Retroflection;
             var shieldConfig = LoadShield(defence, _playerShield);
             _shield = new PlayerShield2(shieldConfig);
-            _shield.Setup(PlayerPos, isLower, false, _startPlayMode, 0);
+            var isShieldRotated = !isYCoordNegative;
+            _shield.Setup(PlayerPos, isShieldRotated, false, _startPlayMode, 0);
             var multiplier = RuntimeGameConfig.Get().Variables._shieldDistanceMultiplier;
             _shieldDistance = model.Defence * multiplier;
+
+            Debug.Log(
+                $"Awake {name} pos {_transform.position} isLower {(isLower ? 1 : 0)} isCameraRotated {(isCameraRotated ? 1 : 0)} isShieldRotated {(isShieldRotated ? 1 : 0)}");
 
             // Player movement
             var playerArea = isYCoordNegative ? _lowerPlayArea : _upperPlayArea;
@@ -136,7 +141,6 @@ namespace Examples2.Scripts.Battle.Players2
                 }
             }
         }
-
 
         private void CreateDistanceMeter()
         {
