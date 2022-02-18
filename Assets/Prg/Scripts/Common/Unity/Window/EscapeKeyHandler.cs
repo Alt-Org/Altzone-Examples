@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Prg.Scripts.Common.Unity.Window
@@ -19,14 +20,14 @@ namespace Prg.Scripts.Common.Unity.Window
 
         private void Update()
         {
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 _activeScenePathDown = SceneManager.GetActiveScene().path;
                 _isEscapePressedDown = true;
                 _isEscapePressedUp = false;
                 return;
             }
-            if (UnityEngine.Input.GetKeyUp(KeyCode.Escape))
+            if (Keyboard.current.escapeKey.wasReleasedThisFrame)
             {
                 _activeScenePathUp = SceneManager.GetActiveScene().path;
                 _isEscapePressedUp = true;
