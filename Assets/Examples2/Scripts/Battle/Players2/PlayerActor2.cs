@@ -195,9 +195,8 @@ namespace Examples2.Scripts.Battle.Players2
 
         private static ShieldConfig LoadShield(Defence defence, Transform transform)
         {
-            var shieldPrefab = defence == Defence.Retroflection
-                ? Resources.Load<ShieldConfig>($"Shields/HotDogShield")
-                : Resources.Load<ShieldConfig>($"Shields/{defence}");
+            var shieldInstance = RuntimeGameConfig.Get().Prefabs.GetShieldPrefab(defence);
+            var shieldPrefab = shieldInstance.GetComponent<ShieldConfig>();
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);

@@ -93,7 +93,7 @@ namespace Altzone.Scripts.Config
     [Serializable]
     public class GamePrefabs
     {
-        [Header("Battle")] public GameObject _playerForDes;
+        [Header("Battle Player Prefabs")] public GameObject _playerForDes;
         public GameObject _playerForDef;
         public GameObject _playerForInt;
         public GameObject _playerForPro;
@@ -101,9 +101,62 @@ namespace Altzone.Scripts.Config
         public GameObject _playerForEgo;
         public GameObject _playerForCon;
 
+        [Header("Battle Shield Prefabs")] public GameObject _shieldForDes;
+        public GameObject _shieldForDef;
+        public GameObject _shieldForInt;
+        public GameObject _shieldForPro;
+        public GameObject _shieldForRet;
+        public GameObject _shieldForEgo;
+        public GameObject _shieldForCon;
+
         public void CopyFrom(GamePrefabs other)
         {
             PropertyCopier<GamePrefabs, GamePrefabs>.CopyFields(other, this);
+        }
+
+        public GameObject GetPlayerPrefab(Defence defence)
+        {
+            switch (defence)
+            {
+                case Defence.Desensitisation:
+                    return _playerForDes;
+                case Defence.Deflection:
+                    return _playerForDef;
+                case Defence.Introjection:
+                    return _playerForInt;
+                case Defence.Projection:
+                    return _playerForPro;
+                case Defence.Retroflection:
+                    return _playerForRet;
+                case Defence.Egotism:
+                    return _playerForEgo;
+                case Defence.Confluence:
+                    return _playerForCon;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(defence), defence, null);
+            }
+        }
+        public GameObject GetShieldPrefab(Defence defence)
+        {
+            switch (defence)
+            {
+                case Defence.Desensitisation:
+                    return _shieldForDes;
+                case Defence.Deflection:
+                    return _shieldForDef;
+                case Defence.Introjection:
+                    return _shieldForInt;
+                case Defence.Projection:
+                    return _shieldForPro;
+                case Defence.Retroflection:
+                    return _shieldForRet;
+                case Defence.Egotism:
+                    return _shieldForEgo;
+                case Defence.Confluence:
+                    return _shieldForCon;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(defence), defence, null);
+            }
         }
     }
 
