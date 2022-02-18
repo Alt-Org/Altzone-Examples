@@ -247,23 +247,15 @@ namespace Prg.Scripts.Common.Unity.Window
                 if (_currentWindows.Count > 0)
                 {
                     var previousWindow = _currentWindows[0];
-                    if (currentWindow._windowDef.Equals(previousWindow._windowDef))
+                    // It seems that currentWindow can be previousWindow due to some misconfiguration or missing configuration
+                    Assert.IsFalse(currentWindow._windowDef.Equals(previousWindow._windowDef));
+                    if (previousWindow._windowDef.IsPopOutWindow)
                     {
-                        // It seems that currentWindow == previousWindow due to some misconfiguration or missing configuration
-                        // TODO: fix later
                         PopAndHide();
                     }
                     else
                     {
-                        Assert.IsFalse(currentWindow._windowDef.Equals(previousWindow._windowDef));
-                        if (previousWindow._windowDef.IsPopOutWindow)
-                        {
-                            PopAndHide();
-                        }
-                        else
-                        {
-                            Hide(previousWindow);
-                        }
+                        Hide(previousWindow);
                     }
                 }
                 if (!currentWindow.IsValid)
@@ -275,7 +267,7 @@ namespace Prg.Scripts.Common.Unity.Window
                 _currentWindows.Insert(0, currentWindow);
                 Show(currentWindow);
             }
-            SafeExecution("Unwind", DoShowWindow);
+            SafeExecution("DoShowWindow", DoShowWindow);
       }
 
         void IWindowManager.PopCurrentWindow()
