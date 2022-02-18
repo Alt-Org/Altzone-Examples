@@ -91,7 +91,7 @@ namespace Examples2.Scripts.Battle.Players2
             var shieldConfig = LoadShield(defence, _playerShield);
             _shield = new PlayerShield2(shieldConfig);
             var isShieldRotated = !isYCoordNegative;
-            _shield.Setup(PlayerPos, isShieldRotated, false, _startPlayMode, 0);
+            _shield.Setup(name, isShieldRotated, false, _startPlayMode, 0);
             var multiplier = RuntimeGameConfig.Get().Variables._shieldDistanceMultiplier;
             _shieldDistance = model.Defence * multiplier;
 

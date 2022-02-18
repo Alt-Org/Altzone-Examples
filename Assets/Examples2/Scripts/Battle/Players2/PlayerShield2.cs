@@ -9,15 +9,15 @@ namespace Examples2.Scripts.Battle.Players2
         private static readonly string[] StateNames = { "Norm", "Frozen", "Ghost" };
 
         private readonly ShieldConfig _config;
+        private readonly ParticleSystem _shieldHitEffect;
 
-        private int _playerPos;
+        private string _shieldName;
         private bool _isVisible;
         private int _playMode;
         private int _rotationIndex;
 
         private GameObject _shield;
         private Collider2D _collider;
-        private ParticleSystem _particleEffect;
 
         public bool IsVisible => _isVisible;
         public int RotationIndex => _rotationIndex;
@@ -27,17 +27,16 @@ namespace Examples2.Scripts.Battle.Players2
         public PlayerShield2(ShieldConfig config)
         {
             _config = config;
+            _shieldHitEffect = _config._shieldHitEffect;
         }
 
         private void SetupShield(bool isShieldRotated)
         {
-            _particleEffect = _config._particle;
-            Debug.Log($"SetupShield playerPos {_playerPos} isShieldRotated {isShieldRotated}");
+            Debug.Log($"SetupShield {_shieldName} isShieldRotated {isShieldRotated}");
             var shields = _config.Shields;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];
-                shield.name = $"{_playerPos}:{shield.name}";
                 shield.Rotate(isShieldRotated);
                 if (i == _rotationIndex)
                 {
@@ -52,9 +51,9 @@ namespace Examples2.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerShield2.Setup(int playerPos, bool isShieldRotated, bool isVisible, int playMode, int rotationIndex)
+        void IPlayerShield2.Setup(string shieldName, bool isShieldRotated, bool isVisible, int playMode, int rotationIndex)
         {
-            _playerPos = playerPos;
+            _shieldName = shieldName;
             _isVisible = isVisible;
             _rotationIndex = rotationIndex;
             SetupShield(isShieldRotated);
@@ -65,7 +64,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield2.SetVisibility(bool isVisible)
         {
-            Debug.Log($"SetVisibility {_playerPos} mode {StateNames[_playMode]} isVisible {_isVisible} <- {isVisible}");
+            Debug.Log($"SetVisibility {_shieldName} mode {StateNames[_playMode]} isVisible {_isVisible} <- {isVisible}");
             _isVisible = isVisible;
             _shield.SetActive(_isVisible);
         }
@@ -74,7 +73,7 @@ namespace Examples2.Scripts.Battle.Players2
         {
             _playMode = playMode;
             Debug.Log(
-                $"SetShieldState {_playerPos} mode {StateNames[_playMode]} <- {StateNames[playMode]} rotation {_rotationIndex} collider {_collider.enabled}");
+                $"SetShieldState {_shieldName} mode {StateNames[_playMode]} <- {StateNames[playMode]} rotation {_rotationIndex} collider {_collider.enabled}");
             _playMode = playMode;
             switch (_playMode)
             {
@@ -97,7 +96,7 @@ namespace Examples2.Scripts.Battle.Players2
             {
                 rotationIndex %= _config.Shields.Length;
             }
-            Debug.Log($"SetRotation {_playerPos} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex}");
+            Debug.Log($"SetRotation {_shieldName} mode {StateNames[_playMode]} rotation {_rotationIndex} <- {rotationIndex}");
             _rotationIndex = rotationIndex;
             _shield.SetActive(false);
             _shield = _config.Shields[_rotationIndex].gameObject;
@@ -107,10 +106,7 @@ namespace Examples2.Scripts.Battle.Players2
 
         void IPlayerShield2.PlayHitEffects(Vector2 contactPoint)
         {
-            _particleEffect.Play();
-#if UNITY_EDITOR
-            UnityEngine.Debug.DrawLine(Vector3.zero, contactPoint, Color.magenta, 1f);
-#endif
+            _shieldHitEffect.Play();
         }
     }
 }

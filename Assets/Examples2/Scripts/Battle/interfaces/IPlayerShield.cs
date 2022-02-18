@@ -9,7 +9,7 @@ namespace Examples2.Scripts.Battle.interfaces
     {
         bool IsVisible { get; }
         int RotationIndex { get; }
-        void Setup(int playerPos, bool isShieldRotated, bool isVisible, int playMode, int rotationIndex);
+        void Setup(string shieldName, bool isShieldRotated, bool isVisible, int playMode, int rotationIndex);
         void SetVisibility(bool isVisible);
         void SetPlayMode(int playMode);
         void SetRotation(int rotationIndex);

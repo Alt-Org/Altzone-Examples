@@ -154,7 +154,7 @@ MonoBehaviour:
   - {fileID: 2285594847874675215}
   - {fileID: 8964048062878968892}
   - {fileID: 6632450271913245997}
-  _particle: {fileID: 910798878028143968}
+  _shieldHitEffect: {fileID: 910798878028143968}
 --- !u!1 &4005631397440395058
 GameObject:
   m_ObjectHideFlags: 0
