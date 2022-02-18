@@ -30,6 +30,13 @@ namespace Prg.Scripts.Common.Unity
             return _instance;
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void RuntimeInitializeOnLoadMethod()
+        {
+            // Manual reset if UNITY Domain Reloading is disabled.
+            _instance = null;
+        }
+
         public static void Push(string message)
         {
             Get().Push(message, 0f, 0f);
@@ -57,7 +64,7 @@ namespace Prg.Scripts.Common.Unity
     }
 
     [Serializable]
-    internal class MessageEntry
+    internal class ScoreFlashItem
     {
         [SerializeField] private GameObject _root;
         [SerializeField] private RectTransform _rectTransform;
@@ -69,7 +76,9 @@ namespace Prg.Scripts.Common.Unity
 
         public int Index { get; private set; }
 
-        public MessageEntry(int index, GameObject root, TMP_Text text)
+        public Vector2 Position => _position;
+
+        public ScoreFlashItem(int index, GameObject root, TMP_Text text)
         {
             Index = index;
             _root = root;
@@ -137,7 +146,7 @@ namespace Prg.Scripts.Common.Unity
             _root.SetActive(false);
         }
 
-        public bool Overlaps(MessageEntry other)
+        public bool Overlaps(ScoreFlashItem other)
         {
             var textRect = GetTextRect();
             var otherRect = other.GetTextRect();
@@ -155,7 +164,7 @@ namespace Prg.Scripts.Common.Unity
         [SerializeField] private Canvas _canvas;
         [SerializeField] private RectTransform _canvasRectTransform;
 
-        [SerializeField] private MessageEntry[] _entries;
+        [SerializeField] private ScoreFlashItem[] _entries;
         [SerializeField] private Animator[] _animators;
         [SerializeField] private int _curIndex;
         private Coroutine[] _routines;
@@ -186,13 +195,13 @@ namespace Prg.Scripts.Common.Unity
 
             var children = _canvas.GetComponentsInChildren<TMP_Text>(true);
             Debug.Log($"Setup children {children.Length}");
-            _entries = new MessageEntry[children.Length];
+            _entries = new ScoreFlashItem[children.Length];
             _animators = new Animator[children.Length];
             _routines = new Coroutine[children.Length];
             for (var i = 0; i < children.Length; ++i)
             {
                 var parent = children[i].gameObject;
-                _entries[i] = new MessageEntry(i, parent, children[i]);
+                _entries[i] = new ScoreFlashItem(i, parent, children[i]);
                 _entries[i].Hide();
                 _animators[i] = new Animator(config._phases);
                 _routines[i] = null;
@@ -237,7 +246,7 @@ namespace Prg.Scripts.Common.Unity
             }
         }
 
-        private MessageEntry Previous(MessageEntry entry)
+        private ScoreFlashItem Previous(ScoreFlashItem entry)
         {
             if (_entries.Length == 1)
             {
@@ -247,7 +256,7 @@ namespace Prg.Scripts.Common.Unity
             return _animators[index].IsWorking ? _entries[index] : null;
         }
 
-        private IEnumerator AnimateText(Animator animator, MessageEntry entry, string text, float x, float y)
+        private IEnumerator AnimateText(Animator animator, ScoreFlashItem entry, string text, float x, float y)
         {
             animator.Reserve(entry);
             yield return null;
@@ -263,20 +272,26 @@ namespace Prg.Scripts.Common.Unity
             _routines[entry.Index] = null;
         }
 
-        private void CheckOverlapping(MessageEntry current)
+        private void CheckOverlapping(ScoreFlashItem current)
         {
             var previous = Previous(current);
+            var first = previous;
             while (previous != null && previous.Overlaps(current))
             {
                 MoveAway(current, previous);
                 current = previous;
                 previous = Previous(current);
+                if (first == previous)
+                {
+                    Debug.LogWarning($"CheckOverlapping overflow: items ({_entries.Length}) array is full");
+                    break;
+                }
             }
         }
 
-        private void MoveAway(MessageEntry current, MessageEntry previous)
+        private void MoveAway(ScoreFlashItem current, ScoreFlashItem previous)
         {
-            Debug.Log($"MoveAway current {current.Index} previous {previous.Index}");
+            Debug.Log($"MoveAway current {current.Index} {current.Position} previous {previous.Index} {previous.Position}");
             var animator = _animators[previous.Index];
             animator.MoveAway();
         }
@@ -310,7 +325,7 @@ namespace Prg.Scripts.Common.Unity
             [SerializeField] private float _elapsedTime;
             [SerializeField] private float _duration;
             [SerializeField] private float _fraction;
-            [SerializeField] private MessageEntry _entry;
+            [SerializeField] private ScoreFlashItem _entry;
 
             private float _fadeOutRotationAngle;
             private float _fadeOutRotationSpeed;
@@ -350,7 +365,7 @@ namespace Prg.Scripts.Common.Unity
                 return false;
             }
 
-            public void Reserve(MessageEntry entry)
+            public void Reserve(ScoreFlashItem entry)
             {
                 _entry = entry;
                 Assert.IsFalse(IsWorking, $"IsWorking index {_entry.Index}");

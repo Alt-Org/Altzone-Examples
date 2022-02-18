@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Prg.Scripts.Common.Photon
 {
@@ -11,50 +12,50 @@ namespace Prg.Scripts.Common.Photon
     /// </summary>
     public class PhotonStatsWindow : MonoBehaviour
     {
-        public bool Visible;
-        public KeyCode controlKey = KeyCode.F2;
+        public bool _visible;
+        public Key _controlKey = Key.F2;
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-        private int WindowId;
-        private Rect WindowRect;
-        private string WindowTitle;
-        private bool hasStyles;
-        private GUIStyle guiButtonStyle;
-        private GUIStyle guiLabelStyle;
+        private int _windowId;
+        private Rect _windowRect;
+        private string _windowTitle;
+        private bool _hasStyles;
+        private GUIStyle _guiButtonStyle;
+        private GUIStyle _guiLabelStyle;
 
         private void OnEnable()
         {
-            WindowId = (int)DateTime.Now.Ticks;
-            WindowRect = new Rect(0, 0, Screen.width, Screen.height);
-            WindowTitle = $"({controlKey}) Photon";
+            _windowId = (int)DateTime.Now.Ticks;
+            _windowRect = new Rect(0, 0, Screen.width, Screen.height);
+            _windowTitle = $"({_controlKey}) Photon";
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(controlKey))
+            if (Keyboard.current[_controlKey].isPressed)
             {
-                toggleWindowState();
+                ToggleWindowState();
             }
         }
 
-        private void toggleWindowState()
+        private void ToggleWindowState()
         {
-            Visible = !Visible;
+            _visible = !_visible;
         }
 
         private void OnGUI()
         {
-            if (!Visible)
+            if (!_visible)
             {
                 return;
             }
-            if (!hasStyles)
+            if (!_hasStyles)
             {
-                hasStyles = true;
-                guiButtonStyle = new GUIStyle(GUI.skin.button) { fontSize = 20 };
-                guiLabelStyle = new GUIStyle(GUI.skin.label) { fontSize = 24 };
+                _hasStyles = true;
+                _guiButtonStyle = new GUIStyle(GUI.skin.button) { fontSize = 20 };
+                _guiLabelStyle = new GUIStyle(GUI.skin.label) { fontSize = 24 };
             }
-            WindowRect = GUILayout.Window(WindowId, WindowRect, DebugWindow, WindowTitle);
+            _windowRect = GUILayout.Window(_windowId, _windowRect, DebugWindow, _windowTitle);
         }
 
         private void DebugWindow(int windowId)
@@ -78,9 +79,9 @@ namespace Prg.Scripts.Common.Photon
             {
                 label = $"Photon: {PhotonNetwork.NetworkClientState}";
             }
-            if (GUILayout.Button(label, guiButtonStyle))
+            if (GUILayout.Button(label, _guiButtonStyle))
             {
-                toggleWindowState();
+                ToggleWindowState();
             }
             if (inRoom)
             {
@@ -119,7 +120,7 @@ namespace Prg.Scripts.Common.Photon
             }
             label += $"\r\nPhoton v='{PhotonLobby.GameVersion}'";
             label += $"\r\nSend rate={PhotonNetwork.SendRate} ser rate={PhotonNetwork.SerializationRate}";
-            GUILayout.Label(label, guiLabelStyle);
+            GUILayout.Label(label, _guiLabelStyle);
         }
 
         private static readonly Dictionary<Type, string> TypeMap = new Dictionary<Type, string>()
@@ -144,70 +145,6 @@ namespace Prg.Scripts.Common.Photon
         private static string ShortTypeName(Type type)
         {
             return TypeMap.TryGetValue(type, out var name) ? name : type.Name;
-        }
-
-        /// <summary>
-        /// Ring buffer for average lag compensation calculation, not exactly exact!
-        /// </summary>
-        /// <remarks>
-        /// Values are updated once per buffer fill and can be seen in Editor.
-        /// </remarks>
-        [Serializable]
-        public class LagCompensation
-        {
-            public string status;
-            public double samplingStart;
-            public double samplingDuration;
-            public int sampleCount;
-            public int sampleIndexCur;
-            public int sampleIndexMax;
-            public float[] samples;
-
-            public LagCompensation(int sampleCount)
-            {
-                this.sampleCount = sampleCount;
-                sampleIndexMax = sampleCount - 1;
-                samples = new float[sampleCount];
-                reset();
-            }
-
-            public void reset()
-            {
-                status = string.Empty;
-                samplingStart = 0;
-                samplingDuration = 0;
-                sampleIndexCur = 0;
-            }
-
-            public void addSample(float lagValue)
-            {
-                samples[sampleIndexCur] = lagValue;
-                if (sampleIndexCur == 0)
-                {
-                    samplingStart = Time.time;
-                    sampleIndexCur += 1;
-                }
-                else if (sampleIndexCur == sampleIndexMax)
-                {
-                    samplingDuration = Time.time - samplingStart;
-                    sampleIndexCur = 0;
-                    status = ToString();
-                }
-                else
-                {
-                    sampleIndexCur += 1;
-                }
-            }
-
-            public override string ToString()
-            {
-                var sum = 0f;
-                for (var i = 0; i < sampleCount; ++i)
-                {
-                    sum += samples[i];
-                }
-                return $"avg lag {sum / sampleCount:0.000} s ({sampleCount}) : {sampleCount / samplingDuration: 0.0} msg/s";
-            }
         }
 #endif
     }

@@ -1,5 +1,6 @@
 ﻿using Prg.Scripts.Common.Unity;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Examples2.Scripts.Test
 {
@@ -22,9 +23,9 @@ namespace Examples2.Scripts.Test
 
         private void Update()
         {
-            if (Input.GetMouseButtonUp(0))
+            if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                _mousePosition = Input.mousePosition;
+                _mousePosition = Mouse.current.position.ReadValue();
                 var message = $"Click {_mousePosition}";
                 Debug.Log(message);
                 var worldPosition = _myCamera.ScreenToWorldPoint(_mousePosition);

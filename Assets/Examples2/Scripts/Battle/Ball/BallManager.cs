@@ -93,7 +93,7 @@ namespace Examples2.Scripts.Battle.Ball
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
                 if (_photonView.Owner.IsMasterClient)
                 {
-                    ScoreFlashNet.Push("POINT", contactPoint.point);
+                    ScoreFlashNet.Push("WALL", contactPoint.point);
                 }
             }
             else if (other.CompareTag(Tags.RedTeam))
