@@ -10,6 +10,9 @@ namespace Prg.Scripts.Common.Unity.Window
     /// Tracks Escape key press (and similar functionality on other devices) on behalf of <c>WindowManager</c>
     /// using <c>UnityEngine.InputSystem</c> to listen given <c>InputAction</c> for Navigation/Back action.
     /// </summary>
+    /// Actual <c>InputAction</c> is configured in Editor with separate <c>ScriptableObject</c>.
+    /// <remarks>
+    /// </remarks>
     public class EscapeKeyHandler : MonoBehaviour
     {
         [SerializeField] private InputActionReference _escapeInputActionRef;

@@ -45,7 +45,7 @@ namespace Altzone.Scripts.Config
     }
 
     /// <summary>
-    /// Game constraints that that control workings of the game.
+    /// Game constraints that that control the workings of the game.
     /// </summary>
     [Serializable]
     public class GameConstraints
@@ -207,32 +207,50 @@ namespace Altzone.Scripts.Config
         [SerializeField] private PlayerDataCache _playerDataCache;
         [SerializeField] private GameInput _gameInput;
 
+        /// <summary>
+        /// Game features that can be toggled on and off.
+        /// </summary>
         public GameFeatures Features
         {
             get => _permanentFeatures;
             set => _permanentFeatures.CopyFrom(value);
         }
 
+        /// <summary>
+        /// Game constraints that that control the workings of the game.
+        /// </summary>
         public GameConstraints GameConstraints
         {
             get => _permanentConstraints;
             set => _permanentConstraints.CopyFrom(value);
         }
 
+        /// <summary>
+        /// Game variables that control game play somehow.
+        /// </summary>
         public GameVariables Variables
         {
             get => _permanentVariables;
             set => _permanentVariables.CopyFrom(value);
         }
 
+        /// <summary>
+        /// Well known prefabs for the game.
+        /// </summary>
         public GamePrefabs Prefabs
         {
             get => _permanentPrefabs;
             private set => _permanentPrefabs.CopyFrom(value);
         }
 
+        /// <summary>
+        /// New Input System Package for Player actions.
+        /// </summary>
         public GameInput Input => _gameInput;
 
+        /// <summary>
+        /// Player data cache - a common storage for player related data that is persisted somewhere (locally).
+        /// </summary>
         public PlayerDataCache PlayerDataCache => _playerDataCache;
 
         private static void LoadGameConfig(RuntimeGameConfig instance)
