@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 248524395616304031}
   - component: {fileID: 695786484879268834}
   m_Layer: 8
-  m_Name: BulliedShield 1
+  m_Name: GirlsShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
