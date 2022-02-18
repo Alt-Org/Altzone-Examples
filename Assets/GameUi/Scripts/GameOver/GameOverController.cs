@@ -15,32 +15,38 @@ namespace GameUi.Scripts.GameOver
 
         private void OnEnable()
         {
-            if (!PhotonWrapper.InRoom)
+            _view.Reset();
+            if (!PhotonNetwork.InRoom)
             {
-                _view.WinnerInfo1 = RichText.Yellow("NOBODY WINS");
-                _view.WinnerInfo2 = string.Empty;
+                _view.WinnerInfo1 = RichText.Yellow("Game was interrupted");
                 return;
             }
+            _view.WinnerInfo1 = RichText.Yellow("Checking results");
             if (_timeOutDelay == 0f)
             {
                 _timeOutDelay = DefaultTimeout;
             }
-            _view.ContinueButton.interactable = false;
             Debug.Log($"OnEnable {PhotonNetwork.CurrentRoom.GetDebugLabel()}");
             StartCoroutine(WaitForWinner());
+        }
+
+        private void OnDisable()
+        {
+            if (PhotonNetwork.InRoom)
+            {
+                PhotonNetwork.LeaveRoom();
+            }
         }
 
         private IEnumerator WaitForWinner()
         {
             yield return null;
             var timeOutTime = _timeOutDelay + Time.time;
-            while (PhotonWrapper.InRoom)
+            while (PhotonNetwork.InRoom)
             {
                 if (Time.time > timeOutTime)
                 {
-                    _view.WinnerInfo1 = RichText.Yellow("UNKNOWN RESULT");
-                    _view.WinnerInfo2 = "No scores found";
-                    PhotonNetwork.LeaveRoom();
+                    _view.WinnerInfo1 = RichText.Yellow("No scores found");
                     break;
                 }
                 var winnerTeam = PhotonWrapper.GetRoomProperty(PhotonBattle.TeamWinKey, -1);
@@ -66,7 +72,6 @@ namespace GameUi.Scripts.GameOver
                     _view.WinnerInfo1 = RichText.Yellow("DRAW!");
                     _view.WinnerInfo2 = string.Empty;
                 }
-                PhotonNetwork.LeaveRoom();
                 break;
             }
             _view.ContinueButton.interactable = true;

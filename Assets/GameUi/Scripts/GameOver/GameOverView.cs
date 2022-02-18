@@ -21,6 +21,13 @@ namespace GameUi.Scripts.GameOver
             set => _winnerInfo2.text = value;
         }
 
+        public void Reset()
+        {
+            _winnerInfo1.text = string.Empty;
+            _winnerInfo2.text = string.Empty;
+            _continueButton.interactable = false;
+        }
+
         public Button ContinueButton => _continueButton;
     }
 }

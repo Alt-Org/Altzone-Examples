@@ -3,7 +3,9 @@ using Altzone.Scripts.Battle;
 using Examples2.Scripts.Battle.Factory;
 using Examples2.Scripts.Battle.interfaces;
 using Examples2.Scripts.Battle.Room;
+using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
+using Prg.Scripts.Common.Unity;
 using UnityConstants;
 using UnityEditor;
 using UnityEngine;
@@ -26,12 +28,14 @@ namespace Examples2.Scripts.Battle.Ball
 
         private IBall _ball;
         private IBrickManager _brickManager;
+        private PhotonView _photonView;
 
         private void Awake()
         {
             Debug.Log("Awake");
             _ball = Context.GetBall;
             _brickManager = Context.GetBrickManager;
+            _photonView = PhotonView.Get(this);
             var ballCollision = _ball.BallCollision;
             ballCollision.OnHeadCollision = OnHeadCollision;
             ballCollision.OnShieldCollision = OnShieldCollision;
@@ -39,31 +43,38 @@ namespace Examples2.Scripts.Battle.Ball
             ballCollision.OnWallCollision = OnWallCollision;
             ballCollision.OnEnterTeamArea = OnEnterTeamArea;
             ballCollision.OnExitTeamArea = OnExitTeamArea;
+
+            ScoreFlashNet.RegisterEventListener();
         }
 
         #region IBallCollision callback events
 
         private void OnHeadCollision(Collision2D collision)
         {
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
-            Debug.Log($"onHeadCollision {other.GetFullPath()}");
+            Debug.Log($"onHeadCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.HeadCollision();
             var scoreType = playerActor.TeamNumber == PhotonBattle.TeamBlueValue ? ScoreType.RedHead : ScoreType.BlueHead;
             this.Publish(new ScoreManager.ScoreEvent(scoreType));
+            if (_photonView.Owner.IsMasterClient)
+            {
+                ScoreFlashNet.Push("HEAD", contactPoint.point);
+            }
         }
 
         private void OnShieldCollision(Collision2D collision)
         {
-            if (collision.contactCount == 0)
-            {
-                return;
-            }
-            var contactPoint = collision.GetContact(0);
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
             Debug.Log($"onShieldCollision {other.GetFullPath()} @ point {contactPoint.point}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
             playerActor.ShieldCollision(contactPoint.point);
+            if (_photonView.Owner.IsMasterClient)
+            {
+                ScoreFlashNet.Push("HIT", contactPoint.point);
+            }
         }
 
         private void OnBrickCollision(Collision2D collision)
@@ -74,15 +85,24 @@ namespace Examples2.Scripts.Battle.Ball
 
         private void OnWallCollision(Collision2D collision)
         {
+            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
-            Debug.Log($"onWallCollision {other.name} {other.tag}");
+            Debug.Log($"onWallCollision {other.name} {other.tag} @ point {contactPoint.point}");
             if (other.CompareTag(Tags.BlueTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.BlueWall));
+                if (_photonView.Owner.IsMasterClient)
+                {
+                    ScoreFlashNet.Push("POINT", contactPoint.point);
+                }
             }
             else if (other.CompareTag(Tags.RedTeam))
             {
                 this.Publish(new ScoreManager.ScoreEvent(ScoreType.RedWall));
+                if (_photonView.Owner.IsMasterClient)
+                {
+                    ScoreFlashNet.Push("WALL", contactPoint.point);
+                }
             }
         }
 

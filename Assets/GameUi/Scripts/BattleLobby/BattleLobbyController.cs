@@ -29,7 +29,7 @@ namespace GameUi.Scripts.BattleLobby
         {
             _photonRoomList = gameObject.GetOrAddComponent<PhotonRoomList>();
             _view.CreateRoomButton.onClick.AddListener(CreateRoom);
-            _view.OnJoinRoom = OnJoinRoomClick;
+            _view.OnJoinRoomClicked = OnJoinRoomClick;
         }
 
         public override void OnEnable()

@@ -55,7 +55,7 @@ namespace GameUi.Scripts.BattleLobby
 
         public Button CreateRoomButton => _createRoomButton;
 
-        public Action<string> OnJoinRoom { get; set; }
+        public Action<string> OnJoinRoomClicked { get; set; }
 
         public void ResetView()
         {
@@ -133,7 +133,7 @@ namespace GameUi.Scripts.BattleLobby
         {
             var roomInfo = _currentRooms[index];
             Debug.Log($"InvokeOnJoinRoom {index} : {roomInfo.GetDebugLabel()}");
-            OnJoinRoom?.Invoke(roomInfo.Name);
+            OnJoinRoomClicked?.Invoke(roomInfo.Name);
         }
     }
 }
