@@ -58,3 +58,8 @@ MonoBehaviour:
     _shieldForEgo: {fileID: 0}
     _shieldForCon: {fileID: 156700737595684781, guid: b01029031a14e6249bf9f167d5b57e45,
       type: 3}
+  _input:
+    _clickInputAction: {fileID: 3018464710834141242, guid: 750f331ad00cee349a579491c975f1af,
+      type: 3}
+    _moveInputAction: {fileID: -7747489554431944705, guid: 750f331ad00cee349a579491c975f1af,
+      type: 3}

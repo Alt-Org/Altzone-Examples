@@ -3,6 +3,7 @@ using Altzone.Scripts.Config.ScriptableObjects;
 using Altzone.Scripts.Model;
 using Prg.Scripts.Common.Util;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Altzone.Scripts.Config
 {
@@ -161,6 +162,16 @@ namespace Altzone.Scripts.Config
     }
 
     /// <summary>
+    /// New Input System Package for Player actions.
+    /// </summary>
+    [Serializable]
+    public class GameInput
+    {
+        [Header("Player Input Actions")] public InputActionReference _clickInputAction;
+        public InputActionReference _moveInputAction;
+    }
+
+    /// <summary>
     /// Runtime game config variables that can be referenced from anywhere safely and optionally can be changed on the fly.
     /// </summary>
     /// <remarks>
@@ -194,6 +205,7 @@ namespace Altzone.Scripts.Config
         [SerializeField] private GameVariables _permanentVariables;
         [SerializeField] private GamePrefabs _permanentPrefabs;
         [SerializeField] private PlayerDataCache _playerDataCache;
+        [SerializeField] private GameInput _gameInput;
 
         public GameFeatures Features
         {
@@ -219,6 +231,8 @@ namespace Altzone.Scripts.Config
             private set => _permanentPrefabs.CopyFrom(value);
         }
 
+        public GameInput Input => _gameInput;
+
         public PlayerDataCache PlayerDataCache => _playerDataCache;
 
         private static void LoadGameConfig(RuntimeGameConfig instance)
@@ -237,6 +251,7 @@ namespace Altzone.Scripts.Config
             instance.Variables = gameSettings._variables;
             instance.Prefabs = gameSettings._prefabs;
             instance._playerDataCache = LoadPlayerDataCache();
+            instance._gameInput = gameSettings._input;
         }
 
         private static PlayerDataCache LoadPlayerDataCache()

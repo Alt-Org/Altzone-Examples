@@ -1,41 +1,47 @@
 using System;
+using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
 namespace Prg.Scripts.Common.Unity.Window
 {
     /// <summary>
-    /// Tracks Escape key press on behalf of <c>WindowManager</c>
-    /// using <c>UnityEngine.InputSystem</c> with simple callback to listen all keypresses.
+    /// Tracks Escape key press (and similar functionality on other devices) on behalf of <c>WindowManager</c>
+    /// using <c>UnityEngine.InputSystem</c> to listen given <c>InputAction</c> for Navigation/Back action.
     /// </summary>
     public class EscapeKeyHandler : MonoBehaviour
     {
-        private const char Escape = '\u001B';
+        [SerializeField] private InputActionReference _escapeInputActionRef;
 
         private Action _callback;
 
+        private void Awake()
+        {
+            var escapeInputAction = Resources.Load<EscapeInputAction>(nameof(EscapeInputAction));
+            Assert.IsNotNull(escapeInputAction, "escapeInputAction != null");
+            _escapeInputActionRef = escapeInputAction._escapeInputAction;
+            Debug.Log($"Awake escapeInputActionRef {_escapeInputActionRef}");
+        }
+
         private void OnEnable()
         {
-            Keyboard.current.onTextInput -= OnTextInput;
-            Keyboard.current.onTextInput += OnTextInput;
+            _escapeInputActionRef.action.performed += OnEscapeActionPerformed;
         }
 
         private void OnDisable()
         {
-            Keyboard.current.onTextInput -= OnTextInput;
+            _escapeInputActionRef.action.performed -= OnEscapeActionPerformed;
         }
 
         private void OnDestroy()
         {
-            Keyboard.current.onTextInput -= OnTextInput;
+            _escapeInputActionRef.action.performed -= OnEscapeActionPerformed;
         }
 
-        private void OnTextInput(char c)
+        private void OnEscapeActionPerformed(InputAction.CallbackContext ctx)
         {
-            if (c == Escape)
-            {
-                _callback?.Invoke();
-            }
+            _callback?.Invoke();
         }
 
         public void SetCallback(Action callback)
