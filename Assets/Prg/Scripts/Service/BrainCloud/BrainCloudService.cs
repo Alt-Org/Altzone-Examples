@@ -7,20 +7,24 @@ namespace Prg.Scripts.Service.BrainCloud
 {
     public class BrainCloudService : MonoBehaviour
     {
-        private static BrainCloudService _instance;
         [SerializeField] private BrainCloudWrapper _brainCloudWrapper;
 
-        public static BrainCloudService Get() => _instance;
+        public static BrainCloudService Get() => FindObjectOfType<BrainCloudService>();
+
+        public static BrainCloudService Create()
+        {
+            Assert.IsNull(Get(), "BrainCloudService.Get() != null");
+            var instance = UnityExtensions.CreateGameObjectAndComponent<BrainCloudService>(nameof(BrainCloudService), false);
+            return instance;
+        }
 
         public bool IsReady => BrainCloudAsync.BrainCloudUser != null;
 
         public BrainCloudUser BrainCloudUser => BrainCloudAsync.BrainCloudUser;
 
-        private async void Awake()
+        private void Awake()
         {
             Debug.Log("Awake");
-            Assert.IsTrue(_instance == null, "_instance == null");
-            _instance = this;
             DontDestroyOnLoad(gameObject);
             _brainCloudWrapper = gameObject.AddComponent<BrainCloudWrapper>();
             BrainCloudAsync.SetBrainCloudWrapper(_brainCloudWrapper);
