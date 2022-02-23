@@ -48,3 +48,5 @@ UserSettings/ButtonNaviLeaveClan	Leave Clan	Leave Clan1	Leave Clan2
 UserSettings/ButtonNaviPlayerName	Player Name	Pelaajanimi	Spelarnamn
 UserSettings/TitleText	user settings	käyttäjäasetukset	användarinställningar
 UserSettings/ButtonToggleDebug	Debug	Debug	Debug
+UserSettings/ButtonNaviBrainCloud	BrainCloud	BrainCloud	BrainCloud
+BrainCloudUi/TitleText	BrainCloud	BrainCloud	BrainCloud
