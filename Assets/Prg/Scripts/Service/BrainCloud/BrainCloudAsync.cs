@@ -1,6 +1,8 @@
 #if USE_BRAINCLOUD
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BrainCloud;
+using BrainCloud.JsonFx.Json;
 using Prg.Scripts.Common.PubSub;
 
 namespace Prg.Scripts.Service.BrainCloud
