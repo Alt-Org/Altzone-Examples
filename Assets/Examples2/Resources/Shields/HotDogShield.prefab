@@ -124,7 +124,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1885560458750418224}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.183, z: 0}
   m_LocalScale: {x: 0.03, y: 0.03, z: 1}
   m_Children:
@@ -388,6 +388,7 @@ MonoBehaviour:
   - {fileID: 4472396640188786655}
   - {fileID: 2196812505419052750}
   _shieldHitEffect: {fileID: 2669135065664048798}
+  _particlePivot: {fileID: 5545943212652545152}
 --- !u!1 &9148317700077183532
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,6 +496,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5545943212652545152}
     m_Modifications:
+    - target: {fileID: 1510482479256572208, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Flip.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1510482479256572208, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Flip.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1510482479256572208, guid: b7cfb23045e7dae4dbcb2d2298232de3,
+        type: 3}
+      propertyPath: m_Flip.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5814683551562830757, guid: b7cfb23045e7dae4dbcb2d2298232de3,
         type: 3}
       propertyPath: m_Name

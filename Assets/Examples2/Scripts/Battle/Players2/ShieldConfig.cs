@@ -11,6 +11,7 @@ namespace Examples2.Scripts.Battle.Players2
         [SerializeField] public ParticleSystem _shieldHitEffect;
 
         public Transform[] Shields => _shields;
+        public Transform _particlePivot;
 
         private void Awake()
         {

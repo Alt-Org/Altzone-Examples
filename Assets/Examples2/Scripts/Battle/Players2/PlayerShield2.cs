@@ -34,10 +34,12 @@ namespace Examples2.Scripts.Battle.Players2
         {
             Debug.Log($"SetupShield {_shieldName} isShieldRotated {isShieldRotated}");
             var shields = _config.Shields;
+            var pivot = _config._particlePivot;
             for (var i = 0; i < shields.Length; ++i)
             {
                 var shield = shields[i];
                 shield.Rotate(isShieldRotated);
+                pivot.Rotate(isShieldRotated);
                 if (i == _rotationIndex)
                 {
                     _shield = shield.gameObject;

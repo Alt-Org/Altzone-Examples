@@ -155,6 +155,7 @@ MonoBehaviour:
   - {fileID: 5426300373652430721}
   - {fileID: 7720180390180572816}
   _shieldHitEffect: {fileID: 6378397916178866636}
+  _particlePivot: {fileID: 4154596542547885278}
 --- !u!1 &546262554226260026
 GameObject:
   m_ObjectHideFlags: 0
