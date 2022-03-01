@@ -13,7 +13,7 @@ namespace Examples2.Scripts.Battle.interfaces
         void SetVisibility(bool isVisible);
         void SetPlayMode(int playMode);
         void SetRotation(int rotationIndex);
-        void PlayHitEffects(Vector2 contactPoint);
+        void PlayHitEffects();
     }
 
     public interface IPlayerShield

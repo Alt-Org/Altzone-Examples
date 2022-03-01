@@ -106,7 +106,7 @@ namespace Examples2.Scripts.Battle.Players2
             _shield.SetActive(_isVisible);
         }
 
-        void IPlayerShield2.PlayHitEffects(Vector2 contactPoint)
+        void IPlayerShield2.PlayHitEffects()
         {
             _shieldHitEffect.Play();
         }
