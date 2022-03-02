@@ -12,7 +12,7 @@ namespace Battle.Scripts.Battle.Players2
 
         private Action<int> _onSendPlayMode;
         private Action<bool> _onSendShieldVisibility;
-        private Action<int, Vector2> _onSendShieldRotation;
+        private Action<int> _onSendShieldRotation;
 
         private void Awake()
         {
@@ -29,7 +29,7 @@ namespace Battle.Scripts.Battle.Players2
             _onSendShieldVisibility = callback;
         }
 
-        public void SendShieldRotation(Action<int, Vector2> callback)
+        public void SendShieldRotation(Action<int> callback)
         {
             _onSendShieldRotation = callback;
         }
@@ -46,10 +46,10 @@ namespace Battle.Scripts.Battle.Players2
             _photonView.RPC(nameof(SendShieldVisibilityRpc), RpcTarget.All, isVisible);
         }
 
-        public void SendShieldRotation(Action<int, Vector2> callback, int rotationIndex, Vector2 contactPoint)
+        public void SendShieldRotation(Action<int> callback, int rotationIndex)
         {
             Assert.IsTrue(callback == _onSendShieldRotation, "callback == _onSendShieldRotation");
-            _photonView.RPC(nameof(SendShieldRotationRpc), RpcTarget.All, rotationIndex, contactPoint);
+            _photonView.RPC(nameof(SendShieldRotationRpc), RpcTarget.All, rotationIndex);
         }
 
         [PunRPC]
@@ -65,9 +65,9 @@ namespace Battle.Scripts.Battle.Players2
         }
 
         [PunRPC]
-        private void SendShieldRotationRpc(int rotationIndex, Vector2 contactPoint)
+        private void SendShieldRotationRpc(int rotationIndex)
         {
-            _onSendShieldRotation(rotationIndex, contactPoint);
+            _onSendShieldRotation(rotationIndex);
         }
     }
 }
