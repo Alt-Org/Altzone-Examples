@@ -101,7 +101,7 @@ namespace Battle.Scripts.Battle.Players
             }
         }
 
-        void IPlayerActor.ShieldCollision(Vector2 contactPoint)
+        void IPlayerActor.ShieldCollision()
         {
             // NOP - until game features are implemented
         }

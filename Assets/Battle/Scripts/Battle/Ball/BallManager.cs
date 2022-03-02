@@ -65,14 +65,13 @@ namespace Battle.Scripts.Battle.Ball
 
         private void OnShieldCollision(Collision2D collision)
         {
-            var contactPoint = collision.GetFirstContactPoint();
             var other = collision.gameObject;
-            Debug.Log($"onShieldCollision {other.GetFullPath()} @ point {contactPoint.point}");
+            Debug.Log($"onShieldCollision {other.GetFullPath()}");
             var playerActor = other.GetComponentInParent<IPlayerActor>();
-            playerActor.ShieldCollision(contactPoint.point);
+            playerActor.ShieldCollision();
             if (_photonView.Owner.IsMasterClient)
             {
-                ScoreFlashNet.Push("HIT", contactPoint.point);
+                ScoreFlashNet.Push("HIT");
             }
         }
 
