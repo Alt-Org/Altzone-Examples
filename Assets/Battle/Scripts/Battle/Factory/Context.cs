@@ -3,7 +3,7 @@ using System.Linq;
 using Altzone.Scripts.Battle;
 using Battle.Scripts.Battle.Ball;
 using Battle.Scripts.Battle.interfaces;
-using Battle.Scripts.Battle.Players;
+using Battle.Scripts.Battle.Players2;
 using Battle.Scripts.Battle.Room;
 using UnityEngine;
 

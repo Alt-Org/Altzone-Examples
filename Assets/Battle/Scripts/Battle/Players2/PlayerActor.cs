@@ -4,7 +4,7 @@ using Altzone.Scripts.Battle;
 using Photon.Realtime;
 using UnityEngine;
 
-namespace Battle.Scripts.Battle.Players
+namespace Battle.Scripts.Battle.Players2
 {
     /// <summary>
     /// Common base class for player actors so that FindObjectsOfType() for <c>PlayerActor</c> can be satisfied for all implementations.

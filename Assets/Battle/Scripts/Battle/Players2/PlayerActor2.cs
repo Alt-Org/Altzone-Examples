@@ -4,7 +4,6 @@ using Altzone.Scripts.Model;
 using Battle.Scripts.Battle.Ball;
 using Battle.Scripts.Battle.Factory;
 using Battle.Scripts.Battle.interfaces;
-using Battle.Scripts.Battle.Players;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using TMPro;

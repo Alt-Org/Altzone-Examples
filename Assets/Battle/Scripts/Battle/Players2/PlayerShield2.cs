@@ -1,5 +1,4 @@
 using Battle.Scripts.Battle.interfaces;
-using Battle.Scripts.Battle.Players;
 using UnityEngine;
 
 namespace Battle.Scripts.Battle.Players2
