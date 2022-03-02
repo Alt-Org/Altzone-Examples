@@ -242,12 +242,12 @@ namespace Battle.Scripts.Battle.Players2
             }
         }
 
-        void IPlayerActor.ShieldCollision(Vector2 contactPoint)
+        void IPlayerActor.ShieldCollision()
         {
             if (PhotonNetwork.IsMasterClient)
             {
                 var rotationIndex = _shield.RotationIndex + 1;
-                _rpc.SendShieldRotation(OnSetShieldRotation, rotationIndex, contactPoint);
+                _rpc.SendShieldRotation(OnSetShieldRotation, rotationIndex);
             }
         }
 
@@ -316,7 +316,7 @@ namespace Battle.Scripts.Battle.Players2
             _shield.SetPlayMode(playMode);
         }
 
-        private void OnSetShieldRotation(int rotationIndex, Vector2 contactPoint)
+        private void OnSetShieldRotation(int rotationIndex)
         {
             _shield.SetRotation(rotationIndex);
             _shield.PlayHitEffects();

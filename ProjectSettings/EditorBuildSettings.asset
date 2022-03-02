@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Battle/Scenes/85-room-test-2.unity
+    guid: a2968010e2b92d643a12baec14622c47
+  - enabled: 1
     path: Assets/GameUi/Scenes/ui-loader.unity
     guid: 65fba5b33ca05ef46b2f0e659872ba36
   - enabled: 1
@@ -26,7 +29,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Battle/Scenes/85-room-test.unity
     guid: dc89caebf072e164b9031f8237062275
-  - enabled: 1
-    path: Assets/Battle/Scenes/85-room-test-2.unity
-    guid: a2968010e2b92d643a12baec14622c47
   m_configObjects: {}
