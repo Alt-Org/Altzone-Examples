@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: scene-game-over-battle
   m_EditorClassIdentifier: 
   _sceneName:
-    sceneName: ui-game-over-battle
+    sceneName: go-game-over-battle
   _isNetworkScene: 0
