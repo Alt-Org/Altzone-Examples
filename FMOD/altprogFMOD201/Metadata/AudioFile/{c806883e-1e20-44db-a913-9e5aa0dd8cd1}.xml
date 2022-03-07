@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="AudioFile" id="{c806883e-1e20-44db-a913-9e5aa0dd8cd1}">
+		<property name="assetPath">
+			<value>the-cradle-of-your-soul-15700.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>177.50204081632654</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{c75fd666-91e1-4274-8183-3683f61d1322}</destination>
+		</relationship>
+	</object>
+</objects>
