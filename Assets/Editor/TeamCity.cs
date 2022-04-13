@@ -260,14 +260,15 @@ namespace Editor
             if (args.IsAndroidFull)
             {
                 EditorUserBuildSettings.androidCreateSymbolsZip = true;
-                EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.Proguard;
+                PlayerSettings.Android.minifyRelease = true;
+                PlayerSettings.Android.minifyWithR8 = true;
             }
             else
             {
                 // Do not change current settings!
             }
             Log($"androidCreateSymbolsZip={EditorUserBuildSettings.androidCreateSymbolsZip}");
-            Log($"androidReleaseMinification={EditorUserBuildSettings.androidReleaseMinification}");
+            Log($"Android.minifyRelease={PlayerSettings.Android.minifyRelease} R8={PlayerSettings.Android.minifyWithR8}");
 
             PlayerSettings.Android.useCustomKeystore = true;
             Log($"useCustomKeystore={PlayerSettings.Android.useCustomKeystore}");
