@@ -64,9 +64,16 @@ namespace Editor
         {
             void PatchIndexHtml(string htmlFile, string curTitle, string newTitle)
             {
+                string oldTitleText;
+                string newTitleText;
+#if UNITY_2019
+                oldTitleText = $"<div class=\"title\">{curTitle}</div>";
+                newTitleText = $"<div class=\"title\">{newTitle}</div>";
+#else
+                oldTitleText = $"<div id=\"unity-build-title\">{curTitle}</div>";
+                newTitleText = $"<div id=\"unity-build-title\">{newTitle}</div>";
+#endif
                 var htmlContent = File.ReadAllText(htmlFile);
-                var oldTitleText = $"<div class=\"title\">{curTitle}</div>";
-                var newTitleText = $"<div class=\"title\">{newTitle}</div>";
                 var newHtmlContent = htmlContent.Replace(oldTitleText, newTitleText);
                 if (newHtmlContent == htmlContent)
                 {
@@ -259,7 +266,7 @@ namespace Editor
             Log($"buildAppBundle={EditorUserBuildSettings.buildAppBundle}");
             if (args.IsAndroidFull)
             {
-                EditorUserBuildSettings.androidCreateSymbolsZip = true;
+                EditorUserBuildSettings.androidCreateSymbols = AndroidCreateSymbols.Debugging;
                 PlayerSettings.Android.minifyRelease = true;
                 PlayerSettings.Android.minifyWithR8 = true;
             }
@@ -267,7 +274,7 @@ namespace Editor
             {
                 // Do not change current settings!
             }
-            Log($"androidCreateSymbolsZip={EditorUserBuildSettings.androidCreateSymbolsZip}");
+            Log($"androidCreateSymbols={EditorUserBuildSettings.androidCreateSymbols}");
             Log($"Android.minifyRelease={PlayerSettings.Android.minifyRelease} R8={PlayerSettings.Android.minifyWithR8}");
 
             PlayerSettings.Android.useCustomKeystore = true;
