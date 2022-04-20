@@ -266,16 +266,28 @@ namespace Editor
             Log($"buildAppBundle={EditorUserBuildSettings.buildAppBundle}");
             if (args.IsAndroidFull)
             {
+                Log($"Override settings in Editor");
+#if UNITY_2019
+                EditorUserBuildSettings.androidCreateSymbolsZip = true;
+                EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.Proguard;
+#else
                 EditorUserBuildSettings.androidCreateSymbols = AndroidCreateSymbols.Debugging;
                 PlayerSettings.Android.minifyRelease = true;
                 PlayerSettings.Android.minifyWithR8 = true;
+#endif
             }
             else
             {
                 // Do not change current settings!
+                Log($"Using current settings from Editor");
             }
+#if UNITY_2019
+            Log($"androidCreateSymbolsZip={EditorUserBuildSettings.androidCreateSymbolsZip}");
+            Log($"androidReleaseMinification={EditorUserBuildSettings.androidReleaseMinification}");
+#else
             Log($"androidCreateSymbols={EditorUserBuildSettings.androidCreateSymbols}");
             Log($"Android.minifyRelease={PlayerSettings.Android.minifyRelease} R8={PlayerSettings.Android.minifyWithR8}");
+#endif
 
             PlayerSettings.Android.useCustomKeystore = true;
             Log($"useCustomKeystore={PlayerSettings.Android.useCustomKeystore}");
