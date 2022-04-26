@@ -202,7 +202,6 @@ namespace Editor.Prg.Dependencies
             var selectedGuids = Selection.assetGUIDs;
             if (selectedGuids.Length == 0)
             {
-                Debug.Log("Nothing is selected");
                 return null;
             }
             var paths = new List<string>();
