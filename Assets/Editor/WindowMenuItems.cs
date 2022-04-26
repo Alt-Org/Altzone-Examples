@@ -127,22 +127,22 @@ namespace Editor
 
         #region Util
 
-        [MenuItem(Util + "List Used layers in Scene", false, 20)]
+        [MenuItem(Util + "List Used layers in Scene", false, 10)]
         private static void ListUsedLayersInScene() => ListUsedLayers.ListUsedLayersInScene();
 
-        [MenuItem(Util + "List Used tags in Scene", false, 21)]
+        [MenuItem(Util + "List Used tags in Scene", false, 11)]
         private static void ListUsedTagsInScene() => ListUsedLayers.ListUsedTagsInScene();
 
-        [MenuItem(Util + "List GameObjects with layer or tag in Scene", false, 22)]
+        [MenuItem(Util + "List GameObjects with layer or tag in Scene", false, 12)]
         private static void ListGameObjectsWithLayerOrTagInScene() => ListUsedLayers.ListGameObjectsWithLayerOrTagInScene();
 
-        [MenuItem(Util + "Create Project 'Standard' Folders", false, 30)]
+        [MenuItem(Util + "Create Project 'Standard' Folders", false, 13)]
         private static void CreateProjectStandardFolders() => CreateStandardFolders.CreateProjectStandardFolders();
 
-        [MenuItem(MenuRoot + "Generate UnityConstants.cs", false, 40)]
+        [MenuItem(Util + "Generate UnityConstants.cs", false, 14)]
         private static void GenerateUnityConstants() => UnityConstantsGenerator.GenerateUnityConstants();
 
-        [MenuItem(Util + "Show Version Info", false, 50)]
+        [MenuItem(Util + "Show Version Info", false, 15)]
         private static void ShowVersionInfo() => MenuShowVersionInfo.ShowVersionInfo();
 
         #endregion
