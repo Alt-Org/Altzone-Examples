@@ -11,14 +11,11 @@ namespace Editor.Prg.Localization
     /// <summary>
     /// Localization process in Editor utility window.
     /// </summary>
-    public class SmartTextSearchEditorWindow : EditorWindow
+    internal class SmartTextSearchEditorWindow : EditorWindow
     {
-        private const string MenuRoot = LocalizerMenu.MenuRoot;
-
-        [MenuItem(MenuRoot + "Show Localization Window")]
-        private static void SearchLocalizationKeys()
+        public static void SearchLocalizationKeys()
         {
-            Debug.Log("SearchLocalizationKeys");
+            Debug.Log("*");
             GetWindow<SmartTextSearchEditorWindow>("Localization Key Utility")
                 .Show();
         }
