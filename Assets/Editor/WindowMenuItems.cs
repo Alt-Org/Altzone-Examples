@@ -9,8 +9,14 @@ using UnityEditor;
 
 namespace Editor
 {
+    /// <summary>
+    /// Container to populate 'Window' menu items for this game in Editor. 
+    /// </summary>
     internal static class WindowMenuItems
     {
+        // https://riptutorial.com/unity3d/example/10475/menu-items
+        // You can add a separator in between two menu items by making sure there is at least 10 digits in between the priority of the menu items.
+        
         private const string MenuRoot = "Window/ALT-Zone/";
         private const string GameDebug = MenuRoot + "Game Debug/";
         private const string Localization = MenuRoot + "Localization/";
