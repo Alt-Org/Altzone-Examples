@@ -25,12 +25,12 @@ namespace Prg.Scripts.Common.PubSub
                 {
                     return;
                 }
-                var handlerCount = Hub.handlers.Count;
+                var handlerCount = Hub.Handlers.Count;
                 if (handlerCount <= 0)
                 {
                     return;
                 }
-                foreach (var h in Hub.handlers)
+                foreach (var h in Hub.Handlers)
                 {
                     Debug.Log($"handler {h}");
                 }
@@ -42,39 +42,39 @@ namespace Prg.Scripts.Common.PubSub
             SceneManager.sceneUnloaded += _ => CheckHandlerCount();
         }
 
-        public static bool Exists<T>(this object obj)
+        public static bool Exists<T>(this object subscriber)
         {
-            return Hub.Exists<T>(obj);
+            return Hub.Exists<T>(subscriber);
         }
 
-        public static void Publish<T>(this object obj)
+        public static void Publish<T>(this object _)
         {
-            Hub.Publish(obj, default(T));
+            Hub.Publish(default(T));
         }
 
-        public static void Publish<T>(this object obj, T data)
+        public static void Publish<T>(this object _, T data)
         {
-            Hub.Publish(obj, data);
+            Hub.Publish(data);
         }
 
-        public static void Subscribe<T>(this object obj, Action<T> handler)
+        public static void Subscribe<T>(this object subscriber, Action<T> handler)
         {
-            Hub.Subscribe(obj, handler);
+            Hub.Subscribe(subscriber, handler);
         }
 
-        public static void Unsubscribe(this object obj)
+        public static void Unsubscribe(this object subscriber)
         {
-            Hub.Unsubscribe(obj);
+            Hub.Unsubscribe(subscriber);
         }
 
-        public static void Unsubscribe<T>(this object obj)
+        public static void Unsubscribe<T>(this object subscriber)
         {
-            Hub.Unsubscribe(obj, (Action<T>)null);
+            Hub.Unsubscribe(subscriber, (Action<T>)null);
         }
 
-        public static void Unsubscribe<T>(this object obj, Action<T> handler)
+        public static void Unsubscribe<T>(this object subscriber, Action<T> handler)
         {
-            Hub.Unsubscribe(obj, handler);
+            Hub.Unsubscribe(subscriber, handler);
         }
     }
 }
