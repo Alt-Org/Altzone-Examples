@@ -8,9 +8,10 @@ namespace Prg.Scripts.Common.PubSub
     public static class PubSubExtensions
     {
         private static readonly Hub Hub = new Hub();
+        private static bool _isApplicationQuitting;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void InitializeOnLoad()
+        private static void BeforeSceneLoad()
         {
             SetEditorStatus();
         }
@@ -20,32 +21,30 @@ namespace Prg.Scripts.Common.PubSub
         {
             void CheckHandlerCount()
             {
-                var handlerCount = Hub.handlers.Count;
-                if (handlerCount > 0)
+                if (_isApplicationQuitting)
                 {
-                    foreach (var h in Hub.handlers)
-                    {
-                        Debug.Log($"handler {h}");
-                    }
-                    Debug.LogWarning($"PubSubExtensions.HandlerCount is {handlerCount}");
+                    return;
                 }
+                var handlerCount = Hub.handlers.Count;
+                if (handlerCount <= 0)
+                {
+                    return;
+                }
+                foreach (var h in Hub.handlers)
+                {
+                    Debug.Log($"handler {h}");
+                }
+                Debug.LogWarning($"sceneUnloaded PubSubExtensions.HandlerCount is {handlerCount}");
             }
 
-            SceneManager.sceneUnloaded += s => CheckHandlerCount();
+            _isApplicationQuitting = false;
+            Application.quitting += () => _isApplicationQuitting = true;
+            SceneManager.sceneUnloaded += _ => CheckHandlerCount();
         }
 
         public static bool Exists<T>(this object obj)
         {
-            foreach (var h in Hub.handlers)
-            {
-                if (Equals(h.Sender.Target, obj) &&
-                    typeof(T) == h.Type)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return Hub.Exists<T>(obj);
         }
 
         public static void Publish<T>(this object obj)

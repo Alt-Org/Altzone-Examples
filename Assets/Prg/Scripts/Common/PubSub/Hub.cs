@@ -21,6 +21,22 @@ namespace Prg.Scripts.Common.PubSub
         private readonly object locker = new object();
         internal readonly List<Handler> handlers = new List<Handler>();
 
+        public bool Exists<T>(object obj)
+        {
+            lock (locker)
+            {
+                foreach (var h in handlers)
+                {
+                    if (Equals(h.Sender.Target, obj) &&
+                        typeof(T) == h.Type)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Allow publishing directly onto this Hub.
         /// </summary>
@@ -59,7 +75,7 @@ namespace Prg.Scripts.Common.PubSub
 
             foreach (var l in handlerList)
             {
-                ((Action<T>) l.Action)(data);
+                ((Action<T>)l.Action)(data);
             }
         }
 
