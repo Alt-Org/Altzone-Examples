@@ -52,7 +52,7 @@ namespace Battle.Scripts.Battle.Players2
 
         private void Awake()
         {
-            Debug.Log($"Awake {_photonView}");
+            Debug.Log($"Awake {_photonView} prefab {name}");
             var player = _photonView.Owner;
             _transform = GetComponent<Transform>();
             _state.InitState(_transform, player);
