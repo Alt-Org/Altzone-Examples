@@ -106,6 +106,7 @@ namespace Editor
             var unityName = EditorApplication.applicationPath.Replace(sep1, sep2);
             var methodName = $"{typeof(TeamCity).FullName}.{nameof(Build)}";
             var script = MyCmdLineScripts.BuildScript
+                .Replace("<<unity_version>>", Application.unityVersion)
                 .Replace("<<unity_name>>", unityName)
                 .Replace("<<method_name>>", methodName);
             File.WriteAllText(scriptName, script);
@@ -457,7 +458,14 @@ namespace Editor
             public static string WebGLPostProcessScript => WebGLPostProcessScriptContent;
 
             private const string BuildScriptContent = @"@echo off
+set VERSION=<<unity_version>>
 set UNITY=<<unity_name>>
+if not exist ""%UNITY%"" (
+    echo *
+    echo * UNITY executable not found: ""%UNITY%""
+    echo *
+    goto :eof
+)
 
 set BUILDTARGET=%1
 if ""%BUILDTARGET%"" == ""Win64"" goto :valid_build
@@ -491,7 +499,9 @@ if exist %build_output% (
     echo Delete folder %build_output%
     rmdir /S /Q %build_output%
 )
-echo Start build
+echo.
+echo Start build with UNITY %VERSION%
+echo.
 echo ""%UNITY%"" %UNITY_OPTIONS%
 ""%UNITY%"" %UNITY_OPTIONS%
 set RESULT=%ERRORLEVEL%
@@ -501,6 +511,7 @@ if not ""%RESULT%"" == ""0"" (
     echo *
     goto :eof
 )
+echo.
 if not exist m_BuildScript_PostProcess.bat (
     echo Build done, check log for results
     goto :eof
