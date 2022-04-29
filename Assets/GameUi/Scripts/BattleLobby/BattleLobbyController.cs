@@ -25,6 +25,8 @@ namespace GameUi.Scripts.BattleLobby
         [SerializeField] private BattleLobbyView _view;
         [SerializeField] private PhotonRoomList _photonRoomList;
 
+        private bool _isJoiningRoom;
+        
         private void Awake()
         {
             _photonRoomList = gameObject.GetOrAddComponent<PhotonRoomList>();
@@ -78,7 +80,7 @@ namespace GameUi.Scripts.BattleLobby
                 yield return null;
                 if (PhotonWrapper.InLobby)
                 {
-                    _view.CreateRoomButton.interactable = true;
+                    _view.EnableButtons();
                     StartCoroutine(QueryLobbyStatus());
                     yield break;
                 }
@@ -118,13 +120,14 @@ namespace GameUi.Scripts.BattleLobby
             Debug.Log($"OnRoomsUpdated InLobby {PhotonWrapper.InLobby}");
             if (!PhotonWrapper.InLobby)
             {
-                _view.CreateRoomButton.interactable = false;
+                _view.DisableButtons();
                 _view.RoomListInfo = "Disconnected from Lobby";
                 return;
             }
             var currentRooms = _photonRoomList.CurrentRooms;
             _view.RoomListInfo = $"Room count is {currentRooms.Count}";
-            _view.UpdateRoomList(currentRooms);
+            var isInteractable = !_isJoiningRoom;
+            _view.UpdateRoomList(currentRooms, isInteractable);
         }
 
         private void CreateRoom()
@@ -137,6 +140,7 @@ namespace GameUi.Scripts.BattleLobby
                 MaxPlayers = 4,
             };
             PhotonLobby.CreateRoom(roomName, roomOptions);
+            _isJoiningRoom = true;
             _view.DisableButtons();
         }
 
@@ -150,6 +154,7 @@ namespace GameUi.Scripts.BattleLobby
                 {
                     if (PhotonLobby.JoinRoom(roomInfo))
                     {
+                        _isJoiningRoom = true;
                         _view.DisableButtons();
                     }
                 }
@@ -195,6 +200,7 @@ namespace GameUi.Scripts.BattleLobby
 
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
+            _isJoiningRoom = false;
             _view.EnableButtons();
         }
 

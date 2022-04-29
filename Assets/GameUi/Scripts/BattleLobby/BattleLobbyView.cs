@@ -74,8 +74,9 @@ namespace GameUi.Scripts.BattleLobby
 
         public void EnableButtons()
         {
-            _createRoomButton.interactable = true;
-            SetRoomButtonsInteractable(true);
+            // TODO: create room is not implemented - so that it can be used for real gameplay - so it is disabled for now!
+            _createRoomButton.interactable = false; //true;
+            SetRoomButtonsInteractable(false); //true);
         }
 
         public void DisableButtons()
@@ -84,18 +85,18 @@ namespace GameUi.Scripts.BattleLobby
             SetRoomButtonsInteractable(false);
         }
 
-        private void SetRoomButtonsInteractable(bool canInteract)
+        private void SetRoomButtonsInteractable(bool isInteractable)
         {
             var childCount = _viewportContent.childCount;
             for (var i = 0; i < childCount; ++i)
             {
                 var roomInfo = _currentRooms[i];
                 var button = _viewportContent.GetChild(i).GetComponent<Button>();
-                button.interactable = canInteract && roomInfo.IsOpen;
+                button.interactable = isInteractable && roomInfo.IsOpen;
             }
         }
 
-        public void UpdateRoomList(ReadOnlyCollection<RoomInfo> currentRooms)
+        public void UpdateRoomList(ReadOnlyCollection<RoomInfo> currentRooms, bool isInteractable)
         {
             var childCount = _viewportContent.childCount;
             while (childCount > currentRooms.Count)
@@ -125,7 +126,8 @@ namespace GameUi.Scripts.BattleLobby
                 var button = _viewportContent.GetChild(i).GetComponent<Button>();
                 var caption = $"{roomInfo.Name} {roomInfo.PlayerCount}/4 {(roomInfo.IsOpen ? "open" : "closed")}";
                 button.SetCaption(caption);
-                button.interactable = roomInfo.IsOpen;
+                // TODO: join room is not implemented - so that it can be used for real gameplay - so it is disabled for now!
+                button.interactable = false; // isInteractable && roomInfo.IsOpen;
             }
         }
 
