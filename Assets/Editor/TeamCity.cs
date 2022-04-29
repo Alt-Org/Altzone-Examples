@@ -113,7 +113,9 @@ namespace Editor
             Debug.Log($"Build script '{scriptName}' written");
             var buildTargetName = CommandLine.BuildTargetNameFrom(EditorUserBuildSettings.activeBuildTarget);
             var driverName = $"{Path.GetFileNameWithoutExtension(scriptName)}_{buildTargetName}.bat";
-            var driverScript = $"{scriptName} {buildTargetName} && pause";
+            var driverScript = MyCmdLineScripts.BuildDriverScript
+                .Replace("<<build_script_name>>", scriptName)
+                .Replace("<<build_target_name>>", buildTargetName);
             File.WriteAllText(driverName, driverScript);
             Debug.Log($"Build script driver '{driverName}' written");
         }
@@ -454,8 +456,11 @@ namespace Editor
         private static class MyCmdLineScripts
         {
             public static string BuildScript => BuildScriptContent;
+            public static string BuildDriverScript => BuildDriverScriptContent;
             public static string AndroidPostProcessScript => AndroidPostProcessScriptContent;
             public static string WebGLPostProcessScript => WebGLPostProcessScriptContent;
+
+            #region BuildScriptContent
 
             private const string BuildScriptContent = @"@echo off
 set VERSION=<<unity_version>>
@@ -487,6 +492,9 @@ goto :eof
 set PROJECTPATH=./
 set METHOD=<<method_name>>
 set LOGFILE=m_Build_%BUILDTARGET%.log
+if exist %LOGFILE% (
+    del /Q %LOGFILE%
+)
 if ""%BUILDTARGET%"" == ""Android"" (
     set ANDROID_KEYSTORE=-keystore ..\local_%USERNAME%\altzone.keystore
 )
@@ -500,7 +508,7 @@ if exist %build_output% (
     rmdir /S /Q %build_output%
 )
 echo.
-echo Start build with UNITY %VERSION%
+echo Start build with UNITY %VERSION% log file %LOGFILE%
 echo.
 echo ""%UNITY%"" %UNITY_OPTIONS%
 ""%UNITY%"" %UNITY_OPTIONS%
@@ -521,7 +529,21 @@ echo *
 call m_BuildScript_PostProcess.bat
 echo *
 echo Post processing done
+goto :eof
 ";
+
+            #endregion
+
+            #region BuildDriverScriptContent
+
+            private const string BuildDriverScriptContent = @"@echo off
+echo ~~~~~ BUILD start ~~~~~
+call <<build_script_name>> <<build_target_name>>
+echo ~~~~~ BUILD  done ~~~~~
+pause";
+
+            #endregion
+            #region AndroidPostProcessScriptContent
 
             private const string AndroidPostProcessScriptContent = @"@echo off
 set BUILD_DIR=BuildAndroid
@@ -586,6 +608,10 @@ echo ROBOCOPY result %RESULT%
 goto :eof
 ";
 
+            #endregion
+
+            #region WebGLPostProcessScriptContent
+
             private const string WebGLPostProcessScriptContent = @"@echo off
 set BUILD_DIR=BuildWebGL
 set DROPBOX_DIR=C:\Users\%USERNAME%\Dropbox\tekstit\altgame\BuildWebGL
@@ -600,6 +626,8 @@ if ""%LOGFILE%""  == """" (
 robocopy %BUILD_DIR% %DROPBOX_DIR% /S /E /V /NP /R:0 /W:0 /LOG+:%LOGFILE%
 goto :eof
 ";
+
+            #endregion
         }
     }
 }
