@@ -52,12 +52,12 @@ namespace Battle.Scripts.Battle.Players2
 
         private void Awake()
         {
-            Debug.Log($"Awake {_photonView} prefab {name}");
+            Debug.Log($"Awake {_photonView} with prefab {name}");
             var player = _photonView.Owner;
             _transform = GetComponent<Transform>();
             _state.InitState(_transform, player);
             var prefix = $"{(player.IsLocal ? "L" : "R")}{PlayerPos}:{TeamNumber}";
-            name = $"@{prefix}>{player.NickName}";
+            name = $"@{name.Replace("(Clone)", string.Empty)}:{prefix}>{player.NickName}";
             SetDebug();
             // Must detect player position from actual y coordinate!
             var isYCoordNegative = _transform.position.y < 0;
