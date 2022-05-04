@@ -13,19 +13,28 @@ MonoBehaviour:
   m_Name: LoggerConfig
   m_EditorClassIdentifier: 
   _isLogToFile: 0
+  _isShowMethodName: 1
   _colorForClassName: White
   _loggerRules: '.*PhotonListener.*=1
 
+    .*SceneLoader.*=1
+
+    .*ScoreFlash.*=0
+
     ^Altzone.*=0
 
-    ^Editor.*=1
+    ^Battle.*=0
 
-    ^Examples2.*=0
+    ^Editor.*=0
+
+    ^GameOver.*=0
 
     ^GameUi.*=0
 
     ^Prg.*=0
 
-    ^Tests.*=1
+    ^Scripts.*=0
 
-    .*=0'
+    ^Tests.*=0
+
+    ^.*=0'
