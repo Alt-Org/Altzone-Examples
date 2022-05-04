@@ -4,7 +4,6 @@ using Editor.Prg.GameDebug;
 using Editor.Prg.Localization;
 using Editor.Prg.Logging;
 using Editor.Prg.Util;
-using Editor.UiProto;
 using UnityEditor;
 
 namespace Editor
@@ -16,7 +15,7 @@ namespace Editor
     {
         // https://riptutorial.com/unity3d/example/10475/menu-items
         // You can add a separator in between two menu items by making sure there is at least 10 digits in between the priority of the menu items.
-        
+
         private const string MenuRoot = "Window/ALT-Zone/";
         private const string GameDebug = MenuRoot + "Game Debug/";
         private const string Localization = MenuRoot + "Localization/";
@@ -25,7 +24,6 @@ namespace Editor
         private const string Build = MenuRoot + "Build/";
         private const string Logging = MenuRoot + "Logging/";
         private const string Util = MenuRoot + "Util/";
-        private const string UiProto = MenuRoot + "UiProto/";
 
         #region GameDebug
 
@@ -144,13 +142,6 @@ namespace Editor
 
         [MenuItem(Build + "Test Android Build Config", false, 12)]
         private static void CheckAndroidBuild() => MenuBuildReport.CheckAndroidBuild();
-
-        #endregion
-
-        #region UiProto
-
-        [MenuItem(UiProto + "Window Report", false, 10)]
-        private static void WindowReport() => MenuWindowReport.WindowReport();
 
         #endregion
     }
