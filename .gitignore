@@ -1,6 +1,6 @@
 # This .gitignore file should be placed at the root of your Unity project directory
 #
-# Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
+# Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 /[Ll]ibrary/
 /[Tt]emp/
@@ -14,8 +14,8 @@
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
 
-# Asset meta data should only be ignored when the corresponding asset is also ignored
-!/[Aa]ssets/**/*.meta
+# Recordings can get excessive in size
+/[Rr]ecordings/
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
@@ -59,6 +59,7 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
+*.app
 
 # Crashlytics generated file
 crashlytics-build.properties
@@ -70,28 +71,40 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# end of Unity.gitignore
+
+# Third party
+
 # Intellij products project files directory
 .idea/
+
+# https://youtrack.jetbrains.com/issue/RIDER-76195 (Fix scheduled for release with Rider package 3.0.14)
+/ProjectSettings/RiderScriptEditorPersistedState.asset
 
 # Project Auditor (https://github.com/Unity-Technologies/ProjectAuditor)
 /Assets/BuildReports/*
 /Assets/BuildReports.meta
 
-# This Project local settings override folder: XxxTest
+# FMOD cache
+FMOD/**/.cache
+
+# This Project
+
+# Local settings override folder: XxxTest
 **/[Rr]esources/*[Tt]est/
 **/[Rr]esources/*[Tt]est.meta
 
-# This Project local settings files: LocalConfig2.asset
+# Local settings files: Local*.asset
 **/[Rr]esources/[Ll]ocal*.asset
 **/[Rr]esources/[Ll]ocal*.asset.meta
 !**/[Rr]esources/LocalizationConfig.asset
 !**/[Rr]esources/LocalizationConfig.asset.meta
 
-# This Project local build config files
+# Local build config files
 m_Build*
 
-# This Project local qualified build output folder
+# Local qualified build output folder
 /[Bb]uild*/
 
-# https://youtrack.jetbrains.com/issue/RIDER-76195
-/ProjectSettings/RiderScriptEditorPersistedState.asset
+# Local windows desktop shortcuts
+/*.lnk
