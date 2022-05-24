@@ -20,7 +20,7 @@ namespace Prg.Scripts.Common.Unity.Window
         }
 
         [Serializable]
-        private class MyWindow
+        public class MyWindow
         {
             public WindowDef _windowDef;
             public GameObject _window;
@@ -37,27 +37,33 @@ namespace Prg.Scripts.Common.Unity.Window
                 _windowDef = windowDef;
                 _window = window;
             }
+
+            public override string ToString()
+            {
+                return $"{(_windowDef != null ? _windowDef.name : "noname")}/{(_window != null ? _window.name : "noname")}";
+            }
         }
 
         public static IWindowManager Get()
         {
-            var windowManager = FindObjectOfType<WindowManager>();
-            if (windowManager == null)
-            {
-                return new NoOpWindowManager();
-            }
-            return windowManager;
+            Assert.IsNotNull(_windowManager, "windowManager != null");
+            return _windowManager;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
         {
-            var windowManager = FindObjectOfType<WindowManager>();
-            if (windowManager == null)
-            {
-                UnityExtensions.CreateGameObjectAndComponent<WindowManager>(nameof(WindowManager), true);
-            }
+            _windowManager = UnityExtensions.CreateGameObjectAndComponent<WindowManager>(nameof(WindowManager), true);
         }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void SubsystemRegistration()
+        {
+            // Manual reset if UNITY Domain Reloading is disabled.
+            _windowManager = null;
+        }
+
+        private static IWindowManager _windowManager;
 
         [SerializeField] private List<MyWindow> _currentWindows;
         [SerializeField] private List<MyWindow> _knownWindows;
@@ -90,6 +96,8 @@ namespace Prg.Scripts.Common.Unity.Window
 #if UNITY_EDITOR
         private void OnApplicationQuit()
         {
+            // Replace actual WindowManager with dummy so that our clients do not have to check for Application Quit themselves. 
+            _windowManager = new NoOpWindowManager();
             ResetState();
         }
 #endif
@@ -136,6 +144,13 @@ namespace Prg.Scripts.Common.Unity.Window
         }
 
         int IWindowManager.WindowCount => _currentWindows.Count;
+
+        List<MyWindow> IWindowManager.WindowStack => _currentWindows;
+        
+        int IWindowManager.FindIndex(WindowDef windowDef)
+        {
+            return _currentWindows.FindIndex(x => x._windowDef == windowDef);
+        }
 
         void IWindowManager.GoBack()
         {
@@ -407,6 +422,10 @@ namespace Prg.Scripts.Common.Unity.Window
             }
 
             public int WindowCount => 0;
+
+            public List<MyWindow> WindowStack => new();
+
+            public int FindIndex(WindowDef windowDef) => -1;
 
             public void GoBack()
             {

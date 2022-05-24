@@ -1,11 +1,13 @@
-﻿using Photon.Pun;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Photon.Pun;
+using Prg.Scripts.Common.Photon;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
-namespace Prg.Scripts.Common.Photon
+namespace Prg.Scripts.Test
 {
     /// <summary>
     /// Helper OnGUI window to show some Photon related info as "overlay" window.
@@ -25,6 +27,7 @@ namespace Prg.Scripts.Common.Photon
 
         private void OnEnable()
         {
+            Assert.IsTrue(FindObjectsOfType<PhotonStatsWindow>().Length == 1, "FindObjectsOfType<PhotonStatsWindow>().Length == 1");
             _windowId = (int)DateTime.Now.Ticks;
             _windowRect = new Rect(0, 0, Screen.width, Screen.height);
             _windowTitle = $"({_controlKey}) Photon";
@@ -32,7 +35,7 @@ namespace Prg.Scripts.Common.Photon
 
         private void Update()
         {
-            if (Keyboard.current[_controlKey].isPressed)
+            if (Keyboard.current[_controlKey].wasPressedThisFrame)
             {
                 ToggleWindowState();
             }
@@ -120,6 +123,18 @@ namespace Prg.Scripts.Common.Photon
             }
             label += $"\r\nPhoton v='{PhotonLobby.GameVersion}'";
             label += $"\r\nSend rate={PhotonNetwork.SendRate} ser rate={PhotonNetwork.SerializationRate}";
+            if (PhotonNetwork.OfflineMode || PhotonNetwork.AutomaticallySyncScene)
+            {
+                label += $"\r\n";
+                if (PhotonNetwork.OfflineMode)
+                {
+                    label += $"OfflineMode ";
+                }
+                if (PhotonNetwork.AutomaticallySyncScene)
+                {
+                    label += $"AutomaticallySyncScene ";
+                }
+            }
             GUILayout.Label(label, _guiLabelStyle);
         }
 
@@ -146,6 +161,71 @@ namespace Prg.Scripts.Common.Photon
         {
             return TypeMap.TryGetValue(type, out var name) ? name : type.Name;
         }
+#if false
+        /// <summary>
+        /// Ring buffer for average lag compensation calculation, not exactly exact!
+        /// </summary>
+        /// <remarks>
+        /// Values are updated once per buffer fill and can be seen in Editor.
+        /// </remarks>
+        [Serializable]
+        public class LagCompensation
+        {
+            public string status;
+            public double samplingStart;
+            public double samplingDuration;
+            public int sampleCount;
+            public int sampleIndexCur;
+            public int sampleIndexMax;
+            public float[] samples;
+
+            public LagCompensation(int sampleCount)
+            {
+                this.sampleCount = sampleCount;
+                sampleIndexMax = sampleCount - 1;
+                samples = new float[sampleCount];
+                reset();
+            }
+
+            public void reset()
+            {
+                status = string.Empty;
+                samplingStart = 0;
+                samplingDuration = 0;
+                sampleIndexCur = 0;
+            }
+
+            public void addSample(float lagValue)
+            {
+                samples[sampleIndexCur] = lagValue;
+                if (sampleIndexCur == 0)
+                {
+                    samplingStart = Time.time;
+                    sampleIndexCur += 1;
+                }
+                else if (sampleIndexCur == sampleIndexMax)
+                {
+                    samplingDuration = Time.time - samplingStart;
+                    sampleIndexCur = 0;
+                    status = ToString();
+                }
+                else
+                {
+                    sampleIndexCur += 1;
+                }
+            }
+
+            public override string ToString()
+            {
+                var sum = 0f;
+                for (var i = 0; i < sampleCount; ++i)
+                {
+                    sum += samples[i];
+                }
+                return $"avg lag {sum / sampleCount:0.000} s ({sampleCount}) : {sampleCount / samplingDuration: 0.0} msg/s";
+            }
+        }
+#endif
 #endif
     }
 }
