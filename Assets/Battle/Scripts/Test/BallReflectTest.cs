@@ -24,6 +24,10 @@ namespace Battle.Scripts.Test
     {
         [SerializeField] private BallSettings settings;
 
+        [Header("Trail Testing")] public bool _isTeleportOnBrickCollision;
+        public int _trailSkipFrames = 15;
+        public TrailRenderer _trailRenderer;
+
         [Header("Live Data"), SerializeField] private bool isRedTeamActive;
         [SerializeField] private bool isBlueTeamActive;
 
@@ -93,6 +97,19 @@ namespace Battle.Scripts.Test
             }
         }
 
+        private int _trailCountDown;
+        private float _trailRendererTime;
+
+        private void Update()
+        {
+            if (--_trailCountDown == 0)
+            {
+                print($"{Time.frameCount} trailRenderer time {_trailRendererTime:0.00}");
+                //_trailRenderer.time = _trailRendererTime;
+                _trailRenderer.emitting = true;
+            }
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!enabled)
@@ -120,6 +137,15 @@ namespace Battle.Scripts.Test
             if (_brickMaskValue == (_brickMaskValue | colliderMask))
             {
                 Bounce(other);
+                if (_isTeleportOnBrickCollision)
+                {
+                    _rigidbody.position = Vector2.zero;
+                    _trailCountDown = _trailSkipFrames;
+                    _trailRendererTime = _trailRenderer.time;
+                    //_trailRenderer.time = 0;
+                    _trailRenderer.emitting = false;
+                    print($"{Time.frameCount} trailRenderer time {0f:0.00}");
+                }
                 Brick(otherGameObject);
                 return;
             }
