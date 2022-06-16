@@ -50,7 +50,10 @@ namespace Examples.Lobby.Scripts.LootLocker
         private async void Awake()
         {
             Debug.Log("Awake start");
-            LootLockerSDKManager.Init(do_not_save_it_here, "0.0.0.1", LootLockerConfig.platformType.Android, true);
+            var apiKey = do_not_save_it_here;
+            var gameVersion = "0.0.0.1";
+            var platform = LootLockerConfig.platformType.Android;
+            LootLockerSDKManager.Init(apiKey, gameVersion, platform, true, null);
             isStartSessionReady = false;
             if (isAsyncMode)
             {

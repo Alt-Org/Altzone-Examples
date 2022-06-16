@@ -7,7 +7,7 @@
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "2.0.0"
       },
-      "hash": "6cf326f57f8763badd2a7e5bf62a9ad519d468e6"
+      "hash": "21938b658b94c7b3d564ceb6610e9d53c7c1bddc"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -32,7 +32,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.11",
+      "version": "2.0.14",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -71,7 +71,7 @@
       "hash": "67c5b6242aa4082990187b23bb608baded9adb12"
     },
     "com.unity.test-framework": {
-      "version": "1.1.29",
+      "version": "1.1.30",
       "depth": 0,
       "source": "registry",
       "dependencies": {
