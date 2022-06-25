@@ -1,4 +1,5 @@
-﻿using Prg.Scripts.Common.Photon;
+﻿#if USE_LOOTLOCKER
+using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using System.Collections;
 using UnityEngine;
@@ -52,3 +53,4 @@ namespace Examples.Lobby.Scripts.LootLocker
         }
     }
 }
+#endif

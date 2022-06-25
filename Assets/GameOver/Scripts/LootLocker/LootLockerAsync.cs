@@ -1,3 +1,4 @@
+#if USE_LOOTLOCKER
 using LootLocker.Requests;
 using System.Threading.Tasks;
 
@@ -42,3 +43,4 @@ namespace Examples.Lobby.Scripts.LootLocker
         }
     }
 }
+#endif

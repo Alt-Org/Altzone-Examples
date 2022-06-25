@@ -1,4 +1,6 @@
-﻿using LootLocker.Requests;
+﻿#if USE_LOOTLOCKER
+using LootLocker.Requests;
+#endif
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -48,7 +50,7 @@ namespace Examples.Lobby.Scripts.LootLocker
 
         public PlayerHandle playerHandle => _playerHandle;
         public bool isValid => _playerHandle != null && isStartSessionReady;
-
+#if USE_LOOTLOCKER
         /// <summary>
         /// Asynchronous methods can be mind-boggling even though they make life a lot easier!
         /// </summary>
@@ -200,5 +202,6 @@ namespace Examples.Lobby.Scripts.LootLocker
                 LootLockerSDKManager.EndSession(_playerHandle.DeviceId, null);
             }
         }
+#endif
     }
 }
