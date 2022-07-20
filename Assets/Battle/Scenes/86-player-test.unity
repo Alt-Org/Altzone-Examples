@@ -5132,7 +5132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7c7b821e45a4220aac25cc2573daa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isOfflineMode: 0
+  _isOfflineMode: 1
   _debugPlayerPos: 1
   _objectsToActivate:
   - {fileID: 1620697639}
@@ -7491,20 +7491,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _config: {fileID: 0}
+  _scrollWheelActionRef: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
   _mouse:
-    zoomSpeed: 0
-    minZoomSpeed: 0
-    maxZoomSpeed: 0
-    panSpeed: 0
-    minPanSpeed: 0
-    maxPanSpeed: 0
+    _isZoom: 1
+    _zoomSpeed: 0
+    _minZoomSpeed: 0
+    _maxZoomSpeed: 0
+    _isPan: 1
+    _panSpeed: 0
+    _minPanSpeed: 0
+    _maxPanSpeed: 0
   _touch:
-    zoomSpeed: 0
-    minZoomSpeed: 0
-    maxZoomSpeed: 0
-    panSpeed: 0
-    minPanSpeed: 0
-    maxPanSpeed: 0
+    _isZoom: 0
+    _zoomSpeed: 0
+    _minZoomSpeed: 0
+    _maxZoomSpeed: 0
+    _isPan: 0
+    _panSpeed: 0
+    _minPanSpeed: 0
+    _maxPanSpeed: 0
   _handler: {fileID: 0}
 --- !u!1 &1645258094
 GameObject:
@@ -8661,7 +8667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ballVelocity: {x: 5, y: 5}
-  _startBallMoving: 1
+  _startBallMoving: 0
   _stopBallMoving: 0
   _hideBall: 0
   _showBall: 0
@@ -9240,6 +9246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}

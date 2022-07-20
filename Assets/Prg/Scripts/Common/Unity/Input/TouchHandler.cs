@@ -28,8 +28,8 @@ namespace Prg.Scripts.Common.Unity.Input
                     if (touch.phase == TouchPhase.Began)
                     {
                         // Check if finger is over a UI element
-                        IsPointerOverGameObject = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
-                        if (IsPointerOverGameObject)
+                        _isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
+                        if (_isPointerOverGameObject)
                         {
                             return;
                         }
@@ -44,7 +44,7 @@ namespace Prg.Scripts.Common.Unity.Input
                         lastPanPosition = touch.position;
                         touchCount += 1;
                         SendMouseDown(lastPanPosition, touchCount);
-                        PanCamera((firstPanPosition - lastPanPosition) * panSpeed);
+                        PanCamera((firstPanPosition - lastPanPosition) * _panSpeed);
                     }
                     break;
 
@@ -63,7 +63,7 @@ namespace Prg.Scripts.Common.Unity.Input
                         var newDistance = Vector2.Distance(newPositions[0], newPositions[1]);
                         var oldDistance = Vector2.Distance(lastZoomPositions[0], lastZoomPositions[1]);
                         var offset = newDistance - oldDistance;
-                        ZoomCamera(offset * zoomSpeed);
+                        ZoomCamera(offset * _zoomSpeed);
                         lastZoomPositions[0] = newPositions[0];
                         lastZoomPositions[1] = newPositions[1];
                     }
