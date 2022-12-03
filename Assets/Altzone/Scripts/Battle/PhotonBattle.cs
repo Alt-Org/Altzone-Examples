@@ -79,7 +79,7 @@ namespace Altzone.Scripts.Battle
             {
                 return PhotonNetwork.NickName;
             }
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             return playerData.PlayerName;
         }
 

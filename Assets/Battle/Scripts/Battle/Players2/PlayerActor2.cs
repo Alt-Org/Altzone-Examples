@@ -1,3 +1,4 @@
+using System;
 using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
@@ -63,7 +64,7 @@ namespace Battle.Scripts.Battle.Players2
             var isYCoordNegative = _transform.position.y < 0;
             var isLower = isYCoordNegative;
             var isCameraRotated = false;
-            var features = RuntimeGameConfig.Get().Features;
+            var features = GameConfig.Get().Features;
             if (features._isRotateGameCamera)
             {
                 var gameCameraInstance = Context.GetGameCamera;
@@ -91,7 +92,7 @@ namespace Battle.Scripts.Battle.Players2
             _shield = new PlayerShield2(shieldConfig);
             var isShieldRotated = !isYCoordNegative;
             _shield.Setup(name, isShieldRotated, false, _startPlayMode, 0);
-            var multiplier = RuntimeGameConfig.Get().Variables._shieldDistanceMultiplier;
+            var multiplier = GameConfig.Get().Variables._shieldDistanceMultiplier;
             _shieldDistance = model.Defence * multiplier;
 
             Debug.Log(
@@ -112,7 +113,7 @@ namespace Battle.Scripts.Battle.Players2
 
         private void SetDebug()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             var isDebugFlag = playerData.IsDebugFlag;
             _isShowDebugCanvas = isDebugFlag && _isShowDebugCanvas;
             _playerInfo = GetComponentInChildren<TextMeshPro>();
@@ -149,7 +150,7 @@ namespace Battle.Scripts.Battle.Players2
             }
             else
             {
-                var features = RuntimeGameConfig.Get().Features;
+                var features = GameConfig.Get().Features;
                 isShieldVisible = features._isSinglePlayerShieldOn;
                 _distanceMeter = new PlayerDistanceMeterFixed(isShieldVisible);
             }
@@ -194,12 +195,13 @@ namespace Battle.Scripts.Battle.Players2
 
         private static ShieldConfig LoadShield(Defence defence, Transform transform)
         {
-            var shieldInstance = RuntimeGameConfig.Get().Prefabs.GetShieldPrefab(defence);
+            throw new NotImplementedException();
+            /*var shieldInstance = GameConfig.Get().Prefabs.GetShieldPrefab(defence);
             var shieldPrefab = shieldInstance.GetComponent<ShieldConfig>();
             Assert.IsNotNull(shieldPrefab, "shieldPrefab != null");
             var shieldConfig = Instantiate(shieldPrefab, transform);
             shieldConfig.name = shieldConfig.name.Replace("(Clone)", string.Empty);
-            return shieldConfig;
+            return shieldConfig;*/
         }
 
         #region External events

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using Altzone.Scripts.Model;
@@ -8,12 +7,71 @@ using UnityEngine;
 
 namespace Altzone.Scripts.Config
 {
+    public interface IPlayerDataCache
+    {
+        string PlayerName { get; set; }
+        string PlayerGuid { get; }
+        int ClanId { get; set; }
+        int CustomCharacterModelId { get; set; }
+        SystemLanguage Language { get; set; }
+        bool IsDebugFlag { get; set; }
+        bool IsTosAccepted { get; set; }
+        bool IsFirstTimePlaying { get; set; }
+        bool IsAccountVerified { get; set; }
+
+        //IBattleCharacter CurrentBattleCharacter { get; }
+        ClanModel Clan { get; }
+
+        bool HasPlayerName { get; }
+        void UpdatePlayerGuid(string newPlayerGuid);
+
+#if UNITY_EDITOR
+        void DebugSavePlayer();
+        void DebugResetPlayer();
+#endif
+    }
+
     /// <summary>
     /// Player data cache - a common storage for player related data that is persisted somewhere (locally).
     /// </summary>
     [Serializable]
-    public class PlayerDataCache
+    public class PlayerDataCache : IPlayerDataCache
     {
+        public static IPlayerDataCache Create()
+        {
+            return new PlayerDataCacheLocal();
+        }
+
+        public int CustomCharacterModelId
+        {
+            get => 1;
+            set => throw new NotImplementedException();
+        }
+
+        public bool IsFirstTimePlaying
+        {
+            get => false;
+            set => throw new NotImplementedException();
+        }
+
+        public bool IsAccountVerified
+        {
+            get => false;
+            set => throw new NotImplementedException();
+        }
+
+        public ClanModel Clan => throw new NotImplementedException();
+
+        public void UpdatePlayerGuid(string newPlayerGuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DebugSavePlayer()
+        {
+            throw new NotImplementedException();
+        }
+
         [SerializeField] protected string _playerName;
 
         /// <summary>
@@ -166,7 +224,6 @@ namespace Altzone.Scripts.Config
             // Placeholder for actual implementation in derived class.
         }
 
-        [Conditional("UNITY_EDITOR")]
         public void DebugResetPlayer()
         {
             // Actually can not delete at this level - just invalidate everything!
@@ -194,7 +251,7 @@ namespace Altzone.Scripts.Config
     {
         private const string PlayerNameKey = "PlayerData.PlayerName";
         private const string PlayerGuidKey = "PlayerData.PlayerGuid";
-        private const string CharacterModelIdKey = "PlayerData.CharacterModelId";
+        private const string CharacterModelIdKey = "PlayerData.CustomCharacterModelId";
         private const string ClanIdKey = "PlayerData.ClanId";
         private const string TermsOfServiceKey = "PlayerData.TermsOfService";
         private const string IsDebugFlagKey = "PlayerData.IsDebugFlag";

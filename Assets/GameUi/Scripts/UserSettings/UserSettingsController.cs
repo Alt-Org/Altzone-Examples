@@ -10,9 +10,9 @@ namespace GameUi.Scripts.UserSettings
 
         private void OnEnable()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             Debug.Log($"OnEnable {playerData}");
-            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
+            _view.PlayerInfo = playerData.PlayerName;
             if (playerData.ClanId > 0)
             {
                 _view.ShowLeaveClanButton();
@@ -28,7 +28,7 @@ namespace GameUi.Scripts.UserSettings
             _view.ToggleDebug.SetCaption(toggleDebugCaption);
             _view.ToggleDebug.onClick.AddListener(() =>
             {
-                playerData.BatchSave(() => { playerData.IsDebugFlag = !playerData.IsDebugFlag; });
+                playerData.IsDebugFlag = !playerData.IsDebugFlag;
                 toggleDebugCaption = $"{originalCaption}: {(playerData.IsDebugFlag ? "1" : "0")}";
                 _view.ToggleDebug.SetCaption(toggleDebugCaption);
             });

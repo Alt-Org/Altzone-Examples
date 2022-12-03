@@ -11,7 +11,7 @@ namespace Prg.Scripts.Test
     /// <summary>
     /// Helper OnGUI window to show breadcrumbs from <c>WindowManager</c>.
     /// </summary>
-    public class Breadcrumbs : MonoBehaviour
+    internal class Breadcrumbs : MonoBehaviour
     {
         public bool _visible;
         public Key _controlKey = Key.F3;
@@ -27,8 +27,9 @@ namespace Prg.Scripts.Test
 
         private void OnEnable()
         {
-            Assert.IsTrue(FindObjectsOfType<Breadcrumbs>().Length == 1, "FindObjectsOfType<Breadcrumbs>().Length == 1");
-            _windowId = (int)DateTime.Now.Ticks;
+            var type = GetType();
+            Assert.IsTrue(FindObjectsOfType(type).Length == 1, $"FindObjectsOfType({type}).Length == 1");
+            _windowId = type.GetHashCode();
             _windowRect = new Rect(0, 0, Screen.width, Screen.height / 3f);
             _windowTitle = $"({_controlKey}) Windows: 0";
             _builder = new StringBuilder();

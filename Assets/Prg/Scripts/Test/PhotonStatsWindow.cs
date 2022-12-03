@@ -12,7 +12,7 @@ namespace Prg.Scripts.Test
     /// <summary>
     /// Helper OnGUI window to show some Photon related info as "overlay" window.
     /// </summary>
-    public class PhotonStatsWindow : MonoBehaviour
+    internal class PhotonStatsWindow : MonoBehaviour
     {
         public bool _visible;
         public Key _controlKey = Key.F2;
@@ -27,8 +27,9 @@ namespace Prg.Scripts.Test
 
         private void OnEnable()
         {
-            Assert.IsTrue(FindObjectsOfType<PhotonStatsWindow>().Length == 1, "FindObjectsOfType<PhotonStatsWindow>().Length == 1");
-            _windowId = (int)DateTime.Now.Ticks;
+            var type = GetType();
+            Assert.IsTrue(FindObjectsOfType(type).Length == 1, $"FindObjectsOfType({type}).Length == 1");
+            _windowId = type.GetHashCode();
             _windowRect = new Rect(0, 0, Screen.width, Screen.height);
             _windowTitle = $"({_controlKey}) Photon";
         }
@@ -63,12 +64,12 @@ namespace Prg.Scripts.Test
 
         private void DebugWindow(int windowId)
         {
-            string label;
+            string title;
             var inRoom = PhotonNetwork.InRoom;
             if (inRoom)
             {
                 var room = PhotonNetwork.CurrentRoom;
-                label = $"{PhotonNetwork.LocalPlayer.NickName} | {room.Name}" +
+                title = $"{PhotonNetwork.LocalPlayer.NickName} | {room.Name}" +
                         $"{(room.IsVisible ? string.Empty : ",hidden")}" +
                         $"{(room.IsOpen ? string.Empty : ",closed")} " +
                         $"{(room.PlayerCount == 1 ? "1 player" : $"{room.PlayerCount} players")}" +
@@ -76,19 +77,22 @@ namespace Prg.Scripts.Test
             }
             else if (PhotonNetwork.InLobby)
             {
-                label = $"Lobby: rooms {PhotonNetwork.CountOfRooms}, players {PhotonNetwork.CountOfPlayers}";
+                title = $"Lobby: rooms {PhotonNetwork.CountOfRooms}, players {PhotonNetwork.CountOfPlayers}";
             }
             else
             {
-                label = $"Photon: {PhotonNetwork.NetworkClientState}";
+                title = $"Photon: {PhotonNetwork.NetworkClientState}";
             }
-            if (GUILayout.Button(label, _guiButtonStyle))
+            if (GUILayout.Button(title, _guiButtonStyle))
             {
                 ToggleWindowState();
+                return;
             }
+            var space = "  ";
+            var label = $"v={PhotonLobby.GameVersion} r={PhotonNetwork.CloudRegion} ping={PhotonNetwork.GetPing()}";
             if (inRoom)
             {
-                label = "Props:";
+                label += $"\r\n--Room--";
                 var room = PhotonNetwork.CurrentRoom;
                 var props = room.CustomProperties;
                 var keys = props.Keys.ToList();
@@ -101,9 +105,9 @@ namespace Prg.Scripts.Test
                         continue;
                     }
                     var propValue = props[key];
-                    label += $"\r\n{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
+                    label += $"\r\n{space}{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
                 }
-                label += "\r\nPlayers:";
+                label += "\r\n--Players--";
                 foreach (var player in room.GetPlayersByActorNumber())
                 {
                     var text = player.GetDebugLabel(verbose: false);
@@ -116,13 +120,12 @@ namespace Prg.Scripts.Test
                         foreach (var key in keys)
                         {
                             var propValue = props[key];
-                            label += $"\r\n{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
+                            label += $"\r\n{space}{key}={propValue} [{ShortTypeName(propValue.GetType())}]";
                         }
                     }
                 }
             }
-            label += $"\r\nPhoton v='{PhotonLobby.GameVersion}'";
-            label += $"\r\nSend rate={PhotonNetwork.SendRate} ser rate={PhotonNetwork.SerializationRate}";
+            label += $"\r\nsend rate={PhotonNetwork.SendRate} ser rate={PhotonNetwork.SerializationRate}";
             if (PhotonNetwork.OfflineMode || PhotonNetwork.AutomaticallySyncScene)
             {
                 label += $"\r\n";
@@ -132,11 +135,14 @@ namespace Prg.Scripts.Test
                 }
                 if (PhotonNetwork.AutomaticallySyncScene)
                 {
-                    label += $"AutomaticallySyncScene ";
+                    label += $"AutoSyncScene ";
                 }
             }
+            label += $"\r\nnick={PhotonNetwork.NickName}";
             GUILayout.Label(label, _guiLabelStyle);
         }
+
+        #region Type names
 
         private static readonly Dictionary<Type, string> TypeMap = new Dictionary<Type, string>()
         {
@@ -161,71 +167,9 @@ namespace Prg.Scripts.Test
         {
             return TypeMap.TryGetValue(type, out var name) ? name : type.Name;
         }
-#if false
-        /// <summary>
-        /// Ring buffer for average lag compensation calculation, not exactly exact!
-        /// </summary>
-        /// <remarks>
-        /// Values are updated once per buffer fill and can be seen in Editor.
-        /// </remarks>
-        [Serializable]
-        public class LagCompensation
-        {
-            public string status;
-            public double samplingStart;
-            public double samplingDuration;
-            public int sampleCount;
-            public int sampleIndexCur;
-            public int sampleIndexMax;
-            public float[] samples;
 
-            public LagCompensation(int sampleCount)
-            {
-                this.sampleCount = sampleCount;
-                sampleIndexMax = sampleCount - 1;
-                samples = new float[sampleCount];
-                reset();
-            }
+        #endregion
 
-            public void reset()
-            {
-                status = string.Empty;
-                samplingStart = 0;
-                samplingDuration = 0;
-                sampleIndexCur = 0;
-            }
-
-            public void addSample(float lagValue)
-            {
-                samples[sampleIndexCur] = lagValue;
-                if (sampleIndexCur == 0)
-                {
-                    samplingStart = Time.time;
-                    sampleIndexCur += 1;
-                }
-                else if (sampleIndexCur == sampleIndexMax)
-                {
-                    samplingDuration = Time.time - samplingStart;
-                    sampleIndexCur = 0;
-                    status = ToString();
-                }
-                else
-                {
-                    sampleIndexCur += 1;
-                }
-            }
-
-            public override string ToString()
-            {
-                var sum = 0f;
-                for (var i = 0; i < sampleCount; ++i)
-                {
-                    sum += samples[i];
-                }
-                return $"avg lag {sum / sampleCount:0.000} s ({sampleCount}) : {sampleCount / samplingDuration: 0.0} msg/s";
-            }
-        }
-#endif
 #endif
     }
 }

@@ -70,7 +70,7 @@ namespace Battle.Scripts.Battle.Room
             _countdownFinished = countdownFinished;
             if (PhotonNetwork.IsMasterClient)
             {
-                var roomStartDelay = RuntimeGameConfig.Get().Variables._roomStartDelay;
+                var roomStartDelay = GameConfig.Get().Variables._roomStartDelay;
                 StartCoroutine(DoCountdown(roomStartDelay));
             }
             var playerActor = Context.GetPlayer(PhotonBattle.GetPlayerPos(player));

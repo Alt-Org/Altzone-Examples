@@ -1,25 +1,28 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Prg.Scripts.Common.Photon
 {
     /// <summary>
     /// Utility to log all Photon events.
     /// </summary>
-    [DefaultExecutionOrder(-100)]
+    /// <remarks>
+    /// Should have very low "script execution order" number in order to be able to log events before others can see them.
+    /// </remarks>
     public class PhotonListener : MonoBehaviour,
         IConnectionCallbacks, ILobbyCallbacks, IMatchmakingCallbacks, IInRoomCallbacks, IPunOwnershipCallbacks
     {
-        private const int MaxTimeDifferenceMs = 60 * 60 * 1000;
-        private const int MinTimeDifferenceMs = -60 * 60 * 1000;
-        private static int _lastServerTimestamp;
+        private const int MaxServerTimeDifferenceMs = 60 * 60 * 1000;
+        private const int MinServerTimeDifferenceMs = -60 * 60 * 1000;
+        private static int _lastServerTimestampForLog;
+        private static string _prevMessage;
 
         private static readonly Dictionary<string, string> PhotonRoomPropNames;
         private static readonly Dictionary<string, string> PhotonPlayerPropNames;
@@ -50,7 +53,7 @@ namespace Prg.Scripts.Common.Photon
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void InitializeOnLoad()
+        private static void BeforeSceneLoad()
         {
             SetEditorStatus();
         }
@@ -58,61 +61,71 @@ namespace Prg.Scripts.Common.Photon
         [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         private static void SetEditorStatus()
         {
-            UnityExtensions.CreateGameObjectAndComponent<PhotonListener>(nameof(PhotonListener), true);
+            UnitySingleton.CreateStaticSingleton<PhotonListener>();
         }
 
-        private IEnumerator Start()
+        private void OnEnable()
         {
-            Debug.Log("Start");
+            if (PhotonNetwork.NetworkingClient != null)
+            {
+                PhotonNetwork.AddCallbackTarget(this);
+            }
+            else
+            {
+                this.ExecuteOnNextFrame(() => PhotonNetwork.AddCallbackTarget(this));
+            }
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
-            yield return new WaitUntil(() => PhotonNetwork.NetworkingClient != null);
-            PhotonNetwork.AddCallbackTarget(this);
+        }
+
+        private void Start()
+        {
             LogPhotonStatus();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             SceneManager.sceneLoaded -= SceneLoaded;
             SceneManager.sceneUnloaded -= SceneUnloaded;
             PhotonNetwork.RemoveCallbackTarget(this);
-            Debug.Log("OnApplicationQuit");
         }
 
         private void OnApplicationQuit()
         {
-            Debug.Log("OnDestroy");
+            Debug.Log("OnApplicationQuit");
         }
 
-        private static void LogPhotonStatus(string message = null)
+        private static void LogPhotonStatus(string message = null, [CallerMemberName] string memberName = null)
         {
-            var frame = new StackFrame(1);
-            var method = frame.GetMethod();
-            var methodName = method != null && method.ReflectedType != null ? method.Name : string.Empty;
-            _logMessage($"{methodName} {message}");
+            Log($"{memberName} {message}");
         }
 
         private static void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            _logMessage($"sceneLoaded {scene.name} ({scene.buildIndex})");
+            Log($"sceneLoaded {scene.name} ({scene.buildIndex})");
         }
 
         private static void SceneUnloaded(Scene scene)
         {
-            _logMessage($"sceneUnloaded {scene.name} ({scene.buildIndex})");
+            Log($"sceneUnloaded {scene.name} ({scene.buildIndex})");
         }
 
-        private static void _logMessage(string message)
+        private static void Log(string message)
         {
-            var c = PhotonNetwork.IsConnectedAndReady ? "r" : PhotonNetwork.IsConnected ? "c" : "-";
-            var deltaTime = PhotonNetwork.ServerTimestamp - _lastServerTimestamp;
-            if (deltaTime > MaxTimeDifferenceMs || deltaTime < MinTimeDifferenceMs)
+            if (message == _prevMessage)
             {
-                _lastServerTimestamp = PhotonNetwork.ServerTimestamp;
+                return;
+            }
+            var c = PhotonNetwork.IsConnectedAndReady ? "r" : PhotonNetwork.IsConnected ? "c" : "-";
+            var deltaTime = PhotonNetwork.ServerTimestamp - _lastServerTimestampForLog;
+            if (deltaTime > MaxServerTimeDifferenceMs || deltaTime < MinServerTimeDifferenceMs)
+            {
+                _lastServerTimestampForLog = PhotonNetwork.ServerTimestamp;
                 deltaTime = 0;
                 c += ">";
             }
             Debug.Log($"{c}> {PhotonNetwork.NetworkClientState} {deltaTime} {message}");
+            _prevMessage = message;
         }
 
         private static string HashtableToString(Hashtable props, IReadOnlyDictionary<string, string> keyMapping)
@@ -149,8 +162,9 @@ namespace Prg.Scripts.Common.Photon
              * https://doc.photonengine.com/en-us/pun/v2/getting-started/feature-overview#versioning_by_gameversion
              * https://forum.photonengine.com/discussion/16543/how-to-prevent-older-versions-of-the-client-from-connecting-to-photonnetwork
              */
-            LogPhotonStatus(
-                $"AppVersion={PhotonNetwork.AppVersion} GameVersion={PhotonNetwork.GameVersion} scene={SceneManager.GetActiveScene().name}");
+            LogPhotonStatus(PhotonNetwork.OfflineMode
+                ? $"OfflineMode scene={SceneManager.GetActiveScene().name}"
+                : $"AppVersion={PhotonNetwork.AppVersion} GameVersion={PhotonNetwork.GameVersion} scene={SceneManager.GetActiveScene().name}");
         }
 
         public void OnDisconnected(DisconnectCause cause)
@@ -168,7 +182,7 @@ namespace Prg.Scripts.Common.Photon
             LogPhotonStatus($"#{data.Count}");
             foreach (var entry in data)
             {
-                Debug.LogFormat("+ data:{0}={1}", entry.Key, entry.Value);
+                LogPhotonStatus($"+ data:{entry.Key}={entry.Value}");
             }
         }
 
@@ -196,7 +210,7 @@ namespace Prg.Scripts.Common.Photon
             LogPhotonStatus($"#{roomList.Count}");
             foreach (var roomInfo in roomList)
             {
-                Debug.LogFormat("+ {0}", roomInfo.GetDebugLabel());
+                Debug.Log($"+ {roomInfo.GetDebugLabel()}");
             }
         }
 
@@ -205,7 +219,7 @@ namespace Prg.Scripts.Common.Photon
             LogPhotonStatus($"#{lobbyStatistics.Count}");
             foreach (var lobbyInfo in lobbyStatistics)
             {
-                Debug.LogFormat("+ {0}", lobbyInfo.ToString());
+                Debug.Log($"+ {lobbyInfo}");
             }
         }
 
@@ -218,7 +232,7 @@ namespace Prg.Scripts.Common.Photon
             LogPhotonStatus($"#{friendList.Count}");
             foreach (var friendInfo in friendList)
             {
-                Debug.LogFormat("+ friend {0}", friendInfo.ToString());
+                Debug.Log($"+ friend {friendInfo}");
             }
         }
 
@@ -234,7 +248,7 @@ namespace Prg.Scripts.Common.Photon
 
         public void OnJoinedRoom()
         {
-            LogPhotonStatus(PhotonNetwork.CurrentRoom.GetDebugLabel());
+            LogPhotonStatus($"{PhotonNetwork.CurrentRoom.GetDebugLabel()} IsMasterClient={PhotonNetwork.IsMasterClient}");
         }
 
         public void OnJoinRoomFailed(short returnCode, string message)

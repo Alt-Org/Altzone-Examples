@@ -1,81 +1,123 @@
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace Prg.Scripts.Common.Unity.Input
 {
+    /// <summary>
+    /// Touch handler implementation using <c>EnhancedTouchSupport</c> and polling in <c>Update</c> loop.
+    /// </summary>
+    /// <remarks>
+    /// Pinch to Zoom Detection https://www.youtube.com/watch?v=5LEVj3PLufE <br />
+    /// https://docs.unity3d.com/Packages/com.unity.inputsystem@1.3/api/UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.html
+    /// </remarks>
     public class TouchHandler : BaseHandler
     {
-        [Header("Debug"),SerializeField]  private int touchCount;
-        [SerializeField] private Vector3 firstPanPosition;
-        [SerializeField] private Vector3 lastPanPosition;
-        [SerializeField] private int panFingerId;
-        [SerializeField] private bool isFingerDown;
-        [SerializeField] private bool zoomActive;
+        [Header("Live Data"),SerializeField]  private int _touchCount;
+        [SerializeField] private Vector2 _curPanPosition;
+        [SerializeField] private Vector2 _prevPanPosition;
+        [SerializeField] private int _panFingerId;
+        [SerializeField] private bool _isFingerDown;
+        [SerializeField] private bool _zoomActive;
 
-        [SerializeField] private Vector2[] lastZoomPositions;
+        private Vector2 _newPrimaryPosition;
+        private Vector2 _newSecondaryPosition;
+        private float _newDistance;
+        private float _previousDistance;
 
-        private readonly Vector2[] newPositions = new Vector2[2];
+        private void OnEnable()
+        {
+            // Enhanced touch support provides automatic finger tracking and touch history recording. It is an API designed for polling!
+            EnhancedTouchSupport.Enable();
+        }
+
+        private void OnDisable()
+        {
+            EnhancedTouchSupport.Disable();
+        }
 
         private void Update()
         {
-            switch (UnityEngine.Input.touchCount)
+            Assert.IsTrue(EnhancedTouchSupport.enabled, "EnhancedTouchSupport.enabled");
+            switch (Touch.activeTouches.Count)
             {
-                case 1: // Panning
+                case 1: 
                     // If the touch began, capture its position and its finger ID.
                     // Otherwise, if the finger ID of the touch doesn't match, skip it.
-                    zoomActive = false;
-                    var touch = UnityEngine.Input.GetTouch(0);
+                    _zoomActive = false;
+                    var touch = Touch.activeTouches[0];
                     if (touch.phase == TouchPhase.Began)
                     {
-                        // Check if finger is over a UI element
-                        _isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
-                        if (_isPointerOverGameObject)
+                        // Start touch down (click)
+                        var isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject(touch.touchId);
+                        if (isPointerOverGameObject)
                         {
+                            // Ignore touch start if finger is over a UI element.
                             return;
                         }
-                        isFingerDown = true;
-                        firstPanPosition = touch.position;
-                        touchCount = 1;
-                        SendMouseDown(firstPanPosition, touchCount);
-                        panFingerId = touch.fingerId;
+                        _isFingerDown = true;
+                        _curPanPosition = touch.screenPosition;
+                        _touchCount = 1;
+                        SendMouseDown(_curPanPosition, _touchCount);
+                        _prevPanPosition = _curPanPosition;
+                        _panFingerId = touch.touchId;
                     }
-                    else if (touch.fingerId == panFingerId && touch.phase == TouchPhase.Moved)
+                    else if (touch.touchId == _panFingerId && touch.phase == TouchPhase.Moved)
                     {
-                        lastPanPosition = touch.position;
-                        touchCount += 1;
-                        SendMouseDown(lastPanPosition, touchCount);
-                        PanCamera((firstPanPosition - lastPanPosition) * _panSpeed);
+                        // Continue touch down (panning)
+                        _curPanPosition = touch.screenPosition;
+                        _touchCount += 1;
+                        SendMouseDown(_curPanPosition, _touchCount);
+                        if (_isPan)
+                        {
+                            const float minDelta = 0.00001f;
+                            var delta = _curPanPosition - _prevPanPosition;
+                            if (Mathf.Abs(delta.x) > minDelta || Mathf.Abs(delta.y) > minDelta)
+                            {
+                                PanCamera(delta * _panSpeed);
+                                _prevPanPosition = _curPanPosition;
+                            }
+                        }
                     }
                     break;
 
-                case 2: // Zooming
-                    newPositions[0] = UnityEngine.Input.GetTouch(0).position;
-                    newPositions[1] = UnityEngine.Input.GetTouch(1).position;
-                    if (!zoomActive)
+                case 2:
+                    // Two finger zooming
+                    if (_isZoom)
                     {
-                        lastZoomPositions[0] = newPositions[0];
-                        lastZoomPositions[1] = newPositions[1];
-                        zoomActive = true;
-                    }
-                    else
-                    {
-                        // Zoom based on the distance between the new positions compared to the distance between the previous positions.
-                        var newDistance = Vector2.Distance(newPositions[0], newPositions[1]);
-                        var oldDistance = Vector2.Distance(lastZoomPositions[0], lastZoomPositions[1]);
-                        var offset = newDistance - oldDistance;
-                        ZoomCamera(offset * _zoomSpeed);
-                        lastZoomPositions[0] = newPositions[0];
-                        lastZoomPositions[1] = newPositions[1];
+                        _newPrimaryPosition = Touch.activeTouches[0].screenPosition;
+                        _newSecondaryPosition = Touch.activeTouches[1].screenPosition;
+                        if (!_zoomActive)
+                        {
+                            _newDistance = Vector2.Distance(_newPrimaryPosition, _newSecondaryPosition);
+                            _previousDistance = _newDistance;
+                            _zoomActive = true;
+                        }
+                        else
+                        {
+                            // Zoom based on the distance between the new positions compared to the distance between the previous positions.
+                            _previousDistance = _newDistance;
+                            _newDistance = Vector2.Distance(_newPrimaryPosition, _newSecondaryPosition);
+                            var deltaDistance = _newDistance - _previousDistance;
+                            ZoomCamera(deltaDistance * _zoomSpeed);
+                        }
                     }
                     break;
 
                 default:
-                    zoomActive = false;
-                    if (isFingerDown)
+                    // Exit
+                    if (_zoomActive)
                     {
-                        // Report last known touch position
-                        isFingerDown = false;
-                        SendMouseUp(touchCount == 1 ? firstPanPosition : lastPanPosition);
+                        _zoomActive = false;
+                    }
+                    if (_isFingerDown)
+                    {
+                        // End touch down, report last touch position
+                        _isFingerDown = false;
+                        SendMouseUp(_prevPanPosition);
                     }
                     break;
             }

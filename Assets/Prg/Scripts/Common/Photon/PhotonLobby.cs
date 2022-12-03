@@ -2,7 +2,6 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using Prg.Scripts.Common.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,11 +10,22 @@ namespace Prg.Scripts.Common.Photon
     /// <summary>
     /// Static helper class to handle basic <c>PhotonNetwork</c> operations in convenient and consistent way.
     /// </summary>
+    /// <remarks>
+    /// Note (1) that by default we use <code>PhotonNetwork.AutomaticallySyncScene = true</code>.<br />
+    /// Note (2) that <c>PhotonNetwork</c> <c>OfflineMode</c> must be handled separately if needed.
+    /// </remarks>
     public static class PhotonLobby
     {
         private const int MaxRoomNameLength = 16;
 
         private static bool _isApplicationQuitting;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void SubsystemRegistration()
+        {
+            // Manual reset if UNITY Domain Reloading is disabled.
+            GetGameVersion = () => DefaultGameVersion;
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
@@ -30,17 +40,13 @@ namespace Prg.Scripts.Common.Photon
         public static string GameVersion => GetGameVersion();
 
         /// <summary>
-        /// To override default <c>PhotonNetwork.GameVersion</c> that is alias for <c>Application.version</c>.
+        /// To override default <c>PhotonNetwork.GameVersion</c> (that is alias for <c>Application.version</c>).
         /// </summary>
-        public static Func<string> GetGameVersion = () => Application.version;
+        public static Func<string> GetGameVersion = () => DefaultGameVersion;
 
-        public static bool OfflineMode
-        {
-            get => PhotonNetwork.OfflineMode;
-            set => PhotonNetwork.OfflineMode = value;
-        }
+        private static string DefaultGameVersion => Application.version;
 
-        public static void Connect(string playerName, bool isAutomaticallySyncScene = true)
+        public static void Connect(string playerName)
         {
             if (_isApplicationQuitting)
             {
@@ -50,14 +56,13 @@ namespace Prg.Scripts.Common.Photon
             {
                 throw new UnityException("PhotonNetwork.OfflineMode not allowed");
             }
-            if (PhotonNetwork.NetworkClientState == ClientState.PeerCreated || PhotonNetwork.NetworkClientState == ClientState.Disconnected)
+            if (!PhotonWrapper.CanConnect)
             {
-                var photonAppSettings = ResourceLoader.Get().LoadAsset<PhotonAppSettings>(nameof(PhotonAppSettings));
-                var appSettings = photonAppSettings != null ? photonAppSettings.appSettings : null;
-                ConnectUsingSettings(appSettings, playerName, isAutomaticallySyncScene);
-                return;
+                throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
             }
-            throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
+            var photonAppSettings = Resources.Load<PhotonAppSettings>(nameof(PhotonAppSettings));
+            var appSettings = photonAppSettings != null ? photonAppSettings.appSettings : null;
+            ConnectUsingSettings(appSettings, playerName);
         }
 
         public static void Disconnect()
@@ -75,28 +80,26 @@ namespace Prg.Scripts.Common.Photon
             {
                 throw new UnityException("PhotonNetwork.OfflineMode not allowed");
             }
-            if (PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer)
+            if (!PhotonWrapper.CanJoinLobby)
             {
-                Debug.Log(
-                    $"JoinLobby {PhotonNetwork.NetworkClientState} scene={SceneManager.GetActiveScene().name} GameVersion={PhotonNetwork.GameVersion}");
-                PhotonNetwork.JoinLobby();
-                return;
+                throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
             }
-            throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
+            Debug.Log(
+                $"JoinLobby {PhotonNetwork.NetworkClientState} scene={SceneManager.GetActiveScene().name} GameVersion={PhotonNetwork.GameVersion}");
+            PhotonNetwork.JoinLobby();
         }
 
         public static void LeaveLobby()
         {
-            if (PhotonNetwork.InLobby)
+            if (!PhotonNetwork.InLobby)
             {
-                Debug.Log("LeaveLobby");
-                PhotonNetwork.LeaveLobby();
-                return;
+                throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
             }
-            throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
+            Debug.Log("LeaveLobby");
+            PhotonNetwork.LeaveLobby();
         }
 
-        public static void CreateRoom(string roomName, RoomOptions roomOptions = null)
+        public static void CreateRoom(string roomName, RoomOptions roomOptions = null, bool isAutomaticallySyncScene = true)
         {
             if (_isApplicationQuitting)
             {
@@ -115,32 +118,33 @@ namespace Prg.Scripts.Common.Photon
                 IsOpen = true,
                 IsVisible = true
             };
+            PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
             PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         }
 
-        public static bool JoinRoom(RoomInfo roomInfo)
-        {
-            if (_isApplicationQuitting)
-            {
-                return false;
-            }
-            Debug.Log($"JoinRoom {roomInfo.GetDebugLabel()} {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
-            var isJoined = PhotonNetwork.JoinRoom(roomInfo.Name);
-            if (!isJoined)
-            {
-                Debug.LogWarning("PhotonNetwork JoinRoom failed");
-            }
-            return isJoined;
-        }
-
-        public static void JoinOrCreateRoom(string roomName,
-            Hashtable customRoomProperties = null, string[] lobbyPropertyNames = null, bool isAutomaticallySyncScene = false)
+        public static void JoinRoom(RoomInfo roomInfo, bool isAutomaticallySyncScene = true)
         {
             if (_isApplicationQuitting)
             {
                 return;
             }
-            Debug.Log($"joinOrCreateRoom {roomName}");
+            Debug.Log($"JoinRoom {roomInfo.GetDebugLabel()} {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
+            PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
+            var isJoined = PhotonNetwork.JoinRoom(roomInfo.Name);
+            if (!isJoined)
+            {
+                Debug.LogWarning($"PhotonNetwork JoinRoom failed: {roomInfo.Name}");
+            }
+        }
+
+        public static void JoinOrCreateRoom(string roomName,
+            Hashtable customRoomProperties = null, string[] lobbyPropertyNames = null, bool isAutomaticallySyncScene = true)
+        {
+            if (_isApplicationQuitting)
+            {
+                return;
+            }
+            Debug.Log($"JoinOrCreateRoom {roomName} {PhotonNetwork.LocalPlayer.GetDebugLabel()}");
             if (string.IsNullOrWhiteSpace(roomName))
             {
                 throw new UnityException("roomName can not be null or empty");
@@ -151,7 +155,11 @@ namespace Prg.Scripts.Common.Photon
                 CustomRoomPropertiesForLobby = lobbyPropertyNames
             };
             PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
-            PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
+            var isSuccess = PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
+            if (!isSuccess)
+            {
+                Debug.LogWarning($"PhotonNetwork JoinOrCreateRoom failed: {roomName}");
+            }
         }
 
         public static void CloseRoom(bool keepVisible = false)
@@ -183,7 +191,22 @@ namespace Prg.Scripts.Common.Photon
             throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
         }
 
-        private static void ConnectUsingSettings(AppSettings appSettings, string playerName, bool isAutomaticallySyncScene)
+        public static string GetRegion()
+        {
+            var region = PhotonNetwork.CloudRegion;
+            if (region == null)
+            {
+                return string.Empty;
+            }
+            var index = region.IndexOf('/');
+            if (index > 1)
+            {
+                region = region.Substring(0, index);
+            }
+            return region;
+        }
+
+        private static void ConnectUsingSettings(AppSettings appSettings, string playerName)
         {
             // See PhotonNetwork.SendRate (which is 30 times per sec)
             // https://documentation.help/Photon-Unity-Networking-2/class_photon_1_1_pun_1_1_photon_network.html#a7b4c9628657402e59fe292502511dcf4
@@ -192,7 +215,6 @@ namespace Prg.Scripts.Common.Photon
             Debug.Log(
                 $"ConnectUsingSettings {PhotonNetwork.NetworkClientState} scene={SceneManager.GetActiveScene().name} player={playerName}" +
                 $" {(appSettings != null ? appSettings.ToStringFull() : string.Empty)}");
-            PhotonNetwork.AutomaticallySyncScene = isAutomaticallySyncScene;
             PhotonNetwork.NickName = playerName;
             PhotonNetwork.GameVersion = string.Empty;
             var started = appSettings != null

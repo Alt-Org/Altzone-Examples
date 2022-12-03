@@ -2,11 +2,46 @@ using System;
 using System.Collections;
 using System.Text;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
+/// <summary>
+/// Helper methods to create UNITY singleton <c>Component</c> with hosting <c>GameObject</c>.
+/// </summary>
+/// <remarks>
+/// <c>Component</c> lifetime is either forever (<c>Object.DontDestroyOnLoad()</c>) or current scene.
+/// </remarks>
+public static class UnitySingleton
+{
+    public static T CreateStaticSingleton<T>() where T : Component
+    {
+        var name = typeof(T).Name;
+        var parent = new GameObject(name);
+#if UNITY_EDITOR
+        if (!EditorApplication.isPlaying)
+        {
+            // DontDestroyOnLoad will fail with 'InvalidOperationException' during EditMode tests etc. and we just skip it with error message.
+            Debug.LogError($"You are creating a STATIC SINGLETON outside PLAY mode: {name}");
+            return parent.AddComponent<T>();
+        }
+#endif
+        Object.DontDestroyOnLoad(parent);
+        return parent.AddComponent<T>();
+    }
+
+    public static T CreateGameObjectAndComponent<T>(string name = null) where T : Component
+    {
+        var parent = new GameObject(name ?? typeof(T).Name);
+        return parent.AddComponent<T>();
+    }
+}
+
+/// <summary>
+/// Extension for working with UNITY <c>GameObject</c>s and <c>Component</c>s.
+/// </summary>
 public static class UnityExtensions
 {
     #region GameObjects and Components
@@ -15,16 +50,6 @@ public static class UnityExtensions
     {
         var component = parent.GetComponent<T>();
         return component != null ? component : parent.AddComponent<T>();
-    }
-
-    public static T CreateGameObjectAndComponent<T>(string name, bool isDontDestroyOnLoad) where T : Component
-    {
-        var parent = new GameObject(name);
-        if (isDontDestroyOnLoad)
-        {
-            Object.DontDestroyOnLoad(parent);
-        }
-        return parent.AddComponent<T>();
     }
 
     #endregion
@@ -93,6 +118,32 @@ public static class UnityExtensions
 
     #endregion
 
+    #region TrailRenderer
+
+    public static void ResetTrailRendererAfterTeleport(this TrailRenderer trailRenderer, MonoBehaviour host, int skipFrames = 2)
+    {
+        IEnumerator DelayedExecute()
+        {
+            var trailRendererTime = trailRenderer.time;
+            trailRenderer.time = 0;
+            trailRenderer.emitting = false;
+            yield return null;
+            // It seems that at least two frames are required for physics engine to catch up after Rigidbody has been teleported.
+            // - note that this was tested using WaitForFixedUpdate which was *totally wrong* in this context!
+            var delay = new WaitForEndOfFrame();
+            while (--skipFrames >= 0)
+            {
+                yield return delay;
+            }
+            trailRenderer.time = trailRendererTime;
+            trailRenderer.emitting = true;
+        }
+
+        host.StartCoroutine(DelayedExecute());
+    }
+
+    #endregion
+
     #region Coroutines
 
     /// <summary>
@@ -140,28 +191,6 @@ public static class UnityExtensions
             yMin = rect.yMin - top,
             xMax = rect.xMax + right,
             yMax = rect.yMax + bottom
-        };
-    }
-
-    public static Rect InflateBlueSide(this Rect rect, Vector2 size, Vector2 size2)
-    {
-        return new Rect
-        {
-            xMin = rect.xMin - size.x,
-            yMin = rect.yMin - size.y,
-            xMax = rect.xMax + size2.x,
-            yMax = rect.yMax + size2.y
-        };
-    }
-
-    public static Rect InflateRedSide(this Rect rect, Vector2 size, Vector2 size2)
-    {
-        return new Rect
-        {
-            xMin = rect.xMin - size2.x,
-            yMin = rect.yMin - size2.y,
-            xMax = rect.xMax + size.x,
-            yMax = rect.yMax + size.y
         };
     }
 

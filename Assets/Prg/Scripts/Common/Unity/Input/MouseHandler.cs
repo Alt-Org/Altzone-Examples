@@ -5,11 +5,17 @@ using UnityEngine.InputSystem;
 
 namespace Prg.Scripts.Common.Unity.Input
 {
+    /// <summary>
+    /// Mouse handler implementation.
+    /// </summary>
     public class MouseHandler : BaseHandler
     {
+        [Header("Live Data"), SerializeField] private bool _isPointerOverGameObject;
+        [SerializeField] private bool _isIgnoringPointer;
+        [SerializeField] private bool _isPanning;
         [SerializeField] private int _clickCount;
-        [SerializeField] private Vector3 _curPanPosition;
-        [SerializeField] private Vector3 _prevPanPosition;
+        [SerializeField] private Vector2 _curPanPosition;
+        [SerializeField] private Vector2 _prevPanPosition;
         [SerializeField] private InputActionReference _scrollWheelRef;
 
         private Vector2 _scrollWheel;
@@ -23,8 +29,6 @@ namespace Prg.Scripts.Common.Unity.Input
             _scrollWheelRef.action.Enable();
             return this;
         }
-
-        private static bool Approximately(float a, float b) => Mathf.Abs(b - a) < 0.00001f; // 5 digits is more than enough for mouse precision!
 
         private void OnEnable()
         {
@@ -47,37 +51,69 @@ namespace Prg.Scripts.Common.Unity.Input
         private void Update()
         {
             _isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject(-1);
-            if (_isPointerOverGameObject)
-            {
-                // Ignore UI elements.
-                return;
-            }
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                // Start mouse down
+                if (_isPointerOverGameObject)
+                {
+                    // Ignore mouse down if it is over an UI element.
+                    if (!_isIgnoringPointer)
+                    {
+                        _isIgnoringPointer = true;
+                    }
+                    return;
+                }
+                // Start mouse down (click)
                 _clickCount = 1;
                 _curPanPosition = Mouse.current.position.ReadValue();
                 SendMouseDown(_curPanPosition, _clickCount);
                 _prevPanPosition = _curPanPosition;
+                return;
             }
-            else if (Mouse.current.leftButton.isPressed)
+            if (Mouse.current.leftButton.isPressed)
             {
-                // Continue mouse down
+                if (!_isPanning)
+                {
+                    // After panning has been started we never stop it!
+                    if (_isPointerOverGameObject)
+                    {
+                        // Ignore mouse down if it is over an UI element or mouse drag (panning) started from there.
+                        return;
+                    }
+                    if (_isIgnoringPointer)
+                    {
+                        // We went outside of an UI element - start panning now
+                        _isIgnoringPointer = false;
+                    }
+                    _isPanning = true;
+                }
+                // Continue or start mouse down (panning)
                 _clickCount += 1;
                 _curPanPosition = Mouse.current.position.ReadValue();
                 SendMouseDown(_curPanPosition, _clickCount);
-                if (_isPan && (!Approximately(_curPanPosition.x, _prevPanPosition.x) || !Approximately(_curPanPosition.y, _prevPanPosition.y)))
+                if (_isPan)
                 {
-                    PanCamera((_curPanPosition - _prevPanPosition) * _panSpeed);
-                    _prevPanPosition = _curPanPosition;
+                    const float minDelta = 0.00001f;
+                    var delta = _curPanPosition - _prevPanPosition;
+                    if (Mathf.Abs(delta.x) > minDelta || Mathf.Abs(delta.y) > minDelta)
+                    {
+                        PanCamera(delta * _panSpeed);
+                        _prevPanPosition = _curPanPosition;
+                    }
                 }
+                return;
             }
-            else if (Mouse.current.leftButton.wasReleasedThisFrame)
+            if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
+                if (_isIgnoringPointer)
+                {
+                    _isIgnoringPointer = false;
+                    return;
+                }
                 // End mouse down, report last mouse position
                 _clickCount = 0;
-                _curPanPosition = Vector3.zero;
-                _prevPanPosition = Vector3.zero;
+                _isPanning = false;
+                _curPanPosition = Vector2.zero;
+                _prevPanPosition = Vector2.zero;
                 SendMouseUp(Mouse.current.position.ReadValue());
             }
         }

@@ -20,15 +20,15 @@ namespace GameUi.Scripts.MainMenu
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable IsFirsTimePlaying {RuntimeGameConfig.IsFirsTimePlaying}");
-            if (RuntimeGameConfig.IsFirsTimePlaying)
+            var playerData = GameConfig.Get().PlayerDataCache;
+            Debug.Log($"OnEnable IsFirsTimePlaying {playerData.IsFirstTimePlaying}");
+            if (playerData.IsFirstTimePlaying)
             {
                 // Patch IsFirsTimePlaying if it is still set!
-                RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
+                playerData.IsFirstTimePlaying = false;
             }
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
             Debug.Log($"{playerData}");
-            _view.PlayerInfo = playerData.GetPlayerInfoLabel();
+            _view.PlayerInfo = playerData.PlayerName;
             _view.TestText = string.Empty;
         }
 

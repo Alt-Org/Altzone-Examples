@@ -27,7 +27,7 @@ namespace GameUi.Scripts.FirstTime
 
         private void OnEnable()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             if (playerData.IsTosAccepted)
             {
                 StartCoroutine(LoadNextWindow());
@@ -56,8 +56,8 @@ namespace GameUi.Scripts.FirstTime
 
         private static void ContinueButton()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            playerData.BatchSave(() => { playerData.IsTosAccepted = true; });
+            var playerData = GameConfig.Get().PlayerDataCache;
+            playerData.IsTosAccepted = true;
             Debug.Log($"TOS ACCEPTED {playerData}");
         }
 

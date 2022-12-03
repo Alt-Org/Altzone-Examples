@@ -81,7 +81,7 @@ namespace Battle.Scripts.Battle.Room
         {
             Debug.Log($"OnGameScoreEvent {data}");
 
-            var variables = RuntimeGameConfig.Get().Variables;
+            var variables = GameConfig.Get().Variables;
             if (data.TeamBlueHeadScore >= variables._headScoreToWin ||
                 data.TeamBlueWallScore >= variables._wallScoreToWin)
             {

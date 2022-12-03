@@ -11,7 +11,7 @@ namespace GameUi.Scripts.ClanManagement
         private void OnEnable()
         {
             _view.ResetView();
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             _view.PlayerInfo = playerData.PlayerName;
             var clanId = playerData.ClanId;
             var clan = Storefront.Get().GetClanModel(clanId);
@@ -27,11 +27,8 @@ namespace GameUi.Scripts.ClanManagement
 
         private static void LeaveClanButton()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            playerData.BatchSave(() =>
-            {
-                playerData.ClanId = -1;
-            });
+            var playerData = GameConfig.Get().PlayerDataCache;
+            playerData.ClanId = -1;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
+using Prg.Scripts.Common.Unity.Localization;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,44 +12,43 @@ namespace Editor.Prg.GameDebug
         public static void ShowLocalPlayerData()
         {
             Debug.Log("*");
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = GameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
         }
 
         public static void CreateDummyPlayerData()
         {
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            playerData.BatchSave(() =>
-            {
-                playerData.PlayerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
-                playerData.Language = Application.systemLanguage;
-                playerData.CharacterModelId = Random.Range((int)Defence.Desensitisation, (int)Defence.Confluence + 1);
-            });
+            Debug.Log("*");
+            var language = Application.systemLanguage;
+            Localizer.LoadTranslations();
+            var playerData = GameConfig.Get().PlayerDataCache;
+            playerData.PlayerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
+            playerData.Language = language;
+            Localizer.SetLanguage(language);
+            playerData.CustomCharacterModelId = Random.Range((int)Defence.Desensitisation, (int)Defence.Confluence + 1);
+            playerData.DebugSavePlayer();
             Debug.Log(playerData.ToString());
         }
 
         public static void SetLanguageToEn()
         {
             Debug.Log("*");
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
-            playerData.Language = SystemLanguage.English;
+            const SystemLanguage language = SystemLanguage.English;
+            Localizer.LoadTranslations();
+            var playerData = GameConfig.Get().PlayerDataCache;
+            playerData.Language = language;
+            Localizer.SetLanguage(language);
+            playerData.DebugSavePlayer();
             Debug.Log(playerData.ToString());
         }
 
-        public static void DeleteLocalPlayerData()
+        public static void ResetLocalPlayerData()
         {
             Debug.Log("*");
-            var playerData = RuntimeGameConfig.GetPlayerDataCacheInEditor();
+            var playerData = GameConfig.Get().PlayerDataCache;
             playerData.DebugResetPlayer();
+            playerData.DebugSavePlayer();
             Debug.Log(playerData.ToString());
-        }
-
-        public static void DeleteLocalAllData()
-        {
-            Debug.Log("*");
-            Debug.Log(RichText.Brown("PlayerPrefs.DeleteAll"));
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.Save();
         }
     }
 }

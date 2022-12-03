@@ -44,23 +44,20 @@ namespace Prg.Scripts.Common.Unity.Window
             }
         }
 
-        public static IWindowManager Get()
-        {
-            Assert.IsNotNull(_windowManager, "windowManager != null");
-            return _windowManager;
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void BeforeSceneLoad()
-        {
-            _windowManager = UnityExtensions.CreateGameObjectAndComponent<WindowManager>(nameof(WindowManager), true);
-        }
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void SubsystemRegistration()
         {
             // Manual reset if UNITY Domain Reloading is disabled.
             _windowManager = null;
+        }
+
+        public static IWindowManager Get()
+        {
+            if (_windowManager == null)
+            {
+                _windowManager = UnitySingleton.CreateStaticSingleton<WindowManager>();
+            }
+            return _windowManager;
         }
 
         private static IWindowManager _windowManager;
@@ -135,7 +132,10 @@ namespace Prg.Scripts.Common.Unity.Window
             {
                 _goBackOnceHandler = new List<Func<GoBackAction>>();
             }
-            _goBackOnceHandler.Add(handler);
+            if (!_goBackOnceHandler.Contains(handler))
+            {
+                _goBackOnceHandler.Add(handler);
+            }
         }
 
         void IWindowManager.UnRegisterGoBackHandlerOnce(Func<GoBackAction> handler)
@@ -354,13 +354,13 @@ namespace Prg.Scripts.Common.Unity.Window
 
         private static void Show(MyWindow window)
         {
-            Debug.Log($"Show {window._windowDef}");
+            Debug.Log($"Show {window._windowDef}", window._window);
             window._window.SetActive(true);
         }
 
         private static void Hide(MyWindow window)
         {
-            Debug.Log($"Hide {window._windowDef}");
+            Debug.Log($"Hide {window._windowDef}", window._window);
             if (window.IsValid)
             {
                 window._window.SetActive(false);

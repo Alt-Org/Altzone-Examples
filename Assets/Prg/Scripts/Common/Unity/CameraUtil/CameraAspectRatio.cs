@@ -9,20 +9,18 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
     [RequireComponent(typeof(Camera))]
     public class CameraAspectRatio : MonoBehaviour
     {
-        private static readonly Rect FixedRect = new Rect(0, 0, 1, 1);
+        private const string Tooltip = "Set this to your target aspect ratio, eg. (16:9), (21:10) or (4:3)";
 
-        // Set this to your target aspect ratio, eg. (16, 9) or (4, 3).
-        [SerializeField] private Vector2 _targetAspectRatio = new Vector2(9, 16);
+        private static readonly Rect FixedRect = new(0, 0, 1, 1);
+
+        [Tooltip(Tooltip), SerializeField] private Vector2 _targetAspectRatio = new(9, 16);
 
         private Camera _camera;
         private Rect _tempRect;
 
         private void Awake()
         {
-            var allowedPlatform = Application.platform == RuntimePlatform.Android ||
-                                  Application.platform == RuntimePlatform.IPhonePlayer ||
-                                  Application.platform == RuntimePlatform.WindowsPlayer ||
-                                  Application.platform == RuntimePlatform.WindowsEditor;
+            var allowedPlatform = AppPlatform.IsMobile || AppPlatform.IsDesktop || AppPlatform.IsEditor;
             if (!allowedPlatform)
             {
                 enabled = false;
@@ -33,6 +31,11 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
         {
             _camera = GetComponent<Camera>();
             UpdateCrop();
+            if (AppPlatform.IsMobile && _camera.rect == FixedRect)
+            {
+                // Aspect ratio is what we want and no fixing is needed.
+                enabled = false;
+            }
         }
 
 #if UNITY_EDITOR
@@ -48,7 +51,6 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
                 UpdateCrop();
             }
         }
-
 #endif
 
         private void OnPreCull()
@@ -63,13 +65,13 @@ namespace Prg.Scripts.Common.Unity.CameraUtil
         private void UpdateCrop()
         {
             // Determine ratios of screen/window & target, respectively.
-            var screenRatio = Screen.width / (float) Screen.height;
+            var screenRatio = Screen.width / (float)Screen.height;
             var targetRatio = _targetAspectRatio.x / _targetAspectRatio.y;
 
             if (Mathf.Approximately(screenRatio, targetRatio))
             {
                 // Screen or window is the target aspect ratio: use the whole area.
-                _camera.rect = new Rect(0, 0, 1, 1);
+                _camera.rect = FixedRect;
             }
             else if (screenRatio > targetRatio)
             {

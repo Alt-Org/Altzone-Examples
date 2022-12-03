@@ -112,7 +112,7 @@ namespace Battle.Scripts.Battle.Room
                 gameBackground.transform.Rotate(isUpsideDown);
             }
 
-            var features = RuntimeGameConfig.Get().Features;
+            var features = GameConfig.Get().Features;
             var isRotate = features._isRotateGameCamera && gameCamera != null;
             if (isRotate)
             {

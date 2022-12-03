@@ -37,12 +37,12 @@ namespace GameUi.Scripts.BattleLobby
         public override void OnEnable()
         {
             base.OnEnable();
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             Debug.Log($"OnEnable {playerData}");
             _view.ResetView();
             _view.GameInfo = $"Version {PhotonLobby.GameVersion}";
             _view.LobbyInfo = string.Empty;
-            _view.CurrentPlayerInfo = playerData.GetPlayerInfoLabel();
+            _view.CurrentPlayerInfo = playerData.PlayerName;
             _view.RoomListInfo = string.Empty;
             StopAllCoroutines();
             _photonRoomList.OnRoomsUpdated += OnRoomsUpdated;
@@ -60,7 +60,7 @@ namespace GameUi.Scripts.BattleLobby
         {
             Debug.Log($"WaitForLobby {PhotonNetwork.NetworkClientState}");
             // Start new Lobby connection every time.
-            PhotonLobby.OfflineMode = false;
+            PhotonNetwork.OfflineMode = false;
             if (PhotonWrapper.InRoom)
             {
                 _view.RoomListInfo = "Prepare connection";
@@ -94,7 +94,7 @@ namespace GameUi.Scripts.BattleLobby
                 if (PhotonWrapper.CanConnect)
                 {
                     _view.RoomListInfo = "Connecting to Lobby";
-                    var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+                    var playerData = GameConfig.Get().PlayerDataCache;
                     Debug.Log($"WaitForLobby Connect {PhotonNetwork.NetworkClientState}");
                     PhotonLobby.Connect(playerData.PlayerName);
                 }
@@ -152,11 +152,9 @@ namespace GameUi.Scripts.BattleLobby
             {
                 if (roomInfo.Name == roomName && !roomInfo.RemovedFromList && roomInfo.IsOpen && roomInfo.PlayerCount < MaxPlayersInRoom)
                 {
-                    if (PhotonLobby.JoinRoom(roomInfo))
-                    {
-                        _isJoiningRoom = true;
-                        _view.DisableButtons();
-                    }
+                    PhotonLobby.JoinRoom(roomInfo);
+                    _isJoiningRoom = true;
+                    _view.DisableButtons();
                 }
             }
         }
@@ -165,10 +163,9 @@ namespace GameUi.Scripts.BattleLobby
         {
             var room = PhotonNetwork.CurrentRoom;
             var player = PhotonNetwork.LocalPlayer;
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            var defence = playerData.CharacterModel.MainDefence;
+            var playerData = GameConfig.Get().PlayerDataCache;
             PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
-            Debug.Log($"OnJoinedRoom InRoom '{room.Name}' as '{PhotonNetwork.NickName}' with {defence}");
+            Debug.Log($"OnJoinedRoom InRoom '{room.Name}' as '{PhotonNetwork.NickName}'");
 
             // Simplified setup for room.
             if (player.IsMasterClient)
@@ -192,7 +189,7 @@ namespace GameUi.Scripts.BattleLobby
             player.SetCustomProperties(new Hashtable
             {
                 { PhotonBattle.PlayerPositionKey, playerPosition },
-                { PhotonBattle.PlayerMainSkillKey, (int)defence }
+                { PhotonBattle.PlayerMainSkillKey, 1 }
             });
 
             WindowManager.Get().ShowWindow(_roomWindow);

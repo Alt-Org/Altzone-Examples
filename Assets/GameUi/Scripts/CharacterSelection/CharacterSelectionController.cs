@@ -9,9 +9,9 @@ namespace GameUi.Scripts.CharacterSelection
 
         private void OnEnable()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             _view.PlayerInfo = playerData.PlayerName;
-            _view.ShowCharacter(playerData.CharacterModelId);
+            _view.ShowCharacter(playerData.CustomCharacterModelId);
 
             _view.OnCharacterSelectionChanged += OnCharacterSelectionChanged;
         }
@@ -23,10 +23,10 @@ namespace GameUi.Scripts.CharacterSelection
 
         private void OnCharacterSelectionChanged(int characterModelId)
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
-            if (playerData.CharacterModelId != characterModelId)
+            var playerData = GameConfig.Get().PlayerDataCache;
+            if (playerData.CustomCharacterModelId != characterModelId)
             {
-                playerData.BatchSave(() => { playerData.CharacterModelId = characterModelId; });
+                playerData.CustomCharacterModelId = characterModelId;
             }
             _view.ShowCharacter(characterModelId);
         }

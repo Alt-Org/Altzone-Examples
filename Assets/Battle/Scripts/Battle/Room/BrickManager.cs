@@ -23,7 +23,7 @@ namespace Battle.Scripts.Battle.Room
 
         private void Awake()
         {
-            var isBricksVisible = RuntimeGameConfig.Get().Features._isBricksVisible;
+            var isBricksVisible = GameConfig.Get().Features._isBricksVisible;
             Debug.Log($"Awake isBricksVisible {isBricksVisible}");
             if (!isBricksVisible)
             {

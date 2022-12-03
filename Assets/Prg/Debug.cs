@@ -27,7 +27,7 @@ public static class Debug
     {
         // Manual reset if UNITY Domain Reloading is disabled.
         _logLineAllowedFilter = null;
-        RemoveTagsForClassName();
+        RemoveTags();
         CachedMethods.Clear();
         SetEditorStatus();
     }
@@ -57,6 +57,7 @@ public static class Debug
     private static bool _isClassNamePrefix;
     private static string _prefixTag;
     private static string _suffixTag;
+    private static string _contextTag = string.Empty;
     private static bool _isEditorHook;
 
     /// <summary>
@@ -92,11 +93,17 @@ public static class Debug
         _suffixTag = suffixTag;
     }
 
-    private static void RemoveTagsForClassName()
+    public static void SetContextTag(string contextTag)
+    {
+        _contextTag = $" {contextTag}";
+    }
+
+    private static void RemoveTags()
     {
         _isClassNamePrefix = false;
         _prefixTag = null;
         _suffixTag = null;
+        _contextTag = string.Empty;
     }
 
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
@@ -111,7 +118,15 @@ public static class Debug
         else if (IsMethodAllowedForLog(method))
         {
             var prefix = GetPrefix(method, memberName);
-            UnityEngine.Debug.Log($"{Time.frameCount % 1000} {prefix}{message}", context);
+            if (AppPlatform.IsEditor)
+            {
+                var contextTag = context != null ? _contextTag : string.Empty;
+                UnityEngine.Debug.Log($"{Time.frameCount % 1000} {prefix}{message}{contextTag}", context);
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"{Time.frameCount % 1000} {prefix}{message}");
+            }
         }
     }
 
@@ -153,6 +168,33 @@ public static class Debug
         {
             // For anonymous types we try its parent type.
             className = method.ReflectedType?.DeclaringType?.Name ?? nameof(Debug);
+        }
+        var methodName = method.Name;
+        if (methodName.StartsWith("<"))
+        {
+            // Local methods are compiled to internal static methods with a name of the following form:
+            // <Name1>g__Name2|x_y
+            // Name1 is the name of the surrounding method. Name2 is the name of the local method.
+            const string methodPrefix = ">g__";
+            const string methodSuffix = "|";
+            var pos1 = methodName.IndexOf(methodPrefix, StringComparison.Ordinal);
+            if (pos1 > 0)
+            {
+                pos1 += methodPrefix.Length;
+                var pos2 = methodName.IndexOf(methodSuffix, pos1, StringComparison.Ordinal);
+                if (pos2 > 0)
+                {
+                    var localName = $">{methodName.Substring(pos1, pos2 - pos1)}";
+                    if (memberName == null)
+                    {
+                        memberName = localName;
+                    }
+                    else
+                    {
+                        memberName += localName;
+                    }
+                }
+            }
         }
         if (memberName != null)
         {

@@ -13,10 +13,10 @@ namespace GameUi.Scripts.PlayerName
 
         private void Awake()
         {
-            var gameConstraints = RuntimeGameConfig.Get().GameConstraints;
-            minPlayerNameLength = gameConstraints._minPlayerNameLength;
+            //var gameConstraints = GameConfig.Get().GameConstraints;
+            minPlayerNameLength = 1;//gameConstraints._minPlayerNameLength;
             var playerNameInput = _view.PlayerNameInput;
-            playerNameInput.characterLimit = gameConstraints._maxPlayerNameLength;
+            playerNameInput.characterLimit = 16;//gameConstraints._maxPlayerNameLength;
             playerNameInput.onValueChanged.AddListener(OnValueChanged);
             playerNameInput.onValidateInput += OnValidateInput;
             playerNameInput.onEndEdit.AddListener(OnEndEdit);
@@ -27,11 +27,11 @@ namespace GameUi.Scripts.PlayerName
 
         private void OnEnable()
         {
-            Debug.Log($"OnEnable FirsTime {RuntimeGameConfig.IsFirsTimePlaying} windows #{WindowManager.Get().WindowCount}");
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
+            Debug.Log($"OnEnable FirsTime {playerData.IsFirstTimePlaying} windows #{WindowManager.Get().WindowCount}");
             Debug.Log($"{playerData}");
             _view.PlayerName = playerData.PlayerName;
-            if (RuntimeGameConfig.IsFirsTimePlaying || WindowManager.Get().WindowCount <= 1)
+            if (playerData.IsFirstTimePlaying || WindowManager.Get().WindowCount <= 1)
             {
                 _view.ShowFirstTime();
             }
@@ -98,18 +98,14 @@ namespace GameUi.Scripts.PlayerName
 
         private void ContinueButton()
         {
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             if (_view.PlayerName != playerData.PlayerName)
             {
-                playerData.BatchSave(() =>
-                {
-                    playerData.PlayerName = _view.PlayerName;
-                    Debug.Log(playerData.ToString());
-                });
+                playerData.PlayerName = _view.PlayerName;
             }
-            if (RuntimeGameConfig.IsFirsTimePlaying)
+            if (playerData.IsFirstTimePlaying)
             {
-                RuntimeGameConfig.RemoveIsFirsTimePlayingStatus();
+                playerData.IsFirstTimePlaying = false;
                 WindowManager.Get().Unwind(null);
             }
         }

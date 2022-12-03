@@ -36,14 +36,11 @@ namespace Editor
         [MenuItem(GameDebug + "Set Player Language to 'EN'", false, 12)]
         private static void SetLanguageToEn() => DebugMenu.SetLanguageToEn();
 
-        [MenuItem(GameDebug + "Delete Local Player Data", false, 13)]
-        private static void DeleteLocalPlayerData() => DebugMenu.DeleteLocalPlayerData();
+        [MenuItem(GameDebug + "Reset Local Player Data", false, 13)]
+        private static void ResetLocalPlayerData() => DebugMenu.ResetLocalPlayerData();
 
         [MenuItem(GameDebug + "Danger Zone/Delete All Local Data", true, 33)]
         private static bool DeleteLocalAllDataIsValid() => true;
-
-        [MenuItem(GameDebug + "Danger Zone/Delete All Local Data")]
-        private static void DeleteLocalAllData() => DebugMenu.DeleteLocalAllData();
 
         #endregion
 

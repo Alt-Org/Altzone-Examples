@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace Prg.Scripts.Common.Unity
+namespace Prg.Scripts.Common.Unity.ToastMessages
 {
     [CreateAssetMenu(menuName = "ALT-Zone/ScoreFlashConfig", fileName = "ScoreFlashConfig")]
-    public class ScoreFlashConfig : ScriptableObject
+    internal class ScoreFlashConfig : ScriptableObject
     {
         public Canvas _canvasPrefab;
         public bool _isClampToScreen;
@@ -15,7 +15,7 @@ namespace Prg.Scripts.Common.Unity
     /// Configuration for <c>ScoreFlash</c>.
     /// </summary>
     [Serializable]
-    public class ScoreFlashPhases
+    internal class ScoreFlashPhases
     {
         #region Parameters for the Fade In Phase
 

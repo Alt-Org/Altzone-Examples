@@ -18,7 +18,7 @@ namespace GameUi.Scripts.UiLoader
         {
             // Simulate that we load some services before can continue to the game main menu (or first time process).
             Debug.Log($"OnEnable _isServicesLoaded {_isServicesLoaded}");
-            var playerData = RuntimeGameConfig.Get().PlayerDataCache;
+            var playerData = GameConfig.Get().PlayerDataCache;
             Debug.Log(playerData.ToString());
             var nextWindowToLoad = playerData.IsTosAccepted && playerData.HasPlayerName
                 ? _windowMainMenu
