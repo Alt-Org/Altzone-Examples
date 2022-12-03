@@ -20,7 +20,7 @@ namespace Editor.Prg.GameDebug
         {
             Debug.Log("*");
             var language = Application.systemLanguage;
-            Localizer.LoadTranslations();
+            Localizer.LoadTranslations(language);
             var playerData = GameConfig.Get().PlayerDataCache;
             playerData.PlayerName = $"Player{1000 * (1 + DateTime.Now.Second % 10) + DateTime.Now.Millisecond:00}";
             playerData.Language = language;
@@ -34,7 +34,7 @@ namespace Editor.Prg.GameDebug
         {
             Debug.Log("*");
             const SystemLanguage language = SystemLanguage.English;
-            Localizer.LoadTranslations();
+            Localizer.LoadTranslations(language);
             var playerData = GameConfig.Get().PlayerDataCache;
             playerData.Language = language;
             Localizer.SetLanguage(language);

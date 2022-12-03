@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using Altzone.Scripts.Config;
 using Altzone.Scripts.Config.ScriptableObjects;
+using Altzone.Scripts.Service.LootLocker;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.Unity;
 using Prg.Scripts.Common.Util;
@@ -12,7 +14,7 @@ using UnityEngine.Advertisements;
 
 namespace Altzone.Scripts
 {
-    public class BootLoader : MonoBehaviour
+    internal static class BootLoader
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
@@ -21,12 +23,24 @@ namespace Altzone.Scripts
             var loggerConfig = localDevConfig != null && localDevConfig._loggerConfig
                 ? localDevConfig._loggerConfig
                 : Resources.Load<LoggerConfig>(nameof(LoggerConfig));
-
+            if (loggerConfig != null)
+            {
+                LoggerConfig.CreateLoggerConfig(loggerConfig);
+            }
             SetEditorStatus();
+            if (localDevConfig != null)
+            {
+                if (!string.IsNullOrWhiteSpace(localDevConfig._photonVersionOverride))
+                {
+                    var capturedPhotonVersionOverride = localDevConfig._photonVersionOverride;
+                    PhotonLobby.GetGameVersion = () => capturedPhotonVersionOverride;
+                }
+            }
             GeoLocation.Load(data =>
             {
-                UnityEngine.Debug.Log($"Photon {PhotonLobby.GameVersion} GeoLocation {data}");
+                UnityEngine.Debug.Log($"Photon {PhotonLobby.GameVersion} GeoLocation {data} IsSimulator {AppPlatform.IsSimulator}");
                 SetConsentMetaData(data);
+                UnitySingleton.CreateStaticSingleton<ServiceLoader>();
             });
         }
 
@@ -35,7 +49,7 @@ namespace Altzone.Scripts
         {
             // Google Play Families compliance:
             // - mixed indicates that the app is directed at mixed audiences (including children).
-            var privacyValue = PlayerPrefs.GetString("consent.families.privacy.mode", "mixed");
+            var privacyValue = PlayerPrefs.GetString(PlayerPrefKeys.ConsentFamiliesPrivacyMode, "mixed");
             var metaData = new MetaData("privacy");
             metaData.Set("mode", privacyValue);
             Advertisement.SetMetaData(metaData);
@@ -55,7 +69,7 @@ namespace Altzone.Scripts
             Advertisement.SetMetaData(metaData);
         }
 
-        [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD"), Conditional("FORCE_LOG")]
         private static void SetEditorStatus()
         {
             // This is just for debugging to get strings (numbers) formatted consistently

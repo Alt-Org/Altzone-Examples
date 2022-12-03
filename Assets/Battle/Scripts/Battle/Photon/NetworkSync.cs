@@ -1,6 +1,6 @@
 using System.Collections;
-using Altzone.Scripts.Battle;
 using Battle.Scripts.Battle.Room;
+using Battle0.Scripts;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;

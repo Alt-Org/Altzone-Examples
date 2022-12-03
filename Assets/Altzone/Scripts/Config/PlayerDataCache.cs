@@ -1,12 +1,16 @@
 using System;
-using System.Security.Cryptography;
-using System.Text;
+using System.Collections;
 using Altzone.Scripts.Model;
-using Prg.Scripts.Common.Unity.Localization;
+using Altzone.Scripts.Service.LootLocker;
+using Prg.Scripts.Common.Unity;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Altzone.Scripts.Config
 {
+    /// <summary>
+    /// Player data cache - a common storage for player related data that is persisted somewhere (locally).
+    /// </summary>
     public interface IPlayerDataCache
     {
         string PlayerName { get; set; }
@@ -19,7 +23,7 @@ namespace Altzone.Scripts.Config
         bool IsFirstTimePlaying { get; set; }
         bool IsAccountVerified { get; set; }
 
-        //IBattleCharacter CurrentBattleCharacter { get; }
+        IBattleCharacter CurrentBattleCharacter { get; }
         ClanModel Clan { get; }
 
         bool HasPlayerName { get; }
@@ -31,48 +35,55 @@ namespace Altzone.Scripts.Config
 #endif
     }
 
+    internal class PlayerData
+    {
+        public string PlayerName;
+        public string PlayerGuid;
+        public int ClanId;
+        public int CustomCharacterModelId;
+        public SystemLanguage Language;
+        public bool IsTosAccepted;
+        public bool IsFirstTimePlaying;
+        public bool IsAccountVerified;
+        public bool IsDebugFlag;
+
+        public void ResetData(int dummyModelId, SystemLanguage defaultLanguage)
+        {
+            PlayerName = string.Empty;
+            PlayerGuid = string.Empty;
+            ClanId = dummyModelId;
+            CustomCharacterModelId = dummyModelId;
+            Language = (SystemLanguage)PlayerPrefs.GetInt(PlayerPrefKeys.LanguageCode, (int)defaultLanguage);
+            IsTosAccepted = false;
+            IsFirstTimePlaying = true;
+            IsAccountVerified = false;
+            IsDebugFlag = false;
+        }
+        
+        public override string ToString()
+        {
+            return $"{nameof(PlayerName)}: {PlayerName}, {nameof(CustomCharacterModelId)}: {CustomCharacterModelId}, {nameof(ClanId)}: {ClanId}" +
+                   $", {nameof(Language)}: {Language}, {nameof(IsTosAccepted)}: {IsTosAccepted}" +
+                   $", {nameof(IsFirstTimePlaying)}: {IsFirstTimePlaying}, {nameof(IsAccountVerified)}: {IsAccountVerified}" +
+                   $", {nameof(IsDebugFlag)}: {IsDebugFlag}, {nameof(PlayerGuid)}: {PlayerGuid}";
+        }
+    }
+
     /// <summary>
-    /// Player data cache - a common storage for player related data that is persisted somewhere (locally).
+    /// <c>IPlayerDataCache</c> default implementation.
     /// </summary>
-    [Serializable]
-    public class PlayerDataCache : IPlayerDataCache
+    internal class PlayerDataCache : IPlayerDataCache
     {
         public static IPlayerDataCache Create()
         {
             return new PlayerDataCacheLocal();
         }
 
-        public int CustomCharacterModelId
-        {
-            get => 1;
-            set => throw new NotImplementedException();
-        }
+        private const string DefaultPlayerName = "Player";
+        private const int DummyModelId = int.MaxValue;
+        private const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
 
-        public bool IsFirstTimePlaying
-        {
-            get => false;
-            set => throw new NotImplementedException();
-        }
-
-        public bool IsAccountVerified
-        {
-            get => false;
-            set => throw new NotImplementedException();
-        }
-
-        public ClanModel Clan => throw new NotImplementedException();
-
-        public void UpdatePlayerGuid(string newPlayerGuid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DebugSavePlayer()
-        {
-            throw new NotImplementedException();
-        }
-
-        [SerializeField] protected string _playerName;
+        private readonly PlayerData PlayerData = new();
 
         /// <summary>
         /// Player name.
@@ -82,57 +93,14 @@ namespace Altzone.Scripts.Config
         /// </remarks>
         public string PlayerName
         {
-            get => _playerName;
+            get => PlayerData.PlayerName;
             set
             {
-                _playerName = value ?? string.Empty;
+                PlayerData.PlayerName = value ?? string.Empty;
+                LootLockerWrapper.SetPlayerName(PlayerData.PlayerName);
                 Save();
             }
         }
-
-        public bool HasPlayerName => !string.IsNullOrWhiteSpace(_playerName);
-
-        [SerializeField] protected int _characterModelId;
-
-        /// <summary>
-        /// Player character model id.
-        /// </summary>
-        public int CharacterModelId
-        {
-            get => _characterModelId;
-            set
-            {
-                _characterModelId = value;
-                Save();
-            }
-        }
-
-        /// <summary>
-        /// Player character model.
-        /// </summary>
-        /// <remarks>
-        /// This is guaranteed to be valid reference all the time even <c>CharacterModelId</c> is invalid.
-        /// </remarks>
-        public CharacterModel CharacterModel =>
-            Storefront.Get().GetCharacterModel(_characterModelId) ??
-            new CharacterModel(-1, "Ö", Defence.Desensitisation, 0, 0, 0, 0);
-
-        [SerializeField] protected int _clanId;
-
-        /// <summary>
-        /// Player clan id.
-        /// </summary>
-        public int ClanId
-        {
-            get => _clanId;
-            set
-            {
-                _clanId = value;
-                Save();
-            }
-        }
-
-        [SerializeField] protected string _playerGuid;
 
         /// <summary>
         /// Unique string to identify this player across devices and systems.
@@ -142,10 +110,36 @@ namespace Altzone.Scripts.Config
         /// </remarks>
         public string PlayerGuid
         {
-            get => _playerGuid;
+            get => PlayerData.PlayerGuid;
+            private set
+            {
+                PlayerData.PlayerGuid = value ?? string.Empty;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Player clan id.
+        /// </summary>
+        public int ClanId
+        {
+            get => PlayerData.ClanId;
             set
             {
-                _playerGuid = value ?? string.Empty;
+                PlayerData.ClanId = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Player custom character model id.
+        /// </summary>
+        public int CustomCharacterModelId
+        {
+            get => PlayerData.CustomCharacterModelId;
+            set
+            {
+                PlayerData.CustomCharacterModelId = value;
                 Save();
             }
         }
@@ -158,26 +152,52 @@ namespace Altzone.Scripts.Config
         /// </remarks>
         public SystemLanguage Language
         {
-            get => Localizer.Language;
-            set => Localizer.SetLanguage(value);
+            get => PlayerData.Language;
+            set
+            {
+                PlayerData.Language = value;
+                Save();
+            }
         }
-
-        [SerializeField] protected bool _isTosAccepted;
 
         /// <summary>
         /// Is Terms Of Service accepted?
         /// </summary>
         public bool IsTosAccepted
         {
-            get => _isTosAccepted;
+            get => PlayerData.IsTosAccepted;
             set
             {
-                _isTosAccepted = value;
+                PlayerData.IsTosAccepted = value;
                 Save();
             }
         }
 
-        [SerializeField] protected bool _isDebugFlag;
+        /// <summary>
+        /// Is this first time game is started?
+        /// </summary>
+        public bool IsFirstTimePlaying
+        {
+            get => PlayerData.IsFirstTimePlaying;
+            set
+            {
+                PlayerData.IsFirstTimePlaying = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Is player's third party account verified?
+        /// </summary>
+        public bool IsAccountVerified
+        {
+            get => PlayerData.IsAccountVerified;
+            set
+            {
+                PlayerData.IsAccountVerified = value;
+                Save();
+            }
+        }
 
         /// <summary>
         /// Debug FLag for debugging and diagnostics purposes.
@@ -187,26 +207,48 @@ namespace Altzone.Scripts.Config
         /// </remarks>
         public bool IsDebugFlag
         {
-            get => _isDebugFlag;
+            get => PlayerData.IsDebugFlag;
             set
             {
-                _isDebugFlag = value;
+                PlayerData.IsDebugFlag = value;
                 Save();
             }
         }
 
+        /// <summary>
+        /// Current battle character.
+        /// </summary>
+        /// <remarks>
+        /// This is guaranteed to be valid reference all the time even <c>CharacterModelId</c> is invalid.
+        /// </remarks>
+        public IBattleCharacter CurrentBattleCharacter => Storefront.Get().GetBattleCharacter(PlayerData.CustomCharacterModelId);
+
+        public ClanModel Clan => Storefront.Get().GetClanModel(PlayerData.ClanId) ?? new ClanModel(DummyModelId, string.Empty, string.Empty);
+
+        public bool HasPlayerName => !string.IsNullOrWhiteSpace(PlayerName);
+
+        public void UpdatePlayerGuid(string newPlayerGuid)
+        {
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(newPlayerGuid), "!string.IsNullOrWhiteSpace(newPlayerGuid)");
+            Assert.AreNotEqual(PlayerData.PlayerGuid, newPlayerGuid);
+
+            PlayerGuid = newPlayerGuid;
+        }
+
         public string GetPlayerInfoLabel()
         {
+            var characterModelName = CurrentBattleCharacter.Name;
             if (ClanId > 0)
             {
                 var clan = Storefront.Get().GetClanModel(ClanId);
                 if (clan != null)
                 {
-                    return $"{PlayerName}[{clan.Tag}] {CharacterModel.Name}";
+                    return $"{PlayerName}[{clan.Tag}] {characterModelName}";
                 }
             }
-            return $"{PlayerName} {CharacterModel.Name}";
+            return $"{PlayerName} {characterModelName}";
         }
+
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
         /// </summary>
@@ -216,111 +258,116 @@ namespace Altzone.Scripts.Config
         }
 
         /// <summary>
-        /// Public <c>BatchSave</c> method to save several properties at once.
+        /// Protected <c>InternalSave</c> to handle actual saving somewhere.
         /// </summary>
-        /// <param name="saveSettings">The action to save all properties in one go.</param>
-        public virtual void BatchSave(Action saveSettings)
+        protected virtual void InternalSave()
         {
             // Placeholder for actual implementation in derived class.
         }
 
+#if UNITY_EDITOR
         public void DebugResetPlayer()
         {
-            // Actually can not delete at this level - just invalidate everything!
-            BatchSave(() =>
-            {
-                PlayerName = string.Empty;
-                CharacterModelId = -1;
-                ClanId = -1;
-                IsTosAccepted = false;
-            });
+            PlayerData.ResetData(DummyModelId, DefaultLanguage);
         }
+
+        public void DebugSavePlayer()
+        {
+            InternalSave();
+        }
+#endif
 
         public override string ToString()
         {
             // This is required for actual implementation to detect changes in our changeable properties!
             return
-                $"Name {PlayerName}, Model {CharacterModelId}, Clan {ClanId}, ToS {(IsTosAccepted ? 1 : 0)}, Lang {Language}, Guid {PlayerGuid}";
+                $"Name {PlayerName}, Model {CustomCharacterModelId}, Clan {ClanId}, ToS {(IsTosAccepted ? 1 : 0)}, Lang {Language}, Guid {PlayerGuid}";
         }
-    }
 
-    /// <summary>
-    /// <c>PlayerDataCache</c> implementation using UNITY <c>PlayerPrefs</c> as backing storage.
-    /// </summary>
-    public class PlayerDataCacheLocal : PlayerDataCache
-    {
-        private const string PlayerNameKey = "PlayerData.PlayerName";
-        private const string PlayerGuidKey = "PlayerData.PlayerGuid";
-        private const string CharacterModelIdKey = "PlayerData.CustomCharacterModelId";
-        private const string ClanIdKey = "PlayerData.ClanId";
-        private const string TermsOfServiceKey = "PlayerData.TermsOfService";
-        private const string IsDebugFlagKey = "PlayerData.IsDebugFlag";
-
-        private bool _isBatchSave;
-
-        public PlayerDataCacheLocal()
+        /// <summary>
+        /// <c>PlayerDataCache</c> implementation using UNITY <c>PlayerPrefs</c> as backing storage.
+        /// </summary>
+        private class PlayerDataCacheLocal : PlayerDataCache
         {
-            _playerName = PlayerPrefs.GetString(PlayerNameKey, string.Empty);
-            _characterModelId = PlayerPrefs.GetInt(CharacterModelIdKey, -1);
-            _clanId = PlayerPrefs.GetInt(ClanIdKey, -1);
-            _playerGuid = PlayerPrefs.GetString(PlayerGuidKey, string.Empty);
-            if (string.IsNullOrWhiteSpace(PlayerGuid))
+            private readonly MonoBehaviour _host;
+            private Coroutine _delayedSave;
+
+            public PlayerDataCacheLocal()
             {
-                _playerGuid = CreatePlayerHandle();
-                // Save GUID immediately on this device!
-                PlayerPrefs.SetString(PlayerGuidKey, PlayerGuid);
+                _host = UnityMonoHelper.Instance;
+                PlayerData.PlayerName = PlayerPrefs.GetString(PlayerPrefKeys.PlayerName, string.Empty);
+                PlayerData.PlayerGuid = PlayerPrefs.GetString(PlayerPrefKeys.PlayerGuid, string.Empty);
+                PlayerData.ClanId = PlayerPrefs.GetInt(PlayerPrefKeys.ClanId, DummyModelId);
+                PlayerData.CustomCharacterModelId = PlayerPrefs.GetInt(PlayerPrefKeys.CharacterModelId, DummyModelId);
+                PlayerData.Language = (SystemLanguage)PlayerPrefs.GetInt(PlayerPrefKeys.LanguageCode, (int)DefaultLanguage);
+                PlayerData.IsTosAccepted = PlayerPrefs.GetInt(PlayerPrefKeys.TermsOfServiceAccepted, 0) == 1;
+                PlayerData.IsFirstTimePlaying = PlayerPrefs.GetInt(PlayerPrefKeys.IsFirstTimePlaying, 1) == 1;
+                PlayerData.IsAccountVerified = PlayerPrefs.GetInt(PlayerPrefKeys.IsAccountVerified, 0) == 1;
+                PlayerData.IsDebugFlag = PlayerPrefs.GetInt(PlayerPrefKeys.IsDebugFlag, 0) == 1;
+                if (!string.IsNullOrWhiteSpace(PlayerGuid) && !string.IsNullOrWhiteSpace(PlayerData.PlayerName))
+                {
+                    Debug.Log(PlayerData.ToString());
+                    return;
+                }
+                // Create and save these settings immediately on this device!
+                if (string.IsNullOrWhiteSpace(PlayerGuid))
+                {
+                    PlayerData.PlayerGuid = Guid.NewGuid().ToString();
+                    PlayerPrefs.SetString(PlayerPrefKeys.PlayerGuid, PlayerGuid);
+                }
+                if (string.IsNullOrWhiteSpace(PlayerData.PlayerName))
+                {
+                    PlayerData.PlayerName = DefaultPlayerName;
+                    PlayerPrefs.SetString(PlayerPrefKeys.PlayerName, PlayerName);
+                }
                 PlayerPrefs.Save();
             }
-            _isTosAccepted = PlayerPrefs.GetInt(TermsOfServiceKey, 0) == 1;
-            _isDebugFlag = PlayerPrefs.GetInt(IsDebugFlagKey, 0) == 1;
-        }
 
-        private static string CreatePlayerHandle()
-        {
-            // Create same GUID for same device if possible
-            // - guid can be used to identify third party cloud game services
-            // - we want to keep it constant for single device even this data is wiped e.g. during testing
-            var deviceId = SystemInfo.deviceUniqueIdentifier;
-            if (deviceId == SystemInfo.unsupportedIdentifier)
+            public override string ToString()
             {
-                return Guid.NewGuid().ToString();
+                return PlayerData.ToString();
             }
-            using (var md5 = MD5.Create())
+
+            protected override void InternalSave()
             {
-                var hash = md5.ComputeHash(Encoding.Unicode.GetBytes(deviceId));
-                return new Guid(hash).ToString();
+                PlayerPrefs.SetString(PlayerPrefKeys.PlayerName, PlayerName);
+                PlayerPrefs.SetString(PlayerPrefKeys.PlayerGuid, PlayerGuid);
+                PlayerPrefs.SetInt(PlayerPrefKeys.ClanId, ClanId);
+                PlayerPrefs.SetInt(PlayerPrefKeys.CharacterModelId, CustomCharacterModelId);
+                PlayerPrefs.SetInt(PlayerPrefKeys.LanguageCode, (int)PlayerData.Language);
+                PlayerPrefs.SetInt(PlayerPrefKeys.TermsOfServiceAccepted, IsTosAccepted ? 1 : 0);
+                PlayerPrefs.SetInt(PlayerPrefKeys.IsFirstTimePlaying, IsFirstTimePlaying ? 1 : 0);
+                PlayerPrefs.SetInt(PlayerPrefKeys.IsAccountVerified, IsAccountVerified ? 1 : 0);
+                PlayerPrefs.SetInt(PlayerPrefKeys.IsDebugFlag, IsDebugFlag ? 1 : 0);
+                Debug.Log(PlayerData.ToString());
             }
-        }
 
-        protected override void Save()
-        {
-            InternalSave();
-        }
-
-        public override void BatchSave(Action saveSettings)
-        {
-            _isBatchSave = true;
-            saveSettings?.Invoke();
-            _isBatchSave = false;
-            InternalSave();
-            // Writes all modified preferences to disk.
-            PlayerPrefs.Save();
-        }
-
-        private void InternalSave()
-        {
-            if (_isBatchSave)
+            protected override void Save()
             {
-                return; // Defer saving until later
+                if (_host == null)
+                {
+                    // Can not delay, using UNITY default functionality save on exit
+                    return;
+                }
+                if (_delayedSave != null)
+                {
+                    // NOP - already delayed.
+                    return;
+                }
+                // Save all changed player prefs on next frame.
+                _delayedSave = _host.StartCoroutine(DelayedSave());
             }
-            // By default Unity writes preferences to disk during OnApplicationQuit().
-            // - you can force them to disk using PlayerPrefs.Save().
-            PlayerPrefs.SetString(PlayerNameKey, PlayerName);
-            PlayerPrefs.SetInt(CharacterModelIdKey, CharacterModelId);
-            PlayerPrefs.SetInt(ClanIdKey, ClanId);
-            PlayerPrefs.SetString(PlayerGuidKey, PlayerGuid);
-            PlayerPrefs.SetInt(TermsOfServiceKey, IsTosAccepted ? 1 : 0);
-            PlayerPrefs.SetInt(IsDebugFlagKey, IsDebugFlag ? 1 : 0);
+
+            private IEnumerator DelayedSave()
+            {
+                // By default Unity writes preferences to disk during OnApplicationQuit().
+                // - you can force them to disk using PlayerPrefs.Save().
+                yield return null;
+                Debug.Log("PlayerPrefs.Save");
+                InternalSave();
+                PlayerPrefs.Save();
+                _delayedSave = null;
+            }
         }
     }
 }

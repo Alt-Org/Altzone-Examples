@@ -1,15 +1,16 @@
 using System;
-using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Altzone.Scripts.Model;
 using Battle.Scripts.Battle.Ball;
 using Battle.Scripts.Battle.Factory;
 using Battle.Scripts.Battle.interfaces;
+using Battle0.Scripts;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
 
 namespace Battle.Scripts.Battle.Players2
 {
@@ -28,7 +29,7 @@ namespace Battle.Scripts.Battle.Players2
         [SerializeField] private Collider2D _collider;
         [SerializeField] private Transform _playerShieldHead;
         [SerializeField] private Transform _playerShieldFoot;
-        [SerializeField] private UnityEngine.InputSystem.PlayerInput _playerInput;
+        [SerializeField] private PlayerInput _playerInput;
 
         [Header("Play Area"), SerializeField] private Rect _upperPlayArea;
         [SerializeField] private Rect _lowerPlayArea;
@@ -83,7 +84,7 @@ namespace Battle.Scripts.Battle.Players2
             _playerShield = isLower
                 ? _playerShieldHead
                 : _playerShieldFoot;
-            var model = PhotonBattle.GetPlayerCharacterModel(player);
+            var model = PhotonBattle.GetCharacterModelForPlayer(player);
             // Keep compiler happy, waiting more shield prefabs to fix this.
             var defence = model.MainDefence == Defence.Retroflection
                 ? model.MainDefence

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Altzone.Scripts.Battle;
+using Battle0.Scripts;
 using Photon.Realtime;
 using UnityEngine;
 

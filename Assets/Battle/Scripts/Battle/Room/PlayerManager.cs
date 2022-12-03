@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
-using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Battle.Scripts.Battle.Factory;
 using Battle.Scripts.Battle.interfaces;
+using Battle0.Scripts;
 using Photon.Pun;
 using Prg.Scripts.Common.Photon;
 using Prg.Scripts.Common.PubSub;

@@ -1,14 +1,15 @@
 using System.Collections;
-using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
 using Battle.Scripts.Battle.Factory;
 using Battle.Scripts.Battle.interfaces;
+using Battle0.Scripts;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity.Window;
 using Prg.Scripts.Common.Unity.Window.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Battle.Scripts.Battle.Room
 {
@@ -101,7 +102,7 @@ namespace Battle.Scripts.Battle.Room
             var red = new TeamInfo(PhotonBattle.TeamRedValue, data.TeamRedHeadScore + data.TeamRedWallScore, PhotonBattle.TeamRedScoreKey);
             Debug.Log($"GameOver win {winningTeam} : {blue} : {red}");
             var room = PhotonNetwork.CurrentRoom;
-            var props = new ExitGames.Client.Photon.Hashtable
+            var props = new Hashtable
             {
                 { PhotonBattle.TeamWinKey, winningTeam },
                 { blue.ScoreKey, blue.Score },

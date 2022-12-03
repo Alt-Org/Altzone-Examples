@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
-using Altzone.Scripts.Battle;
 using Altzone.Scripts.Config;
+using Battle0.Scripts;
 using Photon.Pun;
 using Photon.Realtime;
 using Prg.Scripts.Common.Photon;
@@ -163,7 +163,6 @@ namespace GameUi.Scripts.BattleLobby
         {
             var room = PhotonNetwork.CurrentRoom;
             var player = PhotonNetwork.LocalPlayer;
-            var playerData = GameConfig.Get().PlayerDataCache;
             PhotonNetwork.NickName = room.GetUniquePlayerNameForRoom(player, PhotonNetwork.NickName, "");
             Debug.Log($"OnJoinedRoom InRoom '{room.Name}' as '{PhotonNetwork.NickName}'");
 
@@ -172,8 +171,8 @@ namespace GameUi.Scripts.BattleLobby
             {
                 room.SetCustomProperties(new Hashtable
                 {
-                    { PhotonBattle.TeamBlueKey, "Alpha" },
-                    { PhotonBattle.TeamRedKey, "Beta" }
+                    { PhotonBattle.TeamBlueValue, "Alpha" },
+                    { PhotonBattle.TeamRedValue, "Beta" }
                 });
             }
             var positions = new[]

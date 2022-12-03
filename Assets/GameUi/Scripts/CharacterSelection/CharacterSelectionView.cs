@@ -14,7 +14,7 @@ namespace GameUi.Scripts.CharacterSelection
 
         public Action<int> OnCharacterSelectionChanged;
 
-        private List<CharacterModel> _characterModels;
+        private List<IBattleCharacter> _characterModels;
 
         public string PlayerInfo
         {
@@ -28,7 +28,7 @@ namespace GameUi.Scripts.CharacterSelection
 
         private void Reset()
         {
-            _characterModels = Storefront.Get().GetAllCharacterModels();
+            _characterModels = Storefront.Get().GetAllBattleCharacters();
             Assert.IsTrue(_characterModels.Count == _characterButtons.Length, "characters.Count == _characterButtons.Length");
             _characterModels.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
             for (var i = 0; i < _characterModels.Count; ++i)
@@ -37,7 +37,7 @@ namespace GameUi.Scripts.CharacterSelection
                 var button = _characterButtons[i];
                 button.SetCaption(character.Name);
                 button.interactable = true;
-                var capturedCharacterId = character.Id;
+                var capturedCharacterId = character.CustomCharacterModelId;
                 button.onClick.AddListener(() => { OnCharacterSelectionChanged(capturedCharacterId); });
             }
         }
@@ -48,7 +48,7 @@ namespace GameUi.Scripts.CharacterSelection
             {
                 var character = _characterModels[i];
                 var button = _characterButtons[i];
-                button.interactable = character.Id != characterModelId;
+                button.interactable = character.CustomCharacterModelId != characterModelId;
             }
         }
     }
