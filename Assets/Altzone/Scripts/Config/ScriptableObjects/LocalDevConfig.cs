@@ -14,17 +14,10 @@ namespace Altzone.Scripts.Config.ScriptableObjects
     [CreateAssetMenu(menuName = "ALT-Zone/LocalDevConfig", fileName = "LocalDevConfig")]
     public class LocalDevConfig : ScriptableObject
     {
-        public static LocalDevConfig Instance;
-
         /// <summary>
         /// Use local Photon version to keep all rooms "invisible" for other developers
         /// </summary>
-        [Header("Photon Settings")] public string photonVersionPrefix;
-
-        /// <summary>
-        /// Load project settings first from this folder before searching from normal setting folder(s).
-        /// </summary>
-        public string developmentConfigFolder;
+        [Header("Photon Settings")] public string _photonVersionOverride;
 
         /// <summary>
         /// Reference to <c>LoggerConfig</c> to use.

@@ -63,11 +63,6 @@ namespace Altzone.Scripts
             var ci = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
-
-            if (!string.IsNullOrWhiteSpace(LocalDevConfig.Instance.photonVersionPrefix))
-            {
-                PhotonLobby.GetGameVersion = () => $"{LocalDevConfig.Instance.photonVersionPrefix}{Application.version}";
-            }
         }
     }
 #if USE_UNITY_ADS
