@@ -17,15 +17,10 @@ namespace Altzone.Scripts
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
         {
-            var defaultResourceLoader = ResourceLoader.Get();
-            var localDevConfig = defaultResourceLoader.LoadAsset<LocalDevConfig>(nameof(LocalDevConfig));
-            LocalDevConfig.Instance = Instantiate(localDevConfig);
-
-            var folderConfig = defaultResourceLoader.LoadAsset<FolderConfig>(nameof(FolderConfig));
-            var resourceLoader = ResourceLoader.Get(folderConfig.primaryConfigFolder, localDevConfig.developmentConfigFolder);
-
-            var loggerConfig = resourceLoader.LoadAsset<LoggerConfig>(nameof(LoggerConfig));
-            LoggerConfig.CreateLoggerConfig(loggerConfig);
+            var localDevConfig = Resources.Load<LocalDevConfig>(nameof(LocalDevConfig));
+            var loggerConfig = localDevConfig != null && localDevConfig._loggerConfig
+                ? localDevConfig._loggerConfig
+                : Resources.Load<LoggerConfig>(nameof(LoggerConfig));
 
             SetEditorStatus();
             GeoLocation.Load(data =>

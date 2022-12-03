@@ -1,3 +1,4 @@
+using Prg.Scripts.Common.Util;
 using UnityEngine;
 
 namespace Altzone.Scripts.Config.ScriptableObjects
@@ -24,5 +25,10 @@ namespace Altzone.Scripts.Config.ScriptableObjects
         /// Load project settings first from this folder before searching from normal setting folder(s).
         /// </summary>
         public string developmentConfigFolder;
+
+        /// <summary>
+        /// Reference to <c>LoggerConfig</c> to use.
+        /// </summary>
+        [Header("Development Settings")] public LoggerConfig _loggerConfig;
     }
 }
