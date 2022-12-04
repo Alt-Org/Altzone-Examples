@@ -9,14 +9,14 @@ namespace GameUi.Scripts.PlayerName
     {
         [SerializeField] private PlayerNameView _view;
 
-        private int minPlayerNameLength;
+        private int _minPlayerNameLength;
 
         private void Awake()
         {
-            //var gameConstraints = GameConfig.Get().GameConstraints;
-            minPlayerNameLength = 1;//gameConstraints._minPlayerNameLength;
+            var gameConstraints = GameConfig.Get().Constraints;
+            _minPlayerNameLength = gameConstraints._minPlayerNameLength;
             var playerNameInput = _view.PlayerNameInput;
-            playerNameInput.characterLimit = 16;//gameConstraints._maxPlayerNameLength;
+            playerNameInput.characterLimit = gameConstraints._maxPlayerNameLength;
             playerNameInput.onValueChanged.AddListener(OnValueChanged);
             playerNameInput.onValidateInput += OnValidateInput;
             playerNameInput.onEndEdit.AddListener(OnEndEdit);
@@ -71,7 +71,7 @@ namespace GameUi.Scripts.PlayerName
         private void OnValueChanged(string newValue)
         {
             Debug.Log($"OnValueChanged '{newValue}' len {newValue.Length}");
-            _view.ContinueButton.interactable = !string.IsNullOrWhiteSpace(newValue) && newValue.Length >= minPlayerNameLength;
+            _view.ContinueButton.interactable = !string.IsNullOrWhiteSpace(newValue) && newValue.Length >= _minPlayerNameLength;
         }
 
         private void OnEndEdit(string curValue)
@@ -87,7 +87,7 @@ namespace GameUi.Scripts.PlayerName
                 var tokens = curValue.Split('-');
                 if (tokens.Length == 2)
                 {
-                    if (tokens[0].Length < minPlayerNameLength || tokens[1].Length < minPlayerNameLength)
+                    if (tokens[0].Length < _minPlayerNameLength || tokens[1].Length < _minPlayerNameLength)
                     {
                         curValue = curValue.Replace("-", string.Empty);
                         _view.PlayerName = curValue;
