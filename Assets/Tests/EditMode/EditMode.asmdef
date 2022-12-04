@@ -1,19 +1,21 @@
 {
-    "name": "Runtime.Tests",
+    "name": "EditMode",
+    "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Examples",
         "Prg.Common",
-        "PhotonRealtime",
-        "PhotonUnityNetworking"
+        "Altzone"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll",
-        "Photon3Unity3D.dll"
+        "nunit.framework.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

@@ -6,7 +6,7 @@ using Prg.Scripts.Common.Photon;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Tests.PlayMode
+namespace Tests.PlayMode.Photon
 {
     public class PhotonConnectionTest
     {
@@ -17,7 +17,7 @@ namespace Tests.PlayMode
         [UnityTest]
         public IEnumerator ConnectToPhoton()
         {
-            Debug.Log($"test start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
 
             PhotonLobby.Connect(PlayerName);
             yield return null;
@@ -46,7 +46,7 @@ namespace Tests.PlayMode
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.IsPhotonReady, isPhotonReadyTimeout));
             Assert.That(PhotonNetwork.IsConnected, Is.False, "Is connected");
 
-            Debug.Log($"test end {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"end {PhotonWrapper.NetworkClientState}");
         }
 
         private static bool TimedWait(Func<bool> action, float timeoutTime)

@@ -7,7 +7,7 @@ using Prg.Scripts.Common.Photon;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Tests.PlayMode
+namespace Tests.PlayMode.Photon
 {
     public class PhotonOfflineTest
     {
@@ -17,28 +17,26 @@ namespace Tests.PlayMode
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Debug.Log($"OneTimeSetUp start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
             PhotonNetwork.OfflineMode = true;
             PhotonNetwork.NickName = PlayerName;
             PhotonNetwork.JoinRandomRoom();
-            Debug.Log($"OneTimeSetUp exit {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"exit {PhotonWrapper.NetworkClientState}");
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            Debug.Log($"OneTimeTearDown start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
             PhotonNetwork.Disconnect();
             PhotonNetwork.OfflineMode = false;
-            Debug.Log($"OneTimeTearDown exit {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"exit {PhotonWrapper.NetworkClientState}");
         }
 
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
         [UnityTest]
         public IEnumerator CustomPropertiesTests()
         {
-            Debug.Log($"test start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
 
             var inRoomTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InRoom, inRoomTimeout));
@@ -48,12 +46,12 @@ namespace Tests.PlayMode
             yield return null;
             yield return PlayerCustomPropertiesTests(PhotonNetwork.LocalPlayer);
 
-            Debug.Log($"test end {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"end {PhotonWrapper.NetworkClientState}");
         }
 
         private static IEnumerator RoomCustomPropertiesTests(Room room)
         {
-            Debug.Log($"test start {room.GetDebugLabel()}");
+            Debug.Log($"start {room.GetDebugLabel()}");
 
             const string intPropName = "INT";
             const string stringPropName = "STR";
@@ -119,12 +117,12 @@ namespace Tests.PlayMode
             hasProp = room.HasCustomProperty(stringPropName);
             Assert.That(hasProp, Is.False);
 
-            Debug.Log($"test end {room.GetDebugLabel()}");
+            Debug.Log($"end {room.GetDebugLabel()}");
         }
 
         private static IEnumerator PlayerCustomPropertiesTests(Player player)
         {
-            Debug.Log($"test start {player.GetDebugLabel()}");
+            Debug.Log($"start {player.GetDebugLabel()}");
 
             const string intPropName = "INT";
             const string stringPropName = "STR";
@@ -190,7 +188,7 @@ namespace Tests.PlayMode
             hasProp = player.HasCustomProperty(stringPropName);
             Assert.That(hasProp, Is.False);
 
-            Debug.Log($"test end {player.GetDebugLabel()}");
+            Debug.Log($"end {player.GetDebugLabel()}");
         }
 
         private static bool TimedWait(Func<bool> action, float timeoutTime)
