@@ -1,3 +1,4 @@
+using Editor.Altzone;
 using Editor.Prg.Build;
 using Editor.Prg.Dependencies;
 using Editor.Prg.GameDebug;
@@ -24,6 +25,7 @@ namespace Editor
         private const string Build = MenuRoot + "Build/";
         private const string Logging = MenuRoot + "Logging/";
         private const string Util = MenuRoot + "Util/";
+        private const string LootLocker = MenuRoot + "LootLocker/";
 
         #region GameDebug
 
@@ -39,8 +41,14 @@ namespace Editor
         [MenuItem(GameDebug + "Reset Local Player Data", false, 13)]
         private static void ResetLocalPlayerData() => DebugMenu.ResetLocalPlayerData();
 
-        [MenuItem(GameDebug + "Danger Zone/Delete All Local Data", true, 33)]
-        private static bool DeleteLocalAllDataIsValid() => true;
+        [MenuItem(GameDebug + "Models/Copy Custom Character Models", false, 20)]
+        private static void CopyCustomCharacterModels() => MenuModels.CopyCustomCharacterModels();
+
+        [MenuItem(GameDebug + "Models/Delete Custom Character Models", false, 21)]
+        private static void DeleteCustomCharacterModels() => MenuModels.DeleteCustomCharacterModels();
+
+        [MenuItem(GameDebug + "Models/Dump Character Models to Wiki", false, 22)]
+        private static void DumpModelsToWikiTable() => MenuModels.DumpModelsToWikiTable();
 
         #endregion
 
@@ -142,6 +150,19 @@ namespace Editor
 
         [MenuItem(Build + "Test Android Build Config", false, 12)]
         private static void CheckAndroidBuild() => MenuBuildReport.CheckAndroidBuild();
+
+        #endregion
+
+        #region LootLocker
+
+        [MenuItem(LootLocker + "Create LootLocker API Keys", false, 10)]
+        private static void CreateLootLockerApiKeys() => MenuLootLocker.CreateLootLockerApiKeys();
+
+        [MenuItem(LootLocker + "Show LootLocker API Keys", false, 11)]
+        private static void ShowLootLockerApiKeys() => MenuLootLocker.ShowLootLockerApiKeys();
+
+        [MenuItem(LootLocker + "Check LootLocker Session", false, 12)]
+        private static void CheckSession() => MenuLootLocker.CheckSession();
 
         #endregion
     }
