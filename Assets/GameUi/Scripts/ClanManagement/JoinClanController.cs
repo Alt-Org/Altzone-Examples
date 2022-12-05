@@ -35,7 +35,7 @@ namespace GameUi.Scripts.ClanManagement
                 _view.AddButton(caption, () =>
                 {
                     Debug.Log($"SAVE CLAN {capturedClanId}");
-                    playerData.ClanId = capturedClanId;
+                    playerData.UpdateClanId(capturedClanId);
                 });
             }
         }

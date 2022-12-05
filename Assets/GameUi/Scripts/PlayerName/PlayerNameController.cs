@@ -101,7 +101,7 @@ namespace GameUi.Scripts.PlayerName
             var playerData = GameConfig.Get().PlayerDataCache;
             if (_view.PlayerName != playerData.PlayerName)
             {
-                playerData.PlayerName = _view.PlayerName;
+                playerData.SetPlayerName(_view.PlayerName);
             }
             if (playerData.IsFirstTimePlaying)
             {

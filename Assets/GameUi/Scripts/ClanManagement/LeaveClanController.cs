@@ -28,7 +28,7 @@ namespace GameUi.Scripts.ClanManagement
         private static void LeaveClanButton()
         {
             var playerData = GameConfig.Get().PlayerDataCache;
-            playerData.ClanId = -1;
+            playerData.UpdateClanId(-1);
         }
     }
 }
