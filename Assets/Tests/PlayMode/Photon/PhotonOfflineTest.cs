@@ -17,26 +17,26 @@ namespace Tests.PlayMode.Photon
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonNetwork.NetworkClientState}");
             PhotonNetwork.OfflineMode = true;
             PhotonNetwork.NickName = PlayerName;
             PhotonNetwork.JoinRandomRoom();
-            Debug.Log($"exit {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"exit {PhotonNetwork.NetworkClientState}");
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonNetwork.NetworkClientState}");
             PhotonNetwork.Disconnect();
             PhotonNetwork.OfflineMode = false;
-            Debug.Log($"exit {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"exit {PhotonNetwork.NetworkClientState}");
         }
 
         [UnityTest]
         public IEnumerator CustomPropertiesTests()
         {
-            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonNetwork.NetworkClientState}");
 
             var inRoomTimeout = Time.time + Timeout;
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.InRoom, inRoomTimeout));
@@ -46,7 +46,7 @@ namespace Tests.PlayMode.Photon
             yield return null;
             yield return PlayerCustomPropertiesTests(PhotonNetwork.LocalPlayer);
 
-            Debug.Log($"end {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"end {PhotonNetwork.NetworkClientState}");
         }
 
         private static IEnumerator RoomCustomPropertiesTests(Room room)

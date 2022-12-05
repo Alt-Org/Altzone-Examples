@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 
 namespace Prg.Scripts.Common.Util
@@ -65,9 +64,9 @@ namespace Prg.Scripts.Common.Util
                     }
                 }
                 // Show effective log filename.
-                if (Application.platform.ToString().ToLower().Contains("windows"))
+                if (AppPlatform.IsWindows)
                 {
-                    _fileName = _fileName.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
+                    _fileName = AppPlatform.ConvertToWindowsPath(_fileName);
                 }
                 UnityEngine.Debug.Log($"LogWriter Open file {_fileName}");
                 Application.logMessageReceivedThreaded += UnityLogCallback;
@@ -82,7 +81,7 @@ namespace Prg.Scripts.Common.Util
 
         private void OnDestroy()
         {
-            // OnApplicationQuit() comes before OnDestroy() so we are interested to listen it.
+            // OnApplicationQuit() comes before OnDestroy() so we are *not* interested to listen it.
 
             Application.logMessageReceivedThreaded -= UnityLogCallback;
             UnityEngine.Debug.Log($"LogWriter OnDestroy Close file {_fileName}");
@@ -178,7 +177,8 @@ namespace Prg.Scripts.Common.Util
 
         public static string GetLogName()
         {
-            if (!Application.platform.ToString().ToLower().EndsWith("editor"))
+            var isEditor = AppPlatform.IsEditor;
+            if (!isEditor)
             {
                 // Delete old files.
                 var oldFiles = Directory.GetFiles(Application.persistentDataPath, $"*_{LogFileSuffix}");
@@ -198,8 +198,7 @@ namespace Prg.Scripts.Common.Util
                     }
                 }
             }
-            var platform = Application.platform.ToString().ToLower();
-            var prefix = platform.Contains("editor") ? "editor" : platform.Replace("player", string.Empty);
+            var prefix = isEditor ? "editor" : Application.platform.ToString().ToLower().Replace("player", string.Empty);
             var baseName = Application.productName.ToLower();
             return $"{prefix}_{baseName}_{LogFileSuffix}";
         }

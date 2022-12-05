@@ -5,7 +5,7 @@ using Battle.Scripts.Battle.Room;
 using Battle0.Scripts;
 using Photon.Pun;
 using Prg.Scripts.Common.PubSub;
-using Prg.Scripts.Common.Unity;
+using Prg.Scripts.Common.Unity.ToastMessages;
 using UnityConstants;
 using UnityEngine;
 

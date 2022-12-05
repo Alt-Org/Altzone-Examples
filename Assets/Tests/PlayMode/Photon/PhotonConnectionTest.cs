@@ -17,7 +17,7 @@ namespace Tests.PlayMode.Photon
         [UnityTest]
         public IEnumerator ConnectToPhoton()
         {
-            Debug.Log($"start {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"start {PhotonNetwork.NetworkClientState}");
 
             PhotonLobby.Connect(PlayerName);
             yield return null;
@@ -46,7 +46,7 @@ namespace Tests.PlayMode.Photon
             yield return new WaitUntil(() => TimedWait(() => PhotonWrapper.IsPhotonReady, isPhotonReadyTimeout));
             Assert.That(PhotonNetwork.IsConnected, Is.False, "Is connected");
 
-            Debug.Log($"end {PhotonWrapper.NetworkClientState}");
+            Debug.Log($"end {PhotonNetwork.NetworkClientState}");
         }
 
         private static bool TimedWait(Func<bool> action, float timeoutTime)

@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Prg.Scripts.Common.Photon
 {
@@ -35,14 +36,14 @@ namespace Prg.Scripts.Common.Photon
                 _instance = FindObjectOfType<PhotonEventDispatcher>();
                 if (_instance == null)
                 {
-                    UnitySingleton.CreateGameObjectAndComponent<PhotonEventDispatcher>(nameof(PhotonEventDispatcher));
+                    UnitySingleton.CreateGameObjectAndComponent<PhotonEventDispatcher>();
                 }
             }
             return _instance;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void RuntimeInitializeOnLoadMethod()
+        private static void SubsystemRegistration()
         {
             // Manual reset if UNITY Domain Reloading is disabled.
             _instance = null;
@@ -60,6 +61,12 @@ namespace Prg.Scripts.Common.Photon
             // Reuse EventData to decrease garbage collection but EventData will be overwritten for every event!
             PhotonNetwork.NetworkingClient.LoadBalancingPeer.ReuseEventInstance = true;
             PhotonNetwork.AddCallbackTarget(this);
+        }
+
+        private void OnEnable()
+        {
+            Assert.IsTrue(FindObjectsOfType<PhotonEventDispatcher>().Length == 1,
+                "FindObjectsOfType<PhotonEventDispatcher>().Length == 1");
         }
 
         private void OnDestroy()

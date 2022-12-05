@@ -1,14 +1,14 @@
 using System;
 using System.Text;
 using Prg.Scripts.Common.Photon;
-using Prg.Scripts.Common.Unity.ToastMessages;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
-namespace Prg.Scripts.Common.Unity
+namespace Prg.Scripts.Common.Unity.ToastMessages
 {
     /// <summary>
-    /// Networked version of <c>ScoreFlash</c>.
+    /// Networked version of <c>ScoreFlash</c> for current level. It will destroy itself when scene is unloaded!
     /// </summary>
     /// <remarks>
     /// Use <c>RegisterEventListener</c> if only listening for <c>ScoreFlash</c> messages.
@@ -16,10 +16,11 @@ namespace Prg.Scripts.Common.Unity
     public static class ScoreFlashNet
     {
         private static IScoreFlash _instance;
+        private static bool _isCallbackRegistered;
 
         private static IScoreFlash Get()
         {
-            return _instance ?? (_instance = new ScoreFlasherNet());
+            return _instance ??= new ScoreFlasherNet();
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -31,7 +32,19 @@ namespace Prg.Scripts.Common.Unity
 
         public static void RegisterEventListener()
         {
+            if (!_isCallbackRegistered)
+            {
+                _isCallbackRegistered = true;
+                SceneManager.sceneUnloaded += SceneUnloaded;
+            }
             Get();
+        }
+
+        private static void SceneUnloaded(Scene scene)
+        {
+            _instance = null;
+            _isCallbackRegistered = false;
+            SceneManager.sceneUnloaded -= SceneUnloaded;
         }
 
         public static void Push(string message)
@@ -59,7 +72,7 @@ namespace Prg.Scripts.Common.Unity
     {
         private const int MsgScoreFlash = PhotonEventDispatcher.EventCodeBase + 6;
         private const int MsgBufferFixedLength = 4 + 4 + 1;
-        private const int MaxStringMessageLength = 16;
+        private const int MaxStringMessageLength = 24;
 
         private readonly PhotonEventDispatcher _photonEventDispatcher;
 
@@ -67,7 +80,7 @@ namespace Prg.Scripts.Common.Unity
 
         internal ScoreFlasherNet()
         {
-            Debug.Log($"ScoreFlasherNet created");
+            Debug.Log($"");
             _photonEventDispatcher = PhotonEventDispatcher.Get();
             _photonEventDispatcher.RegisterEventListener(MsgScoreFlash, data => { OnScoreFlash((byte[])data.CustomData); });
         }
@@ -84,7 +97,7 @@ namespace Prg.Scripts.Common.Unity
 
         private static void OnScoreFlash(string message, float x, float y)
         {
-            Debug.Log($"OnScoreFlash {message} x {x} y {y}");
+            Debug.Log($"{x:0.0},{y:0.0}: {message}");
             ScoreFlash.Push(message, x, y);
         }
 

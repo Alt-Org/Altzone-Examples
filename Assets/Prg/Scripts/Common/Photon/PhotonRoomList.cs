@@ -12,14 +12,14 @@ namespace Prg.Scripts.Common.Photon
     /// Convenience class and example how to keep updated room list in a cache.
     /// </summary>
     /// <remarks>
-    /// Note that <c>PhotonNetwork.GetRoomList</c> does not exist and
+    /// Note that <c>PhotonNetwork.GetRoomList</c> does not exist anymore and
     /// you have to manually do your own book keeping of known rooms with <c>ILobbyCallbacks.OnRoomListUpdate</c>.
     /// </remarks>
     public class PhotonRoomList : MonoBehaviour, ILobbyCallbacks
     {
-        [SerializeField] private int _roomListCount; // Just for debugging in Editor
+        [SerializeField] private int _debugRoomListCount;
 
-        private List<RoomInfo> _currentRoomList = new List<RoomInfo>(); // Cached list of current rooms
+        private List<RoomInfo> _currentRoomList = new();
 
         public Action OnRoomsUpdated;
 
@@ -36,7 +36,7 @@ namespace Prg.Scripts.Common.Photon
                 // It seems that OnRoomListUpdate can happen between transitioning from lobby to room:
                 // -> JoinedLobby -> Joining -> Joined
                 _currentRoomList.Clear();
-                _roomListCount = 0;
+                _debugRoomListCount = 0;
                 return _currentRoomList.AsReadOnly();
             }
             throw new UnityException($"Invalid connection state: {PhotonNetwork.NetworkClientState}");
@@ -78,24 +78,24 @@ namespace Prg.Scripts.Common.Photon
         void ILobbyCallbacks.OnJoinedLobby()
         {
             _currentRoomList.Clear();
-            _roomListCount = 0;
-            Debug.Log($"OnJoinedLobby roomsUpdated: {_roomListCount}");
+            _debugRoomListCount = 0;
+            Debug.Log($"roomsUpdated: {_debugRoomListCount}");
             OnRoomsUpdated?.Invoke();
         }
 
         void ILobbyCallbacks.OnLeftLobby()
         {
             _currentRoomList.Clear();
-            _roomListCount = 0;
-            Debug.Log($"OnLeftLobby roomsUpdated: {_roomListCount}");
+            _debugRoomListCount = 0;
+            Debug.Log($"roomsUpdated: {_debugRoomListCount}");
             OnRoomsUpdated?.Invoke();
         }
 
         void ILobbyCallbacks.OnRoomListUpdate(List<RoomInfo> roomList)
         {
             UpdateRoomListing(roomList);
-            _roomListCount = roomList.Count;
-            Debug.Log($"OnRoomListUpdate roomsUpdated: {_roomListCount}");
+            _debugRoomListCount = roomList.Count;
+            Debug.Log($"roomsUpdated: {_debugRoomListCount}");
             OnRoomsUpdated?.Invoke();
         }
 
