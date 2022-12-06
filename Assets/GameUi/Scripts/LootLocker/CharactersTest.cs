@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 #if USE_LOOTLOCKER
+using System.Text;
 using LootLocker.Requests;
 #endif
 
@@ -12,6 +13,7 @@ namespace GameUi.Scripts.LootLocker
 
         [SerializeField] private GameObject _content;
         [SerializeField] private Text _resultLabel;
+        [SerializeField] private Text _textLabel;
 
         [SerializeField] private Button _buttonCharacterTypes;
         [SerializeField] private Button _buttonLoadouts;
@@ -45,6 +47,7 @@ namespace GameUi.Scripts.LootLocker
 #if USE_LOOTLOCKER
             _buttonCharacterTypes.interactable = false;
             _resultLabel.text = WaitText;
+            _textLabel.text = string.Empty;
             LootLockerSDKManager.ListCharacterTypes((response) =>
             {
                 _buttonCharacterTypes.interactable = true;
@@ -56,7 +59,31 @@ namespace GameUi.Scripts.LootLocker
                 }
                 var characterTypes = response.character_types;
                 _resultLabel.text = $"characterTypes {characterTypes.Length}";
+                _textLabel.text = FormatResult(characterTypes).ToString();
             });
+
+            StringBuilder FormatResult(LootLockerCharacter_Types[] characterTypes)
+            {
+                var builder = new StringBuilder();
+                foreach (var characterType in characterTypes)
+                {
+                    if (builder.Length > 0)
+                    {
+                        builder.AppendLine();
+                    }
+                    builder.Append($"{characterType.name} {characterType.id} {(characterType.is_default?"default":"")} #{characterType.storage?.Length}");
+                    if (characterType.storage?.Length > 0)
+                    {
+                        builder.AppendLine();
+                        foreach (var item in characterType.storage)
+                        {
+                            builder.Append($"{item.key}={item.value} ");
+                        }
+                        builder.Length -= 1;
+                    }
+                }
+                return builder;
+            }
 #endif
         }
 
@@ -66,6 +93,7 @@ namespace GameUi.Scripts.LootLocker
 #if USE_LOOTLOCKER
             _buttonLoadouts.interactable = false;
             _resultLabel.text = WaitText;
+            _textLabel.text = string.Empty;
             LootLockerSDKManager.GetCharacterLoadout((response) =>
             {
                 _buttonLoadouts.interactable = false;
