@@ -386,6 +386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _landscapeMatch: 0
   _portraitMatch: 1
+  _pollingInterval: 1
 --- !u!114 &7809343815142949110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -860,7 +861,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5169563382975222739}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c8ffc5a8ce646f687b74a2df175f5c4, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f83d72bb2828ab4da0d2125fed17dd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _localizationKey: UserSettings/ButtonToggleDebug
