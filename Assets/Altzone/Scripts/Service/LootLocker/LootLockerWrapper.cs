@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Altzone.Scripts.Config;
 #if USE_LOOTLOCKER
 using UnityEngine.Assertions;
@@ -58,6 +59,15 @@ namespace Altzone.Scripts.Service.LootLocker
             Manager.EndSession();
         }
 
+        public static Task<string> PingAsync()
+        {
+            if (!Manager.IsRunning)
+            {
+                return CreateError("Manager Is NOT Running");
+            }
+            return Manager.Ping();
+        }
+
         public static string GetPlayerName()
         {
             Assert.IsTrue(Manager.IsRunning, "Manager.IsRunning");
@@ -88,6 +98,11 @@ namespace Altzone.Scripts.Service.LootLocker
         {
         }
 
+        public static Task<string> PingAsync()
+        {
+            return CreateError("USE_LOOTLOCKER not defined");
+        }
+
         public static string GetPlayerName()
         {
             var playerDataCache = GameConfig.Get().PlayerDataCache;
@@ -98,5 +113,12 @@ namespace Altzone.Scripts.Service.LootLocker
         {
         }
 #endif
+
+        private static Task<string> CreateError(string message)
+        {
+            var taskCompletionSource = new TaskCompletionSource<string>();
+            taskCompletionSource.SetResult(message);
+            return taskCompletionSource.Task;
+        }
     }
 }
