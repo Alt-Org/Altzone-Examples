@@ -22,6 +22,11 @@ namespace GameUi.Scripts.LootLocker
             var button1 = _view.TestButton1;
             button1.SetCaption("Ping");
             button1.onClick.AddListener(TestButton1);
+
+            var button2 = _view.TestButton2;
+            button2.SetCaption("Chars");
+            var charactersTest = GetComponent<CharactersTest>();
+            button2.onClick.AddListener(() => charactersTest.enabled = !charactersTest.enabled);
         }
 
         private async void TestButton1()
