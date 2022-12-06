@@ -15,7 +15,7 @@ namespace GameUi.Scripts.Test
             Debug.Log($"3 IsCompleted {result.IsCompleted}");
             yield return new WaitUntil(() => result.IsCompleted);
             Debug.Log($"4 Result {result.Result}");
-            var playerName = LootLockerWrapper.GetPlayerName();
+            var playerName = LootLockerWrapper.PlayerName;
             Debug.Log($"5 playerName {playerName}");
         }
     }

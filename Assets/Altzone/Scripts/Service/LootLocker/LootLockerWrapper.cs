@@ -68,10 +68,16 @@ namespace Altzone.Scripts.Service.LootLocker
             return Manager.Ping();
         }
 
-        public static string GetPlayerName()
+        public static string PlayerName
         {
-            Assert.IsTrue(Manager.IsRunning, "Manager.IsRunning");
-            return Manager.PlayerHandle.PlayerName;
+            get
+            {
+                if (!Manager.IsRunning)
+                {
+                    return GameConfig.Get().PlayerDataCache.PlayerName;
+                }
+                return Manager.PlayerHandle.PlayerName;
+            }
         }
 
         public static void SetPlayerName(string playerName)
@@ -88,7 +94,7 @@ namespace Altzone.Scripts.Service.LootLocker
             var task = Manager.SetPlayerNameAsync(playerName, s => playerDataCache.SetPlayerName(s));
         }
 #else
-        public static bool IsRunning => true;
+        public static bool IsRunning => false;
 
         public static void Start(bool isDevelopmentMode, Func<string> getApiKey = null)
         {
@@ -103,10 +109,12 @@ namespace Altzone.Scripts.Service.LootLocker
             return CreateError("USE_LOOTLOCKER not defined");
         }
 
-        public static string GetPlayerName()
+        public static string PlayerName
         {
-            var playerDataCache = GameConfig.Get().PlayerDataCache;
-            return playerDataCache.PlayerName;
+            get
+            {
+                return GameConfig.Get().PlayerDataCache.PlayerName;
+            }
         }
 
         public static void SetPlayerName(string playerName)
