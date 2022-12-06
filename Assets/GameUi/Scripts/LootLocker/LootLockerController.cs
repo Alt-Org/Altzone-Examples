@@ -5,6 +5,8 @@ namespace GameUi.Scripts.LootLocker
 {
     public class LootLockerController : MonoBehaviour
     {
+        private const string WaitText = "Wait";
+
         [SerializeField] private LootLockerView _view;
 
         private void OnEnable()
@@ -16,6 +18,20 @@ namespace GameUi.Scripts.LootLocker
                 return;
             }
             _view.InfoLabel = $"{LootLockerWrapper.PlayerName}";
+
+            var button1 = _view.TestButton1;
+            button1.SetCaption("Ping");
+            button1.onClick.AddListener(TestButton1);
+        }
+
+        private async void TestButton1()
+        {
+            var button = _view.TestButton1;
+            button.interactable = false;
+            _view.ResultLabel = WaitText;
+            var result = await LootLockerWrapper.PingAsync();
+            _view.ResultLabel = result;
+            button.interactable = true;
         }
     }
 }
