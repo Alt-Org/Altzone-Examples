@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Prg.Scripts.Test
+namespace Prg.Tests
 {
     /// <summary>
     /// Test script to toggle <c>Screen.fullScreen</c> state (which controls Android/IOS navigation bar and status bar).<br />

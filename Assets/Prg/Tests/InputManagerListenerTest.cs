@@ -1,9 +1,10 @@
 using Prg.Scripts.Common.PubSub;
 using Prg.Scripts.Common.Unity.Input;
+using Prg.Scripts.DevUtil;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Prg.Scripts.Test
+namespace Prg.Tests
 {
     public class InputManagerListenerTest : MonoBehaviour
     {
