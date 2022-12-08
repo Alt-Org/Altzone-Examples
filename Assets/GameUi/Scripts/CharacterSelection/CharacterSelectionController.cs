@@ -26,7 +26,7 @@ namespace GameUi.Scripts.CharacterSelection
             var playerData = GameConfig.Get().PlayerDataCache;
             if (playerData.CustomCharacterModelId != characterModelId)
             {
-                playerData.CustomCharacterModelId = characterModelId;
+                playerData.SetCustomCharacterModelId(characterModelId);
             }
             _view.ShowCharacter(characterModelId);
         }

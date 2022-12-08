@@ -10,12 +10,15 @@ namespace Altzone.Scripts.Config
     /// <summary>
     /// Player data cache - a common storage for player related data that is persisted somewhere (locally).
     /// </summary>
+    /// <remarks>
+    /// See https://github.com/Alt-Org/Altzone/wiki/Battle-Pelihahmo
+    /// </remarks>
     public interface IPlayerDataCache
     {
         string PlayerName { get; }
         string PlayerGuid { get; }
         int ClanId { get; }
-        int CustomCharacterModelId { get; set; }
+        int CustomCharacterModelId { get; }
         SystemLanguage Language { get; set; }
         bool IsDebugFlag { get; set; }
         bool IsTosAccepted { get; set; }
@@ -24,8 +27,9 @@ namespace Altzone.Scripts.Config
 
         bool HasPlayerName { get; }
         void SetPlayerName(string playerName);
-        void UpdatePlayerGuid(string newPlayerGuid);
-        void UpdateClanId(int clanId);
+        void SetPlayerGuid(string newPlayerGuid);
+        void SetClanId(int clanId);
+        void SetCustomCharacterModelId(int customCharacterModelId);
 
 #if UNITY_EDITOR
         void DebugSavePlayer();
@@ -33,6 +37,9 @@ namespace Altzone.Scripts.Config
 #endif
     }
 
+    /// <summary>
+    /// Convenience class to keep all local storage related settings in one place.
+    /// </summary>
     internal class PlayerData
     {
         public string PlayerName;
@@ -45,9 +52,9 @@ namespace Altzone.Scripts.Config
         public bool IsAccountVerified;
         public bool IsDebugFlag;
 
-        public void ResetData(int dummyModelId, SystemLanguage defaultLanguage)
+        public void ResetData(string dummyPlayerName, int dummyModelId, SystemLanguage defaultLanguage)
         {
-            PlayerName = string.Empty;
+            PlayerName = dummyPlayerName;
             PlayerGuid = string.Empty;
             ClanId = dummyModelId;
             CustomCharacterModelId = dummyModelId;
@@ -57,7 +64,7 @@ namespace Altzone.Scripts.Config
             IsAccountVerified = false;
             IsDebugFlag = false;
         }
-        
+
         public override string ToString()
         {
             return $"{nameof(PlayerName)}: {PlayerName}, {nameof(CustomCharacterModelId)}: {CustomCharacterModelId}, {nameof(ClanId)}: {ClanId}" +
@@ -72,7 +79,7 @@ namespace Altzone.Scripts.Config
     /// </summary>
     internal class PlayerDataCache : IPlayerDataCache
     {
-        public static IPlayerDataCache Create()
+        internal static IPlayerDataCache Create()
         {
             return new PlayerDataCacheLocal();
         }
@@ -81,7 +88,7 @@ namespace Altzone.Scripts.Config
         /// Negative model IDs are considered invalid.
         /// </summary>
         private const int DummyModelId = -1;
-        
+
         private const string DefaultPlayerName = "Player";
         private const SystemLanguage DefaultLanguage = SystemLanguage.Finnish;
 
@@ -138,7 +145,7 @@ namespace Altzone.Scripts.Config
         public int CustomCharacterModelId
         {
             get => _playerData.CustomCharacterModelId;
-            set
+            private set
             {
                 _playerData.CustomCharacterModelId = value;
                 Save();
@@ -226,8 +233,8 @@ namespace Altzone.Scripts.Config
             PlayerName = playerName ?? DefaultPlayerName;
             LootLockerWrapper.SetPlayerName(_playerData.PlayerName);
         }
-        
-        public void UpdatePlayerGuid(string newPlayerGuid)
+
+        public void SetPlayerGuid(string newPlayerGuid)
         {
             Assert.IsTrue(!string.IsNullOrWhiteSpace(newPlayerGuid), "!string.IsNullOrWhiteSpace(newPlayerGuid)");
             if (_playerData.PlayerGuid != null)
@@ -238,15 +245,16 @@ namespace Altzone.Scripts.Config
             PlayerGuid = newPlayerGuid;
         }
 
-        public void UpdateClanId(int clanId)
+        public void SetClanId(int clanId)
         {
-            if (clanId <= 0)
-            {
-                clanId = DummyModelId;
-            }
-            ClanId = clanId;
+            ClanId = clanId <= 0 ? DummyModelId : clanId;
         }
-        
+
+        public void SetCustomCharacterModelId(int customCharacterModelId)
+        {
+            CustomCharacterModelId = customCharacterModelId <= 0 ? DummyModelId : customCharacterModelId;
+        }
+
         /// <summary>
         /// Protected <c>Save</c> method to handle single property change.
         /// </summary>
@@ -266,7 +274,7 @@ namespace Altzone.Scripts.Config
 #if UNITY_EDITOR
         public void DebugResetPlayer()
         {
-            _playerData.ResetData(DummyModelId, DefaultLanguage);
+            _playerData.ResetData(DefaultPlayerName, DummyModelId, DefaultLanguage);
         }
 
         public void DebugSavePlayer()
