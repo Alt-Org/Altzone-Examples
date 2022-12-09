@@ -91,6 +91,39 @@ namespace Prg.Scripts.Common.RestApi
                 return response ?? string.Empty;
             }
 
+            async Task WriteRequestData(WebRequest webRequest, object contentData)
+            {
+                if (contentData is string stringData)
+                {
+                    var bytes = Encoding.ASCII.GetBytes(stringData);
+                    webRequest.ContentLength = bytes.Length;
+                    if (bytes.Length > 0)
+                    {
+                        webRequest.ContentType = "application/json";
+                        using (var stream = await webRequest.GetRequestStreamAsync())
+                        {
+                            await stream.WriteAsync(bytes, 0, bytes.Length);
+                        }
+                    }
+                }
+                else if (contentData is byte[] formData)
+                {
+                    webRequest.ContentLength = formData.Length;
+                    if (formData.Length > 0)
+                    {
+                        webRequest.ContentType = "application/x-www-form-urlencoded";
+                        using (var stream = await webRequest.GetRequestStreamAsync())
+                        {
+                            await stream.WriteAsync(formData, 0, formData.Length);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new UnityException($"Invalid content type: {contentData?.GetType().FullName}");
+                }
+            }
+            
             Debug.Log($"ExecuteRequest start {url}");
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -119,35 +152,7 @@ namespace Prg.Scripts.Common.RestApi
                 }
                 if (verb == "POST")
                 {
-                    if (content is string stringData)
-                    {
-                        var bytes = Encoding.ASCII.GetBytes(stringData);
-                        request.ContentLength = bytes.Length;
-                        if (bytes.Length > 0)
-                        {
-                            request.ContentType = "application/json";
-                            using (var stream = await request.GetRequestStreamAsync())
-                            {
-                                await stream.WriteAsync(bytes, 0, bytes.Length);
-                            }
-                        }
-                    }
-                    else if (content is byte[] formData)
-                    {
-                        request.ContentLength = formData.Length;
-                        if (formData.Length > 0)
-                        {
-                            request.ContentType = "application/x-www-form-urlencoded";
-                            using (var stream = await request.GetRequestStreamAsync())
-                            {
-                                await stream.WriteAsync(formData, 0, formData.Length);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new UnityException($"Invalid content type: {content?.GetType().FullName}");
-                    }
+                    await WriteRequestData(request, content);
                 }
                 if (!(await request.GetResponseAsync() is HttpWebResponse response))
                 {
@@ -158,26 +163,22 @@ namespace Prg.Scripts.Common.RestApi
                     return new Response($"Request failed: {response.StatusCode}", string.Empty);
                 }
                 contentType = response.ContentType;
-                using (var dataStream = response.GetResponseStream())
+                await using var dataStream = response.GetResponseStream();
+                if (dataStream != null)
                 {
-                    if (dataStream != null)
-                    {
-                        var reader = new StreamReader(dataStream);
-                        httpResponse = await ReadToEndAsyncNonNull(reader);
-                    }
+                    var reader = new StreamReader(dataStream);
+                    httpResponse = await ReadToEndAsyncNonNull(reader);
                 }
             }
             catch (WebException e)
             {
                 if (e.Response != null)
                 {
-                    using (var dataStream = e.Response.GetResponseStream())
+                    await using var dataStream = e.Response.GetResponseStream();
+                    if (dataStream != null)
                     {
-                        if (dataStream != null)
-                        {
-                            var reader = new StreamReader(dataStream);
-                            httpResponse = await ReadToEndAsyncNonNull(reader);
-                        }
+                        var reader = new StreamReader(dataStream);
+                        httpResponse = await ReadToEndAsyncNonNull(reader);
                     }
                 }
                 stopWatch.Stop();
