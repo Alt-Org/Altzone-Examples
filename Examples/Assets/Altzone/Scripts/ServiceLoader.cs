@@ -3,6 +3,7 @@ using Altzone.Scripts.Config;
 using Altzone.Scripts.Service.Audio;
 using Altzone.Scripts.Service.LootLocker;
 using Prg.Scripts.Common.Unity;
+using Prg.Scripts.Common.Unity.Attributes;
 using Prg.Scripts.Common.Unity.Localization;
 using Prg.Scripts.Common.Unity.Window;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace Altzone.Scripts
         /// </summary>
         private const string Prefix2 = "生产"; // Shēngchǎn
 
+        [SerializeField, ReadOnly] private bool _isLootLocker;
+        
         private void OnEnable()
         {
             Debug.Log($"{name}");
@@ -37,7 +40,7 @@ namespace Altzone.Scripts
         }
 
         [Conditional("USE_LOOTLOCKER")]
-        private static void StartLootLocker(bool isDevelopmentMode)
+        private void StartLootLocker(bool isDevelopmentMode)
         {
             // We need player name and guid in order to start LootLocker.
             var playerDataCache = GameConfig.Get().PlayerDataCache;
@@ -50,6 +53,7 @@ namespace Altzone.Scripts
             Debug.Log($"Start LootLocker IsRunning {LootLockerWrapper.IsRunning} suffix {suffix}");
             LootLockerWrapper.Start(isDevelopmentMode,
                 () => Resources.Load<StringProperty>($"{nameof(StringProperty)}{suffix}")?.PropertyValue);
+            _isLootLocker = true;
         }
 
 #if UNITY_EDITOR
