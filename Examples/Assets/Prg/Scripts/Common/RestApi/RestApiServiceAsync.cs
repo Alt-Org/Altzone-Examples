@@ -36,7 +36,30 @@ namespace Prg.Scripts.Common.RestApi
             }
         }
 
-        public static async Task<Response> ExecuteRequest(string verb, string url, byte[] content, string jwtToken = null)
+        /// <summary>
+        /// Container for HTTP Authorization header.
+        /// </summary>
+        /// <remarks>
+        /// Name is typically 'Authorization' and value is service dependent, like e.g. jwt token etc.
+        /// </remarks>
+        public class AuthorizationHeader
+        {
+            public readonly string Name;
+            public readonly string Value;
+
+            public AuthorizationHeader(string value)
+            {
+                Name = "Authorization";
+                Value = value;
+            }
+            public AuthorizationHeader(string name, string value)
+            {
+                Name = name;
+                Value = value;
+            }
+        }
+        
+        public static async Task<Response> ExecuteRequest(string verb, string url, byte[] content, AuthorizationHeader authorizationHeader = null)
         {
             string GetWebExceptionStatus(WebException webException)
             {
@@ -62,9 +85,9 @@ namespace Prg.Scripts.Common.RestApi
             {
                 var request = WebRequest.Create(url);
                 request.Method = verb;
-                if (jwtToken != null)
+                if (authorizationHeader != null)
                 {
-                    request.Headers.Add("Authorization", "Bearer " + jwtToken);
+                    request.Headers.Add(authorizationHeader.Name, authorizationHeader.Value);
                 }
                 if (request is HttpWebRequest webRequest)
                 {
