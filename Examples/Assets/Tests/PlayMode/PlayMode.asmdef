@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "PhotonRealtime",
         "PhotonUnityNetworking",
+        "lootlocker.lootlockersdk.runtime",
         "Altzone",
         "Prg.Common"
     ],
