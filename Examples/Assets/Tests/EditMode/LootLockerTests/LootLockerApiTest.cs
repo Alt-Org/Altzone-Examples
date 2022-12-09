@@ -15,9 +15,10 @@ namespace Tests.EditMode.LootLockerTests
         private const string ServerApiKey = "dev_7c9da977316f449a881f5424215b9902";
         private const string GameVersion = "{\"game_version\": \"0.1.0.0\"}";
 
-        private bool HasSession => _sessionToken != null;
+        private static bool HasSession => _sessionToken != null;
+        private static string _sessionToken;
 
-        private string _sessionToken;
+        private (string key, string value) _dateVersion;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -25,10 +26,11 @@ namespace Tests.EditMode.LootLockerTests
 #if !USE_LOOTLOCKER
             Assert.IsTrue(false, "USE_LOOTLOCKER is not defined");
 #endif
+            _dateVersion = LootLockerConfig.Get().dateVersion;
         }
 
         [Test]
-        public async Task ListCharacterTypesTest()
+        public async Task PlayerPersistentStorageTest()
         {
             Debug.Log($"test HasSession {HasSession}");
             if (!HasSession)
@@ -37,19 +39,120 @@ namespace Tests.EditMode.LootLockerTests
             }
             Assert.IsTrue(HasSession);
 
+            var clanId1 = 3022592;
+            var clanId2 = 3027563;
+            var url = GetUrl($"players/storage?player_ids={clanId1},{clanId2}");
+
+            var headers = new RestApiServiceAsync.Headers(new List<Tuple<string, string>>
+            {
+                new(_dateVersion.key, _dateVersion.value),
+                new("x-auth-token", _sessionToken),
+            });
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, headers);
+            if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            {
+                Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
+                Assert.IsTrue(false);
+                return;
+            }
+            Debug.Log($"data {jsonData.Count}");
+            Assert.IsTrue(jsonData.ContainsKey("items"));
+            if (!(jsonData["items"] is List<object> items))
+            {
+                Debug.Log($"ITEMS ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
+                Assert.IsTrue(false);
+                return;
+            }
+            foreach (var entry in items)
+            {
+                if (entry is Dictionary<string, object> dictionary)
+                {
+                    DumpDictionary(dictionary);
+                }
+            }
+            
+            Debug.Log($"done");
+
+            void DumpDictionary(Dictionary<string, object> dictionary)
+            {
+                Debug.Log($"keys {string.Join(',', dictionary.Keys)}");
+                Debug.Log($"values {string.Join(',', dictionary.Values)}");
+            }
+        }
+        
+        [Test]
+        public async Task PlayerNamesTest()
+        {
+            Debug.Log($"test HasSession {HasSession}");
+            if (!HasSession)
+            {
+                await RegisterServerSession();
+            }
+            Assert.IsTrue(HasSession);
+
+            var clanId1 = 3022592;
+            var clanId2 = 3027563;
+            var url = GetUrl($"players/lookup/name");
+
+            var postData = $"player_id={clanId1}\nplayer_id={clanId2}";
+            
+            var headers = new RestApiServiceAsync.Headers(new List<Tuple<string, string>>
+            {
+                new(_dateVersion.key, _dateVersion.value),
+                new("x-auth-token", _sessionToken),
+            });
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, postData, headers);
+            if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            {
+                Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
+                Assert.IsTrue(false);
+                return;
+            }
+            Debug.Log($"data {jsonData.Count}");
+            foreach (var entry in jsonData)
+            {
+                Debug.Log($"{entry.Key}={entry.Value}");
+            }
+            
             Debug.Log($"done");
         }
 
+        [Test]
+        public async Task ServerSessionPingTest()
+        {
+            // https://ref.lootlocker.com/server-api/#player-persistent-storage
+            
+            Debug.Log($"test HasSession {HasSession}");
+            if (!HasSession)
+            {
+                await RegisterServerSession();
+            }
+            Assert.IsTrue(HasSession);
+
+            var url = GetUrl("ping");
+            
+            var headers = new RestApiServiceAsync.Headers(new List<Tuple<string, string>>
+            {
+                new(_dateVersion.key, _dateVersion.value),
+                new("x-auth-token", _sessionToken),
+            });
+            
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, headers);
+            Debug.Log($"Success {result.Success} {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
+            Assert.IsTrue(result.Success);
+            
+            Debug.Log($"done");
+        }
+        
         private async Task RegisterServerSession()
         {
             _sessionToken = null;
             var url = GetUrl("session");
             const string postData = GameVersion;
             Debug.Log($"postData {postData}");
-            var version = LootLockerConfig.Get().dateVersion;
             var headerValues = new List<Tuple<string, string>>
             {
-                new(version.key, version.value),
+                new(_dateVersion.key, _dateVersion.value),
                 new("x-server-key", ServerApiKey),
             };
             var headers = new RestApiServiceAsync.Headers(headerValues);
