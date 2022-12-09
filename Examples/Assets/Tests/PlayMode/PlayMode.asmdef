@@ -4,9 +4,10 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Prg.Common",
         "PhotonRealtime",
-        "PhotonUnityNetworking"
+        "PhotonUnityNetworking",
+        "Altzone",
+        "Prg.Common"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
