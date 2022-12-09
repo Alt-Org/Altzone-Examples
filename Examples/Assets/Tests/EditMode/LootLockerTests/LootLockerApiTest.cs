@@ -8,6 +8,9 @@ using Prg.Scripts.Common.RestApi;
 
 namespace Tests.EditMode.LootLockerTests
 {
+    /// <summary>
+    /// Tests for <c>LootLocker</c> Server API.
+    /// </summary>
     [TestFixture]
     public class LootLockerApiTest
     {
@@ -32,6 +35,8 @@ namespace Tests.EditMode.LootLockerTests
         [Test]
         public async Task PlayerPersistentStorageTest()
         {
+            // https://ref.lootlocker.com/server-api/#player-persistent-storage
+            
             Debug.Log($"test HasSession {HasSession}");
             if (!HasSession)
             {
@@ -57,32 +62,15 @@ namespace Tests.EditMode.LootLockerTests
             }
             Debug.Log($"data {jsonData.Count}");
             Assert.IsTrue(jsonData.ContainsKey("items"));
-            if (!(jsonData["items"] is List<object> items))
-            {
-                Debug.Log($"ITEMS ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
-                Assert.IsTrue(false);
-                return;
-            }
-            foreach (var entry in items)
-            {
-                if (entry is Dictionary<string, object> dictionary)
-                {
-                    DumpDictionary(dictionary);
-                }
-            }
-            
+            Debug.Log($"items:\r\n{Json.Serialize(jsonData["items"])}");
             Debug.Log($"done");
-
-            void DumpDictionary(Dictionary<string, object> dictionary)
-            {
-                Debug.Log($"keys {string.Join(',', dictionary.Keys)}");
-                Debug.Log($"values {string.Join(',', dictionary.Values)}");
-            }
         }
         
         [Test]
         public async Task PlayerNamesTest()
         {
+            // https://ref.lootlocker.com/server-api/#player-names
+            
             Debug.Log($"test HasSession {HasSession}");
             if (!HasSession)
             {
@@ -92,16 +80,14 @@ namespace Tests.EditMode.LootLockerTests
 
             var clanId1 = 3022592;
             var clanId2 = 3027563;
-            var url = GetUrl($"players/lookup/name");
-
-            var postData = $"player_id={clanId1}\nplayer_id={clanId2}";
+            var url = GetUrl($"players/lookup/name?player_id={clanId1}&player_id={clanId2}");
             
             var headers = new RestApiServiceAsync.Headers(new List<Tuple<string, string>>
             {
                 new(_dateVersion.key, _dateVersion.value),
                 new("x-auth-token", _sessionToken),
             });
-            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, postData, headers);
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, headers);
             if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
             {
                 Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
@@ -109,10 +95,8 @@ namespace Tests.EditMode.LootLockerTests
                 return;
             }
             Debug.Log($"data {jsonData.Count}");
-            foreach (var entry in jsonData)
-            {
-                Debug.Log($"{entry.Key}={entry.Value}");
-            }
+            Assert.IsTrue(jsonData.ContainsKey("players"));
+            Debug.Log($"players:\r\n{Json.Serialize(jsonData["players"])}");
             
             Debug.Log($"done");
         }
@@ -120,7 +104,7 @@ namespace Tests.EditMode.LootLockerTests
         [Test]
         public async Task ServerSessionPingTest()
         {
-            // https://ref.lootlocker.com/server-api/#player-persistent-storage
+            // https://ref.lootlocker.com/server-api/#registering-a-server-session
             
             Debug.Log($"test HasSession {HasSession}");
             if (!HasSession)
