@@ -9,6 +9,9 @@ using System.Threading;
 
 namespace SimpleHTTPServer
 {
+    /// <summary>
+    /// Adopted form https://github.com/sableangle/UnityHTTPServer
+    /// </summary>
     internal class SimpleHttpServer
     {
         #region Error page

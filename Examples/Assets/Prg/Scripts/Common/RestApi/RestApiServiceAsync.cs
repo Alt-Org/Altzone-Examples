@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Prg.Scripts.Common.RestApi
 {
+    /// <summary>
+    /// Async helper for REST API requests.
+    /// </summary>
     public static class RestApiServiceAsync
     {
         public class Response
@@ -36,30 +42,39 @@ namespace Prg.Scripts.Common.RestApi
             }
         }
 
+        public class Headers
+        {
+            public readonly List<Tuple<string, string>> HeaderList;
+
+            public Headers(string name, string value)
+            {
+                HeaderList = new List<Tuple<string, string>>() { new(name, value) };
+            }
+
+            public Headers(List<Tuple<string, string>> headerList)
+            {
+                HeaderList = headerList;
+            }
+        }
+
         /// <summary>
         /// Container for HTTP Authorization header.
         /// </summary>
         /// <remarks>
         /// Name is typically 'Authorization' and value is service dependent, like e.g. jwt token etc.
         /// </remarks>
-        public class AuthorizationHeader
+        public class AuthorizationHeader : Headers
         {
-            public readonly string Name;
-            public readonly string Value;
-
-            public AuthorizationHeader(string value)
+            public AuthorizationHeader(string value) : base("Authorization", value)
             {
-                Name = "Authorization";
-                Value = value;
             }
-            public AuthorizationHeader(string name, string value)
+
+            public AuthorizationHeader(string name, string value) : base(name, value)
             {
-                Name = name;
-                Value = value;
             }
         }
-        
-        public static async Task<Response> ExecuteRequest(string verb, string url, byte[] content, AuthorizationHeader authorizationHeader = null)
+
+        public static async Task<Response> ExecuteRequest(string verb, string url, object content = null, Headers headers = null)
         {
             string GetWebExceptionStatus(WebException webException)
             {
@@ -85,9 +100,18 @@ namespace Prg.Scripts.Common.RestApi
             {
                 var request = WebRequest.Create(url);
                 request.Method = verb;
-                if (authorizationHeader != null)
+                if (headers != null)
                 {
-                    request.Headers.Add(authorizationHeader.Name, authorizationHeader.Value);
+                    foreach (var header in headers.HeaderList)
+                    {
+                        request.Headers.Add(header.Item1, header.Item2);
+                    }
+                }
+                Debug.Log($"Headers #{request.Headers.Count}");
+                for (var i = 0; i < request.Headers.Count; ++i)
+                {
+                    var h = request.Headers;
+                    Debug.Log($"{h.GetKey(i)}: {string.Join(',', h.GetValues(i))}");
                 }
                 if (request is HttpWebRequest webRequest)
                 {
@@ -95,14 +119,34 @@ namespace Prg.Scripts.Common.RestApi
                 }
                 if (verb == "POST")
                 {
-                    request.ContentLength = content.Length;
-                    if (content.Length > 0)
+                    if (content is string stringData)
                     {
-                        request.ContentType = "application/x-www-form-urlencoded";
-                        using (var stream = await request.GetRequestStreamAsync())
+                        var bytes = Encoding.ASCII.GetBytes(stringData);
+                        request.ContentLength = bytes.Length;
+                        if (bytes.Length > 0)
                         {
-                            await stream.WriteAsync(content, 0, content.Length);
+                            request.ContentType = "application/json";
+                            using (var stream = await request.GetRequestStreamAsync())
+                            {
+                                await stream.WriteAsync(bytes, 0, bytes.Length);
+                            }
                         }
+                    }
+                    else if (content is byte[] formData)
+                    {
+                        request.ContentLength = formData.Length;
+                        if (formData.Length > 0)
+                        {
+                            request.ContentType = "application/x-www-form-urlencoded";
+                            using (var stream = await request.GetRequestStreamAsync())
+                            {
+                                await stream.WriteAsync(formData, 0, formData.Length);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new UnityException($"Invalid content type: {content?.GetType().FullName}");
                     }
                 }
                 if (!(await request.GetResponseAsync() is HttpWebResponse response))

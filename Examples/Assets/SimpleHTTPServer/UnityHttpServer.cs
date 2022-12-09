@@ -2,6 +2,9 @@
 
 namespace SimpleHTTPServer
 {
+    /// <summary>
+    /// Adopted form https://github.com/sableangle/UnityHTTPServer
+    /// </summary>
     internal class UnityHttpServer : MonoBehaviour
     {
         [SerializeField] private int _port;
