@@ -1,0 +1,16 @@
+{
+    "name": "SimpleHttpServer",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a7a31c2906faf974aa2230e3d71851e0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
