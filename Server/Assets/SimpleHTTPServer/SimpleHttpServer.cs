@@ -11,7 +11,7 @@ namespace SimpleHTTPServer
 {
     public interface ISimpleHttpServerRequestHandler
     {
-        Tuple<int, string> HandleRequest(HttpListenerRequest request);
+        Tuple<bool, string> HandleRequest(HttpListenerRequest request);
     }
 
     public static class SimpleHttpServerX
@@ -23,7 +23,7 @@ namespace SimpleHTTPServer
             simpleHttpServer.AddRequestHandler(requestHandler);
         }
     }
-    
+
     /// <summary>
     /// Adopted form https://github.com/sableangle/UnityHTTPServer
     /// </summary>
@@ -82,79 +82,80 @@ body{
 
         #endregion
 
-        private static readonly IDictionary<string, string> MimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
-        {
-            #region extension to MIME type list
+        private static readonly IDictionary<string, string> MimeTypeMappings =
+            new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                #region extension to MIME type list
 
-            { ".asf", "video/x-ms-asf" },
-            { ".asx", "video/x-ms-asf" },
-            { ".avi", "video/x-msvideo" },
-            { ".bin", "application/octet-stream" },
-            { ".cco", "application/x-cocoa" },
-            { ".crt", "application/x-x509-ca-cert" },
-            { ".css", "text/css" },
-            { ".deb", "application/octet-stream" },
-            { ".der", "application/x-x509-ca-cert" },
-            { ".dll", "application/octet-stream" },
-            { ".dmg", "application/octet-stream" },
-            { ".ear", "application/java-archive" },
-            { ".eot", "application/octet-stream" },
-            { ".exe", "application/octet-stream" },
-            { ".flv", "video/x-flv" },
-            { ".gif", "image/gif" },
-            { ".hqx", "application/mac-binhex40" },
-            { ".htc", "text/x-component" },
-            { ".htm", "text/html" },
-            { ".html", "text/html" },
-            { ".ico", "image/x-icon" },
-            { ".img", "application/octet-stream" },
-            { ".svg", "image/svg+xml" },
-            { ".iso", "application/octet-stream" },
-            { ".jar", "application/java-archive" },
-            { ".jardiff", "application/x-java-archive-diff" },
-            { ".jng", "image/x-jng" },
-            { ".jnlp", "application/x-java-jnlp-file" },
-            { ".jpeg", "image/jpeg" },
-            { ".jpg", "image/jpeg" },
-            { ".js", "application/x-javascript" },
-            { ".mml", "text/mathml" },
-            { ".mng", "video/x-mng" },
-            { ".mov", "video/quicktime" },
-            { ".mp3", "audio/mpeg" },
-            { ".mpeg", "video/mpeg" },
-            { ".mp4", "video/mp4" },
-            { ".mpg", "video/mpeg" },
-            { ".msi", "application/octet-stream" },
-            { ".msm", "application/octet-stream" },
-            { ".msp", "application/octet-stream" },
-            { ".pdb", "application/x-pilot" },
-            { ".pdf", "application/pdf" },
-            { ".pem", "application/x-x509-ca-cert" },
-            { ".pl", "application/x-perl" },
-            { ".pm", "application/x-perl" },
-            { ".png", "image/png" },
-            { ".prc", "application/x-pilot" },
-            { ".ra", "audio/x-realaudio" },
-            { ".rar", "application/x-rar-compressed" },
-            { ".rpm", "application/x-redhat-package-manager" },
-            { ".rss", "text/xml" },
-            { ".run", "application/x-makeself" },
-            { ".sea", "application/x-sea" },
-            { ".shtml", "text/html" },
-            { ".sit", "application/x-stuffit" },
-            { ".swf", "application/x-shockwave-flash" },
-            { ".tcl", "application/x-tcl" },
-            { ".tk", "application/x-tcl" },
-            { ".txt", "text/plain" },
-            { ".war", "application/java-archive" },
-            { ".wbmp", "image/vnd.wap.wbmp" },
-            { ".wmv", "video/x-ms-wmv" },
-            { ".xml", "text/xml" },
-            { ".xpi", "application/x-xpinstall" },
-            { ".zip", "application/zip" },
+                { ".asf", "video/x-ms-asf" },
+                { ".asx", "video/x-ms-asf" },
+                { ".avi", "video/x-msvideo" },
+                { ".bin", "application/octet-stream" },
+                { ".cco", "application/x-cocoa" },
+                { ".crt", "application/x-x509-ca-cert" },
+                { ".css", "text/css" },
+                { ".deb", "application/octet-stream" },
+                { ".der", "application/x-x509-ca-cert" },
+                { ".dll", "application/octet-stream" },
+                { ".dmg", "application/octet-stream" },
+                { ".ear", "application/java-archive" },
+                { ".eot", "application/octet-stream" },
+                { ".exe", "application/octet-stream" },
+                { ".flv", "video/x-flv" },
+                { ".gif", "image/gif" },
+                { ".hqx", "application/mac-binhex40" },
+                { ".htc", "text/x-component" },
+                { ".htm", "text/html" },
+                { ".html", "text/html" },
+                { ".ico", "image/x-icon" },
+                { ".img", "application/octet-stream" },
+                { ".svg", "image/svg+xml" },
+                { ".iso", "application/octet-stream" },
+                { ".jar", "application/java-archive" },
+                { ".jardiff", "application/x-java-archive-diff" },
+                { ".jng", "image/x-jng" },
+                { ".jnlp", "application/x-java-jnlp-file" },
+                { ".jpeg", "image/jpeg" },
+                { ".jpg", "image/jpeg" },
+                { ".js", "application/x-javascript" },
+                { ".mml", "text/mathml" },
+                { ".mng", "video/x-mng" },
+                { ".mov", "video/quicktime" },
+                { ".mp3", "audio/mpeg" },
+                { ".mpeg", "video/mpeg" },
+                { ".mp4", "video/mp4" },
+                { ".mpg", "video/mpeg" },
+                { ".msi", "application/octet-stream" },
+                { ".msm", "application/octet-stream" },
+                { ".msp", "application/octet-stream" },
+                { ".pdb", "application/x-pilot" },
+                { ".pdf", "application/pdf" },
+                { ".pem", "application/x-x509-ca-cert" },
+                { ".pl", "application/x-perl" },
+                { ".pm", "application/x-perl" },
+                { ".png", "image/png" },
+                { ".prc", "application/x-pilot" },
+                { ".ra", "audio/x-realaudio" },
+                { ".rar", "application/x-rar-compressed" },
+                { ".rpm", "application/x-redhat-package-manager" },
+                { ".rss", "text/xml" },
+                { ".run", "application/x-makeself" },
+                { ".sea", "application/x-sea" },
+                { ".shtml", "text/html" },
+                { ".sit", "application/x-stuffit" },
+                { ".swf", "application/x-shockwave-flash" },
+                { ".tcl", "application/x-tcl" },
+                { ".tk", "application/x-tcl" },
+                { ".txt", "text/plain" },
+                { ".war", "application/java-archive" },
+                { ".wbmp", "image/vnd.wap.wbmp" },
+                { ".wmv", "video/x-ms-wmv" },
+                { ".xml", "text/xml" },
+                { ".xpi", "application/x-xpinstall" },
+                { ".zip", "application/zip" },
 
-            #endregion
-        };
+                #endregion
+            };
 
         private const int BufferSize = 16;
 
@@ -173,7 +174,7 @@ body{
         private readonly Object _methodController;
         private readonly byte[] _buffer = new byte[1024 * BufferSize];
         private readonly Thread _serverThread;
-        
+
         private HttpListener _listener;
 
         private ISimpleHttpServerRequestHandler _requestHandler;
@@ -208,7 +209,7 @@ body{
             _requestHandler = requestHandler;
             Debug.Log($"add request handler {_requestHandler}");
         }
-        
+
         private void ListenThread()
         {
             _listener = new HttpListener();
@@ -238,19 +239,28 @@ body{
         {
             if (_requestHandler != null)
             {
-                var result =_requestHandler.HandleRequest(context.Request);
-                if (result.Item1 >= 0)
+                try
                 {
-                    context.Response.ContentType = "application/json";
-                    var jsonByte = Encoding.UTF8.GetBytes(result.Item2);
-                    context.Response.ContentLength64 = jsonByte.Length;
-                    Stream jsonStream = new MemoryStream(jsonByte);
-                    int byteCount;
-                    while ((byteCount = jsonStream.Read(_buffer, 0, _buffer.Length)) > 0)
-                        context.Response.OutputStream.Write(_buffer, 0, byteCount);
-                    jsonStream.Close();
-                    goto WebResponseDone;
+                    var result = _requestHandler.HandleRequest(context.Request);
+                    if (result.Item1)
+                    {
+                        context.Response.ContentType = "application/json";
+                        var jsonByte = Encoding.UTF8.GetBytes(result.Item2);
+                        context.Response.ContentLength64 = jsonByte.Length;
+                        Stream jsonStream = new MemoryStream(jsonByte);
+                        int byteCount;
+                        while ((byteCount = jsonStream.Read(_buffer, 0, _buffer.Length)) > 0)
+                            context.Response.OutputStream.Write(_buffer, 0, byteCount);
+                        jsonStream.Close();
+                    }
                 }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.Log($"request handler failed: {e.Message}");
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.StatusDescription = e.Message;
+                }
+                goto WebResponseDone;
             }
             UnityEngine.Debug.Log($"REQUEST {context.Request.Url.AbsolutePath} {context.Request.Url.Query}");
             var filename = context.Request.Url.AbsolutePath.Substring(1);
