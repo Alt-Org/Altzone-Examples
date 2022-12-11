@@ -9,6 +9,21 @@ using System.Threading;
 
 namespace SimpleHTTPServer
 {
+    public interface ISimpleHttpServerRequestHandler
+    {
+        Tuple<int, string> HandleRequest(HttpListenerRequest request);
+    }
+
+    public static class SimpleHttpServerX
+    {
+        public static void AddRequestHandler(ISimpleHttpServerRequestHandler requestHandler)
+        {
+            var unityHttpServer = UnityEngine.Object.FindObjectOfType<UnityHttpServer>();
+            var simpleHttpServer = unityHttpServer.SimpleHttpServer;
+            simpleHttpServer.AddRequestHandler(requestHandler);
+        }
+    }
+    
     /// <summary>
     /// Adopted form https://github.com/sableangle/UnityHTTPServer
     /// </summary>
@@ -156,9 +171,12 @@ body{
         private readonly string _rootDirectory;
         private readonly int _port;
         private readonly Object _methodController;
+        private readonly byte[] _buffer = new byte[1024 * BufferSize];
         private readonly Thread _serverThread;
         
         private HttpListener _listener;
+
+        private ISimpleHttpServerRequestHandler _requestHandler;
 
         /// <summary>
         /// Construct server with given port, path, controller.
@@ -172,6 +190,7 @@ body{
             _port = port;
             _methodController = controller;
             _serverThread = new Thread(ListenThread);
+            Debug.Log($"start listening {_port}");
             _serverThread.Start();
         }
 
@@ -184,17 +203,29 @@ body{
             _listener.Stop();
         }
 
+        public void AddRequestHandler(ISimpleHttpServerRequestHandler requestHandler)
+        {
+            _requestHandler = requestHandler;
+            Debug.Log($"add request handler {_requestHandler}");
+        }
+        
         private void ListenThread()
         {
             _listener = new HttpListener();
+            var uriPrefix = "http://*:" + _port + "/";
             _listener.Prefixes.Add("http://*:" + _port + "/");
             _listener.Start();
+            UnityEngine.Debug.Log($"server started @ {uriPrefix}");
             for (;;)
             {
                 try
                 {
                     var context = _listener.GetContext();
                     Process(context);
+                }
+                catch (ThreadAbortException)
+                {
+                    UnityEngine.Debug.Log($"server stopped @ {uriPrefix}");
                 }
                 catch (Exception ex)
                 {
@@ -205,8 +236,23 @@ body{
 
         private void Process(HttpListenerContext context)
         {
+            if (_requestHandler != null)
+            {
+                var result =_requestHandler.HandleRequest(context.Request);
+                if (result.Item1 >= 0)
+                {
+                    context.Response.ContentType = "application/json";
+                    var jsonByte = Encoding.UTF8.GetBytes(result.Item2);
+                    context.Response.ContentLength64 = jsonByte.Length;
+                    Stream jsonStream = new MemoryStream(jsonByte);
+                    int byteCount;
+                    while ((byteCount = jsonStream.Read(_buffer, 0, _buffer.Length)) > 0)
+                        context.Response.OutputStream.Write(_buffer, 0, byteCount);
+                    jsonStream.Close();
+                    goto WebResponseDone;
+                }
+            }
             UnityEngine.Debug.Log($"REQUEST {context.Request.Url.AbsolutePath} {context.Request.Url.Query}");
-
             var filename = context.Request.Url.AbsolutePath.Substring(1);
             if (string.IsNullOrEmpty(filename))
             {
@@ -270,10 +316,9 @@ body{
                 var jsonByte = Encoding.UTF8.GetBytes(jsonString);
                 context.Response.ContentLength64 = jsonByte.Length;
                 Stream jsonStream = new MemoryStream(jsonByte);
-                var buffer = new byte[1024 * BufferSize];
-                int nbytes;
-                while ((nbytes = jsonStream.Read(buffer, 0, buffer.Length)) > 0)
-                    context.Response.OutputStream.Write(buffer, 0, nbytes);
+                int byteCount;
+                while ((byteCount = jsonStream.Read(_buffer, 0, _buffer.Length)) > 0)
+                    context.Response.OutputStream.Write(_buffer, 0, byteCount);
                 jsonStream.Close();
             }
             else

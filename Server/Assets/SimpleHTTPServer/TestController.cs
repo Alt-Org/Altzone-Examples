@@ -5,6 +5,22 @@ namespace SimpleHTTPServer
 {
     internal class TestController : MonoBehaviour
     {
+        private void Awake()
+        {
+            var methods = GetType().GetMethods();
+            foreach (var method in methods)
+            {
+                if (method.IsPublic && method.Name.EndsWith("Method"))
+                {
+                    Debug.Log($"method {method.Name} returns {method.ReturnType.Name}");
+                    foreach (var parameterInfo in method.GetParameters())
+                    {
+                        Debug.Log($" param {parameterInfo.Name} {parameterInfo.ParameterType.Name}");
+                    }
+                }
+            }
+        }
+
         public void SimpleMethod()
         {
             UnityEngine.Debug.Log("Cool, fire via http connect");
@@ -36,7 +52,7 @@ namespace SimpleHTTPServer
             return result;
         }
 
-        public ReturnResult CustomObjectReturnMethodWithQuery(int code, string msg)
+        public ReturnResult CustomObjectReturnMethod(int code, string msg)
         {
             var result = new ReturnResult
             {
