@@ -26,6 +26,8 @@ namespace Altzone.Scripts
         private const string Prefix2 = "生产"; // Shēngchǎn
 
         [SerializeField, ReadOnly] private bool _isLootLocker;
+
+        public bool IsLootLocker => _isLootLocker;
         
         private void OnEnable()
         {
