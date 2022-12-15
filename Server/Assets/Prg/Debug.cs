@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -27,6 +28,8 @@ public static class Debug
     {
         // Manual reset if UNITY Domain Reloading is disabled.
         _logLineAllowedFilter = null;
+        _mainThreadId = -1;
+        _currentFrameCount = 0;
         RemoveTags();
         CachedMethods.Clear();
         SetEditorStatus();
@@ -59,6 +62,8 @@ public static class Debug
     private static string _suffixTag;
     private static string _contextTag = string.Empty;
     private static bool _isEditorHook;
+    private static int _mainThreadId;
+    private static int _currentFrameCount;
 
     /// <summary>
     /// Filters log lines based on method name or other method properties.
@@ -75,6 +80,8 @@ public static class Debug
     {
         Assert.IsNull(_logLineAllowedFilter);
         _logLineAllowedFilter = filter;
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        _currentFrameCount = Time.frameCount;
     }
 
     /// <summary>
@@ -106,6 +113,15 @@ public static class Debug
         _contextTag = string.Empty;
     }
 
+    private static int GetSafeFrameCount()
+    {
+        if (_mainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            _currentFrameCount = Time.frameCount;
+        }
+        return _currentFrameCount % 1000;
+    }
+
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
     public static void Log(string message, Object context = null, [CallerMemberName] string memberName = null)
     {
@@ -121,11 +137,11 @@ public static class Debug
             if (AppPlatform.IsEditor)
             {
                 var contextTag = context != null ? _contextTag : string.Empty;
-                UnityEngine.Debug.Log($"{Time.frameCount % 1000} {prefix}{message}{contextTag}", context);
+                UnityEngine.Debug.Log($"{prefix}{message}{contextTag}", context);
             }
             else
             {
-                UnityEngine.Debug.Log($"{Time.frameCount % 1000} {prefix}{message}");
+                UnityEngine.Debug.Log($"{prefix}{message}");
             }
         }
     }
@@ -141,7 +157,7 @@ public static class Debug
         }
         else if (IsMethodAllowedForLog(method))
         {
-            UnityEngine.Debug.LogFormat($"{Time.frameCount % 1000} {GetPrefix(method)}{format}", args);
+            UnityEngine.Debug.LogFormat($"{GetPrefix(method)}{format}", args);
         }
     }
 
@@ -196,15 +212,16 @@ public static class Debug
                 }
             }
         }
+        var frameCount = GetSafeFrameCount();
         if (memberName != null)
         {
             return _isClassNamePrefix
-                ? $"{_prefixTag}{className}.{memberName}{_suffixTag} "
-                : $"[{className}.{memberName}] ";
+                ? $"{frameCount} {_prefixTag}{className}.{memberName}{_suffixTag} "
+                : $"{frameCount} [{className}.{memberName}] ";
         }
         return _isClassNamePrefix
-            ? $"{_prefixTag}{className}{_suffixTag} "
-            : $"[{className}] ";
+            ? $"{frameCount} {_prefixTag}{className}{_suffixTag} "
+            : $"{frameCount} [{className}] ";
     }
 
     private static bool IsMethodAllowedForLog(MethodBase method)

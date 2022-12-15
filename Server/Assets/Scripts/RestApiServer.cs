@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Model;
 using SimpleHTTPServer;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// Simple REST API to test 'server side' operations with <c>LootLocker</c>.
@@ -14,12 +16,16 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 
     private static readonly Tuple<bool, string> CanNotHandle = new(false, "can not handle");
 
+    private IStorageService _storage;
+
     private IEnumerator Start()
     {
         yield return new WaitUntil(() => GameObject.Find("UnityHttpServer") != null);
         SimpleHttpServerX.AddRequestHandler(this);
         Debug.Log($"AddRequestHandler {name} : {GetType().FullName}");
     }
+
+    private IStorageService Storage => _storage ??= FindObjectOfType<StorageService>();
 
     /// <summary>
     /// Parse and handle <c>SimpleHTTPServer</c> request.
@@ -43,6 +49,8 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         {
             case "move":
                 return HandleMove(parameters);
+            case "clan":
+                return tokens.Length != 3 ? CanNotHandle : HandleClan(tokens[2], parameters);
             default:
                 return CanNotHandle;
         }
@@ -75,6 +83,45 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         return new Tuple<bool, string>(true, text);
     }
 
+    private Tuple<bool, string> HandleClan(string verb, Dictionary<string, string> parameters)
+    {
+        // http://localhost:8090/server/clan/create?id=123&name=abba
+
+        if (!parameters.TryGetValue("id", out var clanStr) || !int.TryParse(clanStr, out var clanId))
+        {
+            throw new InvalidOperationException("clan id is missing or invalid");
+        }
+        switch (verb)
+        {
+            case "create":
+                return CreateClan();
+            default:
+                return CanNotHandle;
+        }
+
+        Tuple<bool, string> CreateClan()
+        {
+            if (!parameters.TryGetValue("name", out var clanName) || string.IsNullOrWhiteSpace(clanName))
+            {
+                throw new InvalidOperationException("clan name is missing or invalid");
+            }
+            var clan = Storage.GetClan(clanId);
+            if (clan != null)
+            {
+                return CanNotHandle;
+            }
+            clan = new ClanModel
+            {
+                Name = clanName,
+            };
+            if (Storage.CreateClan(clan) != 1)
+            {
+                throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
+            }
+            return new Tuple<bool, string>(true, $"Clan '{clan.Id}' '{clan.Name}' created");
+        }
+    }
+
     private static Dictionary<string, string> ParseParameters(string queryString)
     {
         var namedParameters = new Dictionary<string, string>();
@@ -83,6 +130,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             return namedParameters;
         }
         var query = queryString.Replace("?", "").Split('&');
+        Debug.Log($"query {string.Join('|', query)}");
         foreach (var item in query)
         {
             var tokens = item.Split('=');
@@ -90,6 +138,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 throw new InvalidOperationException("invalid query string");
             }
+            Debug.Log($"{tokens[0]}={tokens[1]}");
             namedParameters.Add(tokens[0], tokens[1]);
         }
         return namedParameters;
