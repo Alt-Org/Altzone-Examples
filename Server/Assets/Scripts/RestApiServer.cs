@@ -12,9 +12,37 @@ using Object = UnityEngine.Object;
 /// </summary>
 public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 {
+    [Serializable]
+    public class ErrorResult
+    {
+        public bool success;
+        public string message;
+
+        public ErrorResult(string message)
+        {
+            success = false;
+            this.message = message;
+        }
+    }
+
+    [Serializable]
+    public class SuccessResult
+    {
+        public bool success;
+        public int id;
+        public string message;
+
+        public SuccessResult(int id, string message)
+        {
+            success = true;
+            this.id = id;
+            this.message = message;
+        }
+    }
+
     private const string ServerPathPrefix = "server";
 
-    private static readonly Tuple<bool, string> CanNotHandle = new(false, "can not handle");
+    private static readonly ErrorResult CanNotHandle = new("can not handle");
 
     private IStorageService _storage;
 
@@ -33,13 +61,13 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
     /// <remarks>
     /// Return <c>true</c> on success, <c>false</c> if can not handle and <c>Exception</c> if request handling fails.
     /// </remarks>
-    public Tuple<bool, string> HandleRequest(HttpListenerRequest request)
+    public object HandleRequest(HttpListenerRequest request)
     {
         var path = request.Url.AbsolutePath;
         var tokens = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
         if (tokens.Length == 1 || tokens[0] != ServerPathPrefix)
         {
-            return CanNotHandle;
+            return null;
         }
         var query = request.Url.Query;
         UnityEngine.Debug.Log($"request {path} {query}");
@@ -59,7 +87,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
     /// <summary>
     /// Moves one item from player1 to player2.
     /// </summary>
-    private Tuple<bool, string> HandleMove(Dictionary<string, string> parameters)
+    private object HandleMove(Dictionary<string, string> parameters)
     {
         // http://localhost:8090/server/move?player1=123&player2=456&item=789
 
@@ -80,12 +108,12 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             "{\"player_id\":@player2@,\"player_public_uid\":\"F7D3RPYR\",\"name\":\"Jaskan\",\"last_active_platform\":\"guest\"}]}";
         text = text.Replace("@player1@", player1);
         text = text.Replace("@player2@", player2);
-        return new Tuple<bool, string>(true, text);
+        return text;
     }
 
-    private Tuple<bool, string> HandleClan(string verb, Dictionary<string, string> parameters)
+    private object HandleClan(string verb, Dictionary<string, string> parameters)
     {
-        // http://localhost:8090/server/clan/create?id=123&name=abba
+        // http://localhost:8090/server/clan/...
 
         if (!parameters.TryGetValue("id", out var clanStr) || !int.TryParse(clanStr, out var clanId))
         {
@@ -93,14 +121,30 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         }
         switch (verb)
         {
+            case "get":
+                return GetClan();
             case "create":
                 return CreateClan();
             default:
                 return CanNotHandle;
         }
 
-        Tuple<bool, string> CreateClan()
+        object GetClan()
         {
+            // http://localhost:8090/server/clan/get?id=1
+            
+            var clan = _storage.GetClan(clanId);
+            if (clan == null)
+            {
+                return new ErrorResult("clan not found");
+            }
+            return new SuccessResult(clan.Id, clan.Name);
+        }
+
+        object CreateClan()
+        {
+            // http://localhost:8090/server/clan/create?id=1&name=ABBA
+            
             if (!parameters.TryGetValue("name", out var clanName) || string.IsNullOrWhiteSpace(clanName))
             {
                 throw new InvalidOperationException("clan name is missing or invalid");
@@ -108,7 +152,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             var clan = _storage.GetClan(clanId);
             if (clan != null)
             {
-                return CanNotHandle;
+                return new ErrorResult("clan exists already");
             }
             clan = new ClanModel
             {
@@ -118,7 +162,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
             }
-            return new Tuple<bool, string>(true, $"Clan '{clan.Id}' '{clan.Name}' created");
+            return $"Clan '{clan.Id}' '{clan.Name}' created";
         }
     }
 

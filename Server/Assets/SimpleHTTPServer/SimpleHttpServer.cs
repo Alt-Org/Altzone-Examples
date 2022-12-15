@@ -6,12 +6,25 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using UnityEngine;
+using Object = System.Object;
 
 namespace SimpleHTTPServer
 {
+    /// <summary>
+    /// Middleware interface.
+    /// </summary>
     public interface ISimpleHttpServerRequestHandler
     {
-        Tuple<bool, string> HandleRequest(HttpListenerRequest request);
+        /// <summary>
+        /// Handles a request (or ignores it).
+        /// </summary>
+        /// <remarks>
+        /// Returned <c>object</c> is converted to JSON string and returned <c>string</c> is assumed to be valid JSON already.
+        /// </remarks>
+        /// <param name="request">the request to handle</param>
+        /// <returns><c>object</c> or <c>string</c> on success and null if ignored it (did not handle).</returns>
+        object HandleRequest(HttpListenerRequest request);
     }
 
     public static class SimpleHttpServerX
@@ -242,10 +255,11 @@ body{
                 try
                 {
                     var result = _requestHandler.HandleRequest(context.Request);
-                    if (result.Item1)
+                    if (result != null)
                     {
                         context.Response.ContentType = "application/json";
-                        var jsonByte = Encoding.UTF8.GetBytes(result.Item2);
+                        var json = result is string ? result.ToString() : JsonUtility.ToJson(result);
+                        var jsonByte = Encoding.UTF8.GetBytes(json);
                         context.Response.ContentLength64 = jsonByte.Length;
                         Stream jsonStream = new MemoryStream(jsonByte);
                         int byteCount;
