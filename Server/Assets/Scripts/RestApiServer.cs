@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Model;
 using SimpleHTTPServer;
@@ -13,33 +14,44 @@ using Object = UnityEngine.Object;
 public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 {
     [Serializable]
-    public class ErrorResult
+    public class Result
     {
         public bool success;
         public string message;
 
-        public ErrorResult(string message)
+        public Result(bool success, string message)
         {
-            success = false;
+            this.success = success;
             this.message = message;
         }
     }
 
-    [Serializable]
-    public class SuccessResult
+    public class ErrorResult : Result
     {
-        public bool success;
+        public ErrorResult(string message) : base(false, message)
+        {
+        }
+    }
+
+    public class SuccessResult : Result
+    {
+        public SuccessResult(string message) : base(true, message)
+        {
+        }
+    }
+
+    public class ClanResult : Result
+    {
         public int id;
-        public string message;
+        public string name;
 
-        public SuccessResult(int id, string message)
+        public ClanResult(ClanModel clan, string message) : base(true, message)
         {
-            success = true;
-            this.id = id;
-            this.message = message;
+            id = clan.Id;
+            name = clan.Name;
         }
     }
-
+    
     private const string ServerPathPrefix = "server";
 
     private static readonly ErrorResult CanNotHandle = new("can not handle");
@@ -115,46 +127,59 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
     {
         // http://localhost:8090/server/clan/...
 
-        if (!parameters.TryGetValue("id", out var clanStr) || !int.TryParse(clanStr, out var clanId))
-        {
-            throw new InvalidOperationException("clan id is missing or invalid");
-        }
         switch (verb)
         {
             case "get":
                 return GetClan();
             case "create":
                 return CreateClan();
+            case "delete":
+                return DeleteClan();
             default:
                 return CanNotHandle;
         }
 
+        void VerifyParametersCount(int maxParameterCount)
+        {
+            if (parameters.Count() > maxParameterCount)
+            {
+                throw new InvalidOperationException("invalid parameters");
+            }
+        }
+        
+        int GetClanId()
+        {
+            if (!parameters.TryGetValue("id", out var clanStr) || !int.TryParse(clanStr, out var clanId))
+            {
+                throw new InvalidOperationException("clan id is missing or invalid");
+            }
+            return clanId;
+        }
+        
         object GetClan()
         {
             // http://localhost:8090/server/clan/get?id=1
-            
+
+            VerifyParametersCount(1);
+            var clanId = GetClanId();
             var clan = _storage.GetClan(clanId);
             if (clan == null)
             {
                 return new ErrorResult("clan not found");
             }
-            return new SuccessResult(clan.Id, clan.Name);
+            return new ClanResult(clan, "found");
         }
 
         object CreateClan()
         {
-            // http://localhost:8090/server/clan/create?id=1&name=ABBA
-            
+            // http://localhost:8090/server/clan/create?name=ABBA
+
+            VerifyParametersCount(1);
             if (!parameters.TryGetValue("name", out var clanName) || string.IsNullOrWhiteSpace(clanName))
             {
                 throw new InvalidOperationException("clan name is missing or invalid");
             }
-            var clan = _storage.GetClan(clanId);
-            if (clan != null)
-            {
-                return new ErrorResult("clan exists already");
-            }
-            clan = new ClanModel
+            var clan = new ClanModel
             {
                 Name = clanName,
             };
@@ -162,7 +187,20 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
             }
-            return $"Clan '{clan.Id}' '{clan.Name}' created";
+            return new ClanResult(clan, "created");
+        }
+
+        object DeleteClan()
+        {
+            // http://localhost:8090/server/clan/delete?id=1
+
+            VerifyParametersCount(1);
+            var clanId = GetClanId();
+            if (!_storage.DeleteClan(clanId))
+            {
+                throw new InvalidOperationException($"unable to delete clan '{clanId}'");
+            }
+            return new SuccessResult("deleted");
         }
     }
 

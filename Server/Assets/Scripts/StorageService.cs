@@ -8,6 +8,7 @@ public interface IStorageService
 {
     ClanModel GetClan(int id);
     int CreateClan(ClanModel clan);
+    bool DeleteClan(int id);
 }
 
 /// <summary>
@@ -38,6 +39,8 @@ public class StorageService : MonoBehaviour, IStorageService
     public ClanModel GetClan(int id) => _connection.Table<ClanModel>().FirstOrDefault(x => x.Id == id);
 
     public int CreateClan(ClanModel clan) => _connection.Insert(clan);
+
+    public bool DeleteClan(int id) => _connection.Delete<ClanModel>(id) == 1;
 
     private void OnDestroy()
     {
