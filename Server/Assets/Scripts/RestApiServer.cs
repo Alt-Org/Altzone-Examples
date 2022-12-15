@@ -8,9 +8,9 @@ using UnityEngine;
 /// <summary>
 /// Simple REST API to test 'server side' operations with <c>LootLocker</c>.
 /// </summary>
-public class ServerApi : MonoBehaviour, ISimpleHttpServerRequestHandler
+public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 {
-    private const string ServerPrefix = "server";
+    private const string ServerPathPrefix = "server";
 
     private static readonly Tuple<bool, string> CanNotHandle = new(false, "can not handle");
 
@@ -31,7 +31,7 @@ public class ServerApi : MonoBehaviour, ISimpleHttpServerRequestHandler
     {
         var path = request.Url.AbsolutePath;
         var tokens = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (tokens.Length == 1 || tokens[0] != ServerPrefix)
+        if (tokens.Length == 1 || tokens[0] != ServerPathPrefix)
         {
             return CanNotHandle;
         }
