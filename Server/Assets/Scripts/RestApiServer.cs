@@ -23,9 +23,9 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         yield return new WaitUntil(() => GameObject.Find("UnityHttpServer") != null);
         SimpleHttpServerX.AddRequestHandler(this);
         Debug.Log($"AddRequestHandler {name} : {GetType().FullName}");
+        yield return new WaitUntil(() => (_storage ??= FindObjectOfType<StorageService>()) != null);
+        Debug.Log("storage found");
     }
-
-    private IStorageService Storage => _storage ??= FindObjectOfType<StorageService>();
 
     /// <summary>
     /// Parse and handle <c>SimpleHTTPServer</c> request.
@@ -105,7 +105,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 throw new InvalidOperationException("clan name is missing or invalid");
             }
-            var clan = Storage.GetClan(clanId);
+            var clan = _storage.GetClan(clanId);
             if (clan != null)
             {
                 return CanNotHandle;
@@ -114,7 +114,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 Name = clanName,
             };
-            if (Storage.CreateClan(clan) != 1)
+            if (_storage.CreateClan(clan) != 1)
             {
                 throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
             }
