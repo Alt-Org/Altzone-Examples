@@ -35,7 +35,7 @@ namespace Tests.EditMode.GameServerTests
 
             Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
             Assert.IsTrue(result.Success);
-            var data = Json.Deserialize(result.Payload) as Dictionary<string, object>;
+            var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
             Assert.IsNotNull(data);
             var clans = data["clans"] as List<object>;
             Assert.IsNotNull(clans);

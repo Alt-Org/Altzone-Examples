@@ -54,7 +54,7 @@ namespace Tests.EditMode.LootLockerTests
                 new("x-auth-token", _sessionToken),
             });
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, headers);
-            if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            if (!(MiniJson.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
             {
                 Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
                 Assert.IsTrue(false);
@@ -62,7 +62,7 @@ namespace Tests.EditMode.LootLockerTests
             }
             Debug.Log($"data {jsonData.Count}");
             Assert.IsTrue(jsonData.ContainsKey("items"));
-            Debug.Log($"items:\r\n{Json.Serialize(jsonData["items"])}");
+            Debug.Log($"items:\r\n{MiniJson.Serialize(jsonData["items"])}");
             Debug.Log($"done");
         }
         
@@ -88,7 +88,7 @@ namespace Tests.EditMode.LootLockerTests
                 new("x-auth-token", _sessionToken),
             });
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, headers);
-            if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            if (!(MiniJson.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
             {
                 Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
                 Assert.IsTrue(false);
@@ -96,7 +96,7 @@ namespace Tests.EditMode.LootLockerTests
             }
             Debug.Log($"data {jsonData.Count}");
             Assert.IsTrue(jsonData.ContainsKey("players"));
-            Debug.Log($"players:\r\n{Json.Serialize(jsonData["players"])}");
+            Debug.Log($"players:\r\n{MiniJson.Serialize(jsonData["players"])}");
             
             Debug.Log($"done");
         }
@@ -141,7 +141,7 @@ namespace Tests.EditMode.LootLockerTests
             };
             var headers = new RestApiServiceAsync.Headers(headerValues);
             var result = await RestApiServiceAsync.ExecuteRequest("POST", url, postData, headers);
-            if (!(Json.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            if (!(MiniJson.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
             {
                 Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
                 return;
