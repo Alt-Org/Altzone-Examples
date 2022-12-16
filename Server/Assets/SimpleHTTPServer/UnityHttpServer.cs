@@ -18,7 +18,6 @@ namespace SimpleHTTPServer
         {
             name = nameof(UnityHttpServer);
             _myServer = new SimpleHttpServer(Application.streamingAssetsPath, _port, _controller);
-            _myServer.OnJsonSerialized += JsonUtility.ToJson;
             DontDestroyOnLoad(gameObject);
         }
 

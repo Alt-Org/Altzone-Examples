@@ -22,16 +22,14 @@ namespace Tests.EditMode.GameServerTests
     {
         private const string ServerUrl = "http://localhost:8090/server/";
 
-        [Test, Description("Test that server responds something based on our request")]
-        public async Task ThisIsVeryFirstTest()
+        [Test]
+        public async Task ClanListTest()
         {
-            // http://localhost:8090/server/move?player1=123&player2=456&item=789
+            // http://localhost:8090/server/clan/list
 
             Debug.Log("test");
 
-            const int playerId1 = 10;
-            const int playerId2 = 20;
-            var url = GetUrl($"move?player1={playerId1}&player2={playerId2}&item=123");
+            var url = GetUrl($"clan/list");
 
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
 
@@ -39,17 +37,10 @@ namespace Tests.EditMode.GameServerTests
             Assert.IsTrue(result.Success);
             var data = Json.Deserialize(result.Payload) as Dictionary<string, object>;
             Assert.IsNotNull(data);
-            var players = data["players"] as List<object>;
-            Assert.IsNotNull(players);
-            var playerList = players.Cast<Dictionary<string, object>>().ToList();
-            Assert.IsNotNull(playerList);
-            Assert.AreEqual(2, playerList.Count);
-            
-            // Find player objects by ID from returned player list.
-            var player1 = playerList.Find(x => x["player_id"].Equals((long)playerId1));
-            Assert.IsNotNull(player1);
-            var player2 = playerList.Find(x => x["player_id"].Equals((long)playerId2));
-            Assert.IsNotNull(player2);
+            var clans = data["clans"] as List<object>;
+            Assert.IsNotNull(clans);
+            var clanList = clans.Cast<Dictionary<string, object>>().ToList();
+            Assert.IsNotNull(clanList);
 
             Debug.Log($"done");
         }

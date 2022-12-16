@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Object = System.Object;
 
 namespace SimpleHTTPServer
@@ -172,8 +173,6 @@ body{
 
         private const int BufferSize = 16;
 
-        public Func<object, string> OnJsonSerialized;
-
         private readonly string[] _indexFiles =
         {
             "index.html",
@@ -198,6 +197,7 @@ body{
         /// <param name="path">The root folder path in your computer (Absolute path)</param>
         /// <param name="port">The port for your http server</param>
         /// <param name="controller">The controller instance for the WebAPI</param>
+        /// <param name="onJsonSerialized">The port for your http server</param>
         public SimpleHttpServer(string path, int port, Object controller)
         {
             _rootDirectory = path;
@@ -248,6 +248,20 @@ body{
             }
         }
 
+        private static string JsonUtilityWrapper(object instance)
+        {
+            // It seems that JsonUtility.ToJson does HTML URL Encoding :-(
+            // - we want to revert that behaviour - at least for now as we don't know of anything better!
+            var jsonString = JsonUtility.ToJson(instance);
+            if (jsonString.IndexOf('%') < 0)
+            {
+                return jsonString;
+            }
+            jsonString = Uri.UnescapeDataString(jsonString);
+            Debug.Log($"=>{jsonString}");
+            return jsonString;
+        }
+
         private void Process(HttpListenerContext context)
         {
             if (_requestHandler != null)
@@ -258,8 +272,8 @@ body{
                     if (result != null)
                     {
                         context.Response.ContentType = "application/json";
-                        var json = result is string ? result.ToString() : JsonUtility.ToJson(result);
-                        var jsonByte = Encoding.UTF8.GetBytes(json);
+                        var jsonString = result is string ? result.ToString() : JsonUtilityWrapper(result);
+                        var jsonByte = Encoding.UTF8.GetBytes(jsonString);
                         context.Response.ContentLength64 = jsonByte.Length;
                         Stream jsonStream = new MemoryStream(jsonByte);
                         int byteCount;
@@ -329,14 +343,7 @@ body{
                 {
                     result = new VoidResult { msg = "Success" };
                 }
-                if (OnJsonSerialized == null)
-                {
-                    UnityEngine.Debug.LogError("There is no JsonSerialize delegate registered on SimpleHTTPServer.OnJsonSerialized");
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    context.Response.StatusDescription = "There is no JsonSerialize delegate regist on SimpleHTTPServer.OnJsonSerialized";
-                    goto WebResponseDone;
-                }
-                var jsonString = OnJsonSerialized.Invoke(result);
+                var jsonString = JsonUtilityWrapper(result);
                 var jsonByte = Encoding.UTF8.GetBytes(jsonString);
                 context.Response.ContentLength64 = jsonByte.Length;
                 Stream jsonStream = new MemoryStream(jsonByte);
