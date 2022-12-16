@@ -9,6 +9,7 @@ namespace Model
         [AutoIncrement, PrimaryKey]
         public int Id { get; set; }
 
+        [Indexed(Unique = true)]
         public string Name { get; set; }
     }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Model;
 using SimpleHTTPServer;
+using SQLite;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -40,6 +41,13 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         }
     }
 
+    public class DatabaseError : Result
+    {
+        public DatabaseError(SQLiteException exception) : base(false, $"Database error: {exception.Message}")
+        {
+        }
+    }
+    
     public class ClanResult : Result
     {
         public JsonClanModel clan;
@@ -200,13 +208,26 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             {
                 throw new InvalidOperationException("clan name is missing or invalid");
             }
+            // Unfortunately SQLite unique indexes are not case insensitive (unless you use ImplicitIndex 'hack')
+            var clans = _storage.GetClans();
+            if (clans.Any(x => string.Compare(x.Name, clanName, StringComparison.OrdinalIgnoreCase) == 0))
+            {
+                return new ErrorResult($"clan name is in use '{clanName}'");
+            }
             var clan = new ClanModel
             {
                 Name = clanName,
             };
-            if (_storage.CreateClan(clan) != 1)
+            try
             {
-                throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
+                if (_storage.CreateClan(clan) != 1)
+                {
+                    return new ErrorResult($"unable to insert clan '{clan.Name}'");
+                }
+            }
+            catch (SQLiteException x)
+            {
+                return new DatabaseError(x);
             }
             return new ClanResult(clan, "created");
         }
@@ -227,10 +248,18 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
                 return new ErrorResult("clan not found");
             }
             clan.Name = clanName;
-            if (_storage.UpdateClan(clan) != 1)
+            try
             {
-                throw new InvalidOperationException($"unable to update clan '{clanId}'");
+                if (_storage.UpdateClan(clan) != 1)
+                {
+                    return new ErrorResult($"unable to update clan '{clanId}'");
+                }
             }
+            catch (SQLiteException x)
+            {
+                return new DatabaseError(x);
+            }
+
             return new ClanResult(clan, "updated");
         }
 
@@ -240,9 +269,16 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 
             VerifyParametersCount(1);
             var clanId = GetClanId();
-            if (!_storage.DeleteClan(clanId))
+            try
             {
-                throw new InvalidOperationException($"unable to delete clan '{clanId}'");
+                if (!_storage.DeleteClan(clanId))
+                {
+                    return new ErrorResult($"unable to delete clan '{clanId}'");
+                }
+            }
+            catch (SQLiteException x)
+            {
+                return new DatabaseError(x);
             }
             return new SuccessResult("deleted");
         }
