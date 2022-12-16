@@ -42,16 +42,24 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 
     public class ClanResult : Result
     {
-        public int id;
-        public string name;
+        public JsonClanModel clan;
 
         public ClanResult(ClanModel clan, string message) : base(true, message)
         {
-            id = clan.Id;
-            name = clan.Name;
+            this.clan = new JsonClanModel(clan);
         }
     }
-    
+
+    public class ClanListResult : Result
+    {
+        public List<JsonClanModel> clans;
+
+        public ClanListResult(List<ClanModel> clans, string message) : base(true, message)
+        {
+            this.clans = clans.ConvertAll(x => new JsonClanModel(x));
+        }
+    }
+
     private const string ServerPathPrefix = "server";
 
     private static readonly ErrorResult CanNotHandle = new("can not handle");
@@ -131,8 +139,12 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         {
             case "get":
                 return GetClan();
+            case "list":
+                return GetClans();
             case "create":
                 return CreateClan();
+            case "update":
+                return UpdateClan();
             case "delete":
                 return DeleteClan();
             default:
@@ -146,7 +158,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
                 throw new InvalidOperationException("invalid parameters");
             }
         }
-        
+
         int GetClanId()
         {
             if (!parameters.TryGetValue("id", out var clanStr) || !int.TryParse(clanStr, out var clanId))
@@ -155,7 +167,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
             }
             return clanId;
         }
-        
+
         object GetClan()
         {
             // http://localhost:8090/server/clan/get?id=1
@@ -168,6 +180,15 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
                 return new ErrorResult("clan not found");
             }
             return new ClanResult(clan, "found");
+        }
+
+        object GetClans()
+        {
+            // http://localhost:8090/server/clan/list
+
+            VerifyParametersCount(0);
+            var clans = _storage.GetClans();
+            return new ClanListResult(clans, "list all");
         }
 
         object CreateClan()
@@ -188,6 +209,29 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
                 throw new InvalidOperationException($"unable to insert clan '{clan.Name}'");
             }
             return new ClanResult(clan, "created");
+        }
+
+        object UpdateClan()
+        {
+            // http://localhost:8090/server/clan/update?id=1&name=ABBA
+
+            VerifyParametersCount(2);
+            var clanId = GetClanId();
+            if (!parameters.TryGetValue("name", out var clanName) || string.IsNullOrWhiteSpace(clanName))
+            {
+                throw new InvalidOperationException("clan name is missing or invalid");
+            }
+            var clan = _storage.GetClan(clanId);
+            if (clan == null)
+            {
+                return new ErrorResult("clan not found");
+            }
+            clan.Name = clanName;
+            if (_storage.UpdateClan(clan) != 1)
+            {
+                throw new InvalidOperationException($"unable to update clan '{clanId}'");
+            }
+            return new ClanResult(clan, "updated");
         }
 
         object DeleteClan()
