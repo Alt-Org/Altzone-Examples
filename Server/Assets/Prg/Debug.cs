@@ -28,7 +28,7 @@ public static class Debug
     {
         // Manual reset if UNITY Domain Reloading is disabled.
         _logLineAllowedFilter = null;
-        _mainThreadId = -1;
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _currentFrameCount = 0;
         RemoveTags();
         CachedMethods.Clear();
@@ -78,10 +78,9 @@ public static class Debug
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
     public static void AddLogLineAllowedFilter(Func<MethodBase, bool> filter)
     {
+        Assert.AreEqual(_mainThreadId, Thread.CurrentThread.ManagedThreadId);
         Assert.IsNull(_logLineAllowedFilter);
         _logLineAllowedFilter = filter;
-        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
-        _currentFrameCount = Time.frameCount;
     }
 
     /// <summary>
@@ -117,9 +116,9 @@ public static class Debug
     {
         if (_mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
-            _currentFrameCount = Time.frameCount;
+            _currentFrameCount = Time.frameCount % 1000;
         }
-        return _currentFrameCount % 1000;
+        return _currentFrameCount;
     }
 
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
