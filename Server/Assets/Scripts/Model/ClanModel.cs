@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SQLite;
 
 namespace Model
@@ -22,6 +23,11 @@ namespace Model
         {
             Id = clan.Id;
             Name = clan.Name;
+        }
+
+        public static List<JsonClanModel> ConvertAll(List<ClanModel> clans)
+        {
+            return clans.ConvertAll(x => new JsonClanModel(x));
         }
     }
 }

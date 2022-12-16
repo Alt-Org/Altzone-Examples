@@ -56,7 +56,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 
         public ClanListResult(List<ClanModel> clans, string message) : base(true, message)
         {
-            this.clans = clans.ConvertAll(x => new JsonClanModel(x));
+            this.clans = JsonClanModel.ConvertAll(clans);
         }
     }
 
