@@ -34,6 +34,13 @@ namespace Tests.EditMode.GameServerTests
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
 
             Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
+            if (!result.Success)
+            {
+                Debug.Log("*");
+                Debug.Log("* CHECK THAT SERVER IS RUNNING");
+                Debug.Log("*");
+                Assert.IsTrue(false);
+            }
             Assert.IsTrue(result.Success);
             var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
             Assert.IsNotNull(data);

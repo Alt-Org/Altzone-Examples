@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using LootLocker;
 using NUnit.Framework;
@@ -141,8 +142,10 @@ namespace Tests.EditMode.LootLockerTests
             };
             var headers = new RestApiServiceAsync.Headers(headerValues);
             var result = await RestApiServiceAsync.ExecuteRequest("POST", url, postData, headers);
-            if (!(MiniJson.Deserialize(result.Payload) is Dictionary<string, object> jsonData))
+            var payload = MiniJson.Deserialize(result.Payload);
+            if (payload is not Dictionary<string, object> jsonData)
             {
+                Debug.Log(payload.GetType().FullName);
                 Debug.Log($"JSON ERROR {result.Payload.Replace('\r', '.').Replace('\n', '.')}");
                 return;
             }
