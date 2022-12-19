@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SQLiteNetExtensions.Exceptions
+namespace SQLite.SQLiteNetExtensions.Exceptions
 {
     public class IncorrectRelationshipException : Exception
     {

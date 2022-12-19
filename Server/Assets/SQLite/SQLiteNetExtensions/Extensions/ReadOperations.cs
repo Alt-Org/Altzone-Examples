@@ -5,12 +5,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using SQLite;
-using SQLiteNetExtensions.Attributes;
-using SQLiteNetExtensions.Extensions.TextBlob;
-using SQLiteNetExtensions.Exceptions;
+using SQLite.SQLiteNetExtensions.Attributes;
+using SQLite.SQLiteNetExtensions.Exceptions;
+using SQLite.SQLiteNetExtensions.Extensions.TextBlob;
 
-namespace SQLiteNetExtensions.Extensions
+namespace SQLite.SQLiteNetExtensions.Extensions
 {
     using ObjectCache = Dictionary<string, Dictionary<object, object>>;
 

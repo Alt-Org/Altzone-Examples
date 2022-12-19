@@ -1,6 +1,6 @@
 using System;
 
-namespace SQLiteNetExtensions.Attributes
+namespace SQLite.SQLiteNetExtensions.Attributes
 {
     [Flags]
     public enum CascadeOperation {

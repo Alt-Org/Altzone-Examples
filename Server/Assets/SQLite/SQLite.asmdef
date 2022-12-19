@@ -1,5 +1,5 @@
 {
-    "name": "SQLiteAsync",
+    "name": "SQLite",
     "rootNamespace": "",
     "references": [
         "UniTask"

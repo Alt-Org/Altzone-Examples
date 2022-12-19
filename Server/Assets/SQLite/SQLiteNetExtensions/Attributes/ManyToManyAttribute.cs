@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SQLiteNetExtensions.Attributes
+namespace SQLite.SQLiteNetExtensions.Attributes
 {
     public class ManyToManyAttribute : RelationshipAttribute
     {

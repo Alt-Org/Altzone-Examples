@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SQLite;
-using SQLiteNetExtensions.Attributes;
-using SQLiteNetExtensions.Exceptions;
-using SQLiteNetExtensions.Extensions.TextBlob;
+using SQLite.SQLiteNetExtensions.Attributes;
+using SQLite.SQLiteNetExtensions.Exceptions;
+using SQLite.SQLiteNetExtensions.Extensions.TextBlob;
 
-namespace SQLiteNetExtensions.Extensions
+namespace SQLite.SQLiteNetExtensions.Extensions
 {
     public static class WriteOperations
     {

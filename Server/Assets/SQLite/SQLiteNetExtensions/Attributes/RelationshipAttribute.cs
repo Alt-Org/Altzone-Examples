@@ -1,7 +1,6 @@
 ﻿using System;
-using SQLite;
 
-namespace SQLiteNetExtensions.Attributes
+namespace SQLite.SQLiteNetExtensions.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public abstract class RelationshipAttribute : IgnoreAttribute

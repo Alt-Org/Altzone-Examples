@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using SQLiteNetExtensions.Attributes;
-using SQLiteNetExtensions.Extensions.TextBlob.Serializers;
+using SQLite.SQLiteNetExtensions.Attributes;
+using SQLite.SQLiteNetExtensions.Extensions.TextBlob.Serializers;
 
-namespace SQLiteNetExtensions.Extensions.TextBlob
+namespace SQLite.SQLiteNetExtensions.Extensions.TextBlob
 {
     public static class TextBlobOperations
     {

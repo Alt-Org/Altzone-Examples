@@ -1,6 +1,6 @@
 using System;
 
-namespace SQLiteNetExtensions.Extensions.TextBlob
+namespace SQLite.SQLiteNetExtensions.Extensions.TextBlob
 {
     public interface ITextBlobSerializer
     {

@@ -1,4 +1,4 @@
-﻿namespace SQLiteNetExtensions.Attributes
+﻿namespace SQLite.SQLiteNetExtensions.Attributes
 {
     public class ManyToOneAttribute : RelationshipAttribute
     {

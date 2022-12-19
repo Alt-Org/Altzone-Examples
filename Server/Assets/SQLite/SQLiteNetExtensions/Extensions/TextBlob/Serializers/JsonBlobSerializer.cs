@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SQLiteNetExtensions.Extensions.TextBlob.Serializers
+namespace SQLite.SQLiteNetExtensions.Extensions.TextBlob.Serializers
 {
     public class JsonBlobSerializer : ITextBlobSerializer
     {
