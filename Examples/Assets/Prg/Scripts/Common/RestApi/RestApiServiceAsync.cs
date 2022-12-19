@@ -121,7 +121,7 @@ namespace Prg.Scripts.Common.RestApi
                 // (5) return our own Response object.
                 stopWatch.Stop();
                 Debug.Log($"Request success: '{responseContentType}' len {httpResponse.Length} in {stopWatch.ElapsedMilliseconds} ms");
-                Debug.Log($"Response: {LogHttpResponse()}");
+                Debug.Log($"Response ({httpResponse.Length}) {LogHttpResponse()}");
                 return new Response(httpResponse);
             }
             catch (WebException e)
@@ -135,7 +135,10 @@ namespace Prg.Scripts.Common.RestApi
                 stopWatch.Stop();
                 var status = GetWebExceptionStatus(e);
                 Debug.Log($"Request failed: {status} in {stopWatch.ElapsedMilliseconds} ms");
-                Debug.Log($"body {httpResponse}");
+                if (httpResponse.Length > 0)
+                {
+                    Debug.Log($"body ({httpResponse.Length}) {httpResponse}");
+                }
                 return new Response(status, httpResponse ?? string.Empty);
             }
             catch (Exception e)
