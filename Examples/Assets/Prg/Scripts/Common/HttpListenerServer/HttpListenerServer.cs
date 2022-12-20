@@ -41,8 +41,9 @@ namespace Prg.Scripts.Common.HttpListenerServer
         /// Returned <c>object</c> is converted to JSON string and returned <c>string</c> is assumed to be valid JSON already.
         /// </remarks>
         /// <param name="request">the request to handle</param>
+        /// <param name="body">body content (as string)</param>
         /// <returns><c>object</c> or <c>string</c> on success and null if ignored it (did not handle).</returns>
-        object HandleRequest(HttpListenerRequest request);
+        object HandleRequest(HttpListenerRequest request, string body);
     }
 
     public static class SimpleListenerServerFactory
@@ -55,6 +56,8 @@ namespace Prg.Scripts.Common.HttpListenerServer
 
     internal class SimpleListenerServer : ISimpleListenerServer
     {
+        private const string JsonContentType = "application/json";
+        private const string FormPostContentType = "application/x-www-form-urlencoded";
         private const int BufferSize = 4 * 1024;
 
         private readonly int _port;
@@ -113,7 +116,8 @@ namespace Prg.Scripts.Common.HttpListenerServer
 
         public void AddHandler(IListenerServerHandler handler)
         {
-            throw new NotImplementedException();
+            Debug.Log($"{_port} {handler}");
+            _handlers.Add(handler);
         }
 
         private void ListenThread()
@@ -150,9 +154,25 @@ namespace Prg.Scripts.Common.HttpListenerServer
         {
             try
             {
+                var request = context.Request;
+                string body = null;
+                if (request.HasEntityBody)
+                {
+                    var validContentType = request.ContentType is JsonContentType or FormPostContentType;
+                    if (!validContentType)
+                    {
+                        throw new InvalidOperationException($"invalid content type: {request.ContentType}");
+                    }
+                    var encoding = request.ContentEncoding;
+                    var inputStream = request.InputStream;
+                    var reader = new StreamReader(inputStream, encoding);
+                    body = reader.ReadToEnd();
+                    reader.Close();
+                    inputStream.Close();
+                }
                 foreach (var handler in _handlers)
                 {
-                    var response = handler.HandleRequest(context.Request);
+                    var response = handler.HandleRequest(context.Request, body);
                     if (response != null)
                     {
                         WriteResponse(response);
@@ -192,7 +212,7 @@ namespace Prg.Scripts.Common.HttpListenerServer
                 }
                 memoryStream.Close();
             }
-            
+
             string JsonUtilityWrapper(object instance)
             {
                 // It seems that JsonUtility.ToJson does HTML URL Encoding :-(
