@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
@@ -18,11 +21,48 @@ namespace Prg.Scripts.Common.HttpListenerServer
     /// https://github.com/arshad115/HttpListenerServer
     /// https://github.com/sableangle/UnityHTTPServer
     /// </remarks>
-    public class SimpleListenerServer
+    public interface ISimpleListenerServer
     {
+        bool IsRunning { get; }
+        void Start();
+        void AddHandler(IListenerServerHandler handler);
+        void Stop();
+    }
+
+    /// <summary>
+    /// Request handler for <c>ISimpleListenerServer</c>.
+    /// </summary>
+    public interface IListenerServerHandler
+    {
+        /// <summary>
+        /// Handles a request (or ignores it).
+        /// </summary>
+        /// <remarks>
+        /// Returned <c>object</c> is converted to JSON string and returned <c>string</c> is assumed to be valid JSON already.
+        /// </remarks>
+        /// <param name="request">the request to handle</param>
+        /// <returns><c>object</c> or <c>string</c> on success and null if ignored it (did not handle).</returns>
+        object HandleRequest(HttpListenerRequest request);
+    }
+
+    public static class SimpleListenerServerFactory
+    {
+        public static ISimpleListenerServer Create(int port, HttpListenerServer watchDog = null)
+        {
+            return new SimpleListenerServer(port, watchDog);
+        }
+    }
+
+    internal class SimpleListenerServer : ISimpleListenerServer
+    {
+        private const int BufferSize = 4 * 1024;
+
         private readonly int _port;
         private readonly Thread _serverThread;
         private readonly HttpListener _listener;
+        private readonly List<IListenerServerHandler> _handlers = new();
+
+        private byte[] _buffer;
 
         public bool IsRunning => _listener.IsListening;
 
@@ -71,6 +111,11 @@ namespace Prg.Scripts.Common.HttpListenerServer
             _listener.Stop();
         }
 
+        public void AddHandler(IListenerServerHandler handler)
+        {
+            throw new NotImplementedException();
+        }
+
         private void ListenThread()
         {
             var uriPrefix = "http://*:" + _port + "/";
@@ -78,6 +123,7 @@ namespace Prg.Scripts.Common.HttpListenerServer
             Debug.Log($"{_port} start server @ {uriPrefix}");
             try
             {
+                _buffer = new byte[BufferSize];
                 _listener.Start();
                 for (;;)
                 {
@@ -104,14 +150,61 @@ namespace Prg.Scripts.Common.HttpListenerServer
         {
             try
             {
-                throw new NotImplementedException("HandleContext is not implemented yet");
+                foreach (var handler in _handlers)
+                {
+                    var response = handler.HandleRequest(context.Request);
+                    if (response != null)
+                    {
+                        WriteResponse(response);
+                        context.Response.OutputStream.Flush();
+                        context.Response.OutputStream.Close();
+                        return;
+                    }
+                }
+                throw new InvalidOperationException("No handlers found");
             }
             catch (Exception x)
             {
                 Debug.Log($"{_port} request handler failed: {x.GetType().FullName} : {x.Message}");
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.StatusDescription = $"{x.GetType().FullName} : {x.Message}";
+            }
+            finally
+            {
                 context.Response.Close();
+            }
+
+            void WriteResponse(object responseObject)
+            {
+                context.Response.ContentType = "application/json";
+                var jsonString = responseObject is string ? responseObject.ToString() : JsonUtilityWrapper(responseObject);
+                var jsonByte = Encoding.UTF8.GetBytes(jsonString);
+                context.Response.ContentLength64 = jsonByte.Length;
+                var memoryStream = new MemoryStream(jsonByte);
+                for (;;)
+                {
+                    var byteCount = memoryStream.Read(_buffer, 0, _buffer.Length);
+                    if (byteCount <= 0)
+                    {
+                        break;
+                    }
+                    context.Response.OutputStream.Write(_buffer, 0, byteCount);
+                }
+                memoryStream.Close();
+            }
+            
+            string JsonUtilityWrapper(object instance)
+            {
+                // It seems that JsonUtility.ToJson does HTML URL Encoding :-(
+                // - we want to revert that behaviour - at least for now as we don't know of anything better!
+                var jsonString = JsonUtility.ToJson(instance);
+                if (jsonString.IndexOf('%') < 0)
+                {
+                    return jsonString;
+                }
+                jsonString = Uri.UnescapeDataString(jsonString);
+                Debug.Log($"=>{jsonString}");
+                return jsonString;
             }
         }
     }
@@ -123,14 +216,14 @@ namespace Prg.Scripts.Common.HttpListenerServer
     {
         public int _port;
 
-        public SimpleListenerServer Server;
+        public ISimpleListenerServer Server;
 
         private void OnEnable()
         {
             Debug.Log($"port {_port}");
             if (_port > 0 && Server == null)
             {
-                Server = new SimpleListenerServer(_port, this);
+                Server = SimpleListenerServerFactory.Create(_port, this);
                 Server.Start();
             }
         }

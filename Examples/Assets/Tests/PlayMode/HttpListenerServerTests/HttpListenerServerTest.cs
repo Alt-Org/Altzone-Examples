@@ -14,7 +14,7 @@ namespace Tests.PlayMode.HttpListenerServerTests
     {
         private const int Port = 8090;
 
-        private SimpleListenerServer _server;
+        private ISimpleListenerServer _server;
         private ServerUrl _serverUrl;
 
         [OneTimeSetUp]
@@ -22,7 +22,7 @@ namespace Tests.PlayMode.HttpListenerServerTests
         {
             _serverUrl = new ServerUrl($"http://localhost:{Port}/");
             Debug.Log($"{_serverUrl}");
-            _server = new SimpleListenerServer(Port);
+            _server = SimpleListenerServerFactory.Create(Port);
             _server.Start();
             while (!_server.IsRunning)
             {
