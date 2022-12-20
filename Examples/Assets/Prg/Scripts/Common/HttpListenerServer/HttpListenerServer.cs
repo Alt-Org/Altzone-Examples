@@ -24,9 +24,7 @@ namespace Prg.Scripts.Common.HttpListenerServer
         private readonly Thread _serverThread;
         private readonly HttpListener _listener;
 
-        private bool _isRunning;
-
-        public bool IsRunning => _isRunning;
+        public bool IsRunning => _listener.IsListening;
 
         public SimpleListenerServer(int port, HttpListenerServer watchDog = null)
         {
@@ -81,7 +79,6 @@ namespace Prg.Scripts.Common.HttpListenerServer
             try
             {
                 _listener.Start();
-                _isRunning = true;
                 for (;;)
                 {
                     var context = _listener.GetContext();
@@ -99,7 +96,6 @@ namespace Prg.Scripts.Common.HttpListenerServer
             }
             finally
             {
-                _isRunning = false;
                 _listener.Stop();
             }
         }
