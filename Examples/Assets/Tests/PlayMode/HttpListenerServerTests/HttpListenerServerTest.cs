@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Prg.Scripts.Common.HttpListenerServer;
@@ -23,6 +24,11 @@ namespace Tests.PlayMode.HttpListenerServerTests
             Debug.Log($"{_serverUrl}");
             _server = new SimpleListenerServer(Port);
             _server.Start();
+            while (!_server.IsRunning)
+            {
+                // Because our HTTP server is starting in an other thread we can do busy wait!
+                Thread.Yield();
+            }
         }
 
         [UnityTest]
@@ -30,8 +36,6 @@ namespace Tests.PlayMode.HttpListenerServerTests
         {
             var url = _serverUrl.GetUrlFor("test");
             Debug.Log($"test {url}");
-
-            yield return new WaitUntil(() => _server.IsRunning);
 
             var response = StartRequest(SendRequestAsync);
             yield return WaitTaskToComplete(response);
