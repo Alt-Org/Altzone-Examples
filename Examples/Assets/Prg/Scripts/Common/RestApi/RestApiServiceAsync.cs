@@ -10,6 +10,29 @@ using UnityEngine;
 namespace Prg.Scripts.Common.RestApi
 {
     /// <summary>
+    /// Helper to create valid URLs for given server base URL.
+    /// </summary>
+    public class ServerUrl
+    {
+        private readonly string _urlPrefix;
+
+        public ServerUrl(string urlPrefix)
+        {
+            _urlPrefix = urlPrefix.EndsWith("/") ? urlPrefix.Substring(0, urlPrefix.Length - 1) : urlPrefix;
+        }
+
+        public string GetUrlFor(string path)
+        {
+            return path.StartsWith("/") ? $"{_urlPrefix}{path}" : $"{_urlPrefix}/{path}";
+        }
+
+        public override string ToString()
+        {
+            return _urlPrefix;
+        }
+    }
+    
+    /// <summary>
     /// Async helper for common REST API requests using JSON.
     /// </summary>
     public static class RestApiServiceAsync

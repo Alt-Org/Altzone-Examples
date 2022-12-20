@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Prg.Scripts.Common.HttpListenerServer;
 using Prg.Scripts.Common.RestApi;
@@ -11,14 +12,15 @@ namespace Tests.PlayMode.HttpListenerServerTests
     public class HttpListenerServerTest
     {
         private const int Port = 8090;
-    
+
         private SimpleListenerServer _server;
-        private bool _isRequestReady;
+        private ServerUrl _serverUrl;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Debug.Log("");
+            _serverUrl = new ServerUrl($"http://localhost:{Port}/");
+            Debug.Log($"{_serverUrl}");
             _server = new SimpleListenerServer(Port);
             _server.Start();
         }
@@ -26,27 +28,30 @@ namespace Tests.PlayMode.HttpListenerServerTests
         [UnityTest]
         public IEnumerator SendRequestAsyncTest()
         {
-            Debug.Log($"test");
+            var url = _serverUrl.GetUrlFor("test");
+            Debug.Log($"test {url}");
+
             yield return new WaitUntil(() => _server.IsRunning);
 
-            StartRequest(SendRequestAsync);
-            yield return new WaitUntil(() => _isRequestReady);
+            var response = StartRequest(SendRequestAsync);
+            yield return WaitTaskToComplete(response);
+            Debug.Log($"response {response.Result}");
+
+            async Task<RestApiServiceAsync.Response> SendRequestAsync()
+            {
+                return await RestApiServiceAsync.ExecuteRequest("GET", url);
+            }
         }
 
-        private void StartRequest(Action request)
+        private static Task<RestApiServiceAsync.Response> StartRequest(Func<Task<RestApiServiceAsync.Response>> request)
         {
-            Debug.Log("");
-            _isRequestReady = false;
-            request();
+            return request();
         }
-    
-        private async void SendRequestAsync()
+
+        private static IEnumerator WaitTaskToComplete(Task task)
         {
-            Debug.Log("");
-            var url = $"http://localhost:{Port}/test";
-            var response = await RestApiServiceAsync.ExecuteRequest("GET", url);
-            Debug.Log(response.ToString());
-            _isRequestReady = true;
+            yield return new WaitUntil(() => task.IsCompleted);
+            Assert.AreEqual(TaskStatus.RanToCompletion, task.Status);
         }
     }
 }
