@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Model;
-using SimpleHTTPServer;
+using Prg.Scripts.Common.HttpListenerServer;
 using SQLite;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 /// <summary>
 /// Simple REST API to test 'server side' operations with <c>LootLocker</c>.
 /// </summary>
-public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
+public class RestApiServer : MonoBehaviour, IListenerServerHandler
 {
     [Serializable]
     public class Result
@@ -68,6 +67,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
         }
     }
 
+    private const int ServerPort = 8090;
     private const string ServerPathPrefix = "server";
 
     private static readonly ErrorResult CanNotHandle = new("can not handle");
@@ -76,11 +76,14 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
 
     private IEnumerator Start()
     {
-        yield return new WaitUntil(() => GameObject.Find("UnityHttpServer") != null);
-        SimpleHttpServerX.AddRequestHandler(this);
-        Debug.Log($"AddRequestHandler {name} : {GetType().FullName}");
+        var server = SimpleListenerServerFactory.Create(ServerPort);
+        server.Start();
+        server.AddHandler(this);
+        yield return new WaitUntil(() => server.IsRunning);
+        Debug.Log("http server running");
+
         yield return new WaitUntil(() => (_storage ??= FindObjectOfType<StorageService>()) != null);
-        Debug.Log("storage found");
+        Debug.Log("storage running");
     }
 
     /// <summary>
@@ -89,7 +92,7 @@ public class RestApiServer : MonoBehaviour, ISimpleHttpServerRequestHandler
     /// <remarks>
     /// Return <c>true</c> on success, <c>false</c> if can not handle and <c>Exception</c> if request handling fails.
     /// </remarks>
-    public object HandleRequest(HttpListenerRequest request)
+    public object HandleRequest(HttpListenerRequest request, string body)
     {
         var path = request.Url.AbsolutePath;
         var tokens = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
