@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Model;
 using Prg.Scripts.Common.HttpListenerServer;
+using Prg.Scripts.Common.MiniJson;
 using SQLite;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
         {
         }
     }
-    
+
     public class ClanResult : Result
     {
         public JsonClanModel clan;
@@ -116,30 +117,61 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
     }
 
     /// <summary>
-    /// Moves one item from player1 to player2.
+    /// Dummy example: moves one item from player1 to player2.
     /// </summary>
     private object HandleMove(Dictionary<string, string> parameters)
     {
         // http://localhost:8090/server/move?player1=123&player2=456&item=789
 
-        if (!parameters.TryGetValue("player1", out var player1))
+        if (!parameters.TryGetValue("player1", out var playerId1))
         {
             throw new InvalidOperationException("player1 id not found");
         }
-        if (!parameters.TryGetValue("player2", out var player2))
+        if (!parameters.TryGetValue("player2", out var playerId2))
         {
             throw new InvalidOperationException("player2 id not found");
         }
-        if (!parameters.TryGetValue("item", out var item))
+        if (!parameters.TryGetValue("item", out var itemId))
         {
             throw new InvalidOperationException("item id not found");
         }
-        var text =
-            "{\"players\":[{\"player_id\":@player1@,\"player_public_uid\":\"GJDE7SAD\",\"name\":\"Jaskan\",\"last_active_platform\":\"google_play_store\"}," +
-            "{\"player_id\":@player2@,\"player_public_uid\":\"F7D3RPYR\",\"name\":\"Jaskan\",\"last_active_platform\":\"guest\"}]}";
-        text = text.Replace("@player1@", player1);
-        text = text.Replace("@player2@", player2);
-        return text;
+        // Just something: list of players involved in operation.
+        var player1 = new Dictionary<string, object>
+        {
+            { "player_id", playerId1 },
+            {
+                "items_removed", new List<string>
+                {
+                    itemId,
+                }
+            },
+            { "player_public_uid", "GJDE7SAD" },
+            { "name", "Player1" },
+            { "last_active_platform", "google_play_store" },
+        };
+        var player2 = new Dictionary<string, object>
+        {
+            { "player_id", playerId2 },
+            {
+                "items_added", new List<string>
+                {
+                    itemId,
+                }
+            },
+            { "player_public_uid", "F7D3RPYR" },
+            { "name", "Player2" },
+            { "last_active_platform", "guest" },
+        };
+        var playerList = new List<Dictionary<string, object>>
+        {
+            player1, player2
+        };
+        var players = new Dictionary<string, object>
+        {
+            { "players", playerList }
+        };
+        var json = MiniJson.Serialize(players);
+        return json;
     }
 
     private object HandleClan(string verb, Dictionary<string, string> parameters)
