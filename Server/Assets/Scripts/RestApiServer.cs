@@ -19,12 +19,16 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
     {
         public bool success;
         public string message;
+        public string timestamp;
 
         public Result(bool success, string message)
         {
             this.success = success;
             this.message = message;
+            timestamp = Timestamp();
         }
+
+        public static string Timestamp() => $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}";
     }
 
     public class ErrorResult : Result
@@ -70,6 +74,7 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
 
     private const int ServerPort = 8090;
     private const string ServerPathPrefix = "server";
+    private const string TimestampName = "timestamp";
 
     private static readonly ErrorResult CanNotHandle = new("can not handle");
 
@@ -168,7 +173,8 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
         };
         var players = new Dictionary<string, object>
         {
-            { "players", playerList }
+            { "players", playerList },
+            { TimestampName, Result.Timestamp() },
         };
         var json = MiniJson.Serialize(players);
         return json;
