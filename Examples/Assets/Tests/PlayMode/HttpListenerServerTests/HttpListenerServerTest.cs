@@ -12,9 +12,14 @@ using UnityEngine.TestTools;
 
 namespace Tests.PlayMode.HttpListenerServerTests
 {
+    /// <summary>
+    /// Tests for our 'localhost' <c>ISimpleListenerServer</c>.
+    /// </summary>
     public class HttpListenerServerTest
     {
-        private const int Port = 8090;
+        private const int TestServerPort = 8090;
+        private const int FirstLegalPort = 1023;
+        private const int LastLegalPort = 65535;
 
         private ISimpleListenerServer _server;
         private ServerUrl _serverUrl;
@@ -22,9 +27,12 @@ namespace Tests.PlayMode.HttpListenerServerTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _serverUrl = new ServerUrl($"http://localhost:{Port}/");
+            _serverUrl = new ServerUrl($"http://localhost:{TestServerPort}/");
             Debug.Log($"{_serverUrl}");
-            _server = SimpleListenerServerFactory.Create(Port);
+            Assert.IsTrue(TestServerPort >= FirstLegalPort);
+            Assert.IsTrue(TestServerPort <= LastLegalPort);
+            
+            _server = SimpleListenerServerFactory.Create(TestServerPort);
             _server.Start();
             _server.AddHandler(new EchoHandler());
             _server.AddHandler(new MalfunctioningHandler());
@@ -38,8 +46,9 @@ namespace Tests.PlayMode.HttpListenerServerTests
         [UnityTest, Description("Start and stop server")]
         public IEnumerator StopListenerTest()
         {
-            const int port = Port + 10000;
+            const int port = TestServerPort + 10000;
             Debug.Log($"test {port}");
+            Assert.IsTrue(TestServerPort <= LastLegalPort);
 
             var stopServer = SimpleListenerServerFactory.Create(port);
             Assert.IsFalse(stopServer.IsRunning);
