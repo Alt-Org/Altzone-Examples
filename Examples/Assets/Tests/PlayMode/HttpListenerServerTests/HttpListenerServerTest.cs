@@ -35,6 +35,21 @@ namespace Tests.PlayMode.HttpListenerServerTests
             }
         }
 
+        [UnityTest, Description("Start and stop server")]
+        public IEnumerator StopListenerTest()
+        {
+            const int port = Port + 10000;
+            Debug.Log($"test {port}");
+
+            var stopServer = SimpleListenerServerFactory.Create(port);
+            Assert.IsFalse(stopServer.IsRunning);
+            stopServer.Start();
+            yield return new WaitUntil(() => stopServer.IsRunning);
+            Assert.IsTrue(stopServer.IsRunning);
+            stopServer.Stop();
+            Assert.IsFalse(stopServer.IsRunning);
+        }
+        
         [UnityTest, Description("Echo handler for GET and POST")]
         public IEnumerator EchoHandlerTest()
         {
