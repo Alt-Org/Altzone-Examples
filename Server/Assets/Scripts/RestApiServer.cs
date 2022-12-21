@@ -107,7 +107,7 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
             return null;
         }
         var query = request.Url.Query;
-        UnityEngine.Debug.Log($"request {path} {query}");
+        Debug.Log($"{DateTime.Now:fff} request {path} {query}");
         var parameters = ParseParameters(query);
         var verb = tokens[1];
         switch (verb)
@@ -117,16 +117,29 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
             case "clan":
                 return tokens.Length != 3 ? CanNotHandle : HandleClan(tokens[2], parameters);
             case "ping":
-                return tokens.Length != 2 ? CanNotHandle : new SuccessResult("ping");
+                return HandlePing(tokens);
             default:
                 return CanNotHandle;
         }
     }
 
+    private static object HandlePing(string[] tokens)
+    {
+        if (tokens.Length == 2)
+        {
+            return new SuccessResult("ping");
+        }
+        if (tokens.Length == 3)
+        {
+            return new SuccessResult($"ping/{tokens[2]}");
+        }
+        return CanNotHandle;
+    }
+    
     /// <summary>
     /// Dummy example: moves one item from player1 to player2.
     /// </summary>
-    private object HandleMove(Dictionary<string, string> parameters)
+    private static object HandleMove(Dictionary<string, string> parameters)
     {
         // http://localhost:8090/server/move?player1=123&player2=456&item=789
 
