@@ -20,16 +20,23 @@ namespace Tests.EditMode.GameServerTests
     [TestFixture]
     public class GameServerTest
     {
-        private const string ServerUrl = "http://localhost:8090/server/";
+        private const int TestServerPort = 8090;
+        private ServerUrl _serverUrl;
 
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _serverUrl = new ServerUrl($"http://localhost:{TestServerPort}/server/");
+            Debug.Log($"{_serverUrl}");
+        }
+        
         [Test]
         public async Task ClanListTest()
         {
             // http://localhost:8090/server/clan/list
 
-            Debug.Log("test");
-
-            var url = GetUrl($"clan/list");
+            var url = _serverUrl.GetUrlFor("clan/list");
+            Debug.Log($"test {url}");
 
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
 
@@ -50,13 +57,6 @@ namespace Tests.EditMode.GameServerTests
             Assert.IsNotNull(clanList);
 
             Debug.Log($"done");
-        }
-
-        private static string GetUrl(string path)
-        {
-            var start = ServerUrl.EndsWith("/") ? ServerUrl.Substring(0, ServerUrl.Length - 1) : ServerUrl;
-            var end = path.StartsWith("/") ? path.Substring(1) : path;
-            return $"{start}/{end}";
         }
     }
 }
