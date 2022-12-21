@@ -29,7 +29,13 @@ namespace Tests.EditMode.GameServerTests
             _serverUrl = new ServerUrl($"http://localhost:{TestServerPort}/server/");
             Debug.Log($"{_serverUrl}");
         }
-        
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            Debug.Log("");
+        }
+
         [Test]
         public async Task ClanListTest()
         {
