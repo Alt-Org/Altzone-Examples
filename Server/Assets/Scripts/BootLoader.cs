@@ -8,7 +8,7 @@ internal static class BootLoader
     {
         var loggerConfig = ScriptableObject.CreateInstance<LoggerConfig>();
         loggerConfig._loggerRules = 
-@"^Prg.*=0
+@"^Prg.*=1
 ^Tests\..*=1";
         loggerConfig._colorForClassName = "white";
         loggerConfig._isDefaultMatchTrue = true;
