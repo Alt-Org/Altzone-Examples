@@ -116,6 +116,8 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
                 return HandleMove(parameters);
             case "clan":
                 return tokens.Length != 3 ? CanNotHandle : HandleClan(tokens[2], parameters);
+            case "ping":
+                return tokens.Length != 2 ? CanNotHandle : new SuccessResult("ping");
             default:
                 return CanNotHandle;
         }
