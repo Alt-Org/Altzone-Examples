@@ -22,13 +22,20 @@ namespace ServerTest
             Parallel.For(0, requestCount, i =>
                 {
                     var webRequest = WebRequest.Create($"http://localhost:8090/server/ping/{i}");
-                    Console.WriteLine($"Send {stopwatch.ElapsedMilliseconds} #{i}");
-                    using (var webResponse = webRequest.GetResponse())
+                    Console.WriteLine($"  Send {stopwatch.ElapsedMilliseconds} #{i}");
+                    try
                     {
-                        if (webResponse is HttpWebResponse httpWebResponse)
+                        using (var webResponse = webRequest.GetResponse())
                         {
-                            Console.WriteLine($"Status {stopwatch.ElapsedMilliseconds} #{i} {httpWebResponse.StatusCode}");
+                            if (webResponse is HttpWebResponse httpWebResponse)
+                            {
+                                Console.WriteLine($"Status {stopwatch.ElapsedMilliseconds} #{i} {httpWebResponse.StatusCode}");
+                            }
                         }
+                    }
+                    catch (WebException x)
+                    {
+                        Console.WriteLine($" Error {stopwatch.ElapsedMilliseconds} #{i} {x.Status} {x.Message}");
                     }
                 }
             );
