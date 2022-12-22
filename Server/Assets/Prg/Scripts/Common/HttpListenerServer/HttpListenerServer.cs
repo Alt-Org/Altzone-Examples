@@ -65,17 +65,18 @@ namespace Prg.Scripts.Common.HttpListenerServer
         private const int BufferSize = 4 * 1024;
 
         private readonly int _port;
-        private readonly Thread _serverThread;
         private readonly HttpListener _listener;
         private readonly List<IListenerServerHandler> _handlers = new();
+        private readonly Thread _serverThread;
 
         public bool IsRunning => _listener.IsListening;
 
         public SimpleListenerServer(int port, HttpListenerServer watchDog = null)
         {
             _port = port;
-            _serverThread = new Thread(ListenThread);
             _listener = new HttpListener();
+            var listener = new SingleThreadedListener(_port, _listener, _handlers);
+            _serverThread = new Thread(listener.ListenThread);
             Application.quitting += Stop;
             if (watchDog == null)
             {
@@ -122,86 +123,102 @@ namespace Prg.Scripts.Common.HttpListenerServer
             _handlers.Add(handler);
         }
 
-        private void ListenThread()
+        private class SingleThreadedListener
         {
-            var uriPrefix = "http://*:" + _port + "/";
-            _listener.Prefixes.Add(uriPrefix);
-            Debug.Log($"{_port} start server @ {uriPrefix}");
-            try
-            {
-                var buffer = new byte[BufferSize];
-                _listener.Start();
-                for (;;)
-                {
-                    var context = _listener.GetContext();
-                    HandleContext(context, buffer);
-                }
-            }
-            catch (ThreadAbortException)
-            {
-                Debug.Log($"{_port} server stopped");
-            }
-            catch (Exception x)
-            {
-                Debug.Log($"{_port} unhandled exception: {x.GetType().FullName} : {x.Message}");
-                Debug.LogException(x);
-            }
-            finally
-            {
-                _listener.Stop();
-            }
-        }
+            private readonly int _port;
+            private readonly HttpListener _listener;
+            private readonly List<IListenerServerHandler> _handlers;
 
-        private void HandleContext(HttpListenerContext context, byte[] buffer)
-        {
-            try
+            public SingleThreadedListener(int port, HttpListener listener, List<IListenerServerHandler> handlers)
             {
-                var request = context.Request;
-                string body = null;
-                if (request.HasEntityBody)
+                _port = port;
+                _listener = listener;
+                _handlers = handlers;
+            }
+
+            public void ListenThread()
+            {
+                var uriPrefix = "http://*:" + _port + "/";
+                _listener.Prefixes.Add(uriPrefix);
+                Debug.Log($"{_port} start server @ {uriPrefix}");
+                try
                 {
-                    var validContentType = request.ContentType is JsonContentType or FormPostContentType;
-                    if (!validContentType)
+                    var buffer = new byte[BufferSize];
+                    _listener.Start();
+                    for (;;)
                     {
-                        throw new InvalidOperationException($"invalid content type: {request.ContentType}");
+                        var context = _listener.GetContext();
+                        HandleContext(context, buffer);
                     }
-                    var encoding = request.ContentEncoding;
-                    var inputStream = request.InputStream;
-                    var reader = new StreamReader(inputStream, encoding);
-                    body = reader.ReadToEnd();
-                    reader.Close();
-                    inputStream.Close();
                 }
-                foreach (var handler in _handlers)
+                catch (ThreadAbortException)
                 {
-                    var response = handler.HandleRequest(context.Request, body);
-                    if (response != null)
+                    Debug.Log($"{_port} server stopped");
+                }
+                catch (Exception x)
+                {
+                    Debug.Log($"{_port} unhandled exception: {x.GetType().FullName} : {x.Message}");
+                    Debug.LogException(x);
+                }
+                finally
+                {
+                    _listener.Stop();
+                }
+            }
+
+            private void HandleContext(HttpListenerContext context, byte[] buffer)
+            {
+                try
+                {
+                    var request = context.Request;
+                    string body = null;
+                    if (request.HasEntityBody)
                     {
-                        WriteResponse(response);
-                        context.Response.OutputStream.Flush();
-                        context.Response.OutputStream.Close();
+                        var validContentType = request.ContentType is JsonContentType or FormPostContentType;
+                        if (!validContentType)
+                        {
+                            throw new InvalidOperationException($"invalid content type: {request.ContentType}");
+                        }
+                        var encoding = request.ContentEncoding;
+                        var inputStream = request.InputStream;
+                        var reader = new StreamReader(inputStream, encoding);
+                        body = reader.ReadToEnd();
+                        reader.Close();
+                        inputStream.Close();
+                    }
+                    var response = context.Response;
+                    foreach (var handler in _handlers)
+                    {
+                        var responseObject = handler.HandleRequest(context.Request, body);
+                        if (responseObject == null)
+                        {
+                            continue;
+                        }
+                        WriteResponse(response, buffer, responseObject);
+                        response.OutputStream.Flush();
+                        response.OutputStream.Close();
                         return;
                     }
+                    throw new InvalidOperationException("No handlers found");
                 }
-                throw new InvalidOperationException("No handlers found");
-            }
-            catch (Exception x)
-            {
-                Debug.Log($"{_port} request handler failed: {x.GetType().FullName} : {x.Message}");
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.StatusDescription = $"{x.GetType().FullName} : {x.Message}";
-            }
-            finally
-            {
-                context.Response.Close();
+                catch (Exception x)
+                {
+                    Debug.Log($"{_port} request handler failed: {x.GetType().FullName} : {x.Message}");
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.StatusDescription = $"{x.GetType().FullName} : {x.Message}";
+                }
+                finally
+                {
+                    context.Response.Close();
+                }
             }
 
-            void WriteResponse(object responseObject)
+            private static void WriteResponse(HttpListenerResponse response, byte[] buffer, object responseObject)
             {
-                context.Response.ContentType = "application/json";
+                response.ContentType = "application/json";
                 var jsonString = responseObject is string ? responseObject.ToString() : JsonUtilityWrapper(responseObject);
                 var jsonByte = Encoding.UTF8.GetBytes(jsonString);
-                context.Response.ContentLength64 = jsonByte.Length;
+                response.ContentLength64 = jsonByte.Length;
                 var memoryStream = new MemoryStream(jsonByte);
                 for (;;)
                 {
@@ -210,12 +227,12 @@ namespace Prg.Scripts.Common.HttpListenerServer
                     {
                         break;
                     }
-                    context.Response.OutputStream.Write(buffer, 0, byteCount);
+                    response.OutputStream.Write(buffer, 0, byteCount);
                 }
                 memoryStream.Close();
             }
 
-            string JsonUtilityWrapper(object instance)
+            private static string JsonUtilityWrapper(object instance)
             {
                 // It seems that JsonUtility.ToJson does HTML URL Encoding :-(
                 // - we want to revert that behaviour - at least for now as we don't know of anything better!
