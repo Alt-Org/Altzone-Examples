@@ -54,7 +54,12 @@ namespace Prg.Scripts.Common.HttpListenerServer
     {
         public static ISimpleListenerServer Create(int port, HttpListenerServer watchDog = null)
         {
-            return new SimpleListenerServer(port, watchDog);
+            return new SimpleListenerServer(port, false, watchDog);
+        }
+
+        public static ISimpleListenerServer CreateMultiThreaded(int port, HttpListenerServer watchDog = null)
+        {
+            return new SimpleListenerServer(port, true, watchDog);
         }
     }
 
@@ -71,11 +76,13 @@ namespace Prg.Scripts.Common.HttpListenerServer
 
         public bool IsRunning => _listener.IsListening;
 
-        public SimpleListenerServer(int port, HttpListenerServer watchDog = null)
+        public SimpleListenerServer(int port, bool isMultiThreaded, HttpListenerServer watchDog = null)
         {
             _port = port;
             _listener = new HttpListener();
-            var listener = new SingleThreadedListener(_port, _listener, _handlers);
+            var listener = isMultiThreaded
+                ? new MultiThreadedListener(_port, _listener, _handlers)
+                : new SingleThreadedListener(_port, _listener, _handlers);
             _serverThread = new Thread(listener.ListenThread);
             Application.quitting += Stop;
             if (watchDog == null)
@@ -125,48 +132,53 @@ namespace Prg.Scripts.Common.HttpListenerServer
 
         private class SingleThreadedListener
         {
-            private readonly int _port;
-            private readonly HttpListener _listener;
+            protected readonly int Port;
+            protected readonly HttpListener Listener;
             private readonly List<IListenerServerHandler> _handlers;
 
             public SingleThreadedListener(int port, HttpListener listener, List<IListenerServerHandler> handlers)
             {
-                _port = port;
-                _listener = listener;
+                Port = port;
+                Listener = listener;
                 _handlers = handlers;
             }
 
             public void ListenThread()
             {
-                var uriPrefix = "http://*:" + _port + "/";
-                _listener.Prefixes.Add(uriPrefix);
-                Debug.Log($"{_port} start server @ {uriPrefix}");
+                var uriPrefix = "http://*:" + Port + "/";
+                Listener.Prefixes.Add(uriPrefix);
                 try
                 {
-                    var buffer = new byte[BufferSize];
-                    _listener.Start();
-                    for (;;)
-                    {
-                        var context = _listener.GetContext();
-                        HandleContext(context, buffer);
-                    }
+                    Run();
                 }
                 catch (ThreadAbortException)
                 {
-                    Debug.Log($"{_port} server stopped");
+                    Debug.Log($"{Port} server stopped");
                 }
                 catch (Exception x)
                 {
-                    Debug.Log($"{_port} unhandled exception: {x.GetType().FullName} : {x.Message}");
+                    Debug.Log($"{Port} unhandled exception: {x.GetType().FullName} : {x.Message}");
                     Debug.LogException(x);
                 }
                 finally
                 {
-                    _listener.Stop();
+                    Listener.Stop();
                 }
             }
 
-            private void HandleContext(HttpListenerContext context, byte[] buffer)
+            protected virtual void Run()
+            {
+                Debug.Log($"{Port} start server @ {string.Join(',', Listener.Prefixes)}");
+                var buffer = new byte[BufferSize];
+                Listener.Start();
+                for (; Listener.IsListening;)
+                {
+                    var context = Listener.GetContext();
+                    HandleContext(context, buffer);
+                }
+            }
+
+            protected void HandleContext(HttpListenerContext context, byte[] buffer)
             {
                 try
                 {
@@ -203,7 +215,7 @@ namespace Prg.Scripts.Common.HttpListenerServer
                 }
                 catch (Exception x)
                 {
-                    Debug.Log($"{_port} request handler failed: {x.GetType().FullName} : {x.Message}");
+                    Debug.Log($"{Port} request handler failed: {x.GetType().FullName} : {x.Message}");
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.StatusDescription = $"{x.GetType().FullName} : {x.Message}";
                 }
@@ -244,6 +256,31 @@ namespace Prg.Scripts.Common.HttpListenerServer
                 jsonString = Uri.UnescapeDataString(jsonString);
                 Debug.Log($"=>{jsonString}");
                 return jsonString;
+            }
+        }
+
+        private class MultiThreadedListener : SingleThreadedListener
+        {
+            public MultiThreadedListener(int port, HttpListener listener, List<IListenerServerHandler> handlers) : base(port, listener, handlers)
+            {
+            }
+
+            protected override void Run()
+            {
+                Debug.Log($"{Port} start server @ {string.Join(',', Listener.Prefixes)}");
+                Listener.Start();
+                for (; Listener.IsListening;)
+                {
+                    var result = Listener.BeginGetContext(ListenerCallback, Listener);
+                    result.AsyncWaitHandle.WaitOne();
+                }
+            }
+
+            private void ListenerCallback(IAsyncResult result)
+            {
+                var context = Listener.EndGetContext(result);
+                var buffer = new byte[BufferSize];
+                HandleContext(context, buffer);
             }
         }
     }
