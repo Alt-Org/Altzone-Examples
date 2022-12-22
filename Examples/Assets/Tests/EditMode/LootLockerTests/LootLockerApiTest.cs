@@ -4,8 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using LootLocker;
 using NUnit.Framework;
+using Prg.Scripts.Common.Http.RestApi;
 using Prg.Scripts.Common.MiniJson;
-using Prg.Scripts.Common.RestApi;
 
 namespace Tests.EditMode.LootLockerTests
 {

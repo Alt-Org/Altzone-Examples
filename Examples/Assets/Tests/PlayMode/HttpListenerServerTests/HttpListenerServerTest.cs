@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Prg.Scripts.Common.HttpListenerServer;
-using Prg.Scripts.Common.RestApi;
+using Prg.Scripts.Common.Http.HttpListenerServer;
+using Prg.Scripts.Common.Http.RestApi;
 using UnityEngine;
 using UnityEngine.TestTools;
 

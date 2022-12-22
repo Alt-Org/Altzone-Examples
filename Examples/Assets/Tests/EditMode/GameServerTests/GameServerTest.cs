@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Prg.Scripts.Common.Http.RestApi;
 using Prg.Scripts.Common.MiniJson;
-using Prg.Scripts.Common.RestApi;
 
 namespace Tests.EditMode.GameServerTests
 {
