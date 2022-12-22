@@ -14,6 +14,8 @@ using UnityEngine;
 /// </summary>
 public class RestApiServer : MonoBehaviour, IListenerServerHandler
 {
+    #region JSON Data Transfer Objects
+
     [Serializable]
     public class Result
     {
@@ -71,6 +73,8 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
             this.clans = JsonClanModel.ConvertAll(clans);
         }
     }
+
+    #endregion
 
     private const int ServerPort = 8090;
     private const string ServerPathPrefix = "server";
@@ -135,7 +139,7 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
         }
         return CanNotHandle;
     }
-    
+
     /// <summary>
     /// Dummy example: moves one item from player1 to player2.
     /// </summary>
@@ -347,16 +351,18 @@ public class RestApiServer : MonoBehaviour, IListenerServerHandler
         {
             return namedParameters;
         }
-        var query = queryString.Replace("?", "").Split('&');
-        Debug.Log($"query {string.Join('|', query)}");
+        var query = queryString.Replace("?", "").Split('&', StringSplitOptions.RemoveEmptyEntries);
         foreach (var item in query)
         {
-            var tokens = item.Split('=');
+            var tokens = item.Split('=', StringSplitOptions.RemoveEmptyEntries);
             if (tokens.Length != 2)
             {
-                throw new InvalidOperationException("invalid query string");
+                throw new InvalidOperationException("invalid query string (key=value)");
             }
-            Debug.Log($"{tokens[0]}={tokens[1]}");
+            if (namedParameters.ContainsKey(tokens[0]))
+            {
+                throw new InvalidOperationException("duplicate query string key");
+            }
             namedParameters.Add(tokens[0], tokens[1]);
         }
         return namedParameters;

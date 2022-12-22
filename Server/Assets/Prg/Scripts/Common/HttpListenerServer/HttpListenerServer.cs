@@ -69,8 +69,6 @@ namespace Prg.Scripts.Common.HttpListenerServer
         private readonly HttpListener _listener;
         private readonly List<IListenerServerHandler> _handlers = new();
 
-        private byte[] _buffer;
-
         public bool IsRunning => _listener.IsListening;
 
         public SimpleListenerServer(int port, HttpListenerServer watchDog = null)
@@ -131,12 +129,12 @@ namespace Prg.Scripts.Common.HttpListenerServer
             Debug.Log($"{_port} start server @ {uriPrefix}");
             try
             {
-                _buffer = new byte[BufferSize];
+                var buffer = new byte[BufferSize];
                 _listener.Start();
                 for (;;)
                 {
                     var context = _listener.GetContext();
-                    HandleContext(context);
+                    HandleContext(context, buffer);
                 }
             }
             catch (ThreadAbortException)
@@ -154,7 +152,7 @@ namespace Prg.Scripts.Common.HttpListenerServer
             }
         }
 
-        private void HandleContext(HttpListenerContext context)
+        private void HandleContext(HttpListenerContext context, byte[] buffer)
         {
             try
             {
@@ -207,12 +205,12 @@ namespace Prg.Scripts.Common.HttpListenerServer
                 var memoryStream = new MemoryStream(jsonByte);
                 for (;;)
                 {
-                    var byteCount = memoryStream.Read(_buffer, 0, _buffer.Length);
+                    var byteCount = memoryStream.Read(buffer, 0, buffer.Length);
                     if (byteCount <= 0)
                     {
                         break;
                     }
-                    context.Response.OutputStream.Write(_buffer, 0, byteCount);
+                    context.Response.OutputStream.Write(buffer, 0, byteCount);
                 }
                 memoryStream.Close();
             }
