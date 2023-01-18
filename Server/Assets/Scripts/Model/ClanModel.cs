@@ -11,19 +11,22 @@ namespace Model
 
         [Indexed(Unique = true)]
         public string Name { get; set; }
+        
+        public DateTime LastUpdate { get; set; }
     }
 
     [Serializable]
     public class JsonClanModel
     {
         public int Id;
-
         public string Name;
+        public DateTime LastUpdate;
 
         public JsonClanModel(ClanModel clan)
         {
             Id = clan.Id;
             Name = clan.Name;
+            LastUpdate = clan.LastUpdate;
         }
 
         public static List<JsonClanModel> ConvertAll(List<ClanModel> clans)
