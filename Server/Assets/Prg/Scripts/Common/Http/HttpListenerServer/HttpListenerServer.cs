@@ -183,6 +183,11 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
                 try
                 {
                     var request = context.Request;
+                    if (request.Url.AbsolutePath == "/favicon.ico")
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                        return;
+                    }
                     string body = null;
                     if (request.HasEntityBody)
                     {
