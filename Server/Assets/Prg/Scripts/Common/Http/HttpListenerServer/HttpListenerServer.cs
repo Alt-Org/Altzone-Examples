@@ -29,7 +29,7 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
     {
         bool IsRunning { get; }
         void Start();
-        void AddHandler(IListenerServerHandler handler);
+        void AddHandler(string pathPrefix, IListenerServerHandler handler);
         void Stop();
     }
 
@@ -39,7 +39,7 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
     public interface IListenerServerHandler
     {
         /// <summary>
-        /// Handles a request (or ignores it).
+        /// Handles a request that is routed to it based on URI path prefix.
         /// </summary>
         /// <remarks>
         /// Returned <c>object</c> is converted to JSON string and returned <c>string</c> is assumed to be valid JSON already.
@@ -71,7 +71,7 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
 
         private readonly int _port;
         private readonly HttpListener _listener;
-        private readonly List<IListenerServerHandler> _handlers = new();
+        private readonly Dictionary<string, IListenerServerHandler> _handlers = new();
         private readonly Thread _serverThread;
 
         public bool IsRunning => _listener.IsListening;
@@ -124,19 +124,23 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
             _listener.Stop();
         }
 
-        public void AddHandler(IListenerServerHandler handler)
+        public void AddHandler(string pathPrefix, IListenerServerHandler handler)
         {
             Debug.Log($"{_port} {handler}");
-            _handlers.Add(handler);
+            if (_handlers.ContainsKey(pathPrefix))
+            {
+                throw new InvalidOperationException($"duplicate pathPrefix '{pathPrefix}'");
+            }
+            _handlers.Add(pathPrefix, handler);
         }
 
         private class SingleThreadedListener
         {
             protected readonly int Port;
             protected readonly HttpListener Listener;
-            private readonly List<IListenerServerHandler> _handlers;
+            private readonly Dictionary<string, IListenerServerHandler> _handlers;
 
-            public SingleThreadedListener(int port, HttpListener listener, List<IListenerServerHandler> handlers)
+            public SingleThreadedListener(int port, HttpListener listener, Dictionary<string, IListenerServerHandler> handlers)
             {
                 Port = port;
                 Listener = listener;
@@ -194,7 +198,7 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
                         var validContentType = request.ContentType is JsonContentType or FormPostContentType;
                         if (!validContentType)
                         {
-                            throw new InvalidOperationException($"invalid content type: {request.ContentType}");
+                            throw new InvalidOperationException($"Invalid content type: {request.ContentType}");
                         }
                         var encoding = request.ContentEncoding;
                         var inputStream = request.InputStream;
@@ -204,19 +208,25 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
                         inputStream.Close();
                     }
                     var response = context.Response;
-                    foreach (var handler in _handlers)
+                    var tokens = request.Url.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                    if (tokens.Length < 2)
                     {
-                        var responseObject = handler.HandleRequest(context.Request, body);
-                        if (responseObject == null)
-                        {
-                            continue;
-                        }
-                        WriteResponse(response, buffer, responseObject);
-                        response.OutputStream.Flush();
-                        response.OutputStream.Close();
+                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                         return;
                     }
-                    throw new InvalidOperationException("No handlers found");
+                    var pathPrefix = tokens[0];
+                    if (!_handlers.TryGetValue(pathPrefix, out var handler))
+                    {
+                        throw new InvalidOperationException("No handlers found");
+                    }
+                    var responseObject = handler.HandleRequest(context.Request, body);
+                    if (responseObject == null)
+                    {
+                        throw new InvalidOperationException($"Handler failed: {handler.GetType().Name}");
+                    }
+                    WriteResponse(response, buffer, responseObject);
+                    response.OutputStream.Flush();
+                    response.OutputStream.Close();
                 }
                 catch (Exception x)
                 {
@@ -266,7 +276,8 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
 
         private class MultiThreadedListener : SingleThreadedListener
         {
-            public MultiThreadedListener(int port, HttpListener listener, List<IListenerServerHandler> handlers) : base(port, listener, handlers)
+            public MultiThreadedListener(int port, HttpListener listener, Dictionary<string, IListenerServerHandler> handlers) : base(port, listener,
+                handlers)
             {
             }
 
