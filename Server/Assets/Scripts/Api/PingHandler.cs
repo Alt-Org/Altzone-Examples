@@ -17,7 +17,6 @@ namespace Api
                 throw new InvalidOperationException($"invalid path '{path}'");
             }
             var query = request.Url.Query;
-            Debug.Log($"{DateTime.Now:fff} request {path} {query}");
             var parameters = RestApiServer.ParseParameters(query);
             var verb = tokens[1];
             switch (verb)

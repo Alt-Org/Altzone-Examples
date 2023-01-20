@@ -105,7 +105,7 @@ namespace Api
 
         private IEnumerator Start()
         {
-            var server = SimpleListenerServerFactory.Create(ServerPort);
+            var server = SimpleListenerServerFactory.Create(ServerPort, OnResponse);
             server.Start();
             if (_isRequireAuthentication)
             {
@@ -140,6 +140,13 @@ namespace Api
             }
         }
 
+        private void OnResponse(Tuple<string, string> tuple)
+        {
+            Debug.Log($"{DateTime.Now:fff} {tuple.Item1} -> {tuple.Item2}");
+            _messageCount += 1;
+            _messageQueue.Enqueue(tuple);
+        }
+        
         /// <summary>
         /// Parse and handle <c>SimpleHTTPServer</c> request.
         /// </summary>
@@ -147,26 +154,6 @@ namespace Api
         /// Return <c>true</c> on success, <c>false</c> if can not handle and <c>Exception</c> if request handling fails.
         /// </remarks>
         public object HandleRequest(HttpListenerRequest request, string body)
-        {
-            _messageCount += 1;
-            try
-            {
-                var response = _HandleRequest(request, body);
-                _messageQueue.Enqueue(new Tuple<string, string>(
-                    $"{request.Url.AbsolutePath}{request.Url.Query}",
-                    "OK"));
-                return response;
-            }
-            catch (Exception x)
-            {
-                _messageQueue.Enqueue(new Tuple<string, string>(
-                    $"{request.Url.AbsolutePath}{request.Url.Query}",
-                    x.Message));
-                throw;
-            }
-        }
-
-        private object _HandleRequest(HttpListenerRequest request, string body)
         {
             if (_isRequireAuthentication)
             {
@@ -183,7 +170,6 @@ namespace Api
                 throw new InvalidOperationException($"invalid path '{path}'");
             }
             var query = request.Url.Query;
-            Debug.Log($"{DateTime.Now:fff} request {path} {query}");
             var parameters = ParseParameters(query);
             var verb = tokens[1];
             switch (verb)

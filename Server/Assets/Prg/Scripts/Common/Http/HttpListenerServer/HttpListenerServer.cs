@@ -56,14 +56,16 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
 
     public static class SimpleListenerServerFactory
     {
-        public static ISimpleListenerServer Create(int port, HttpListenerServer watchDog = null)
+        public static ISimpleListenerServer Create(int port, Action<Tuple<string, string>> onResponse, 
+            HttpListenerServer watchDog = null)
         {
-            return new SimpleListenerServer(port, false, watchDog);
+            return new SimpleListenerServer(port, false, onResponse, watchDog);
         }
 
-        public static ISimpleListenerServer CreateMultiThreaded(int port, HttpListenerServer watchDog = null)
+        public static ISimpleListenerServer CreateMultiThreaded(int port, Action<Tuple<string, string>> onResponse,
+            HttpListenerServer watchDog = null)
         {
-            return new SimpleListenerServer(port, true, watchDog);
+            return new SimpleListenerServer(port, true, onResponse, watchDog);
         }
     }
 
@@ -80,13 +82,14 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
 
         public bool IsRunning => _listener.IsListening;
 
-        public SimpleListenerServer(int port, bool isMultiThreaded, HttpListenerServer watchDog = null)
+        public SimpleListenerServer(int port, bool isMultiThreaded,
+            Action<Tuple<string, string>> onResponse = null, HttpListenerServer watchDog = null)
         {
             _port = port;
             _listener = new HttpListener();
             var listener = isMultiThreaded
-                ? new MultiThreadedListener(_port, _listener, _handlers)
-                : new SingleThreadedListener(_port, _listener, _handlers);
+                ? new MultiThreadedListener(_port, _listener, _handlers, onResponse)
+                : new SingleThreadedListener(_port, _listener, _handlers, onResponse);
             _serverThread = new Thread(listener.ListenThread);
             Application.quitting += Stop;
             if (watchDog == null)
@@ -143,12 +146,15 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
             protected readonly int Port;
             protected readonly HttpListener Listener;
             private readonly Dictionary<string, IListenerServerHandler> _handlers;
+            private readonly Action<Tuple<string, string>> _onResponse;
 
-            public SingleThreadedListener(int port, HttpListener listener, Dictionary<string, IListenerServerHandler> handlers)
+            public SingleThreadedListener(int port, HttpListener listener,
+                Dictionary<string, IListenerServerHandler> handlers, Action<Tuple<string, string>> onResponse)
             {
                 Port = port;
                 Listener = listener;
                 _handlers = handlers;
+                _onResponse = onResponse;
             }
 
             public void ListenThread()
@@ -243,6 +249,9 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
                 finally
                 {
                     context.Response.Close();
+                    _onResponse?.Invoke(new Tuple<string, string>(
+                        $"{context.Request.HttpMethod} {context.Request.RawUrl}", 
+                        $"{context.Response.StatusCode} {context.Response.StatusDescription}"));
                 }
             }
 
@@ -282,8 +291,9 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
 
         private class MultiThreadedListener : SingleThreadedListener
         {
-            public MultiThreadedListener(int port, HttpListener listener, Dictionary<string, IListenerServerHandler> handlers) : base(port, listener,
-                handlers)
+            public MultiThreadedListener(int port, HttpListener listener,
+                Dictionary<string, IListenerServerHandler> handlers, Action<Tuple<string, string>> onResponse)
+                : base(port, listener, handlers, onResponse)
             {
             }
 
@@ -321,7 +331,7 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
             Debug.Log($"port {_port}");
             if (_port > 0 && Server == null)
             {
-                Server = SimpleListenerServerFactory.Create(_port, this);
+                Server = SimpleListenerServerFactory.Create(_port, null, this);
                 Server.Start();
             }
         }
