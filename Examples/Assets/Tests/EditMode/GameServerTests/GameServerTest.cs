@@ -21,13 +21,20 @@ namespace Tests.EditMode.GameServerTests
     public class GameServerTest
     {
         private const int TestServerPort = 8090;
+        private const string TestServerAppId = "123456";
+        private const string AuthorizationHeaderPrefix = "Bearer ";
+        
         private ServerUrl _serverUrl;
+
+        private bool _isAuthenticationRequired;
+        private RestApiServiceAsync.AuthorizationHeader _authorizationHeader;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _serverUrl = new ServerUrl($"http://localhost:{TestServerPort}/server/");
-            Debug.Log($"{_serverUrl}");
+            _serverUrl = new ServerUrl($"http://localhost:{TestServerPort}");
+            _isAuthenticationRequired = true;
+            Debug.Log($"{_serverUrl} isAuthenticationRequired {_isAuthenticationRequired}");
         }
 
         [OneTimeTearDown]
@@ -37,24 +44,57 @@ namespace Tests.EditMode.GameServerTests
         }
 
         [Test]
-        public async Task ClanListTest()
+        public async Task PingTest()
         {
-            // http://localhost:8090/server/clan/list
-
-            var url = _serverUrl.GetUrlFor("clan/list");
+            var url = _serverUrl.GetUrlFor("test/ping");
             Debug.Log($"test {url}");
 
             var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
 
             Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
-            if (!result.Success)
+            AssertSuccess(result);
+
+            var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
+            Assert.IsNotNull(data);
+        }
+
+        [Test]
+        public async Task AuthenticationTest()
+        {
+            // http://localhost:8090/login/authenticate?appid=123456
+            
+            var url = _serverUrl.GetUrlFor($"login/authenticate?appid={TestServerAppId}");
+            Debug.Log($"test {url}");
+            
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
+            Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
+            AssertSuccess(result);
+
+
+            var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
+            Assert.IsNotNull(data);
+            var key = data["AuthenticationKey"] as string;
+            Assert.IsNotNull(key);
+        }
+        
+        [Test]
+        public async Task ClanListTest()
+        {
+            // http://localhost:8090/server/clan/list
+
+            var url = _serverUrl.GetUrlFor("server/clan/list");
+            Debug.Log($"test {url}");
+
+            if (_isAuthenticationRequired && _authorizationHeader == null)
             {
-                Debug.Log("*");
-                Debug.Log("* CHECK THAT SERVER IS RUNNING");
-                Debug.Log("*");
-                Assert.IsTrue(false);
+                await CheckAuthentication();
             }
-            Assert.IsTrue(result.Success);
+            //var key = "Abba";
+            //_authorizationHeader = new RestApiServiceAsync.AuthorizationHeader($"{AuthorizationHeaderPrefix}{key}");
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url, null, _authorizationHeader);
+            Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
+            AssertSuccess(result);
+
             var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
             Assert.IsNotNull(data);
             var clans = data["clans"] as List<object>;
@@ -63,6 +103,35 @@ namespace Tests.EditMode.GameServerTests
             Assert.IsNotNull(clanList);
 
             Debug.Log($"done");
+        }
+
+        private async Task CheckAuthentication()
+        {
+            var url = _serverUrl.GetUrlFor($"login/authenticate?appid={TestServerAppId}");
+            Debug.Log($"url {url}");
+
+            var result = await RestApiServiceAsync.ExecuteRequest("GET", url);
+            Debug.Log($"result: {result.ToString().Replace('\r', '.').Replace('\n', '.')}");
+            AssertSuccess(result);
+
+            var data = MiniJson.Deserialize(result.Payload) as Dictionary<string, object>;
+            Assert.IsNotNull(data);
+            var key = data["AuthenticationKey"] as string;
+            Assert.IsNotNull(key);
+
+            Debug.Log($"key {key}");
+            _authorizationHeader = new RestApiServiceAsync.AuthorizationHeader($"{AuthorizationHeaderPrefix}{key}");
+        }
+
+        private static void AssertSuccess(RestApiServiceAsync.Response response)
+        {
+            if (!response.Success)
+            {
+                Debug.Log("*");
+                Debug.Log("* CHECK THAT SERVER IS RUNNING");
+                Debug.Log("*");
+            }
+            Assert.IsTrue(response.Success);
         }
     }
 }
