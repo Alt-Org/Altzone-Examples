@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,11 @@ namespace Api
     /// </summary>
     public class RestApiServer : MonoBehaviour, IListenerServerHandler
     {
+        [SerializeField] private int _messageCount;
+        [SerializeField] private string _request;
+        [SerializeField] private string _response;
+        [SerializeField] private string _responseTime;
+
         #region JSON Data Transfer Objects
 
         [Serializable]
@@ -87,6 +93,8 @@ namespace Api
 
         private IStorageService _storage;
 
+        private readonly ConcurrentQueue<Tuple<string, string>> _messageQueue = new();
+
         private IEnumerator Start()
         {
             var server = SimpleListenerServerFactory.Create(ServerPort);
@@ -99,6 +107,20 @@ namespace Api
             Debug.Log("storage running");
         }
 
+        private void Update()
+        {
+            while (_messageQueue.Count > 0)
+            {
+                if (!_messageQueue.TryDequeue(out var tuple))
+                {
+                    return;
+                }
+                _request = tuple.Item1;
+                _response = tuple.Item2;
+                _responseTime = $"{DateTime.Now:HH:mm:ss.fff}";
+            }
+        }
+
         /// <summary>
         /// Parse and handle <c>SimpleHTTPServer</c> request.
         /// </summary>
@@ -106,6 +128,26 @@ namespace Api
         /// Return <c>true</c> on success, <c>false</c> if can not handle and <c>Exception</c> if request handling fails.
         /// </remarks>
         public object HandleRequest(HttpListenerRequest request, string body)
+        {
+            _messageCount += 1;
+            try
+            {
+                var response = _HandleRequest(request, body);
+                _messageQueue.Enqueue(new Tuple<string, string>(
+                    $"{request.Url.AbsolutePath}{request.Url.Query}",
+                    "OK"));
+                return response;
+            }
+            catch (Exception x)
+            {
+                _messageQueue.Enqueue(new Tuple<string, string>(
+                    $"{request.Url.AbsolutePath}{request.Url.Query}",
+                    x.Message));
+                throw;
+            }
+        }
+
+        private object _HandleRequest(HttpListenerRequest request, string body)
         {
             var path = request.Url.AbsolutePath;
             var tokens = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -119,8 +161,6 @@ namespace Api
             var verb = tokens[1];
             switch (verb)
             {
-                case "move":
-                    return HandleMove(parameters);
                 case "clan":
                     return tokens.Length != 3 ? CanNotHandle : HandleClan(tokens[2], parameters);
                 case "ping":
@@ -141,65 +181,6 @@ namespace Api
                 return new SuccessResult($"ping/{tokens[2]}");
             }
             return CanNotHandle;
-        }
-
-        /// <summary>
-        /// Dummy example: moves one item from player1 to player2.
-        /// </summary>
-        private static object HandleMove(Dictionary<string, string> parameters)
-        {
-            // http://localhost:8090/server/move?player1=123&player2=456&item=789
-
-            if (!parameters.TryGetValue("player1", out var playerId1))
-            {
-                throw new InvalidOperationException("player1 id not found");
-            }
-            if (!parameters.TryGetValue("player2", out var playerId2))
-            {
-                throw new InvalidOperationException("player2 id not found");
-            }
-            if (!parameters.TryGetValue("item", out var itemId))
-            {
-                throw new InvalidOperationException("item id not found");
-            }
-            // Just something: list of players involved in operation.
-            var player1 = new Dictionary<string, object>
-            {
-                { "player_id", playerId1 },
-                {
-                    "items_removed", new List<string>
-                    {
-                        itemId,
-                    }
-                },
-                { "player_public_uid", "GJDE7SAD" },
-                { "name", "Player1" },
-                { "last_active_platform", "google_play_store" },
-            };
-            var player2 = new Dictionary<string, object>
-            {
-                { "player_id", playerId2 },
-                {
-                    "items_added", new List<string>
-                    {
-                        itemId,
-                    }
-                },
-                { "player_public_uid", "F7D3RPYR" },
-                { "name", "Player2" },
-                { "last_active_platform", "guest" },
-            };
-            var playerList = new List<Dictionary<string, object>>
-            {
-                player1, player2
-            };
-            var players = new Dictionary<string, object>
-            {
-                { "players", playerList },
-                { TimestampName, Result.Timestamp() },
-            };
-            var json = MiniJson.Serialize(players);
-            return json;
         }
 
         private object HandleClan(string verb, Dictionary<string, string> parameters)
