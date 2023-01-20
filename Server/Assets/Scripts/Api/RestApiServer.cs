@@ -6,10 +6,10 @@ using System.Linq;
 using System.Net;
 using Model;
 using Prg.Scripts.Common.Http.HttpListenerServer;
-using Prg.Scripts.Common.MiniJson;
 using Service;
 using SQLite;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Api
 {
@@ -18,7 +18,12 @@ namespace Api
     /// </summary>
     public class RestApiServer : MonoBehaviour, IListenerServerHandler
     {
-        [SerializeField] private int _messageCount;
+        [Header("Authentication"), SerializeField] private bool _isRequireAuthentication;
+        [SerializeField] private string _authenticationKey;
+
+        [Header("Ping Test"), SerializeField] private bool _isIncludePingTest;
+        
+        [Header("Debug Data"), SerializeField] private int _messageCount;
         [SerializeField] private string _request;
         [SerializeField] private string _response;
         [SerializeField] private string _responseTime;
@@ -86,11 +91,14 @@ namespace Api
         #endregion
 
         private const int ServerPort = 8090;
+        private const string AuthenticationPathPrefix = "login";
+        private const string PingPathPrefix = "test";
         private const string ServerPathPrefix = "server";
         private const string TimestampName = "timestamp";
 
         private static readonly ErrorResult CanNotHandle = new("can not handle");
 
+        private IJwtAuthentication _authentication;
         private IStorageService _storage;
 
         private readonly ConcurrentQueue<Tuple<string, string>> _messageQueue = new();
@@ -99,6 +107,17 @@ namespace Api
         {
             var server = SimpleListenerServerFactory.Create(ServerPort);
             server.Start();
+            if (_isRequireAuthentication)
+            {
+                Assert.IsTrue(_authenticationKey?.Length > 0);
+                var authentication = new JwtAuthentication(_authenticationKey);
+                _authentication = authentication;
+                server.AddHandler(AuthenticationPathPrefix, authentication);
+            }
+            if (_isIncludePingTest)
+            {
+                server.AddHandler(PingPathPrefix, new PingHandler());
+            }
             server.AddHandler(ServerPathPrefix, this);
             yield return new WaitUntil(() => server.IsRunning);
             Debug.Log("http server running");
@@ -149,9 +168,17 @@ namespace Api
 
         private object _HandleRequest(HttpListenerRequest request, string body)
         {
+            if (_isRequireAuthentication)
+            {
+                var authorization = request.Headers.Get("Authorization");
+                if (!_authentication.ValidateToken(authorization))
+                {
+                    throw new UnauthorizedException();
+                }
+            }
             var path = request.Url.AbsolutePath;
             var tokens = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length == 1 || tokens[0] != ServerPathPrefix)
+            if (tokens.Length < 2)
             {
                 throw new InvalidOperationException($"invalid path '{path}'");
             }
@@ -163,24 +190,9 @@ namespace Api
             {
                 case "clan":
                     return tokens.Length != 3 ? CanNotHandle : HandleClan(tokens[2], parameters);
-                case "ping":
-                    return HandlePing(tokens);
                 default:
                     return CanNotHandle;
             }
-        }
-
-        private static object HandlePing(string[] tokens)
-        {
-            if (tokens.Length == 2)
-            {
-                return new SuccessResult("ping");
-            }
-            if (tokens.Length == 3)
-            {
-                return new SuccessResult($"ping/{tokens[2]}");
-            }
-            return CanNotHandle;
         }
 
         private object HandleClan(string verb, Dictionary<string, string> parameters)
@@ -328,7 +340,7 @@ namespace Api
             }
         }
 
-        private static Dictionary<string, string> ParseParameters(string queryString)
+        public static Dictionary<string, string> ParseParameters(string queryString)
         {
             var namedParameters = new Dictionary<string, string>();
             if (string.IsNullOrEmpty(queryString))

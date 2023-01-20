@@ -165,7 +165,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
@@ -290,6 +290,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5f34892e4a4e604d97ec18efb6d5633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isRequireAuthentication: 1
+  _authenticationKey: Abba
+  _isIncludePingTest: 1
+  _messageCount: 0
+  _request: 
+  _response: 
+  _responseTime: 
 --- !u!4 &791945496
 Transform:
   m_ObjectHideFlags: 0
@@ -303,7 +310,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:

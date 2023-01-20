@@ -33,6 +33,10 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
         void Stop();
     }
 
+    public class UnauthorizedException : Exception
+    {
+    }
+
     /// <summary>
     /// Request handler for <c>ISimpleListenerServer</c>.
     /// </summary>
@@ -231,7 +235,9 @@ namespace Prg.Scripts.Common.Http.HttpListenerServer
                 catch (Exception x)
                 {
                     Debug.Log($"{Port} request handler failed: {x.GetType().FullName} : {x.Message}");
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.StatusCode = x is UnauthorizedException
+                        ? (int)HttpStatusCode.Unauthorized
+                        : (int)HttpStatusCode.InternalServerError;
                     context.Response.StatusDescription = $"{x.GetType().FullName} : {x.Message}";
                 }
                 finally
