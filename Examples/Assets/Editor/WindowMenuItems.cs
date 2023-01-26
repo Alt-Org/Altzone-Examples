@@ -41,13 +41,7 @@ namespace Editor
         [MenuItem(GameDebug + "Reset Local Player Data", false, 13)]
         private static void ResetLocalPlayerData() => DebugMenu.ResetLocalPlayerData();
 
-        [MenuItem(GameDebug + "Models/Copy Custom Character Models", false, 20)]
-        private static void CopyCustomCharacterModels() => MenuModels.CopyCustomCharacterModels();
-
-        [MenuItem(GameDebug + "Models/Delete Custom Character Models", false, 21)]
-        private static void DeleteCustomCharacterModels() => MenuModels.DeleteCustomCharacterModels();
-
-        [MenuItem(GameDebug + "Models/Dump Character Models to Wiki", false, 22)]
+        [MenuItem(GameDebug + "Models/Dump Character Models to Wiki", false, 24)]
         private static void DumpModelsToWikiTable() => MenuModels.DumpModelsToWikiTable();
 
         #endregion
