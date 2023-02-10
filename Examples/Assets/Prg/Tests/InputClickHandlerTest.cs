@@ -6,8 +6,11 @@ namespace Prg.Tests
 {
     public class InputClickHandlerTest : MonoBehaviour, IInputTapHandler
     {
+        [Header("Settings"), SerializeField] private float _longTapDelay = 0.5f;
         [SerializeField] private InputActionReference _clickActionRef;
 
+        [SerializeField, Header("Debug")] private bool _isLogEvents;
+        
         private InputAction _inputAction;
         private Vector2 _startPosition;
         private Vector2 _inputPosition;
@@ -45,20 +48,39 @@ namespace Prg.Tests
             _startTime = Time.time;
             _duration = 0;
             _startPosition = ctx.ReadValue<Vector2>();
-            Debug.Log($"duration {_duration:0.000} pos {_startPosition}");
+            if (_isLogEvents)
+            {
+                Debug.Log($"duration {_duration:0.000} pos {_startPosition}");
+            }
         }
 
         private void ClickPerformed(InputAction.CallbackContext ctx)
         {
             _duration = Time.time - _startTime;
             _inputPosition = ctx.ReadValue<Vector2>();
-            Debug.Log($"duration {_duration:0.000} pos {_inputPosition}");
+            if (_isLogEvents)
+            {
+                Debug.Log($"duration {_duration:0.000} pos {_inputPosition}");
+            }
         }
 
         private void ClickCancelled(InputAction.CallbackContext ctx)
         {
             _duration = Time.time - _startTime;
-            Debug.Log($"duration {_duration:0.000} pos {_inputPosition} delta {_startPosition - _inputPosition}");
+            if (_isLogEvents)
+            {
+                Debug.Log($"duration {_duration:0.000} pos {_inputPosition} delta {_startPosition - _inputPosition}");
+            }
+            if (_clickReceiver == null)
+            {
+                return;
+            }
+            if (_duration < _longTapDelay)
+            {
+                _clickReceiver.Tap(_inputPosition);
+                return;
+            }
+            _clickReceiver.LongTap(_inputPosition);
         }
 
         void IInputTapHandler.SetTapReceiver(IInputTapReceiver clickReceiver)
