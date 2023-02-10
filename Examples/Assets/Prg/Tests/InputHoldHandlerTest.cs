@@ -23,20 +23,24 @@ namespace Prg.Tests
         private void OnEnable()
         {
             Debug.Log($"{_inputAction}");
-            _inputAction.Enable();
-        }
-
-        private void Start()
-        {
-            Debug.Log($"{_inputAction}");
+            _inputAction.started += HoldStarted;
             _inputAction.performed += HoldPerformed;
             _inputAction.canceled += HoldCancelled;
+            _inputAction.Enable();
         }
 
         private void OnDisable()
         {
             Debug.Log($"{_inputAction}");
+            _inputAction.started -= HoldStarted;
+            _inputAction.performed -= HoldPerformed;
+            _inputAction.canceled -= HoldCancelled;
             _inputAction.Disable();
+        }
+
+        private void HoldStarted(InputAction.CallbackContext ctx)
+        {
+            Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition} {ctx.interaction?.GetType().Name}");
         }
 
         private void HoldPerformed(InputAction.CallbackContext ctx)

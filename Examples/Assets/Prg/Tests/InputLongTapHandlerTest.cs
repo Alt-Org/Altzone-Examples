@@ -38,19 +38,16 @@ namespace Prg.Tests
         private void OnEnable()
         {
             Debug.Log($"{_inputAction}");
-            _inputAction.Enable();
-        }
-
-        private void Start()
-        {
-            Debug.Log($"{_inputAction}");
             _inputAction.performed += TapPerformed;
             _inputAction.canceled += TapCancelled;
+            _inputAction.Enable();
         }
 
         private void OnDisable()
         {
             Debug.Log($"{_inputAction}");
+            _inputAction.performed -= TapPerformed;
+            _inputAction.canceled -= TapCancelled;
             _inputAction.Disable();
         }
 
