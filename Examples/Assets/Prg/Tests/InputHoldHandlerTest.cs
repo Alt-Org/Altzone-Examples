@@ -16,6 +16,8 @@ namespace Prg.Tests
             Debug.Log($"{_holdActionRef}");
             Assert.IsNotNull(_holdActionRef);
             _inputAction = _holdActionRef.action;
+            Assert.IsFalse(string.IsNullOrWhiteSpace(_inputAction.interactions));
+            Debug.Log($"interactions {_inputAction.interactions}");
         }
 
         private void OnEnable()
@@ -40,13 +42,13 @@ namespace Prg.Tests
         private void HoldPerformed(InputAction.CallbackContext ctx)
         {
             _inputPosition = ctx.ReadValue<Vector2>();
-            Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition}");
+            Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition} {ctx.interaction?.GetType().Name}");
         }
 
         private void HoldCancelled(InputAction.CallbackContext ctx)
         {
             _inputPosition = ctx.ReadValue<Vector2>();
-            Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition}");
+            Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition} {ctx.interaction?.GetType().Name}");
         }
     }
 }
