@@ -1,0 +1,56 @@
+{
+    "name": "TapInputAction",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "b600db15-d979-4903-882a-c21feeb68096",
+            "actions": [
+                {
+                    "name": "Tap",
+                    "type": "Value",
+                    "id": "fbb9dbd5-7a1f-4b24-9401-e29885978ed9",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "Hold(duration=1)",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "One Modifier",
+                    "id": "91c957e0-6d16-4f8a-a071-275b6629fb5b",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tap",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "12b56bf8-8961-4f82-ab60-b16c011a76ec",
+                    "path": "<Pointer>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tap",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "ef81e909-3eb8-4038-bfda-4275ea58b0fe",
+                    "path": "<Pointer>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tap",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
