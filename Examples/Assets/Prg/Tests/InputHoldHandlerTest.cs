@@ -1,21 +1,21 @@
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
 namespace Prg.Tests
 {
-    public class LongTapHandlerTest : MonoBehaviour
+    public class InputHoldHandlerTest : MonoBehaviour
     {
-        [SerializeField] private InputActionReference _tapActionRef;
+        [SerializeField] private InputActionReference _holdActionRef;
 
         private InputAction _inputAction;
         private Vector2 _inputPosition;
 
         private void Awake()
         {
-            Debug.Log($"{_tapActionRef}");
-            Assert.IsNotNull(_tapActionRef);
-            _inputAction = _tapActionRef.action;
+            Debug.Log($"{_holdActionRef}");
+            Assert.IsNotNull(_holdActionRef);
+            _inputAction = _holdActionRef.action;
         }
 
         private void OnEnable()
@@ -27,8 +27,8 @@ namespace Prg.Tests
         private void Start()
         {
             Debug.Log($"{_inputAction}");
-            _inputAction.performed += TapPerformed;
-            _inputAction.canceled += TapCancelled;
+            _inputAction.performed += HoldPerformed;
+            _inputAction.canceled += HoldCancelled;
         }
 
         private void OnDisable()
@@ -37,13 +37,13 @@ namespace Prg.Tests
             _inputAction.Disable();
         }
 
-        private void TapPerformed(InputAction.CallbackContext ctx)
+        private void HoldPerformed(InputAction.CallbackContext ctx)
         {
             _inputPosition = ctx.ReadValue<Vector2>();
             Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition}");
         }
 
-        private void TapCancelled(InputAction.CallbackContext ctx)
+        private void HoldCancelled(InputAction.CallbackContext ctx)
         {
             _inputPosition = ctx.ReadValue<Vector2>();
             Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition}");
