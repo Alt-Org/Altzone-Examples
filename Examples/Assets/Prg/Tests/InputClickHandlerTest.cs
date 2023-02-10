@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace Prg.Tests
 {
-    public class InputClickHandlerTest : MonoBehaviour
+    public class InputClickHandlerTest : MonoBehaviour, IInputTapHandler
     {
         [SerializeField] private InputActionReference _clickActionRef;
 
@@ -13,6 +13,7 @@ namespace Prg.Tests
         private Vector2 _inputPosition;
         private float _startTime;
         private float _duration;
+        private IInputTapReceiver _clickReceiver;
 
         private void Awake()
         {
@@ -58,6 +59,11 @@ namespace Prg.Tests
         {
             _duration = Time.time - _startTime;
             Debug.Log($"duration {_duration:0.000} pos {_inputPosition} delta {_startPosition - _inputPosition}");
+        }
+
+        void IInputTapHandler.SetTapReceiver(IInputTapReceiver clickReceiver)
+        {
+            _clickReceiver = clickReceiver;
         }
     }
 }

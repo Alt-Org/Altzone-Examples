@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Prg.Tests
 {
-    public class InputTapReceiver : MonoBehaviour, IInputTapReceiver
+    public class InputClickReceiver : MonoBehaviour, IInputTapReceiver
     {
         private IEnumerator Start()
         {
             Debug.Log($"start {Time.frameCount}");
-            InputLongTapHandlerTest implementation = null;
-            yield return new WaitUntil(() => (implementation = FindObjectOfType<InputLongTapHandlerTest>()) != null);
+            InputClickHandlerTest implementation = null;
+            yield return new WaitUntil(() => (implementation = FindObjectOfType<InputClickHandlerTest>()) != null);
             yield return new WaitUntil(() => implementation.enabled);
             if (implementation is IInputTapHandler handler)
             {
