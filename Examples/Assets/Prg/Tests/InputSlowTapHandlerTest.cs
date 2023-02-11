@@ -16,6 +16,14 @@ namespace Prg.Tests
         void SetTapReceiver(IInputTapReceiver tapReceiver);
     }
 
+    /// <summary>
+    /// Two videos from <b>samyam</b> for inspiration:<br />
+    /// See Input System Interactions Explained | Press, Hold, Tap, SlowTap, MultiTap
+    /// <a href="https://www.youtube.com/watch?v=rMlcwtoui4I">link</a>
+    /// <br />
+    /// How to use TOUCH with the Input System in Unity (see 15:51)
+    /// <a href="https://www.youtube.com/watch?v=4MOOitENQVg">link</a>
+    /// </summary>
     public class InputSlowTapHandlerTest : MonoBehaviour, IInputTapHandler
     {
         [SerializeField, Header("Settings"), Range(0, 100)] private float _trackingSensitivityPercent = 1.0f;
