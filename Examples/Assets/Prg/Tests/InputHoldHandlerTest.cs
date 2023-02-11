@@ -52,7 +52,6 @@ namespace Prg.Tests
 
         private void HoldCancelled(InputAction.CallbackContext ctx)
         {
-            _inputPosition = ctx.ReadValue<Vector2>();
             Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition} {ctx.interaction?.GetType().Name}");
         }
     }

@@ -8,8 +8,8 @@ namespace Prg.Tests
         private IEnumerator Start()
         {
             Debug.Log($"start {Time.frameCount}");
-            InputLongTapHandlerTest implementation = null;
-            yield return new WaitUntil(() => (implementation = FindObjectOfType<InputLongTapHandlerTest>()) != null);
+            InputSlowTapHandlerTest implementation = null;
+            yield return new WaitUntil(() => (implementation = FindObjectOfType<InputSlowTapHandlerTest>()) != null);
             yield return new WaitUntil(() => implementation.enabled);
             if (implementation is IInputTapHandler handler)
             {

@@ -701,7 +701,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &401956288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -714,8 +714,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfd744fa8f3a48c7b295765b35828de8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _longTapDelay: 0.5
   _clickActionRef: {fileID: 3018464710834141242, guid: 750f331ad00cee349a579491c975f1af,
     type: 3}
+  _isLogEvents: 1
 --- !u!4 &401956289
 Transform:
   m_ObjectHideFlags: 0
@@ -729,7 +731,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &495971634
 GameObject:
@@ -747,7 +749,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &495971635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -773,7 +775,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &540901325
 GameObject:
@@ -1021,7 +1023,7 @@ GameObject:
   m_Component:
   - component: {fileID: 581703686}
   m_Layer: 0
-  m_Name: --- LONG TAP Input Action test --
+  m_Name: --- SLOW TAP Input Action test --
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1040,7 +1042,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &641859498
 GameObject:
@@ -1550,7 +1552,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1236661350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1576,7 +1578,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1351086688
 GameObject:
@@ -2154,7 +2156,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1614131291
 GameObject:
@@ -2167,12 +2169,12 @@ GameObject:
   - component: {fileID: 1614131293}
   - component: {fileID: 1614131292}
   m_Layer: 0
-  m_Name: InputLongTapHandlerTest
+  m_Name: InputSlowTapHandlerTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1614131292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2201,7 +2203,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1642479569
 GameObject:

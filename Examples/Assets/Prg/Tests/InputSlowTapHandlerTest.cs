@@ -16,7 +16,7 @@ namespace Prg.Tests
         void SetTapReceiver(IInputTapReceiver tapReceiver);
     }
 
-    public class InputLongTapHandlerTest : MonoBehaviour, IInputTapHandler
+    public class InputSlowTapHandlerTest : MonoBehaviour, IInputTapHandler
     {
         [SerializeField, Header("Settings")] private InputActionReference _tapActionRef;
 
@@ -76,7 +76,6 @@ namespace Prg.Tests
 
         private void TapCancelled(InputAction.CallbackContext ctx)
         {
-            _inputPosition = ctx.ReadValue<Vector2>();
             if (_isLogEvents)
             {
                 Debug.Log($"duration {ctx.duration:0.000} pos {_inputPosition} {ctx.interaction?.GetType().Name}");

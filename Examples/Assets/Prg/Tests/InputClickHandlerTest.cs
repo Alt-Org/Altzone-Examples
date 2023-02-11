@@ -4,6 +4,10 @@ using UnityEngine.InputSystem;
 
 namespace Prg.Tests
 {
+    /// <summary>
+    /// See Input System Interactions Explained | Press, Hold, Tap, SlowTap, MultiTap
+    /// https://www.youtube.com/watch?v=rMlcwtoui4I
+    /// </summary>
     public class InputClickHandlerTest : MonoBehaviour, IInputTapHandler
     {
         [Header("Settings"), SerializeField] private float _longTapDelay = 0.5f;
