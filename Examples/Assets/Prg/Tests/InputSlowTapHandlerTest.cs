@@ -18,7 +18,8 @@ namespace Prg.Tests
 
     public class InputSlowTapHandlerTest : MonoBehaviour, IInputTapHandler
     {
-        [SerializeField, Header("Settings")] private InputActionReference _tapActionRef;
+        [SerializeField, Header("Settings"), Range(0, 100)] private float _trackingSensitivityPercent = 1.0f;
+        [SerializeField] private InputActionReference _tapActionRef;
         [SerializeField] private InputActionReference _positionActionRef;
 
         [SerializeField, Header("Debug")] private bool _isLogEvents;
@@ -28,6 +29,9 @@ namespace Prg.Tests
         private Vector2 _startPosition;
         private Vector2 _inputPosition;
         private IInputTapReceiver _tapReceiver;
+        private bool _isCheckSensitivity;
+        private float _sensitivityScreenX;
+        private float _sensitivityScreenY;
 
         private void Awake()
         {
@@ -37,6 +41,15 @@ namespace Prg.Tests
             _positionAction = _positionActionRef.action;
             Assert.IsFalse(string.IsNullOrWhiteSpace(_tapAction.interactions));
             Debug.Log($"interactions {_tapAction.interactions}");
+            if (!(_trackingSensitivityPercent > 0))
+            {
+                return;
+            }
+            var resolution = Screen.currentResolution;
+            _isCheckSensitivity = true;
+            _sensitivityScreenX = resolution.width / 100f * _trackingSensitivityPercent;
+            _sensitivityScreenY = resolution.height / 100f * _trackingSensitivityPercent;
+            Debug.Log($"tracking {_trackingSensitivityPercent}% : x,y {_sensitivityScreenX:0},{_sensitivityScreenY:0} from {resolution}");
         }
 
         private void OnEnable()
@@ -79,6 +92,18 @@ namespace Prg.Tests
             if (_tapReceiver == null)
             {
                 return;
+            }
+            if (_isCheckSensitivity)
+            {
+                var delta = _startPosition - _inputPosition;
+                if (Mathf.Abs(delta.x) > _sensitivityScreenX || Mathf.Abs(delta.y) > _sensitivityScreenY)
+                {
+                    if (_isLogEvents)
+                    {
+                        Debug.Log($"IGNORED delta {delta}");
+                    }
+                    return;
+                }
             }
             var interaction = ctx.interaction;
             switch (interaction)

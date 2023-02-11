@@ -10,7 +10,7 @@
                     "type": "Button",
                     "id": "fbb9dbd5-7a1f-4b24-9401-e29885978ed9",
                     "expectedControlType": "Button",
-                    "processors": "AxisDeadzone",
+                    "processors": "",
                     "interactions": "SlowTap,Tap",
                     "initialStateCheck": true
                 },

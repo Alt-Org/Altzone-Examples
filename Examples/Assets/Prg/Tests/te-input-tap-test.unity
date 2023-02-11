@@ -2187,6 +2187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7b1ee851ee414c8ace153ad95f045a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _trackingSensitivityPercent: 0.5
   _tapActionRef: {fileID: 3018464710834141242, guid: 981fa0f41548cc54fae1b7ca3a887066,
     type: 3}
   _positionActionRef: {fileID: 1409209381587443175, guid: 981fa0f41548cc54fae1b7ca3a887066,
