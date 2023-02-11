@@ -2189,7 +2189,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tapActionRef: {fileID: 3018464710834141242, guid: 981fa0f41548cc54fae1b7ca3a887066,
     type: 3}
-  _isLogEvents: 1
+  _positionActionRef: {fileID: 1409209381587443175, guid: 981fa0f41548cc54fae1b7ca3a887066,
+    type: 3}
+  _isLogEvents: 0
 --- !u!4 &1614131293
 Transform:
   m_ObjectHideFlags: 0
