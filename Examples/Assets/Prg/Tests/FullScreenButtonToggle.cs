@@ -16,7 +16,7 @@ namespace Prg.Tests
     public class FullScreenButtonToggle : MonoBehaviour
     {
         [SerializeField] private TMP_Text _resolutionLabel;
-        
+
         private void Awake()
         {
             var button = GetComponent<Button>();
@@ -28,8 +28,24 @@ namespace Prg.Tests
             StartCoroutine(UpdateCaption(button));
             if (_resolutionLabel != null)
             {
-                _resolutionLabel.text = $"{Screen.width}x{Screen.height}";
+                ShowResolution(_resolutionLabel);
             }
+        }
+
+        private static void ShowResolution(TMP_Text resolutionLabel)
+        {
+            var screenWidth = Screen.width;
+            var screenHeight = Screen.height;
+            var safeArea = Screen.safeArea;
+            var isMobile = AppPlatform.IsMobile || AppPlatform.IsSimulator;
+            var isFullSafeArea = !isMobile ||
+                                 (Mathf.Approximately(safeArea.width, screenWidth) && Mathf.Approximately(safeArea.height, screenHeight));
+            if (isFullSafeArea)
+            {
+                resolutionLabel.text = $"{screenWidth}x{screenHeight}";
+                return;
+            }
+            resolutionLabel.text = $"{screenWidth}x{screenHeight}\n({safeArea.width}x{safeArea.height})";
         }
 
         private static IEnumerator UpdateCaption(Button button)
