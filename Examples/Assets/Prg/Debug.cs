@@ -121,6 +121,11 @@ public static class Debug
         return _currentFrameCount;
     }
 
+    public static void Break()
+    {
+        UnityEngine.Debug.Break();
+    }
+    
     [Conditional("UNITY_EDITOR"), Conditional("FORCE_LOG")]
     public static void Log(string message, Object context = null, [CallerMemberName] string memberName = null)
     {
