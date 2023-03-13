@@ -85,15 +85,23 @@ public static class UnityExtensions
 
     public static void SetCaption(this Button button, string caption)
     {
+        var textMeshProUGUI = button.GetComponentInChildren<TextMeshProUGUI>();
+        if (textMeshProUGUI != null)
+        {
+            textMeshProUGUI.text = caption;
+            return;
+        }
         var text = button.GetComponentInChildren<Text>();
         if (text != null)
         {
+            Debug.LogWarning($"Using deprecating 'UI/Legacy/Text' instead of 'TextMeshProUGUI' in {button.GetFullPath()}");
             text.text = caption;
             return;
         }
         var tmpText = button.GetComponentInChildren<TMP_Text>();
         if (tmpText != null)
         {
+            Debug.LogWarning($"Using old 'TMP_Text' instead of new 'TextMeshProUGUI' in {button.GetFullPath()}");
             tmpText.text = caption;
             return;
         }
@@ -102,14 +110,21 @@ public static class UnityExtensions
 
     public static string GetCaption(this Button button)
     {
+        var textMeshProUGUI = button.GetComponentInChildren<TextMeshProUGUI>();
+        if (textMeshProUGUI != null)
+        {
+            return textMeshProUGUI.text;
+        }
         var text = button.GetComponentInChildren<Text>();
         if (text != null)
         {
+            Debug.LogWarning($"Using deprecating 'UI/Legacy/Text' instead of 'TextMeshProUGUI' in {button.GetFullPath()}");
             return text.text;
         }
         var tmpText = button.GetComponentInChildren<TMP_Text>();
         if (tmpText != null)
         {
+            Debug.LogWarning($"Using old 'TMP_Text' instead of new 'TextMeshProUGUI' in {button.GetFullPath()}");
             return tmpText.text;
         }
         Assert.IsTrue(false, "button does not have a text component");
@@ -198,11 +213,6 @@ public static class UnityExtensions
 
     #region Debugging
 
-    public static string GetFullPath(this Transform transform)
-    {
-        return transform == null ? string.Empty : GetFullPath(transform.gameObject);
-    }
-
     public static string GetFullPath(this Component component)
     {
         return component == null ? string.Empty : GetFullPath(component.gameObject);
@@ -214,11 +224,11 @@ public static class UnityExtensions
         {
             return string.Empty;
         }
-        var path = new StringBuilder("\\").Append(gameObject.name);
+        var path = new StringBuilder(gameObject.name);
         while (gameObject.transform.parent != null)
         {
             gameObject = gameObject.transform.parent.gameObject;
-            path.Insert(0, gameObject.name).Insert(0, '\\');
+            path.Insert(0, '/').Insert(0, gameObject.name);
         }
         return path.ToString();
     }

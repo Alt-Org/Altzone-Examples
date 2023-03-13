@@ -67,8 +67,10 @@ namespace Prg.Scripts.Common.Unity.Window
 
         private GameObject _windowsParent;
         private WindowDef _pendingWindow;
+
         private List<Func<GoBackAction>> _goBackOnceHandler;
         private int _executionLevel;
+        
 
         private void Awake()
         {
@@ -141,6 +143,19 @@ namespace Prg.Scripts.Common.Unity.Window
         void IWindowManager.UnRegisterGoBackHandlerOnce(Func<GoBackAction> handler)
         {
             _goBackOnceHandler?.Remove(handler);
+        }
+
+        WindowDef IWindowManager.CurrentWindow
+        {
+            get
+            {
+                if (_currentWindows.Count == 0)
+                {
+                    return null;
+                }
+                var currentWindow = _currentWindows[0];
+                return currentWindow._windowDef;
+            }
         }
 
         int IWindowManager.WindowCount => _currentWindows.Count;
@@ -421,6 +436,8 @@ namespace Prg.Scripts.Common.Unity.Window
                 // NOP
             }
 
+            public WindowDef CurrentWindow => null;
+            
             public int WindowCount => 0;
 
             public List<MyWindow> WindowStack => new();
