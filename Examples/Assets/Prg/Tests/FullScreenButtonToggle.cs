@@ -15,7 +15,8 @@ namespace Prg.Tests
     [RequireComponent(typeof(Button))]
     public class FullScreenButtonToggle : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _resolutionLabel;
+        [SerializeField] private TextMeshProUGUI _resolutionLabel;
+        [SerializeField] private TextMeshProUGUI _frameRateLabel;
 
         private void Awake()
         {
@@ -30,9 +31,13 @@ namespace Prg.Tests
             {
                 ShowResolution(_resolutionLabel);
             }
+            if (_frameRateLabel != null)
+            {
+                ShowFrameRate(_frameRateLabel);
+            }
         }
 
-        private static void ShowResolution(TMP_Text resolutionLabel)
+        private static void ShowResolution(TextMeshProUGUI resolutionLabel)
         {
             var screenWidth = Screen.width;
             var screenHeight = Screen.height;
@@ -48,6 +53,11 @@ namespace Prg.Tests
             resolutionLabel.text = $"{screenWidth}x{screenHeight}\n({safeArea.width}x{safeArea.height})";
         }
 
+        private static void ShowFrameRate(TextMeshProUGUI frameRateLabel)
+        {
+            frameRateLabel.text = $"{Application.targetFrameRate} fps | {QualitySettings.vSyncCount} vsync";
+        }
+        
         private static IEnumerator UpdateCaption(Button button)
         {
             yield return null;
