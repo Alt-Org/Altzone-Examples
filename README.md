@@ -3,3 +3,5 @@
 # Altzone Examples
  
 This is a collection of some code and assets for [Altzone](https://github.com/Alt-Org/Altzone) project.
+
+See [Codacy Dashboard](https://app.codacy.com/gh/Alt-Org/Altzone-Examples/dashboard) for code quality metrics.
