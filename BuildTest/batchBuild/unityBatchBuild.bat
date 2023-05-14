@@ -20,18 +20,20 @@ if not exist "%UNITY_EXE%" (
     goto :done
 )
 if exist %LOG_FILE% (
-    del /Q %LOG_FILE%
+    echo. >%LOG_FILE%
 )
 echo.
 echo ~~~~~ BUILD execute %ENV_FILE% ~~~~~
 set BUILD_PARAMS1=-executeMethod %BUILD_METHOD% -quit -batchmode
-set BUILD_PARAMS2=-projectPath ./ -buildTarget %BUILD_TARGET% -logFile "%LOG_FILE%"
+set BUILD_PARAMS2=-projectPath .\ -buildTarget %BUILD_TARGET% -logFile "%LOG_FILE%"
 set BUILD_PARAMS3=-envFile "%ENV_FILE%"
 echo set1 %BUILD_PARAMS1%
 echo set2 %BUILD_PARAMS2%
 echo set3 %BUILD_PARAMS3%
-echo "%UNITY_EXE%" %BUILD_PARAMS1% %BUILD_PARAMS2% %BUILD_PARAMS3%
-set RESULT=%ERRORLEVEL%
+@echo on
+"%UNITY_EXE%" %BUILD_PARAMS1% %BUILD_PARAMS2% %BUILD_PARAMS3%
+@set RESULT=%ERRORLEVEL%
+@echo off
 echo Build returns %RESULT%
 if not "%RESULT%" == "0" (
     echo *

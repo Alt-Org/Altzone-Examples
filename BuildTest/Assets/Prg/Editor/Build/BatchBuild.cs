@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -21,11 +22,23 @@ namespace Prg.Editor.Build
     {
         internal static void BuildPlayer()
         {
-            Debug.Log("BuildPlayer start");
-            var batchBuildOptions = GetBatchBuildOptions();
-            var buildReport = BuildPLayer(batchBuildOptions);
-            SaveBuildReport(buildReport);
-            Debug.Log($"BuildPlayer exit {buildReport.summary.result}");
+            Debug.Log("build start");
+            var options = new BatchBuildOptions(Environment.GetCommandLineArgs());
+            Debug.Log($"batchBuildOptions {options}");
+            if (options.IsTestRun)
+            {
+                Debug.Log("build exit 0");
+                EditorApplication.Exit(0);
+                return;
+            }
+            var stopWatch = Stopwatch.StartNew();
+            var buildReport = BuildPLayer(options);
+            if (buildReport.summary.result == BuildResult.Succeeded)
+            {
+                SaveBuildReport(buildReport, options.LogFile);
+            }
+            stopWatch.Stop();
+            Debug.Log($"build exit result {buildReport.summary.result} time {stopWatch.Elapsed.TotalMinutes:0.0} m");
             EditorApplication.Exit(buildReport.summary.result == BuildResult.Succeeded ? 0 : 1);
         }
 
@@ -37,33 +50,27 @@ namespace Prg.Editor.Build
                 .ToArray();
             var buildPlayerOptions = new BuildPlayerOptions
             {
-                locationPathName = Path.Combine(options.ProjectPath, options.OutputDir),
+                locationPathName = options.OutputPathName,
                 options = options.BuildOptions,
                 scenes = scenes,
                 target = options.BuildTarget,
                 targetGroup = options.BuildTargetGroup,
             };
-            if (Directory.Exists(buildPlayerOptions.locationPathName))
+            if (Directory.Exists(options.OutputFolder))
             {
-                Directory.Delete(buildPlayerOptions.locationPathName, recursive: true);
+                Directory.Delete(options.OutputFolder, recursive: true);
             }
+            Directory.CreateDirectory(options.OutputFolder);
             var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
             return buildReport;
         }
 
-        private static void SaveBuildReport(BuildReport buildReport)
+        private static void SaveBuildReport(BuildReport buildReport, string logFile)
         {
-            if (buildReport.summary.result != BuildResult.Succeeded)
-            {
-                return;
-            }
-            throw new NotImplementedException();
+            Debug.Log("report start");
         }
 
-        private static BatchBuildOptions GetBatchBuildOptions()
-        {
-            return new BatchBuildOptions(Environment.GetCommandLineArgs());
-        }
+        #region BatchBuildOptions
 
         private class BatchBuildOptions
         {
@@ -76,11 +83,14 @@ namespace Prg.Editor.Build
             public readonly BuildTarget BuildTarget;
             public readonly BuildTargetGroup BuildTargetGroup;
             public readonly BuildOptions BuildOptions;
-            public readonly string OutputDir;
+            public readonly string OutputPathName;
             public readonly string Keystore;
 
             // Just for information, if needed.
+            public readonly string OutputFolder;
             public readonly bool IsDevelopmentBuild;
+
+            public readonly bool IsTestRun;
 
             public BatchBuildOptions(string[] args)
             {
@@ -185,11 +195,35 @@ namespace Prg.Editor.Build
                             // This requires actual keystore file name and two passwords!
                             Keystore = value;
                             break;
+                        case "IsTestRun":
+                            IsTestRun = bool.Parse(value);
+                            break;
                     }
                 }
 
-                BuildOptions = BuildOptions.DetailedBuildReport | (IsDevelopmentBuild ? BuildOptions.Development : 0);
-                OutputDir = Path.Combine(ProjectPath, $"build{BuildPipeline.GetBuildTargetName(BuildTarget)}");
+                BuildOptions = BuildOptions.StrictMode | BuildOptions.DetailedBuildReport;
+                if (IsDevelopmentBuild)
+                {
+                    BuildOptions |= BuildOptions.Development;
+                }
+                OutputFolder = Path.Combine(ProjectPath, $"build{BuildPipeline.GetBuildTargetName(BuildTarget)}");
+                if (BuildTarget == BuildTarget.WebGL)
+                {
+                    OutputPathName = OutputFolder;
+                    return;
+                }
+                var appName = SanitizePath($"{Application.productName}_{Application.version}_{PlayerSettings.Android.bundleVersionCode}");
+                var appExtension = BuildTarget == BuildTarget.Android ? "aab" : "exe";
+                OutputPathName = Path.Combine(OutputFolder, $"{appName}.{appExtension}");
+            }
+
+            public override string ToString()
+            {
+                return $"{nameof(ProjectPath)}: {ProjectPath}, {nameof(LogFile)}: {LogFile}, {nameof(EnvFile)}: {EnvFile}" +
+                       $", {nameof(BuildTarget)}: {BuildTarget}, {nameof(BuildTargetGroup)}: {BuildTargetGroup}" +
+                       $", {nameof(BuildOptions)}: [{BuildOptions}], {nameof(Keystore)}: {Keystore}" +
+                       $", {nameof(OutputFolder)}: {OutputFolder}, {nameof(OutputPathName)}: {OutputPathName}" +
+                       $", {nameof(IsDevelopmentBuild)}: {IsDevelopmentBuild}, {nameof(IsTestRun)}: {IsTestRun}";
             }
 
             // Build target parameter mapping
@@ -211,9 +245,32 @@ namespace Prg.Editor.Build
                     new Tuple<BuildTarget, BuildTargetGroup>(BuildTarget.WebGL, BuildTargetGroup.WebGL)
                 },
             };
+
+            private static string SanitizePath(string path)
+            {
+                // https://www.mtu.edu/umc/services/websites/writing/characters-avoid/
+                var illegalCharacters = new[]
+                {
+                    '#', '<', '$', '+',
+                    '%', '>', '!', '`',
+                    '&', '*', '\'', '|',
+                    '{', '?', '"', '=',
+                    '}', '/', ':',
+                    '\\', ' ', '@',
+                };
+                for (var i = 0; i < path.Length; ++i)
+                {
+                    var c = path[i];
+                    if (illegalCharacters.Contains(c))
+                    {
+                        path = path.Replace(c, '_');
+                    }
+                }
+                return path;
+            }
         }
 
-#if false
+#if true
         [MenuItem("Altzone/Batch Build Options Test", false, 19)]
         private static void BatchBuildOptionsTest()
         {
@@ -224,17 +281,20 @@ namespace Prg.Editor.Build
                 "-quit",
                 "-batchmode",
                 "-projectPath",
-                "./",
+                ".",
                 "-buildTarget",
                 "Win64",
                 "-logFile",
-                @"m_Build_Win64.log",
+                "m_Build_Win64.log",
                 "-envFile",
-                @"m_Build_Win64.env"
+                "m_Build_Win64.env"
             };
-            var test = new BatchBuildOptions(args);
-            Debug.Log(test.ToString());
+            var options = new BatchBuildOptions(args);
+            Debug.Log(options.ToString());
+            Debug.Log(Path.Combine(options.ProjectPath, options.OutputPathName));
         }
 #endif
+
+        #endregion
     }
 }
