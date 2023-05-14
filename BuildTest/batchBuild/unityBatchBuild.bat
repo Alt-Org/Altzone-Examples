@@ -2,6 +2,7 @@
 set ENV_FILE=%1
 echo.
 echo ~~~~~ BUILD start with %ENV_FILE% ~~~~~
+cd
 if not exist %ENV_FILE% (
     echo *
     echo * Build environment file %ENV_FILE% not found
@@ -23,7 +24,13 @@ if exist %LOG_FILE% (
 )
 echo.
 echo ~~~~~ BUILD execute %ENV_FILE% ~~~~~
-echo "%UNITY_EXE%" -quit -batchmode -projectPath ./ -executeMethod %BUILD_METHOD% -buildTarget %BUILD_TARGET% -logFile "%LOG_FILE%"
+set BUILD_PARAMS1=-executeMethod %BUILD_METHOD% -quit -batchmode
+set BUILD_PARAMS2=-projectPath ./ -buildTarget %BUILD_TARGET% -logFile "%LOG_FILE%"
+set BUILD_PARAMS3=-envFile "%ENV_FILE%"
+echo set1 %BUILD_PARAMS1%
+echo set2 %BUILD_PARAMS2%
+echo set3 %BUILD_PARAMS3%
+echo "%UNITY_EXE%" %BUILD_PARAMS1% %BUILD_PARAMS2% %BUILD_PARAMS3%
 set RESULT=%ERRORLEVEL%
 echo Build returns %RESULT%
 if not "%RESULT%" == "0" (
