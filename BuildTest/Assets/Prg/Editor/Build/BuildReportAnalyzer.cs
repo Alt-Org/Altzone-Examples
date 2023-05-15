@@ -261,7 +261,7 @@ namespace Prg.Editor.Build
         /// https://github.com/Unity-Technologies/BuildReportInspector/blob/master/com.unity.build-report-inspector/Editor/BuildReportInspector.cs
         /// </remarks>
         /// <returns>the last <c>BuildReport</c> instance or <c>null</c> if one is not found</returns>
-        private static BuildReport GetOrCreateLastBuildReport()
+        public static BuildReport GetOrCreateLastBuildReport()
         {
             if (!File.Exists(LastBuildReportPath))
             {
