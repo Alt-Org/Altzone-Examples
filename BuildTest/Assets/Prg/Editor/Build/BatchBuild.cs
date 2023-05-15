@@ -33,12 +33,11 @@ namespace Prg.Editor.Build
             }
             var stopWatch = Stopwatch.StartNew();
             var buildReport = BuildPLayer(options);
-            if (buildReport.summary.result == BuildResult.Succeeded)
-            {
-                SaveBuildReport(buildReport, options.LogFile);
-            }
             stopWatch.Stop();
             Debug.Log($"build exit result {buildReport.summary.result} time {stopWatch.Elapsed.TotalMinutes:0.0} m");
+            Debug.Log($"Build Report" +
+                      $"\tbuildStartedAt\t{buildReport.summary.buildStartedAt:yyyy-dd-MM HH:mm}" +
+                      $"\tbuildEndedAt\t{buildReport.summary.buildEndedAt:yyyy-dd-MM HH:mm}");
             EditorApplication.Exit(buildReport.summary.result == BuildResult.Succeeded ? 0 : 1);
         }
 
@@ -63,11 +62,6 @@ namespace Prg.Editor.Build
             Directory.CreateDirectory(options.OutputFolder);
             var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
             return buildReport;
-        }
-
-        private static void SaveBuildReport(BuildReport buildReport, string logFile)
-        {
-            Debug.Log("report start");
         }
 
         #region BatchBuildOptions

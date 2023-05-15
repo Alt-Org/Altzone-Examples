@@ -1,7 +1,7 @@
 @echo off
 set ENV_FILE=%1
 echo.
-echo ~~~~~ BUILD start with %ENV_FILE% ~~~~~
+echo ~~~~~ BUILD start %TIME% with %ENV_FILE% ~~~~~
 cd
 if not exist %ENV_FILE% (
     echo *
@@ -43,4 +43,4 @@ if not "%RESULT%" == "0" (
 )
 :done
 echo.
-echo ~~~~~ BUILD  done with %ENV_FILE% ~~~~~
+echo ~~~~~ BUILD done  %TIME% with %ENV_FILE% ~~~~~
