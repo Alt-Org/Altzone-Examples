@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,27 +11,140 @@ using UnityEngine.Assertions;
 
 namespace Prg.Editor.Build
 {
-    internal static class BuildReportLogFileParser
+#if true
+    internal static class Menu
     {
-        internal static void SaveBuildReport(BuildReport buildReport)
+        [MenuItem("Altzone/Batch Build Report Test (log)", false, 19)]
+        private static void BatchBuildReportLogFileTest()
         {
-            const string assetFolder = "Assets/BuildReports";
-
-            Debug.Log("report start");
-            var stopWatch = Stopwatch.StartNew();
-            var d = buildReport.summary.buildEndedAt;
-            var dateString = $"{d.Year}-{d.Month:00}-{d.Day:00}_{d.Minute:00}.{d.Second:00}";
-            var assetReportName = $"{assetFolder}/Build_{dateString}.buildreport";
-
-            // Create asset based 'Build Report'
-            AssetDatabase.CreateAsset(buildReport, assetReportName);
-            var assetReport = AssetDatabase.LoadAssetAtPath<BuildReport>(assetReportName);
-            stopWatch.Stop();
-            Debug.Log($"create report {assetReportName} time {stopWatch.Elapsed.TotalMinutes:0.0} m");
-            Assert.IsNotNull(assetReport);
+            Debug.Log("*");
+            BuildReportParser.SaveBuildReport("m_Build_Win64.log", "m_Build_Win64.log.test.tsv");
         }
 
-        internal static BuildReportLog ParseBuildReport(DateTime buildEndedAt, string buildLogFilename)
+        [MenuItem("Altzone/Batch Build Report Test (asset)", false, 19)]
+        private static void BatchBuildReportAssetFileTest()
+        {
+            Debug.Log("*");
+            var buildReport = BuildReportParser.GetOrCreateLastBuildReport();
+            BuildReportParser.SaveBuildReport(buildReport, "m_Build_Win64.report.test.tsv");
+        }
+    }
+#endif
+
+    internal static class BuildReportParser
+    {
+        internal const string LastBuildReportPath = "Library/LastBuild.buildreport";
+        private const string BuildReportDir = "Assets/BuildReports";
+
+        internal static void SaveBuildReport(BuildReport buildReport, string outputFilename)
+        {
+            var culture = CultureInfo.InvariantCulture;
+
+            var assetReport = ParseBuildReport(buildReport);
+            var packedAssets = assetReport.BuildReportAssetLines;
+            var builder = new StringBuilder()
+                .Append($"Name\tSize Kb\t%\tFiles\t{packedAssets.Count}\tReported Size\t{(assetReport.TotalFileSizeKb).ToString("0.0", culture)}")
+                .AppendLine();
+            packedAssets = packedAssets.OrderBy(x => x.packedSize).Reverse().ToList();
+            foreach (var asset in packedAssets)
+            {
+                builder.Append(asset.sourceAssetPath).Append('\t')
+                    .Append((asset.packedSize / 1024D).ToString("0.0", culture))
+                    .AppendLine();
+            }
+            // Remove last CR-LF.
+            builder.Length -= 2;
+            File.WriteAllText(outputFilename, builder.ToString());
+            Debug.Log($"* write {packedAssets.Count} lines {outputFilename}");
+        }
+
+        internal static void SaveBuildReport(string buildLogFilename, string outputFilename)
+        {
+            var culture = CultureInfo.InvariantCulture;
+            var logReport = ParseBuildReport(buildLogFilename);
+            Assert.IsNotNull(logReport);
+            var logLines = logReport.BuildReportLogLines;
+            var builder = new StringBuilder()
+                .Append($"Name\tSize Kb\t%\tFiles\t{logLines.Count}\tReported Size\t{logReport.TotalFileSizeKb.ToString("0.0", culture)}")
+                .AppendLine();
+            foreach (var line in logLines)
+            {
+                builder.Append(line.FilePath).Append('\t')
+                    .Append(line.FileSizeKb.ToString("0.0", culture)).Append('\t')
+                    .Append(line.Percentage > 0 ? line.Percentage.ToString("\t0.0", culture) : null)
+                    .AppendLine();
+            }
+            // Remove last CR-LF.
+            builder.Length -= 2;
+            File.WriteAllText(outputFilename, builder.ToString());
+            Debug.Log($"* write {logLines.Count} lines {outputFilename}");
+        }
+
+        /// <summary>
+        /// Gets last UNITY Build Report from file.
+        /// </summary>
+        /// <remarks>
+        /// This code is based on UNITY Build Report Inspector<br />
+        /// https://docs.unity3d.com/Packages/com.unity.build-report-inspector@0.1/manual/index.html<br />
+        /// https://github.com/Unity-Technologies/BuildReportInspector/blob/master/com.unity.build-report-inspector/Editor/BuildReportInspector.cs
+        /// </remarks>
+        /// <returns>the last <c>BuildReport</c> instance or <c>null</c> if one is not found</returns>
+        public static BuildReport GetOrCreateLastBuildReport()
+        {
+            if (!File.Exists(LastBuildReportPath))
+            {
+                Debug.Log($"Last Build Report NOT FOUND: {LastBuildReportPath}");
+                return null;
+            }
+            if (!Directory.Exists(BuildReportDir))
+            {
+                Directory.CreateDirectory(BuildReportDir);
+            }
+
+            var date = File.GetLastWriteTime(LastBuildReportPath);
+            var name = $"Build_{date:yyyy-dd-MM_HH.mm.ss}";
+            var assetPath = $"{BuildReportDir}/{name}.buildreport";
+
+            // Load last Build Report.
+            var buildReport = AssetDatabase.LoadAssetAtPath<BuildReport>(assetPath);
+            if (buildReport != null && buildReport.name == name)
+            {
+                return buildReport;
+            }
+            // Create new last Build Report.
+            File.Copy("Library/LastBuild.buildreport", assetPath, true);
+            AssetDatabase.ImportAsset(assetPath);
+            buildReport = AssetDatabase.LoadAssetAtPath<BuildReport>(assetPath);
+            buildReport.name = name;
+            AssetDatabase.SaveAssets();
+            return buildReport;
+        }
+
+        private static BuildReportAssets ParseBuildReport(BuildReport buildReport)
+        {
+            List<PackedAssetInfo> packedAssets = new List<PackedAssetInfo>();
+            foreach (var packedAsset in buildReport.packedAssets)
+            {
+                var contents = packedAsset.contents;
+                foreach (var assetInfo in contents)
+                {
+                    if (assetInfo.type == typeof(MonoBehaviour))
+                    {
+                        continue;
+                    }
+                    var sourceAssetGuid = assetInfo.sourceAssetGUID.ToString();
+                    if (sourceAssetGuid == "00000000000000000000000000000000" || sourceAssetGuid == "0000000000000000f000000000000000")
+                    {
+                        continue;
+                    }
+                    packedAssets.Add(assetInfo);
+                }
+            }
+            var reportedSize = packedAssets.Sum(x => (long)x.packedSize);
+            return new BuildReportAssets(reportedSize / 1024D, packedAssets);
+        }
+
+        private static BuildReportLog ParseBuildReport(string buildLogFilename)
         {
             const string buildReportLine = "Build Report";
             const string usedAssetsLine = "Used Assets and files from the Resources folder, sorted by uncompressed size:";
@@ -43,7 +155,6 @@ namespace Prg.Editor.Build
             //  341.5 kb	 0.1% Assets/TextMesh Pro/Sprites/EmojiOne.png
             //  0.1 kb	 0.0% Assets/MenuUi/Scripts/Shop.cs
 
-            var filename = Path.GetFileName(buildLogFilename);
             var lines = File.ReadAllLines(buildLogFilename);
             var lastLine = lines.Length - 1;
             var currentLine = 0;
@@ -59,7 +170,7 @@ namespace Prg.Editor.Build
             if (currentLine == lastLine)
             {
                 Debug.LogWarning($"Report file {buildLogFilename} does not have a 'Build Report'");
-                return new BuildReportLog(buildEndedAt, -1, null);
+                return new BuildReportLog(-1, null);
             }
             // Find Used Assets line.
             currentLine += 1;
@@ -74,13 +185,13 @@ namespace Prg.Editor.Build
                 {
                     Debug.LogWarning($"Report file {buildLogFilename} did not have data" +
                                      $" for 'Used Assets' because <b>player data was not rebuilt</b> on last build!");
-                    return new BuildReportLog(buildEndedAt, -1, null);
+                    return new BuildReportLog(-1, null);
                 }
             }
             if (currentLine == lastLine)
             {
                 Debug.LogWarning($"Report file {buildLogFilename} does not have valid 'Build Report'");
-                return new BuildReportLog(buildEndedAt, -1, null);
+                return new BuildReportLog(-1, null);
             }
             // Read all Used Assets lines.
             var totalSize = 0D;
@@ -93,33 +204,35 @@ namespace Prg.Editor.Build
                 {
                     break;
                 }
-                if (Filter.IsLogLineExcluded(line))
-                {
-                    continue;
-                }
                 var assetLine = new BuildReportLogLine(line);
-                if (Filter.IsLogLineExcluded(line, assetLine.FileSizeKb))
-                {
-                    continue;
-                }
                 totalSize += assetLine.FileSizeKb;
                 result.Add(assetLine);
             }
-            return new BuildReportLog(buildEndedAt, totalSize, result);
+            return new BuildReportLog(totalSize, result);
         }
     }
 
     internal class BuildReportLog
     {
-        public readonly DateTime BuildEndedAt;
         public readonly double TotalFileSizeKb;
         public readonly List<BuildReportLogLine> BuildReportLogLines;
 
-        public BuildReportLog(DateTime buildEndedAt, double totalFileSizeKb, List<BuildReportLogLine> buildReportLogLines)
+        public BuildReportLog(double totalFileSizeKb, List<BuildReportLogLine> buildReportLogLines)
         {
-            BuildEndedAt = buildEndedAt;
             TotalFileSizeKb = totalFileSizeKb;
             BuildReportLogLines = buildReportLogLines ?? new List<BuildReportLogLine>();
+        }
+    }
+
+    internal class BuildReportAssets
+    {
+        public readonly double TotalFileSizeKb;
+        public readonly List<PackedAssetInfo> BuildReportAssetLines;
+
+        public BuildReportAssets(double totalFileSizeKb, List<PackedAssetInfo> buildReportAssetLines)
+        {
+            TotalFileSizeKb = totalFileSizeKb;
+            BuildReportAssetLines = buildReportAssetLines;
         }
     }
 
@@ -159,132 +272,4 @@ namespace Prg.Editor.Build
             Percentage = double.Parse(tokens[2], Culture);
         }
     }
-
-    internal static class Filter
-    {
-        internal static bool IsLogLineExcluded(string line)
-        {
-            return line.Contains("% Packages/") ||
-                   line.Contains("% Resources/") ||
-                   line.EndsWith(".cs");
-        }
-        internal static bool IsLogLineExcluded(string line, double sizeKb)
-        {
-            return sizeKb < 1.0 || line.Contains("% Assets/TextMesh Pro/");
-        }
-
-        internal static bool IsAssetPathExcluded(string path, ulong packedSize)
-        {
-            // Note that
-            // - scenes are not included in Build Report as other assets
-            // - inputactions can not be detected for now and we ignore them silently
-            if (packedSize < 1024UL)
-            {
-                return true;
-            }
-            if (path.StartsWith("Assets/TextMesh Pro/"))
-            {
-                return packedSize < 1024UL * 1024UL;
-            }
-            return path.StartsWith("Packages/") ||
-                   path.StartsWith("Assets/BuildReport") ||
-                   path.StartsWith("Assets/Photon/") ||
-                   path.StartsWith("Assets/Plugins/") ||
-                   path.StartsWith("Assets/Tests/") ||
-                   path.Contains("/Editor/") ||
-                   path.Contains("/Test/") ||
-                   path.EndsWith(".asmdef") ||
-                   path.EndsWith(".asmref") ||
-                   path.EndsWith(".controller") ||
-                   path.EndsWith(".cs") ||
-                   path.EndsWith(".inputactions") ||
-                   path.EndsWith(".preset") ||
-                   path.EndsWith(".unity");
-        }
-    }
-#if true
-    internal static class Menu
-    {
-        [MenuItem("Altzone/Batch Build Report Test (log)", false, 19)]
-        private static void BatchBuildReportLogFileTest()
-        {
-            const string outputFileName = "m_Build_Win64.log.tsv";
-
-            Debug.Log($"* write {outputFileName}");
-            var culture = CultureInfo.InvariantCulture;
-            var logReport = BuildReportLogFileParser.ParseBuildReport(DateTime.Now, "m_Build_Win64.log");
-            Assert.IsNotNull(logReport);
-            var builder = new StringBuilder()
-                .Append("Name\tSize Kb\t%")
-                .AppendLine()
-                .Append($"Total Size\t{logReport.TotalFileSizeKb.ToString("0.0", culture)}")
-                .AppendLine();
-            foreach (var line in logReport.BuildReportLogLines)
-            {
-                builder.Append(line.FilePath).Append('\t')
-                    .Append(line.FileSizeKb.ToString("0.0", culture)).Append('\t')
-                    .Append(line.Percentage > 0 ? line.Percentage.ToString("0.0", culture) : "0")
-                    .AppendLine();
-            }
-            // Remove last CR-LF.
-            builder.Length -= 2;
-            File.WriteAllText(outputFileName, builder.ToString());
-        }
-
-        [MenuItem("Altzone/Batch Build Report Test (asset)", false, 19)]
-        private static void BatchBuildReportAssetFileTest()
-        {
-            const string outputFileName = "m_Build_Win64.report.tsv";
-
-            Debug.Log($"* write {outputFileName}");
-            var culture = CultureInfo.InvariantCulture;
-            var buildReport = BuildReportAnalyzer.GetOrCreateLastBuildReport();
-
-            var packedAssets = LoadAssetsFromBuildReport(buildReport);
-            var reportedSize = packedAssets.Sum(x => (long)x.packedSize);
-            var builder = new StringBuilder()
-                .Append("Name\tSize Kb\t%")
-                .AppendLine()
-                .Append($"Report Size\t{(reportedSize / 1024D).ToString("0.0", culture)}")
-                .AppendLine();
-            packedAssets = packedAssets.OrderBy(x => x.packedSize).Reverse().ToList();
-            foreach (var asset in packedAssets)
-            {
-                builder.Append(asset.sourceAssetPath).Append('\t')
-                    .Append((asset.packedSize / 1024D).ToString("0.0", culture))
-                    .AppendLine();
-            }
-            // Remove last CR-LF.
-            builder.Length -= 2;
-            File.WriteAllText(outputFileName, builder.ToString());
-        }
-
-        private static List<PackedAssetInfo> LoadAssetsFromBuildReport(BuildReport buildReport)
-        {
-            List<PackedAssetInfo> allBuildAssets = new List<PackedAssetInfo>();
-            foreach (var packedAsset in buildReport.packedAssets)
-            {
-                var contents = packedAsset.contents;
-                foreach (var assetInfo in contents)
-                {
-                    if (assetInfo.type == typeof(MonoBehaviour))
-                    {
-                        continue;
-                    }
-                    var sourceAssetGuid = assetInfo.sourceAssetGUID.ToString();
-                    if (sourceAssetGuid == "00000000000000000000000000000000" || sourceAssetGuid == "0000000000000000f000000000000000")
-                    {
-                        continue;
-                    }
-                    if (Filter.IsAssetPathExcluded(assetInfo.sourceAssetPath, assetInfo.packedSize))
-                    {
-                        continue;
-                    }
-                    allBuildAssets.Add(assetInfo);
-                }
-            }
-            return allBuildAssets;
-        }
-    }
-#endif
 }

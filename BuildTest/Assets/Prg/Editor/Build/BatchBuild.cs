@@ -61,6 +61,14 @@ namespace Prg.Editor.Build
             }
             Directory.CreateDirectory(options.OutputFolder);
             var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            if (options.IsBuildReport)
+            {
+                const string reportExtension = ".report.tsv";
+                var outputFilename = options.LogFile.EndsWith(".log")
+                    ? options.LogFile.Replace(".log", reportExtension)
+                    : $"{options.LogFile}{reportExtension}";
+                BuildReportParser.SaveBuildReport(buildReport, outputFilename);
+            }
             return buildReport;
         }
 
@@ -83,6 +91,7 @@ namespace Prg.Editor.Build
             // Just for information, if needed.
             public readonly string OutputFolder;
             public readonly bool IsDevelopmentBuild;
+            public readonly bool IsBuildReport;
 
             public readonly bool IsTestRun;
 
@@ -184,6 +193,9 @@ namespace Prg.Editor.Build
                     {
                         case "IsDevelopmentBuild":
                             IsDevelopmentBuild = bool.Parse(value);
+                            break;
+                        case "IsBuildReport":
+                            IsBuildReport = bool.Parse(value);
                             break;
                         case "Keystore":
                             // This requires actual keystore file name and two passwords!

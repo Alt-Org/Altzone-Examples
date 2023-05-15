@@ -19,8 +19,6 @@ namespace Prg.Editor.Build
     /// </remarks>
     internal static class BuildReportAnalyzer
     {
-        private const string LastBuildReportPath = "Library/LastBuild.buildreport";
-        private const string BuildReportDir = "Assets/BuildReports";
         private const ulong MinPackedSize = 1024;
 
         private const string HtmlReportName = "Assets/BuildReports/BuildReport.html";
@@ -30,10 +28,10 @@ namespace Prg.Editor.Build
             Debug.Log("*");
             BuildReport buildReport = null;
             Timed("Load Last Build Report", () =>
-                buildReport = GetOrCreateLastBuildReport());
+                buildReport = BuildReportParser.GetOrCreateLastBuildReport());
             if (buildReport == null)
             {
-                Debug.Log($"{LastBuildReportPath} NOT FOUND");
+                Debug.Log($"{BuildReportParser.LastBuildReportPath} NOT FOUND");
                 return;
             }
             AnalyzeLastBuildReport(buildReport, false, false, useJavaScriptSort);
@@ -44,10 +42,10 @@ namespace Prg.Editor.Build
             Debug.Log("*");
             BuildReport buildReport = null;
             Timed("Load Last Build Report", () =>
-                buildReport = GetOrCreateLastBuildReport());
+                buildReport = BuildReportParser.GetOrCreateLastBuildReport());
             if (buildReport == null)
             {
-                Debug.Log($"{LastBuildReportPath} NOT FOUND");
+                Debug.Log($"{BuildReportParser.LastBuildReportPath} NOT FOUND");
                 return;
             }
             AnalyzeLastBuildReport(buildReport, true, false, useJavaScriptSort);
@@ -250,46 +248,6 @@ namespace Prg.Editor.Build
                    path.EndsWith(".inputactions") ||
                    path.EndsWith(".preset") ||
                    path.EndsWith(".unity");
-        }
-
-        /// <summary>
-        /// Gets last UNITY Build Report from file.
-        /// </summary>
-        /// <remarks>
-        /// This code is based on UNITY Build Report Inspector<br />
-        /// https://docs.unity3d.com/Packages/com.unity.build-report-inspector@0.1/manual/index.html<br />
-        /// https://github.com/Unity-Technologies/BuildReportInspector/blob/master/com.unity.build-report-inspector/Editor/BuildReportInspector.cs
-        /// </remarks>
-        /// <returns>the last <c>BuildReport</c> instance or <c>null</c> if one is not found</returns>
-        public static BuildReport GetOrCreateLastBuildReport()
-        {
-            if (!File.Exists(LastBuildReportPath))
-            {
-                Debug.Log($"Last Build Report NOT FOUND: {LastBuildReportPath}");
-                return null;
-            }
-            if (!Directory.Exists(BuildReportDir))
-            {
-                Directory.CreateDirectory(BuildReportDir);
-            }
-
-            var date = File.GetLastWriteTime(LastBuildReportPath);
-            var name = $"Build_{date:yyyy-dd-MM_HH.mm.ss}";
-            var assetPath = $"{BuildReportDir}/{name}.buildreport";
-
-            // Load last Build Report.
-            var buildReport = AssetDatabase.LoadAssetAtPath<BuildReport>(assetPath);
-            if (buildReport != null && buildReport.name == name)
-            {
-                return buildReport;
-            }
-            // Create new last Build Report.
-            File.Copy("Library/LastBuild.buildreport", assetPath, true);
-            AssetDatabase.ImportAsset(assetPath);
-            buildReport = AssetDatabase.LoadAssetAtPath<BuildReport>(assetPath);
-            buildReport.name = name;
-            AssetDatabase.SaveAssets();
-            return buildReport;
         }
 
         #region Utilities
