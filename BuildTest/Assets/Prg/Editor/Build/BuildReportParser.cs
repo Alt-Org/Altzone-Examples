@@ -18,7 +18,10 @@ namespace Prg.Editor.Build
         private static void BatchBuildReportLogFileTest()
         {
             Debug.Log("*");
-            BuildReportParser.SaveBuildReport("m_Build_Win64.log", "m_Build_Win64.log.test.tsv");
+            var logFile = File.Exists("m_Build_Win64_build.log")
+                ? "m_Build_Win64_build.log"
+                : "m_Build_Win64.log";
+            BuildReportParser.SaveBuildReport(logFile, "m_Build_Win64.log.test.tsv");
         }
 
         [MenuItem("Altzone/Batch Build Report Test (asset)", false, 19)]
@@ -77,7 +80,7 @@ namespace Prg.Editor.Build
             // Remove last CR-LF.
             builder.Length -= 2;
             File.WriteAllText(outputFilename, builder.ToString());
-            Debug.Log($"* write {logLines.Count} lines {outputFilename}");
+            Debug.Log($"* write {logLines.Count} lines {buildLogFilename} -> {outputFilename}");
         }
 
         /// <summary>
