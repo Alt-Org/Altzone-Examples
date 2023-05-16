@@ -20,9 +20,15 @@ namespace Prg.Editor.Build
     /// </summary>
     internal static class BatchBuild
     {
+        private const string ReportExtension = ".report.tsv";
+        private const string LogExtension = ".log.tsv";
+
+        /// <summary>
+        /// Called from command line or CI system to build the project 'executable'.
+        /// </summary>
         internal static void BuildPlayer()
         {
-            Debug.Log("build start");
+            Debug.Log("start");
             var options = new BatchBuildOptions(Environment.GetCommandLineArgs());
             Debug.Log($"batchBuildOptions {options}");
             if (options.IsTestRun)
@@ -34,11 +40,35 @@ namespace Prg.Editor.Build
             var stopWatch = Stopwatch.StartNew();
             var buildReport = BuildPLayer(options);
             stopWatch.Stop();
-            Debug.Log($"build exit result {buildReport.summary.result} time {stopWatch.Elapsed.TotalMinutes:0.0} m");
+            Debug.Log($"exit result {buildReport.summary.result} time {stopWatch.Elapsed.TotalMinutes:0.0} m");
             Debug.Log($"Build Report" +
                       $"\tbuildStartedAt\t{buildReport.summary.buildStartedAt:yyyy-dd-MM HH:mm}" +
                       $"\tbuildEndedAt\t{buildReport.summary.buildEndedAt:yyyy-dd-MM HH:mm}");
             EditorApplication.Exit(buildReport.summary.result == BuildResult.Succeeded ? 0 : 1);
+        }
+
+        /// <summary>
+        /// Called from command line or CI system to post process build output after successful build.
+        /// </summary>
+        /// <remarks>
+        /// We can not access UNITY build log file during build so we must handle it after build has been done.<br />
+        /// </remarks>
+        internal static void BuildPlayerPostProcessing()
+        {
+            Debug.Log("start");
+            var options = new BatchBuildOptions(Environment.GetCommandLineArgs());
+            Debug.Log($"batchBuildOptions {options}");
+            if (options.IsTestRun)
+            {
+                Debug.Log("build exit 0");
+                EditorApplication.Exit(0);
+                return;
+            }
+            var stopWatch = Stopwatch.StartNew();
+            var outputFilename = ReplaceLogExtension(options.LogFile, LogExtension);
+            BuildReportParser.SaveBuildReport(options.LogFilePost, outputFilename);
+            stopWatch.Stop();
+            Debug.Log($"exit time {stopWatch.Elapsed.TotalMinutes:0.0} m");
         }
 
         private static BuildReport BuildPLayer(BatchBuildOptions options)
@@ -63,13 +93,17 @@ namespace Prg.Editor.Build
             var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
             if (options.IsBuildReport)
             {
-                const string reportExtension = ".report.tsv";
-                var outputFilename = options.LogFile.EndsWith(".log")
-                    ? options.LogFile.Replace(".log", reportExtension)
-                    : $"{options.LogFile}{reportExtension}";
+                var outputFilename = ReplaceLogExtension(options.LogFile, ReportExtension);
                 BuildReportParser.SaveBuildReport(buildReport, outputFilename);
             }
             return buildReport;
+        }
+
+        private static string ReplaceLogExtension(string filename, string extension)
+        {
+            return filename.EndsWith(".log")
+                ? filename.Replace(".log", extension)
+                : $"{filename}{extension}";
         }
 
         #region BatchBuildOptions
@@ -92,6 +126,9 @@ namespace Prg.Editor.Build
             public readonly string OutputFolder;
             public readonly bool IsDevelopmentBuild;
             public readonly bool IsBuildReport;
+
+            // Build post processing.
+            public readonly string LogFilePost;
 
             public readonly bool IsTestRun;
 
@@ -204,9 +241,13 @@ namespace Prg.Editor.Build
                         case "IsTestRun":
                             IsTestRun = bool.Parse(value);
                             break;
+                        case "LOG_FILE_POST":
+                            LogFilePost = value;
+                            break;
                     }
                 }
 
+                // Create actual build options
                 BuildOptions = BuildOptions.StrictMode | BuildOptions.DetailedBuildReport;
                 if (IsDevelopmentBuild)
                 {
@@ -229,7 +270,8 @@ namespace Prg.Editor.Build
                        $", {nameof(BuildTarget)}: {BuildTarget}, {nameof(BuildTargetGroup)}: {BuildTargetGroup}" +
                        $", {nameof(BuildOptions)}: [{BuildOptions}], {nameof(Keystore)}: {Keystore}" +
                        $", {nameof(OutputFolder)}: {OutputFolder}, {nameof(OutputPathName)}: {OutputPathName}" +
-                       $", {nameof(IsDevelopmentBuild)}: {IsDevelopmentBuild}, {nameof(IsTestRun)}: {IsTestRun}";
+                       $", {nameof(IsDevelopmentBuild)}: {IsDevelopmentBuild}, {nameof(IsTestRun)}: {IsTestRun}" +
+                       $", {nameof(LogFilePost)}: {LogFilePost}";
             }
 
             // Build target parameter mapping
@@ -276,11 +318,11 @@ namespace Prg.Editor.Build
             }
         }
 
-#if true
+#if false
         [MenuItem("Altzone/Batch Build Options Test", false, 19)]
         private static void BatchBuildOptionsTest()
         {
-            var args = new string[]
+            var args = new[]
             {
                 @"C:\Program Files\Unity\Hub\Editor\2021.3.21f1\Editor\Unity.exe",
                 "-executeMethod Prg.Editor.Build.BatchBuild.BuildPlayer",
